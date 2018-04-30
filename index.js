@@ -33,6 +33,10 @@ app.post('/sendRawTransaction', async (req, res) => {
   res.send(hash);
 });
 
+setInterval(() => {
+  node.submitBlock();
+}, (argv.interval || 1) * 60 * 1000);
+
 // ToDo: listen contract events here
 
 const port = argv.port || argv.p || '8585';
