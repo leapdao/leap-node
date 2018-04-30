@@ -5,10 +5,43 @@
   "author": "Alex Lunyov <isuntc@gmail.com>",
   "license": "MIT",
   "private": true,
+  "scripts": {
+    "test": "echo \"no tests yet\" && exit 0",
+    "precommit": "./node_modules/.bin/lint-staged"
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --write",
+      "git add",
+      "eslint"
+    ]
+  },
+  "prettier": {
+    "printWidth": 80,
+    "tabWidth": 2,
+    "useTabs": false,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5",
+    "bracketSpacing": true
+  },
   "dependencies": {
     "body-parser": "^1.18.2",
     "express": "^4.16.3",
     "minimist": "^1.2.0",
     "parsec-lib": "git+ssh://git@github.com:parsec-labs/parsec-lib.git"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-eslint": "^8.2.3",
+    "babel-preset-env": "^1.6.1",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-plugin-import": "^2.11.0",
+    "husky": "^0.14.3",
+    "lint-staged": "^7.0.5",
+    "prettier": "^1.12.1"
   }
 }

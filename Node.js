@@ -1,3 +1,5 @@
+/* eslint-disable class-methods-use-this */
+
 module.exports = class Node {
   /*
    * Returns current block hash
@@ -25,7 +27,7 @@ module.exports = class Node {
           to: '0x0',
           value: 0,
           input: '0x0',
-        }
+        },
       ],
     };
   }
@@ -51,6 +53,7 @@ module.exports = class Node {
    * @return String hash
    */
   async sendTransaction(tx) {
+    console.log(tx);
     return '0x0';
   }
 
@@ -58,4 +61,4 @@ module.exports = class Node {
    * Submits current block to the bridge
    */
   submitBlock() {}
-}
+};

@@ -6,7 +6,12 @@ const argv = require('minimist')(process.argv.slice(2));
 
 const node = new Node();
 const app = express();
-app.use(bodyParser.json({ type: 'application/*+json' }));
+
+app.use(
+  bodyParser.json({
+    type: 'application/*+json',
+  })
+);
 
 app.get('/block/:hash', async (req, res) => {
   const block = await node.getBlock(req.params.hash);
@@ -32,14 +37,10 @@ app.post('/sendRawTransaction', async (req, res) => {
 
 const port = argv.port || argv.p || '8585';
 const host = argv.host || argv.h || '127.0.0.1';
-app.listen(
-  port,
-  host,
-  (err) => {
-    if (err) {
-      console.error(err);
-    } else {
-      console.log(`Running on ${host}:${port}`);
-    }
+app.listen(port, host, err => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log(`Running on ${host}:${port}`);
   }
-);
+});
