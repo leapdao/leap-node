@@ -1,0 +1,14 @@
+{
+  "name": "parsec-node",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Alex Lunyov <isuntc@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.3",
+    "minimist": "^1.2.0",
+    "parsec-lib": "git+ssh://git@github.com:parsec-labs/parsec-lib.git"
+  }
+}
