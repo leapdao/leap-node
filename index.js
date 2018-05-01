@@ -29,7 +29,7 @@ app.get('/currentBlock', async (req, res) => {
 });
 
 app.post('/sendRawTransaction', async (req, res) => {
-  const hash = await node.getCurrentBlock(req.body.transaction);
+  const hash = await node.sendRawTransaction(req.body.transaction);
   res.send(hash);
 });
 

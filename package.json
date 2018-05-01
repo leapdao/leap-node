@@ -29,7 +29,7 @@
     "body-parser": "^1.18.2",
     "express": "^4.16.3",
     "minimist": "^1.2.0",
-    "parsec-lib": "git+ssh://git@github.com:parsec-labs/parsec-lib.git"
+    "parsec-lib": "^0.1.1"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",

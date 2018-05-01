@@ -1,12 +1,35 @@
 /* eslint-disable class-methods-use-this */
+const { Tx, Type, Block } = require('parsec-lib');
+
+function isUnspent(tx) {
+  console.log(tx);
+  return true;
+}
 
 module.exports = class Node {
+  constructor(web3, bridgeAddr, privKey) {
+    this.transactionsData = {};
+    this.blocksData = {};
+    this.chain = [];
+    this.block = null;
+    this.bridgeAddr = bridgeAddr;
+    this.privKey = privKey;
+    this.bridge = web3.contract([]).at(this.bridgeAddr);
+    this.bridge.genesis.call((err, genesis) => {
+      this.block = new Block(genesis, 0);
+    });
+  }
+
   /*
    * Returns current block hash
    * @return String
    */
   async getCurrentBlock() {
     return '0x0';
+  }
+
+  async getBlockNumber() {
+    return 0;
   }
 
   // ToDo: add block number support
@@ -16,20 +39,7 @@ module.exports = class Node {
    * @return Object
    */
   async getBlock(hash) {
-    return {
-      hash,
-      parentHash: '0x0',
-      size: 0,
-      transactions: [
-        {
-          hash: '0x0',
-          from: '0x0',
-          to: '0x0',
-          value: 0,
-          input: '0x0',
-        },
-      ],
-    };
+    return this.blocksData[hash];
   }
 
   /*
@@ -38,13 +48,7 @@ module.exports = class Node {
    * @return Object
    */
   async getTransaction(hash) {
-    return {
-      hash,
-      from: '0x0',
-      to: '0x0',
-      value: 0,
-      input: '0x0',
-    };
+    return this.transactionsData[hash];
   }
 
   /*
@@ -52,13 +56,40 @@ module.exports = class Node {
    * @param tx Object
    * @return String hash
    */
-  async sendTransaction(tx) {
-    console.log(tx);
+  async sendRawTransaction(txData) {
+    const tx = Tx.parse(txData);
+
+    if (tx.type !== Type.TRANSFER) {
+      throw new Error('Wrong transaction type');
+    }
+
+    // check sender address with ins txs «owner» to be sure they can spend it
+    const inputTxs = tx.ins
+      .map(input => this.transactionsData[input.prevTx])
+      .filter(a => a)
+      .filter(isUnspent);
+
+    if (inputTxs.length !== tx.ins.length) {
+      throw new Error('Wrong inputs');
+    }
+
+    // ToDo: get hash somewhere
+    this.transactionsData[tx.hash] = tx;
+
+    this.block.addTx(tx.hash);
+
     return '0x0';
   }
 
   /*
    * Submits current block to the bridge
    */
-  submitBlock() {}
+  async submitBlock() {
+    await this.bridge.submitBlock(
+      this.block.parent,
+      this.block.merkelRoot(),
+      ...this.block.sign(this.privKey)
+    );
+    this.block = new Block(this.block.hash(), this.block.height + 1);
+  }
 };
