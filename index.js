@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const Node = require('./Node');
+const Node = require('./src/Node');
 
 const argv = require('minimist')(process.argv.slice(2));
 

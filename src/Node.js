@@ -1,5 +1,6 @@
 /* eslint-disable class-methods-use-this */
 const { Tx, Type, Block } = require('parsec-lib');
+const BridgeABI = require('./bridgeABI');
 
 function isUnspent(tx) {
   console.log(tx);
@@ -14,7 +15,7 @@ module.exports = class Node {
     this.block = null;
     this.bridgeAddr = bridgeAddr;
     this.privKey = privKey;
-    this.bridge = web3.contract([]).at(this.bridgeAddr);
+    this.bridge = web3.eth.contract(BridgeABI).at(this.bridgeAddr);
     this.bridge.genesis.call((err, genesis) => {
       this.block = new Block(genesis, 0);
     });
