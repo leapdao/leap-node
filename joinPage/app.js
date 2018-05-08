@@ -10,7 +10,7 @@ const promisifyWeb3Call = (method, ...args) =>
     });
   });
 
-const bridgeAddress = '0x';
+const bridgeAddress = '0xa0a368325920b028e4da0ee2d7ccd8468b7ad1ee';
 const tokenAddress = '0xa6794e7663add37e44ae6bb1e8544b8de1e238cb';
 
 if (!window.web3) {
@@ -39,16 +39,20 @@ Promise.all([
 
   submitButton.addEventListener('click', async () => {
     const amount = decimals.mul(amountInput.value);
-    const approveTxHash = promisifyWeb3Call(
+    const approveTxHash = await promisifyWeb3Call(
       token.approve.sendTransaction,
       bridgeAddress,
       amount,
       { from: accounts[0] }
     );
     console.log('approve', approveTxHash);
-    const joinTxHash = promisifyWeb3Call(bridge.join.sendTransaction, amount, {
-      from: accounts[0],
-    });
+    const joinTxHash = await promisifyWeb3Call(
+      bridge.join.sendTransaction,
+      amount,
+      {
+        from: accounts[0],
+      }
+    );
     console.log('join', joinTxHash);
     alert('Everything is ok, hashes in console');
     amountInput.value = '0';
