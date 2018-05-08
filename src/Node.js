@@ -45,12 +45,13 @@ module.exports = class Node {
    */
   async init() {
     const [hash, height] = await this.bridge.getTip([
-      this.web3.eth.accounts[0],
+      '0x7159fc66d7df6fa51c99eaf96c160fa8a9ec7287',
+      '0x8ccfd031639d8d9f46133859ea80deaf5dee9be3',
+      '0x634b47d61f93d2096672743c5e3bcdd25f18c350',
+      '0x8db6b632d743aef641146dc943acb64957155388',
     ]);
     if (hash === '0x') {
-      throw new Error(
-        'Looks like you not joined. You can join here: https://parser-node-join-dapp.io'
-      );
+      throw new Error('Something goes wrong. getTip returned empty hash');
     }
 
     this.block = new Block(hash, Number(height));

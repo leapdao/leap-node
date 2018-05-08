@@ -1,14 +1,58 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const Web3 = require('web3');
+const dashdash = require('dashdash');
 const Node = require('./src/Node');
 
-const argv = require('minimist')(process.argv.slice(2));
+const dashParser = dashdash.createParser({
+  options: [
+    {
+      names: ['port', 'p'],
+      type: 'number',
+      default: 8545,
+      help: 'REST API port',
+    },
+    {
+      names: ['host', 'h'],
+      type: 'string',
+      default: '127.0.0.1',
+      help: 'REST API host',
+    },
+    {
+      names: ['bridgeAddr'],
+      type: 'string',
+      help: 'ParsecBridge contract address',
+    },
+    {
+      names: ['interval'],
+      type: 'number',
+      default: 1,
+      help: 'Interval in minutes for submitting new block',
+    },
+    {
+      names: ['help'],
+      type: 'bool',
+      help: 'Print this help and exit.',
+    },
+  ],
+});
+const options = dashParser.parse();
+
+if (options.help) {
+  const help = dashParser.help({ includeEnv: true }).trimRight();
+  console.log('Options:', help);
+  process.exit(0);
+}
+
+if (!options.bridgeAddr) {
+  console.error('bridgeAddr is required');
+  process.exit(0);
+}
 
 const web3 = new Web3();
 web3.setProvider(new web3.providers.HttpProvider('https://rinkeby.infura.io'));
 
-const node = new Node(web3, argv.bridgeAddr);
+const node = new Node(web3, options.bridgeAddr);
 const app = express();
 
 app.use(
@@ -39,20 +83,18 @@ app.post('/sendRawTransaction', async (req, res) => {
 
 setInterval(() => {
   node.submitBlock();
-}, (argv.interval || 1) * 60 * 1000);
+}, (options.interval || 1) * 60 * 1000);
 
 // ToDo: listen contract events here
 
-console.log('Initializing node');
+console.log('Initializing node', options);
 node.init().then(
   () => {
-    const port = argv.port || argv.p || '8585';
-    const host = argv.host || argv.h || '127.0.0.1';
-    app.listen(port, host, err => {
+    app.listen(options.port, options.host, err => {
       if (err) {
         console.error(err);
       } else {
-        console.log(`Running on ${host}:${port}`);
+        console.log(`Running on ${options.host}:${options.port}`);
       }
     });
   },
