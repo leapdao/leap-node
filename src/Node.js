@@ -7,11 +7,32 @@ function isUnspent(tx) {
   return true;
 }
 
+function parseAndValidateTx(node, txData) {
+  const tx = Tx.parse(txData);
+
+  if (tx.type !== Type.TRANSFER) {
+    throw new Error('Wrong transaction type');
+  }
+
+  // check sender address with ins txs «owner» to be sure they can spend it
+  const inputTxs = tx.ins
+    .map(input => node.transactionsData[input.prevTx])
+    .filter(a => a)
+    .filter(isUnspent);
+
+  if (inputTxs.length !== tx.ins.length) {
+    throw new Error('Wrong inputs');
+  }
+
+  return tx;
+}
+
 module.exports = class Node {
   constructor(web3, bridgeAddr, privKey) {
     this.transactionsData = {};
     this.blocksData = {};
     this.chain = [];
+    this.baseHeight = 0;
     this.block = null;
     this.bridgeAddr = bridgeAddr;
     this.privKey = privKey;
@@ -26,20 +47,27 @@ module.exports = class Node {
    * @return String
    */
   async getCurrentBlock() {
-    return '0x0';
+    return this.block.hash();
   }
 
   async getBlockNumber() {
-    return 0;
+    return this.chain.length + this.baseHeight;
   }
 
-  // ToDo: add block number support
+  getBlockHashByNumber(number) {
+    return this.chain[number - this.baseHeight];
+  }
+
   /*
    * Returns block object with transactions
-   * @param hash String
+   * @param hashOrNumber String | Number
    * @return Object
    */
-  async getBlock(hash) {
+  async getBlock(hashOrNumber) {
+    const hash =
+      typeof hashOrNumber === 'number'
+        ? this.getBlockHashByNumber(hashOrNumber)
+        : hashOrNumber;
     return this.blocksData[hash];
   }
 
@@ -54,32 +82,15 @@ module.exports = class Node {
 
   /*
    * Adds transaction to the current block
-   * @param tx Object
+   * @param txData String signed UTXO transaction
    * @return String hash
    */
   async sendRawTransaction(txData) {
-    const tx = Tx.parse(txData);
-
-    if (tx.type !== Type.TRANSFER) {
-      throw new Error('Wrong transaction type');
-    }
-
-    // check sender address with ins txs «owner» to be sure they can spend it
-    const inputTxs = tx.ins
-      .map(input => this.transactionsData[input.prevTx])
-      .filter(a => a)
-      .filter(isUnspent);
-
-    if (inputTxs.length !== tx.ins.length) {
-      throw new Error('Wrong inputs');
-    }
-
-    // ToDo: get hash somewhere
+    const tx = parseAndValidateTx(txData);
     this.transactionsData[tx.hash] = tx;
-
     this.block.addTx(tx.hash);
 
-    return '0x0';
+    return tx.hash;
   }
 
   /*
@@ -91,6 +102,9 @@ module.exports = class Node {
       this.block.merkelRoot(),
       ...this.block.sign(this.privKey)
     );
+    const hash = this.block.hash();
+    this.chain.push(hash);
+    this.blocksData[hash] = this.block;
     this.block = new Block(this.block.hash(), this.block.height + 1);
   }
 };
