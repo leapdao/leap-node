@@ -36,10 +36,24 @@ module.exports = class Node {
     this.block = null;
     this.bridgeAddr = bridgeAddr;
     this.privKey = privKey;
+    this.web3 = web3;
     this.bridge = web3.eth.contract(BridgeABI).at(this.bridgeAddr);
-    this.bridge.genesis.call((err, genesis) => {
-      this.block = new Block(genesis, 0);
-    });
+  }
+
+  /*
+   * Join, read chain state and other init stuff here
+   */
+  async init() {
+    const [hash, height] = await this.bridge.getTip([
+      this.web3.eth.accounts[0],
+    ]);
+    if (hash === '0x') {
+      throw new Error(
+        'Looks like you not joined. You can join here: https://parser-node-join-dapp.io'
+      );
+    }
+
+    this.block = new Block(hash, Number(height));
   }
 
   /*
