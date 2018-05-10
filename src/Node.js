@@ -1,6 +1,12 @@
 /* eslint-disable class-methods-use-this */
 const { Tx, Type, Block } = require('parsec-lib');
 const BridgeABI = require('./bridgeABI');
+const DepositSubscription = require('./DepositSubscription');
+
+function eventToTx(event) {
+  console.log(event);
+  return {};
+}
 
 function isUnspent(tx) {
   console.log(tx);
@@ -37,19 +43,32 @@ module.exports = class Node {
     this.bridgeAddr = bridgeAddr;
     this.privKey = privKey;
     this.web3 = web3;
-    this.bridge = web3.eth.contract(BridgeABI).at(this.bridgeAddr);
+    this.bridge = new web3.eth.Contract(BridgeABI, this.bridgeAddr);
+
+    const depositSubscription = new DepositSubscription(web3, this.bridge);
+    depositSubscription.on('events', this.handleNewDeposits.bind(this));
+  }
+
+  handleNewDeposits(events) {
+    events.map(eventToTx).forEach(tx => {
+      this.transactionsData[tx.hash] = tx;
+    });
   }
 
   /*
    * Join, read chain state and other init stuff here
    */
   async init() {
-    const [hash, height] = await this.bridge.getTip([
-      '0x7159fc66d7df6fa51c99eaf96c160fa8a9ec7287',
-      '0x8ccfd031639d8d9f46133859ea80deaf5dee9be3',
-      '0x634b47d61f93d2096672743c5e3bcdd25f18c350',
-      '0x8db6b632d743aef641146dc943acb64957155388',
-    ]);
+    const { 0: hash, 1: height } = await this.bridge.methods
+      .getTip([
+        '0x7159fc66d7df6fa51c99eaf96c160fa8a9ec7287',
+        '0x8ccfd031639d8d9f46133859ea80deaf5dee9be3',
+        '0x634b47d61f93d2096672743c5e3bcdd25f18c350',
+        '0x8db6b632d743aef641146dc943acb64957155388',
+        '0x4436373705394267350db2c06613990d34621d69',
+      ])
+      .call();
+    console.log('getTip', hash, Number(height));
     if (hash === '0x') {
       throw new Error('Something goes wrong. getTip returned empty hash');
     }
@@ -114,7 +133,7 @@ module.exports = class Node {
   async submitBlock() {
     await this.bridge.submitBlock(
       this.block.parent,
-      this.block.merkelRoot(),
+      this.block.merkleRoot(),
       ...this.block.sign(this.privKey)
     );
     const hash = this.block.hash();

@@ -81,15 +81,13 @@ app.post('/sendRawTransaction', async (req, res) => {
   res.send(hash);
 });
 
-setInterval(() => {
-  node.submitBlock();
-}, (options.interval || 1) * 60 * 1000);
-
-// ToDo: listen contract events here
-
-console.log('Initializing node', options);
+console.log('Initializing node');
 node.init().then(
   () => {
+    // setInterval(() => {
+    //   node.submitBlock();
+    // }, (options.interval || 1) * 60 * 1000);
+
     app.listen(options.port, options.host, err => {
       if (err) {
         console.error(err);
@@ -99,6 +97,6 @@ node.init().then(
     });
   },
   error => {
-    console.error('Initialization failed with error:', error.message);
+    console.error('Initialization failed with error:', error);
   }
 );
