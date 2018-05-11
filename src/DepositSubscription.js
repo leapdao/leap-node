@@ -28,6 +28,12 @@ module.exports = class DepositSubscription extends EventEmitter {
         this.bridgeContract.methods
           .deposits(event.returnValues.depositId)
           .call()
+          .then(deposit => ({
+            height: Number(deposit.height),
+            owner: deposit.owner,
+            amount: Number(deposit.amount),
+            depositId: event.returnValues.depositId,
+          }))
       )
     );
     if (events.length > 0) {

@@ -5,7 +5,9 @@ const DepositSubscription = require('./DepositSubscription');
 
 function depositToTx(deposit) {
   console.log('NewDeposit', deposit);
-  return {};
+  return new Tx(deposit.height)
+    .deposit(deposit.depositId, deposit.amount, deposit.owner)
+    .toJSON();
 }
 
 function isUnspent(tx) {
@@ -52,6 +54,7 @@ module.exports = class Node {
   handleNewDeposits(deposits) {
     deposits.map(depositToTx).forEach(tx => {
       this.transactionsData[tx.hash] = tx;
+      this.block.addTx(tx.hash);
     });
   }
 
