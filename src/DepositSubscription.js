@@ -23,9 +23,15 @@ module.exports = class DepositSubscription extends EventEmitter {
       'NewDeposit',
       options
     );
-    console.log(events);
+    const deposits = await Promise.all(
+      events.map(event =>
+        this.bridgeContract.methods
+          .deposits(event.returnValues.depositId)
+          .call()
+      )
+    );
     if (events.length > 0) {
-      this.emit('events', events);
+      this.emit('deposits', deposits);
     }
     this.fromBlock = blockNumber;
   }

@@ -3,8 +3,8 @@ const { Tx, Type, Block } = require('parsec-lib');
 const BridgeABI = require('./bridgeABI');
 const DepositSubscription = require('./DepositSubscription');
 
-function eventToTx(event) {
-  console.log(event);
+function depositToTx(deposit) {
+  console.log('NewDeposit', deposit);
   return {};
 }
 
@@ -46,11 +46,11 @@ module.exports = class Node {
     this.bridge = new web3.eth.Contract(BridgeABI, this.bridgeAddr);
 
     const depositSubscription = new DepositSubscription(web3, this.bridge);
-    depositSubscription.on('events', this.handleNewDeposits.bind(this));
+    depositSubscription.on('deposits', this.handleNewDeposits.bind(this));
   }
 
-  handleNewDeposits(events) {
-    events.map(eventToTx).forEach(tx => {
+  handleNewDeposits(deposits) {
+    deposits.map(depositToTx).forEach(tx => {
       this.transactionsData[tx.hash] = tx;
     });
   }

@@ -31,29 +31,49 @@ Promise.all([
   const decimals = new web3.BigNumber(10).pow(decimalsNum);
   const balanceNode = document.querySelector('#bal');
   const amountInput = document.querySelector('#amount');
-  const submitButton = document.querySelector('#submit');
+  const joinButton = document.querySelector('#joinSubmit');
+  const depositButton = document.querySelector('#depositSubmit');
+
+  const txOptions = { from: accounts[0] };
 
   promisifyWeb3Call(token.balanceOf, accounts[0]).then(balance => {
     balanceNode.innerText = `${Number(balance.div(decimals))} ${symbol}`;
   });
 
-  submitButton.addEventListener('click', async () => {
+  joinButton.addEventListener('click', async () => {
     const amount = decimals.mul(amountInput.value);
     const approveTxHash = await promisifyWeb3Call(
       token.approve.sendTransaction,
       bridgeAddress,
       amount,
-      { from: accounts[0] }
+      txOptions
     );
     console.log('approve', approveTxHash);
     const joinTxHash = await promisifyWeb3Call(
       bridge.join.sendTransaction,
       amount,
-      {
-        from: accounts[0],
-      }
+      txOptions
     );
     console.log('join', joinTxHash);
+    alert('Everything is ok, hashes in console');
+    amountInput.value = '0';
+  });
+
+  depositButton.addEventListener('click', async () => {
+    const amount = decimals.mul(amountInput.value);
+    const approveTxHash = await promisifyWeb3Call(
+      token.approve.sendTransaction,
+      bridgeAddress,
+      amount,
+      txOptions
+    );
+    console.log('approve', approveTxHash);
+    const depositTxHash = await promisifyWeb3Call(
+      bridge.deposit.sendTransaction,
+      amount,
+      txOptions
+    );
+    console.log('deposit', depositTxHash);
     alert('Everything is ok, hashes in console');
     amountInput.value = '0';
   });
