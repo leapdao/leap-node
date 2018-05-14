@@ -3502,9 +3502,9 @@ parse5@4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/parse5/-/parse5-4.0.0.tgz#6d78656e3da8d78b4ec0b906f7c08ef1dfe3f608"
 
-parsec-lib@^0.1.1:
+parsec-lib@parsec-labs/parsec-lib:
   version "0.1.1"
-  resolved "https://registry.yarnpkg.com/parsec-lib/-/parsec-lib-0.1.1.tgz#14c87a9502cec2d00d8d5c6733dab3d3428b47d8"
+  resolved "https://codeload.github.com/parsec-labs/parsec-lib/tar.gz/c767afbb7c690eb2fb1ca188f9eb4c8ccebf6b2e"
   dependencies:
     bignumber.js "^4.0.2"
     es6-promise "^4.1.0"
