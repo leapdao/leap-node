@@ -79,13 +79,14 @@ module.exports = class Node {
         '0x4436373705394267350db2c06613990d34621d69',
       ])
       .call();
-    console.log('getTip', hash, Number(height));
+    console.log('getTip', hash, Number(height) + 1);
     if (hash === '0x') {
       throw new Error('Something goes wrong. getTip returned empty hash');
     }
 
-    this.baseHeight = Number(height);
-    this.block = new Block(hash, Number(height) + 1);
+    this.baseHeight = Number(height) + 1;
+    this.hash = hash;
+    this.block = new Block(hash, this.baseHeight);
   }
 
   handleNewDeposits(deposits) {
@@ -148,9 +149,7 @@ module.exports = class Node {
     }
 
     const blockReward = this.bridge.methods.blockReward().call();
-    this.block.addTx(
-      new Tx(this.block.height).coinbase(blockReward, this.account.address)
-    );
+    this.block.addTx(new Tx().coinbase(blockReward, this.account.address));
 
     const args = [
       this.block.parent,
