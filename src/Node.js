@@ -63,8 +63,6 @@ module.exports = class Node {
 
     const depositSubscription = new DepositSubscription(web3, this.bridge);
     depositSubscription.on('deposits', this.handleNewDeposits.bind(this));
-
-    // console.log(this.bridge.methods.join(0));
   }
 
   handleNewDeposits(deposits) {
@@ -95,14 +93,6 @@ module.exports = class Node {
 
     this.baseHeight = Number(height);
     this.block = new Block(hash, Number(height));
-  }
-
-  /*
-   * Returns current block hash
-   * @return String
-   */
-  async getCurrentBlock() {
-    return this.block.hash();
   }
 
   async getBlockNumber() {
@@ -152,6 +142,10 @@ module.exports = class Node {
    * Submits current block to the bridge
    */
   async submitBlock() {
+    if (this.block.txList.length === 0) {
+      return;
+    }
+
     const args = [
       this.block.parent,
       this.block.merkleRoot(),
