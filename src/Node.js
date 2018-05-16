@@ -37,16 +37,20 @@ function parseAndValidateTx(node, txData) {
   return tx;
 }
 
-async function sendTransaction(web3, method) {
+async function sendTransaction(web3, method, bridgeAddr, privKey) {
   const data = method.encodeABI();
   const gas = Math.round((await method.estimateGas()) * 1.2);
   const tx = {
-    to: this.bridgeAddr,
+    to: bridgeAddr,
     data,
     gas,
   };
-  const signedTx = web3.eth.accounts.signTransaction(tx, this.privKey);
-  return web3.eth.sendSignedTransaction(signedTx);
+  console.log({ tx });
+  const signedTx = await web3.eth.accounts.signTransaction(tx, privKey);
+  console.log({ signedTx });
+  const txResult = web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+  console.log({ txResult });
+  return txResult;
 }
 
 module.exports = class Node {
@@ -158,7 +162,17 @@ module.exports = class Node {
     ];
     console.log('submitBlock', args);
     const method = this.bridge.methods.submitBlock(...args);
+<<<<<<< HEAD
     await sendTransaction(this.web3, method);
+=======
+    const txHash = await sendTransaction(
+      this.web3,
+      method,
+      this.bridgeAddr,
+      this.privKey
+    );
+    console.log(txHash);
+>>>>>>> First successful tx
     const hash = this.block.hash();
     this.chain.push(hash);
     this.blocksData[hash] = this.block;
