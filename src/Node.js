@@ -83,13 +83,12 @@ module.exports = class Node {
         '0x4436373705394267350db2c06613990d34621d69',
       ])
       .call();
-    console.log('getTip', hash, Number(height) + 1);
+    console.log('getTip', hash, Number(height) + 2);
     if (hash === '0x') {
       throw new Error('Something goes wrong. getTip returned empty hash');
     }
 
-    this.baseHeight = Number(height) + 1;
-    this.hash = hash;
+    this.baseHeight = Number(height) + 2;
     this.block = new Block(hash, this.baseHeight);
   }
 
@@ -162,9 +161,6 @@ module.exports = class Node {
     ];
     console.log('submitBlock', args);
     const method = this.bridge.methods.submitBlock(...args);
-<<<<<<< HEAD
-    await sendTransaction(this.web3, method);
-=======
     const txHash = await sendTransaction(
       this.web3,
       method,
@@ -172,7 +168,6 @@ module.exports = class Node {
       this.privKey
     );
     console.log(txHash);
->>>>>>> First successful tx
     const hash = this.block.hash();
     this.chain.push(hash);
     this.blocksData[hash] = this.block;
