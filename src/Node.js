@@ -60,17 +60,10 @@ module.exports = class Node {
     this.privKey = privKey;
     this.web3 = web3;
     this.bridge = new web3.eth.Contract(BridgeABI, this.bridgeAddr);
+    this.account = this.web3.eth.accounts.privateKeyToAccount(privKey);
 
     const depositSubscription = new DepositSubscription(web3, this.bridge);
     depositSubscription.on('deposits', this.handleNewDeposits.bind(this));
-  }
-
-  handleNewDeposits(deposits) {
-    deposits.map(depositToTx).forEach(tx => {
-      console.log(tx);
-      this.transactionsData[tx.hash()] = tx.toJSON();
-      this.block.addTx(tx);
-    });
   }
 
   /*
@@ -92,7 +85,15 @@ module.exports = class Node {
     }
 
     this.baseHeight = Number(height);
-    this.block = new Block(hash, Number(height));
+    this.block = new Block(hash, Number(height) + 1);
+  }
+
+  handleNewDeposits(deposits) {
+    deposits.map(depositToTx).forEach(tx => {
+      console.log(tx);
+      this.transactionsData[tx.hash()] = tx.toJSON();
+      this.block.addTx(tx);
+    });
   }
 
   async getBlockNumber() {
@@ -133,7 +134,7 @@ module.exports = class Node {
   async sendRawTransaction(txData) {
     const tx = parseAndValidateTx(txData);
     this.transactionsData[tx.hash] = tx;
-    this.block.addTx(tx.hash);
+    this.block.addTx(tx);
 
     return tx.hash;
   }
@@ -145,6 +146,11 @@ module.exports = class Node {
     if (this.block.txList.length === 0) {
       return;
     }
+
+    const blockReward = this.bridge.methods.blockReward().call();
+    this.block.addTx(
+      new Tx(this.block.height).coinbase(blockReward, this.account.address)
+    );
 
     const args = [
       this.block.parent,
