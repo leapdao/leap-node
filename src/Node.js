@@ -5,9 +5,11 @@ const DepositSubscription = require('./DepositSubscription');
 
 function depositToTx(deposit) {
   console.log('NewDeposit', deposit);
-  return new Tx(deposit.height)
-    .deposit(deposit.depositId, deposit.amount, deposit.owner)
-    .toJSON();
+  return new Tx(deposit.height).deposit(
+    deposit.depositId,
+    deposit.amount,
+    deposit.owner
+  );
 }
 
 function isUnspent(tx) {
@@ -35,6 +37,18 @@ function parseAndValidateTx(node, txData) {
   return tx;
 }
 
+async function sendTransaction(web3, method) {
+  const data = method.encodeABI();
+  const gas = Math.round((await method.estimateGas()) * 1.2);
+  const tx = {
+    to: this.bridgeAddr,
+    data,
+    gas,
+  };
+  const signedTx = web3.eth.accounts.signTransaction(tx, this.privKey);
+  return web3.eth.sendSignedTransaction(signedTx);
+}
+
 module.exports = class Node {
   constructor(web3, bridgeAddr, privKey) {
     this.transactionsData = {};
@@ -49,12 +63,15 @@ module.exports = class Node {
 
     const depositSubscription = new DepositSubscription(web3, this.bridge);
     depositSubscription.on('deposits', this.handleNewDeposits.bind(this));
+
+    // console.log(this.bridge.methods.join(0));
   }
 
   handleNewDeposits(deposits) {
     deposits.map(depositToTx).forEach(tx => {
-      this.transactionsData[tx.hash] = tx;
-      this.block.addTx(tx.hash);
+      console.log(tx);
+      this.transactionsData[tx.hash()] = tx.toJSON();
+      this.block.addTx(tx);
     });
   }
 
@@ -76,6 +93,7 @@ module.exports = class Node {
       throw new Error('Something goes wrong. getTip returned empty hash');
     }
 
+    this.baseHeight = Number(height);
     this.block = new Block(hash, Number(height));
   }
 
@@ -134,14 +152,24 @@ module.exports = class Node {
    * Submits current block to the bridge
    */
   async submitBlock() {
-    await this.bridge.submitBlock(
+    const args = [
       this.block.parent,
       this.block.merkleRoot(),
-      ...this.block.sign(this.privKey)
-    );
-    const hash = this.block.hash();
-    this.chain.push(hash);
-    this.blocksData[hash] = this.block;
-    this.block = new Block(this.block.hash(), this.block.height + 1);
+      ...this.block.sign(this.privKey),
+    ];
+    console.log('submitBlock', args);
+    const method = this.bridge.methods.submitBlock(...args);
+    sendTransaction(this.web3, method)
+      .on('transactionHash', txHash => console.log('txHash', txHash))
+      .on('confirmation', (num, rc) => console.log('confirmation', num, rc))
+      .on('receipt', receipt => {
+        console.log('receipt', receipt);
+        if (receipt && receipt.gas > receipt.gasUsed) {
+          const hash = this.block.hash();
+          this.chain.push(hash);
+          this.blocksData[hash] = this.block;
+          this.block = new Block(this.block.hash(), this.block.height + 1);
+        }
+      });
   }
 };

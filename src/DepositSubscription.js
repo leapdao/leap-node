@@ -15,7 +15,7 @@ module.exports = class DepositSubscription extends EventEmitter {
   async fetchEvents() {
     const blockNumber = await this.web3.eth.getBlockNumber();
     const options = {
-      fromBlock: this.fromBlock || blockNumber - 100,
+      fromBlock: this.fromBlock || blockNumber - 10000,
       toBlock: 'latest',
     };
 

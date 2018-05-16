@@ -52,7 +52,9 @@ if (!options.bridgeAddr) {
 const web3 = new Web3();
 web3.setProvider(new web3.providers.HttpProvider('https://rinkeby.infura.io'));
 
-const node = new Node(web3, options.bridgeAddr);
+const privKey =
+  '0xad8e31c8862f5f86459e7cca97ac9302c5e1817077902540779eef66e21f394a';
+const node = new Node(web3, options.bridgeAddr, privKey);
 const app = express();
 
 app.use(
@@ -84,9 +86,9 @@ app.post('/sendRawTransaction', async (req, res) => {
 console.log('Initializing node');
 node.init().then(
   () => {
-    // setInterval(() => {
-    //   node.submitBlock();
-    // }, (options.interval || 1) * 60 * 1000);
+    setInterval(() => {
+      node.submitBlock();
+    }, (options.interval || 1) * 60 * 1000);
 
     app.listen(options.port, options.host, err => {
       if (err) {
