@@ -153,17 +153,17 @@ module.exports = class Node {
     ];
     console.log('submitBlock', args);
     const method = this.bridge.methods.submitBlock(...args);
-    sendTransaction(this.web3, method)
-      .on('transactionHash', txHash => console.log('txHash', txHash))
-      .on('confirmation', (num, rc) => console.log('confirmation', num, rc))
-      .on('receipt', receipt => {
-        console.log('receipt', receipt);
-        if (receipt && receipt.gas > receipt.gasUsed) {
-          const hash = this.block.hash();
-          this.chain.push(hash);
-          this.blocksData[hash] = this.block;
-          this.block = new Block(this.block.hash(), this.block.height + 1);
-        }
-      });
+    await sendTransaction(this.web3, method);
+    const hash = this.block.hash();
+    this.chain.push(hash);
+    this.blocksData[hash] = this.block;
+    this.block = new Block(this.block.hash(), this.block.height + 1);
+    // .on('transactionHash', txHash => console.log('txHash', txHash))
+    // .on('confirmation', (num, rc) => console.log('confirmation', num, rc))
+    // .on('receipt', receipt => {
+    //   console.log('receipt', receipt);
+    //   if (receipt && receipt.gas > receipt.gasUsed) {
+    //   }
+    // });
   }
 };
