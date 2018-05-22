@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
 const { Tx, Type, Block } = require('parsec-lib');
 const BridgeABI = require('./bridgeABI');
-const DepositSubscription = require('./DepositSubscription');
+const ContractEventsSubscription = require('./ContractEventsSubscription');
 
 function depositToTx(deposit) {
   console.log('NewDeposit', deposit);
@@ -67,8 +67,12 @@ module.exports = class Node {
     this.bridge = new web3.eth.Contract(BridgeABI, this.bridgeAddr);
     this.account = this.web3.eth.accounts.privateKeyToAccount(privKey);
 
-    const depositSubscription = new DepositSubscription(web3, this.bridge);
-    depositSubscription.on('deposits', this.handleNewDeposits.bind(this));
+    const eventsSubscription = new ContractEventsSubscription(
+      web3,
+      this.bridge
+    );
+    eventsSubscription.on('NewDeposit', this.handleNewDeposit.bind(this));
+    eventsSubscription.on('NewHeight', this.handleNewHeight.bind(this));
   }
 
   async getOperators() {
@@ -101,11 +105,24 @@ module.exports = class Node {
     console.log('init');
   }
 
-  handleNewDeposits(deposits) {
-    deposits.map(depositToTx).forEach(tx => {
-      this.transactionsData[tx.hash()] = tx.toJSON();
-      this.mempool.push(tx);
+  async handleNewHeight(event) {
+    console.log('NewHeight', event);
+  }
+
+  async handleNewDeposit(event) {
+    const deposit = await this.bridgeContract.methods
+      .deposits(event.returnValues.depositId)
+      .call();
+
+    const tx = depositToTx({
+      height: Number(deposit.height),
+      owner: deposit.owner,
+      amount: Number(deposit.amount),
+      depositId: event.returnValues.depositId,
     });
+
+    this.transactionsData[tx.hash()] = tx.toJSON();
+    this.mempool.push(tx);
   }
 
   async getBlockNumber() {
