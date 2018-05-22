@@ -58,6 +58,7 @@ module.exports = class Node {
     this.transactionsData = {};
     this.blocksData = {};
     this.chain = [];
+    this.mempool = [];
     this.baseHeight = 0;
     this.block = null;
     this.bridgeAddr = bridgeAddr;
@@ -70,38 +71,46 @@ module.exports = class Node {
     depositSubscription.on('deposits', this.handleNewDeposits.bind(this));
   }
 
-  /*
-   * Join, read chain state and other init stuff here
-   */
-  async init() {
+  async getOperators() {
+    return [
+      '0x7159fc66d7df6fa51c99eaf96c160fa8a9ec7287',
+      '0x8ccfd031639d8d9f46133859ea80deaf5dee9be3',
+      '0x634b47d61f93d2096672743c5e3bcdd25f18c350',
+      '0x8db6b632d743aef641146dc943acb64957155388',
+      '0x4436373705394267350db2c06613990d34621d69',
+    ];
+  }
+
+  async getTip() {
+    const operators = await this.getOperators();
     const { 0: hash, 1: height } = await this.bridge.methods
-      .getTip([
-        '0x7159fc66d7df6fa51c99eaf96c160fa8a9ec7287',
-        '0x8ccfd031639d8d9f46133859ea80deaf5dee9be3',
-        '0x634b47d61f93d2096672743c5e3bcdd25f18c350',
-        '0x8db6b632d743aef641146dc943acb64957155388',
-        '0x4436373705394267350db2c06613990d34621d69',
-      ])
+      .getTip(operators)
       .call();
     console.log('getTip', hash, Number(height) + 2);
     if (hash === '0x') {
       throw new Error('Something goes wrong. getTip returned empty hash');
     }
 
-    this.baseHeight = Number(height) + 2;
-    this.block = new Block(hash, this.baseHeight);
+    return { hash, height: Number(height) + 2 };
+  }
+
+  /*
+   * Join, read chain state and other init stuff here
+   */
+  async init() {
+    console.log('init');
   }
 
   handleNewDeposits(deposits) {
     deposits.map(depositToTx).forEach(tx => {
-      console.log(tx);
       this.transactionsData[tx.hash()] = tx.toJSON();
-      this.block.addTx(tx);
+      this.mempool.push(tx);
     });
   }
 
   async getBlockNumber() {
-    return this.chain.length + this.baseHeight;
+    const { height } = await this.getTip();
+    return height;
   }
 
   getBlockHashByNumber(number) {
@@ -138,7 +147,7 @@ module.exports = class Node {
   async sendRawTransaction(txData) {
     const tx = parseAndValidateTx(txData);
     this.transactionsData[tx.hash] = tx;
-    this.block.addTx(tx);
+    this.mempool.push(tx);
 
     return tx.hash;
   }
@@ -147,18 +156,16 @@ module.exports = class Node {
    * Submits current block to the bridge
    */
   async submitBlock() {
-    if (this.block.txList.length === 0) {
+    if (this.mempool.length === 0) {
       return;
     }
+    const { hash, height } = await this.getTip();
+    const blockReward = await this.bridge.methods.blockReward().call();
+    const block = new Block(hash, height);
+    this.mempool.forEach(tx => block.addTx(tx));
+    block.addTx(new Tx().coinbase(blockReward, this.account.address));
 
-    const blockReward = this.bridge.methods.blockReward().call();
-    this.block.addTx(new Tx().coinbase(blockReward, this.account.address));
-
-    const args = [
-      this.block.parent,
-      this.block.merkleRoot(),
-      ...this.block.sign(this.privKey),
-    ];
+    const args = [hash, block.merkleRoot(), ...block.sign(this.privKey)];
     console.log('submitBlock', args);
     const method = this.bridge.methods.submitBlock(...args);
     const txHash = await sendTransaction(
@@ -168,16 +175,8 @@ module.exports = class Node {
       this.privKey
     );
     console.log(txHash);
-    const hash = this.block.hash();
-    this.chain.push(hash);
-    this.blocksData[hash] = this.block;
-    this.block = new Block(this.block.hash(), this.block.height + 1);
-    // .on('transactionHash', txHash => console.log('txHash', txHash))
-    // .on('confirmation', (num, rc) => console.log('confirmation', num, rc))
-    // .on('receipt', receipt => {
-    //   console.log('receipt', receipt);
-    //   if (receipt && receipt.gas > receipt.gasUsed) {
-    //   }
-    // });
+    // this.chain.push(block.hash());
+    this.blocksData[block.hash()] = block;
+    this.mempool = [];
   }
 };
