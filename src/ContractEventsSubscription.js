@@ -20,10 +20,7 @@ module.exports = class ContractEventsSubscription extends EventEmitter {
         toBlock: 'latest',
       };
 
-      const events = await this.bridgeContract.getPastEvents(
-        'allEvents',
-        options
-      );
+      const events = await this.contract.getPastEvents('allEvents', options);
 
       events.forEach(event => {
         this.emit(event.event, event);

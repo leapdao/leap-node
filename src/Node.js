@@ -163,10 +163,10 @@ module.exports = class Node {
    */
   async sendRawTransaction(txData) {
     const tx = parseAndValidateTx(txData);
-    this.transactionsData[tx.hash] = tx;
+    this.transactionsData[tx.hash()] = tx.toJSON();
     this.mempool.push(tx);
 
-    return tx.hash;
+    return tx.hash();
   }
 
   /*
