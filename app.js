@@ -14,15 +14,12 @@ const app = lotion({
 });
 
 const sumOuts = (value, out) => value + out.value;
-const sumTxsOuts = (value, tx) => tx.outs.reduce(sumOuts, value);
-
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 // Patched lotion with support of async handler needed here
 // https://github.com/parsec-labs/js-abci/commit/0d8ac8467b0e764b8b6f2c6f732501dc386dfcfc#diff-28f410b2e519d66e906cae6f42bcf5d8R12
-app.useTx(async (state, { encoded: rawTx }, chainInfo) => {
-  console.log(chainInfo);
-  await delay(2000);
+app.useTx(async (state, { encoded: rawTx }) => {
+  await delay(200); // simulates network (contract calls, etc)
   const tx = Tx.parse(rawTx);
   if (tx.type !== Type.DEPOSIT && tx.type !== Type.TRANSFER) {
     throw new Error('Unsupported tx type. Only deposits and transfers');
@@ -40,30 +37,37 @@ app.useTx(async (state, { encoded: rawTx }, chainInfo) => {
   }
 
   if (tx.type === Type.TRANSFER) {
-    const unspents = tx.ins.map(ins => state.unspents[ins.prevTx]);
-    // ToDo: need to check ownership
-    if (unspents.length !== tx.ins.length) {
-      throw new Error('Doublespend?');
+    const inputTransactions = tx.ins
+      .map(ins => ({ prevTx: state.unspent[ins.prevTx], outPos: ins.outPos }))
+      .filter(({ prevTx }) => !!prevTx);
+
+    if (tx.ins.length !== inputTransactions.length) {
+      throw new Error('Wrong inputs');
     }
 
-    const insValue = unspents.reduce(sumTxsOuts, 0);
+    const insValue = inputTransactions
+      .map(({ prevTx, outPos }) => prevTx.outs[outPos])
+      .reduce(sumOuts, 0);
     const outsValue = tx.outs.reduce(sumOuts, 0);
 
     if (insValue !== outsValue) {
       throw new Error('Ins and outs values are mismatch');
     }
 
-    unspents.forEach(unspent => {
-      unspent.outs.forEach(out => {
-        state.balances[out.addr] -= out.value;
-      });
-      delete state.unspents[unspent.hash];
+    inputTransactions.forEach(({ prevTx, outPos }) => {
+      const out = prevTx.outs[outPos];
+      state.balances[out.addr] -= out.value;
+      state.unspent[prevTx.hash].outs[outPos] = null;
+
+      if (state.unspent[prevTx.hash].outs.filter(a => a).length === 0) {
+        delete state.unspent[prevTx.hash];
+      }
     });
 
     tx.outs.forEach(out => {
       state.balances[out.addr] = (state.balances[out.addr] || 0) + out.value;
     });
-    state.unspents[tx.hash] = tx;
+    state.unspent[tx.hash] = tx;
   }
 
   state.txHashes.push(tx.hash);
