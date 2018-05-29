@@ -28,9 +28,11 @@
   "dependencies": {
     "body-parser": "^1.18.2",
     "dashdash": "^1.14.1",
+    "ethereumjs-util": "^5.2.0",
     "express": "^4.16.3",
-    "lotion": "^0.1.18",
-    "parsec-lib": "parsec-labs/parsec-lib",
+    "lotion": "github:keppel/lotion",
+    "lotion-connect": "^0.1.0",
+    "parsec-lib": "github:parsec-labs/parsec-lib",
     "web3": "^1.0.0-beta.34"
   },
   "devDependencies": {
