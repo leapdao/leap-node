@@ -11,7 +11,7 @@ const PRIV_3 =
   '0x9ae3ed3d1659a33902644da4ce645cfac1de84bc0889909db83692c8374fc44e';
 
 const getInitialState = () => ({
-  txHashes: [],
+  txs: {},
   balances: {},
   unspent: {},
 });

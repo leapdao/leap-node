@@ -10,7 +10,7 @@ module.exports = async (state, { encoded: rawTx }) => {
     throw new Error('Unsupported tx type. Only deposits and transfers');
   }
 
-  if (state.txHashes.indexOf(tx.hash()) > -1) {
+  if (state.txs[tx.hash()]) {
     throw new Error('Tx already submitted');
   }
 
@@ -69,5 +69,5 @@ module.exports = async (state, { encoded: rawTx }) => {
   }
 
   state.unspent[tx.hash()] = tx.toJSON();
-  state.txHashes.push(tx.hash());
+  state.txs[tx.hash()] = tx.toJSON();
 };
