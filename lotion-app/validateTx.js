@@ -1,24 +1,10 @@
-const ethUtil = require('ethereumjs-util');
-const lotion = require('lotion');
 const { Tx, Type } = require('parsec-lib');
+const ethUtil = require('ethereumjs-util');
 
-// const bridgeAddr = '0xa0a368325920b028e4da0ee2d7ccd8468b7ad1ee';
-
-const app = lotion({
-  initialState: {
-    txHashes: [], // prevents tx resubmit
-    balances: {}, // stores account balances
-    unspent: {}, // stores txs with unspent outputs (deposits, transfers)
-  },
-  // target: 'tcp://localhost:46657',
-  abciPort: 46658,
-});
-
-const sumOuts = (value, out) => value + out.value;
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+const sumOuts = (value, out) => value + out.value;
 
-app.useTx(async (state, { encoded: rawTx }) => {
-  await delay(200); // simulates network (contract calls, etc)
+module.exports = async (state, { encoded: rawTx }) => {
   const tx = Tx.fromRaw(rawTx);
   if (tx.type !== Type.DEPOSIT && tx.type !== Type.TRANSFER) {
     throw new Error('Unsupported tx type. Only deposits and transfers');
@@ -30,6 +16,7 @@ app.useTx(async (state, { encoded: rawTx }) => {
 
   if (tx.type === Type.DEPOSIT) {
     // check deposit from contract here
+    await delay(200); // simulates network (contract calls, etc)
     const [{ address, value }] = tx.outputs;
     state.balances[address] = (state.balances[address] || 0) + value;
   }
@@ -83,6 +70,4 @@ app.useTx(async (state, { encoded: rawTx }) => {
 
   state.unspent[tx.hash()] = tx.toJSON();
   state.txHashes.push(tx.hash());
-});
-
-app.listen(process.env.PORT || 3000).then(params => console.log(params));
+};
