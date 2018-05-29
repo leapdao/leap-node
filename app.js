@@ -83,7 +83,6 @@ app.useTx(async (state, { encoded: rawTx }) => {
 
   state.unspent[tx.hash()] = tx.toJSON();
   state.txHashes.push(tx.hash());
-  console.log('state', state);
 });
 
 app.listen(process.env.PORT || 3000).then(params => console.log(params));
