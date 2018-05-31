@@ -151,9 +151,9 @@ abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
 
-abci@^2.1.0:
+"abci@github:parsec-labs/js-abci#plasma":
   version "2.1.0"
-  resolved "https://registry.yarnpkg.com/abci/-/abci-2.1.0.tgz#d9772cc01af4229195ba1ae98d3a74a35927c80a"
+  resolved "https://codeload.github.com/parsec-labs/js-abci/tar.gz/5970378d99039e8144bee819c03e2067c048ce63"
   dependencies:
     bl "^1.2.2"
     debug "^3.1.0"
@@ -1650,7 +1650,7 @@ cross-spawn@^5.0.1, cross-spawn@^5.1.0:
     shebang-command "^1.2.0"
     which "^1.2.9"
 
-cross-spawn@^6.0.0:
+cross-spawn@^6.0.0, cross-spawn@^6.0.5:
   version "6.0.5"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-6.0.5.tgz#4a5ec7c64dfae22c3a14124dbacdee846d80cbc4"
   dependencies:
@@ -4541,11 +4541,11 @@ lotion-connect@^0.1.0:
     tendermint "^3.1.8"
     varstruct "^6.1.2"
 
-"lotion@github:keppel/lotion":
+"lotion@github:parsec-labs/lotion#plasma":
   version "0.1.18"
-  resolved "https://codeload.github.com/keppel/lotion/tar.gz/46715d0c60b12582ead122f321664b696c251ecd"
+  resolved "https://codeload.github.com/parsec-labs/lotion/tar.gz/39e52d7ebd14890937cb5e7e9eb8950aacf99154"
   dependencies:
-    abci "^2.1.0"
+    abci "github:parsec-labs/js-abci#plasma"
     axios "^0.16.2"
     body-parser "^1.17.2"
     cors "^2.8.4"
@@ -4562,7 +4562,7 @@ lotion-connect@^0.1.0:
     lotion-connect "^0.1.0"
     merk "^1.3.1"
     peer-channel "0.1.1"
-    tendermint-node "^2.0.3"
+    tendermint-node "^2.0.4"
     varstruct "^6.1.1"
 
 lowercase-keys@^1.0.0:
@@ -6744,11 +6744,12 @@ tar@^4:
     safe-buffer "^5.1.2"
     yallist "^3.0.2"
 
-tendermint-node@^2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/tendermint-node/-/tendermint-node-2.0.3.tgz#38d69853cd44aef6481b9088804a43e47cc99a7b"
+tendermint-node@^2.0.4:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/tendermint-node/-/tendermint-node-2.0.4.tgz#b7046b1086ecff00d756f63dac0e4b45ad878189"
   dependencies:
     axios "^0.18.0"
+    cross-spawn "^6.0.5"
     debug "^3.1.0"
     decamelize "^2.0.0"
     execa "^0.10.0"
