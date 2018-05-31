@@ -17,6 +17,8 @@ module.exports = async function transfer(
   amount,
   { height, privKey } = {}
 ) {
+  from = from.toLowerCase(); // eslint-disable-line
+  to = to.toLowerCase(); // eslint-disable-line
   const balance = (await client.state.balances[from]) || 0;
 
   if (balance < amount) {
@@ -36,6 +38,10 @@ module.exports = async function transfer(
 
       return aSum - bSum;
     });
+
+  if (senderUnspent) {
+    throw new Error(`There are no unspents for address ${from}`);
+  }
 
   const inputs = [];
   const outputs = [new Output(amount, to)];
@@ -60,6 +66,10 @@ module.exports = async function transfer(
     }
   }
 
+  if (inputs.length === 0) {
+    throw new Error('No inputs');
+  }
+
   if (sum > amount) {
     outputs.push(new Output(sum - amount, from));
   }
@@ -67,7 +77,7 @@ module.exports = async function transfer(
   const tx = Tx.transfer(height, inputs, outputs);
 
   if (privKey) {
-    tx.sign(tx.inputs.map(() => privKey));
+    return tx.sign(tx.inputs.map(() => privKey));
   }
 
   return tx;
