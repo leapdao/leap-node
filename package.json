@@ -6,7 +6,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "test": "echo \"no tests yet\" && exit 0",
+    "test": "./node_modules/.bin/jest",
+    "test:watch": "./node_modules/.bin/jest --watch",
     "precommit": "./node_modules/.bin/lint-staged"
   },
   "lint-staged": {
@@ -31,7 +32,6 @@
     "ethereumjs-util": "^5.2.0",
     "express": "^4.16.3",
     "lotion": "github:keppel/lotion",
-    "lotion-connect": "^0.1.0",
     "parsec-lib": "github:parsec-labs/parsec-lib",
     "web3": "^1.0.0-beta.34"
   },

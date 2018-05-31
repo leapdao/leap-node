@@ -6,7 +6,7 @@ const validateTx = require('./validateTx');
 
 const app = lotion({
   initialState: {
-    txs: {}, // prevents tx resubmit
+    txs: {},
     balances: {}, // stores account balances
     unspent: {}, // stores txs with unspent outputs (deposits, transfers)
   },
