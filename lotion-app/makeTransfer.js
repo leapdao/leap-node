@@ -39,7 +39,7 @@ module.exports = async function transfer(
       return aSum - bSum;
     });
 
-  if (senderUnspent) {
+  if (senderUnspent.length === 0) {
     throw new Error(`There are no unspents for address ${from}`);
   }
 
