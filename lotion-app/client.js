@@ -1,4 +1,4 @@
-const lotion = require('lotion');
+const connect = require('lotion-connect');
 const Web3 = require('web3');
 const { Tx } = require('parsec-lib');
 const makeTransfer = require('./makeTransfer');
@@ -8,10 +8,10 @@ const web3 = new Web3('https://rinkeby.infura.io');
 const privKey =
   '0xad8e31c8862f5f86459e7cca97ac9302c5e1817077902540779eef66e21f394a';
 const account = web3.eth.accounts.privateKeyToAccount(privKey);
-const GCI = '8c0fc14131028d608b092ca5a43702272185f63aa0caa29e2eb2bfbad7a6453f';
+const GCI = '1a90d93654d5d6cd3b592d37393276ecb6ce0ddd6251b4d7f3c1250f1329a67e';
 
 async function run() {
-  const client = await lotion.connect(GCI);
+  const client = await connect(GCI);
 
   console.log('------');
   console.log(await client.state.balances);
