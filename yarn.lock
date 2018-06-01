@@ -151,9 +151,9 @@ abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
 
-"abci@github:parsec-labs/js-abci#plasma":
+"abci@github:parsec-labs/js-abci#375f5408075a0b0f0f216069534a5af209e1e909":
   version "2.1.0"
-  resolved "https://codeload.github.com/parsec-labs/js-abci/tar.gz/5970378d99039e8144bee819c03e2067c048ce63"
+  resolved "https://codeload.github.com/parsec-labs/js-abci/tar.gz/375f5408075a0b0f0f216069534a5af209e1e909"
   dependencies:
     bl "^1.2.2"
     debug "^3.1.0"
@@ -4541,11 +4541,11 @@ lotion-connect@^0.1.0:
     tendermint "^3.1.8"
     varstruct "^6.1.2"
 
-lotion@parsec-labs/lotion#plasma:
+lotion@parsec-labs/lotion#bab1ed07cffdec4c64622d0196d8f367a72d98b4:
   version "0.1.18"
-  resolved "https://codeload.github.com/parsec-labs/lotion/tar.gz/87dd7da4d1dde05ebfd49336a6424027dffba50c"
+  resolved "https://codeload.github.com/parsec-labs/lotion/tar.gz/bab1ed07cffdec4c64622d0196d8f367a72d98b4"
   dependencies:
-    abci "github:parsec-labs/js-abci#plasma"
+    abci "github:parsec-labs/js-abci#375f5408075a0b0f0f216069534a5af209e1e909"
     axios "^0.16.2"
     body-parser "^1.17.2"
     cors "^2.8.4"

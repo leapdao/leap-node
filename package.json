@@ -31,7 +31,7 @@
     "dashdash": "^1.14.1",
     "ethereumjs-util": "^5.2.0",
     "express": "^4.16.3",
-    "lotion": "parsec-labs/lotion#plasma",
+    "lotion": "parsec-labs/lotion#bab1ed07cffdec4c64622d0196d8f367a72d98b4",
     "parsec-lib": "github:parsec-labs/parsec-lib",
     "web3": "^1.0.0-beta.34"
   },
