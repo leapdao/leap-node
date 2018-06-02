@@ -21,7 +21,8 @@ test('successful deposit tx', async () => {
   const tx = Tx.deposit(12, 500, ADDR_1);
   await validateTx(state, { encoded: tx.hex() });
   expect(state.balances[ADDR_1]).toBe(500);
-  expect(state.unspent[tx.hash()]).toBeDefined();
+  const outpoint = new Outpoint(tx.hash(), 0);
+  expect(state.unspent[outpoint.hex()]).toBeDefined();
 });
 
 test('successful transfer tx', async () => {
@@ -29,7 +30,8 @@ test('successful transfer tx', async () => {
   const deposit = Tx.deposit(12, 500, ADDR_1);
   await validateTx(state, { encoded: deposit.hex() });
   expect(state.balances[ADDR_1]).toBe(500);
-  expect(state.unspent[deposit.hash()]).toBeDefined();
+  let outpoint = new Outpoint(deposit.hash(), 0);
+  expect(state.unspent[outpoint.hex()]).toBeDefined();
 
   const transfer = Tx.transfer(
     0,
@@ -39,8 +41,9 @@ test('successful transfer tx', async () => {
   await validateTx(state, { encoded: transfer.hex() });
   expect(state.balances[ADDR_1]).toBe(0);
   expect(state.balances[ADDR_2]).toBe(500);
-  expect(state.unspent[deposit.hash()]).toBeUndefined();
-  expect(state.unspent[transfer.hash()]).toBeDefined();
+  expect(state.unspent[transfer.inputs[0].prevout.hex()]).toBeNull();
+  outpoint = new Outpoint(transfer.hash(), 0);
+  expect(state.unspent[outpoint.hex()]).toBeDefined();
 });
 
 test('duplicate tx', async () => {
@@ -59,7 +62,8 @@ test('transfer tx with unowned output', async () => {
   const deposit = Tx.deposit(12, 500, ADDR_2);
   await validateTx(state, { encoded: deposit.hex() });
   expect(state.balances[ADDR_2]).toBe(500);
-  expect(state.unspent[deposit.hash()]).toBeDefined();
+  const outpoint = new Outpoint(deposit.hash(), 0);
+  expect(state.unspent[outpoint.hex()]).toBeDefined();
 
   const transfer = Tx.transfer(
     0,
@@ -85,7 +89,7 @@ test('transfer tx with non-existent output  (1)', async () => {
   try {
     await validateTx(state, { encoded: transfer.hex() });
   } catch (e) {
-    expect(e.message).toBe('Wrong inputs');
+    expect(e.message).toBe('trying to spend non-existing output');
   }
 });
 
@@ -101,7 +105,7 @@ test('transfer tx with non-existent output (2)', async () => {
   try {
     await validateTx(state, { encoded: transfer.hex() });
   } catch (e) {
-    expect(e.message).toBe('Wrong inputs');
+    expect(e.message).toBe('trying to spend non-existing output');
   }
 });
 
