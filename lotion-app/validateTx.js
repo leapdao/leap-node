@@ -50,7 +50,7 @@ module.exports = async (state, { encoded: rawTx }) => {
   }
 
   // remove inputs
-  tx.inputs.forEach(( input, outPos ) => {
+  tx.inputs.forEach(input => {
     const outpointId = input.prevout.hex();
     const { address, value } = state.unspent[outpointId];
     state.balances[address] -= value;

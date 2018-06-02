@@ -25,6 +25,20 @@ test('successful deposit tx', async () => {
   expect(state.unspent[outpoint.hex()]).toBeDefined();
 });
 
+test('successful exit tx', async () => {
+  const state = getInitialState();
+  const tx = Tx.deposit(12, 500, ADDR_1);
+  await validateTx(state, { encoded: tx.hex() });
+  expect(state.balances[ADDR_1]).toBe(500);
+  const outpoint = new Outpoint(tx.hash(), 0);
+  expect(state.unspent[outpoint.hex()]).toBeDefined();
+
+  const exit = Tx.exit(new Input(new Outpoint(tx.hash(), 0)));
+  await validateTx(state, { encoded: exit.hex() });
+  expect(state.balances[ADDR_1]).toBe(0);
+  expect(state.unspent[outpoint.hex()]).toBeNull();
+});
+
 test('successful transfer tx', async () => {
   const state = getInitialState();
   const deposit = Tx.deposit(12, 500, ADDR_1);
