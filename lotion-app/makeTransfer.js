@@ -1,11 +1,5 @@
 const { Tx, Input, Outpoint, Output } = require('parsec-lib');
 
-function sumAddressOutputs(tx, address) {
-  return tx.outputs
-    .filter(output => output && output.address === address)
-    .reduce((sum, o) => sum + o.value);
-}
-
 /*
  * Creates transfer tx based on address unspent outputs
  */
@@ -26,7 +20,6 @@ module.exports = async function transfer(
   }
 
   const unspent = await client.state.unspent;
-  console.log(unspent);
   const senderUnspent = Object.keys(unspent)
     .map(k => ({
       outpoint: Outpoint.fromRaw(k),
@@ -36,10 +29,7 @@ module.exports = async function transfer(
       return unspend.output && unspend.output.address === fromAddr;
     })
     .sort((a, b) => {
-      const aSum = sumAddressOutputs(a, fromAddr);
-      const bSum = sumAddressOutputs(b, fromAddr);
-
-      return aSum - bSum;
+      return a.output.value - b.output.value;
     });
 
   if (senderUnspent.length === 0) {

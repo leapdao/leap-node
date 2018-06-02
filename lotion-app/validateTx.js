@@ -1,12 +1,15 @@
 const { Tx, Type, Outpoint } = require('parsec-lib');
-const ethUtil = require('ethereumjs-util');
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 const sumOuts = (value, out) => value + out.value;
 
 module.exports = async (state, { encoded: rawTx }) => {
   const tx = Tx.fromRaw(rawTx);
-  if (tx.type !== Type.DEPOSIT && tx.type !== Type.EXIT && tx.type !== Type.TRANSFER) {
+  if (
+    tx.type !== Type.DEPOSIT &&
+    tx.type !== Type.EXIT &&
+    tx.type !== Type.TRANSFER
+  ) {
     throw new Error('Unsupported tx type. Only deposits and transfers');
   }
 
@@ -60,9 +63,11 @@ module.exports = async (state, { encoded: rawTx }) => {
   // add outputs
   tx.outputs.forEach((out, outPos) => {
     const outpoint = new Outpoint(tx.hash(), outPos);
+    if (state.unspent[outpoint.hex()]) {
+      throw new Error('attempt to create existing output');
+    }
     state.balances[out.address] =
-        (state.balances[out.address] || 0) + out.value;
+      (state.balances[out.address] || 0) + out.value;
     state.unspent[outpoint.hex()] = out;
   });
-  
 };

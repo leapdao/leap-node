@@ -25,6 +25,20 @@ test('successful deposit tx', async () => {
   expect(state.unspent[outpoint.hex()]).toBeDefined();
 });
 
+test('prevent double deposit', async () => {
+  const state = getInitialState();
+  const tx = Tx.deposit(12, 500, ADDR_1);
+  await validateTx(state, { encoded: tx.hex() });
+  expect(state.balances[ADDR_1]).toBe(500);
+  const outpoint = new Outpoint(tx.hash(), 0);
+  expect(state.unspent[outpoint.hex()]).toBeDefined();
+  try {
+    await validateTx(state, { encoded: tx.hex() });
+  } catch (e) {
+    expect(e.message).toBe('attempt to create existing output');
+  }
+});
+
 test('successful exit tx', async () => {
   const state = getInitialState();
   const tx = Tx.deposit(12, 500, ADDR_1);
@@ -67,7 +81,7 @@ test('duplicate tx', async () => {
   try {
     await validateTx(state, { encoded: tx.hex() });
   } catch (e) {
-    expect(e.message).toBe('Tx already submitted');
+    expect(e.message).toBe('attempt to create existing output');
   }
 });
 
