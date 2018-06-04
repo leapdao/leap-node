@@ -17,18 +17,15 @@ const getInitialState = () => ({
   unspent: {},
 });
 
-const makeBridgeWithDepositMock = deposit => {
+const makeBridgeWithDepositMock = (owner, amount) => {
   return {
     methods: {
-      deposits: () => ({ call: () => Promise.resolve(deposit) }),
+      deposits: () => ({ call: () => Promise.resolve({ owner, amount }) }),
     },
   };
 };
 
-const defaultDepositMock = makeBridgeWithDepositMock({
-  owner: ADDR_1,
-  value: '500',
-});
+const defaultDepositMock = makeBridgeWithDepositMock(ADDR_1, '500');
 
 test('successful deposit tx', async () => {
   const state = getInitialState();
@@ -43,14 +40,7 @@ test('non-existent deposit', async () => {
   const state = getInitialState();
   const tx = Tx.deposit(12, 500, ADDR_1);
   try {
-    await validateTx(
-      state,
-      tx,
-      makeBridgeWithDepositMock({
-        owner: EMPTY_ADDR,
-        value: '0',
-      })
-    );
+    await validateTx(state, tx, makeBridgeWithDepositMock(EMPTY_ADDR, '0'));
   } catch (e) {
     expect(e.message).toBe('Trying to submit incorrect deposit');
   }
@@ -60,14 +50,7 @@ test('deposit with wrong owner', async () => {
   const state = getInitialState();
   const tx = Tx.deposit(12, 500, ADDR_1);
   try {
-    await validateTx(
-      state,
-      tx,
-      makeBridgeWithDepositMock({
-        owner: ADDR_2,
-        value: '0',
-      })
-    );
+    await validateTx(state, tx, makeBridgeWithDepositMock(ADDR_2, '500'));
   } catch (e) {
     expect(e.message).toBe('Trying to submit incorrect deposit');
   }
@@ -77,14 +60,7 @@ test('deposit with wrong value', async () => {
   const state = getInitialState();
   const tx = Tx.deposit(12, 500, ADDR_1);
   try {
-    await validateTx(
-      state,
-      tx,
-      makeBridgeWithDepositMock({
-        owner: ADDR_1,
-        value: '600',
-      })
-    );
+    await validateTx(state, tx, makeBridgeWithDepositMock(ADDR_1, '600'));
   } catch (e) {
     expect(e.message).toBe('Trying to submit incorrect deposit');
   }
@@ -179,14 +155,7 @@ test('duplicate tx', async () => {
 test('transfer tx with unowned output', async () => {
   const state = getInitialState();
   const deposit = Tx.deposit(12, 500, ADDR_2);
-  await validateTx(
-    state,
-    deposit,
-    makeBridgeWithDepositMock({
-      owner: ADDR_2,
-      value: '500',
-    })
-  );
+  await validateTx(state, deposit, makeBridgeWithDepositMock(ADDR_2, '500'));
   expect(state.balances[ADDR_2]).toBe(500);
   const outpoint = new Outpoint(deposit.hash(), 0);
   expect(state.unspent[outpoint.hex()]).toBeDefined();

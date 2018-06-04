@@ -1,3 +1,4 @@
+const ethUtil = require('ethereumjs-util');
 const { Type, Outpoint } = require('parsec-lib');
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -22,8 +23,9 @@ module.exports = async (state, tx, bridge) => {
   if (tx.type === Type.DEPOSIT) {
     const deposit = await bridge.methods.deposits(tx.options.depositId).call();
     if (
-      Number(deposit.value) !== tx.outputs[0].value ||
-      deposit.owner !== tx.outputs[0].address
+      Number(deposit.amount) !== tx.outputs[0].value ||
+      ethUtil.toChecksumAddress(deposit.owner) !==
+        ethUtil.toChecksumAddress(tx.outputs[0].address)
     ) {
       throw new Error('Trying to submit incorrect deposit');
     }
