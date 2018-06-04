@@ -1,5 +1,5 @@
-const ethUtil = require('ethereumjs-util');
 const { Type, Outpoint } = require('parsec-lib');
+const { addrCmp } = require('./utils');
 
 const sumOuts = (value, out) => value + out.value;
 
@@ -23,8 +23,7 @@ module.exports = async (state, tx, bridge) => {
     const deposit = await bridge.methods.deposits(tx.options.depositId).call();
     if (
       Number(deposit.amount) !== tx.outputs[0].value ||
-      ethUtil.toChecksumAddress(deposit.owner) !==
-        ethUtil.toChecksumAddress(tx.outputs[0].address)
+      !addrCmp(deposit.owner, tx.outputs[0].address)
     ) {
       throw new Error('Trying to submit incorrect deposit');
     }
@@ -38,11 +37,7 @@ module.exports = async (state, tx, bridge) => {
     const [{ prevout }] = tx.inputs;
     const unspent = state.unspent[prevout.hex()];
     const exit = await bridge.methods.exits(prevout.getUtxoId()).call();
-    if (
-      Number(exit.amount) !== unspent.value
-      // ethUtil.toChecksumAddress(exit.owner) !==
-      //   ethUtil.toChecksumAddress(unspent.address)
-    ) {
+    if (Number(exit.amount) !== unspent.value) {
       throw new Error('Trying to submit incorrect exit');
     }
   }

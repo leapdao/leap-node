@@ -8,6 +8,7 @@ const bridgeABI = require('./src/bridgeABI');
 const ContractEventsSubscription = require('./src/ContractEventsSubscription');
 const validateTx = require('./src/validateTx');
 const validateBlock = require('./src/validateBlock');
+const { map } = require('./src/utils');
 
 const dashParser = dashdash.createParser({
   options: [
@@ -84,8 +85,6 @@ app.listen(options.port).then(async params => {
     );
     await client.send({ encoded: tx.hex() });
   };
-
-  const map = mapFn => arr => arr.map(mapFn);
 
   const handleExit = async event => {
     const { txHash, outIndex } = event.returnValues;

@@ -1,4 +1,4 @@
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+const { delay } = require('./utils');
 
 module.exports = async (state, chainInfo) => {
   // check if this is a validator

@@ -4,7 +4,7 @@ const { Tx, Input, Outpoint, Output } = require('parsec-lib');
  * Creates transfer tx based on address unspent outputs
  */
 // ToDo: solve subset sum/knapsack problem for optimal outputs usage
-module.exports = async function transfer(
+module.exports = async function makeTransfer(
   client,
   from,
   to,
