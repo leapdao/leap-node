@@ -39,6 +39,32 @@ test('prevent double deposit', async () => {
   }
 });
 
+test('prevent double deposit (spent)', async () => {
+  const state = getInitialState();
+  const deposit = Tx.deposit(12, 500, ADDR_1);
+  await validateTx(state, { encoded: deposit.hex() });
+  expect(state.balances[ADDR_1]).toBe(500);
+  const outpoint = new Outpoint(deposit.hash(), 0);
+  expect(state.unspent[outpoint.hex()]).toBeDefined();
+
+  const transfer = Tx.transfer(
+    0,
+    [new Input(outpoint)],
+    [new Output(500, ADDR_2)]
+  ).sign([PRIV_1]);
+  await validateTx(state, { encoded: transfer.hex() });
+  expect(state.unspent[outpoint.hex()]).toBeNull();
+
+  // Jest doesn't support toThrow with async/await currently https://github.com/facebook/jest/issues/1700
+  let error;
+  try {
+    await validateTx(state, { encoded: deposit.hex() });
+  } catch (e) {
+    error = e.message;
+  }
+  expect(error).toBe('attempt to create existing output');
+});
+
 test('successful exit tx', async () => {
   const state = getInitialState();
   const tx = Tx.deposit(12, 500, ADDR_1);
@@ -105,7 +131,7 @@ test('transfer tx with unowned output', async () => {
   }
 });
 
-test('transfer tx with non-existent output  (1)', async () => {
+test('transfer tx with non-existent output (1)', async () => {
   const state = getInitialState();
   const deposit = Tx.deposit(12, 500, ADDR_2);
 

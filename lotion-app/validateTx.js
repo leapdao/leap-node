@@ -63,7 +63,7 @@ module.exports = async (state, { encoded: rawTx }) => {
   // add outputs
   tx.outputs.forEach((out, outPos) => {
     const outpoint = new Outpoint(tx.hash(), outPos);
-    if (state.unspent[outpoint.hex()]) {
+    if (state.unspent[outpoint.hex()] !== undefined) {
       throw new Error('attempt to create existing output');
     }
     state.balances[out.address] =
