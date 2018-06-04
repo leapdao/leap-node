@@ -1,10 +1,9 @@
-const { Tx, Type, Outpoint } = require('parsec-lib');
+const { Type, Outpoint } = require('parsec-lib');
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 const sumOuts = (value, out) => value + out.value;
 
-module.exports = async (state, { encoded: rawTx }) => {
-  const tx = Tx.fromRaw(rawTx);
+module.exports = async (state, tx) => {
   if (
     tx.type !== Type.DEPOSIT &&
     tx.type !== Type.EXIT &&

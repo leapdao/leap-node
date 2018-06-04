@@ -1,3 +1,4 @@
+const { Tx } = require('parsec-lib');
 const lotion = require('lotion');
 
 const validateTx = require('./validateTx');
@@ -13,7 +14,9 @@ const app = lotion({
   abciPort: 46658,
 });
 
-app.useTx(validateTx);
+app.useTx((state, { encoded }) => {
+  validateTx(state, Tx.fromRaw(encoded));
+});
 
 app.useBlock(validateBlock);
 
