@@ -1,41 +1,42 @@
-const { Tx, Type } = require('parsec-lib');
-const ethUtil = require('ethereumjs-util');
+const { Tx, Type, Outpoint } = require('parsec-lib');
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 const sumOuts = (value, out) => value + out.value;
 
 module.exports = async (state, { encoded: rawTx }) => {
   const tx = Tx.fromRaw(rawTx);
-  if (tx.type !== Type.DEPOSIT && tx.type !== Type.TRANSFER) {
-    throw new Error('Unsupported tx type. Only deposits and transfers');
+  if (
+    tx.type !== Type.DEPOSIT &&
+    tx.type !== Type.EXIT &&
+    tx.type !== Type.TRANSFER
+  ) {
+    throw new Error('Unsupported tx type. Only deposits, exits and transfers');
   }
 
-  if (state.txs[tx.hash()]) {
-    throw new Error('Tx already submitted');
-  }
+  tx.inputs.forEach(input => {
+    const outpointId = input.prevout.hex();
+    if (!state.unspent[outpointId]) {
+      throw new Error('Trying to spend non-existing output');
+    }
+  });
 
   if (tx.type === Type.DEPOSIT) {
     // check deposit from contract here
     await delay(200); // simulates network (contract calls, etc)
-    const [{ address, value }] = tx.outputs;
-    state.balances[address] = (state.balances[address] || 0) + value;
+  }
+
+  if (tx.type === Type.EXIT) {
+    // check exit from contract here
+    await delay(200); // simulates network (contract calls, etc)
   }
 
   if (tx.type === Type.TRANSFER) {
     const inputTransactions = tx.inputs
-      .map(input => ({
-        prevTx: state.unspent[ethUtil.bufferToHex(input.prevout.hash)],
-        outPos: input.prevout.index,
-      }))
-      .filter(({ prevTx, outPos }, i) => {
-        if (!prevTx) {
+      .map(input => state.unspent[input.prevout.hex()])
+      .filter(({ address }, i) => {
+        if (address !== tx.inputs[i].signer) {
           return false;
         }
-
-        if (prevTx.outputs[outPos].address !== tx.inputs[i].signer) {
-          return false;
-        }
-
         return true;
       });
 
@@ -43,31 +44,30 @@ module.exports = async (state, { encoded: rawTx }) => {
       throw new Error('Wrong inputs');
     }
 
-    const insValue = inputTransactions
-      .map(({ prevTx, outPos }) => prevTx.outputs[outPos])
-      .reduce(sumOuts, 0);
+    const insValue = inputTransactions.reduce(sumOuts, 0);
     const outsValue = tx.outputs.reduce(sumOuts, 0);
 
     if (insValue !== outsValue) {
       throw new Error('Ins and outs values are mismatch');
     }
-
-    inputTransactions.forEach(({ prevTx, outPos }) => {
-      const out = prevTx.outputs[outPos];
-      state.balances[out.address] -= out.value;
-      state.unspent[prevTx.hash].outputs[outPos] = null;
-
-      if (state.unspent[prevTx.hash].outputs.filter(a => a).length === 0) {
-        delete state.unspent[prevTx.hash];
-      }
-    });
-
-    tx.outputs.forEach(out => {
-      state.balances[out.address] =
-        (state.balances[out.address] || 0) + out.value;
-    });
   }
 
-  state.unspent[tx.hash()] = tx.toJSON();
-  state.txs[tx.hash()] = tx.toJSON();
+  // remove inputs
+  tx.inputs.forEach(input => {
+    const outpointId = input.prevout.hex();
+    const { address, value } = state.unspent[outpointId];
+    state.balances[address] -= value;
+    state.unspent[outpointId] = null;
+  });
+
+  // add outputs
+  tx.outputs.forEach((out, outPos) => {
+    const outpoint = new Outpoint(tx.hash(), outPos);
+    if (state.unspent[outpoint.hex()] !== undefined) {
+      throw new Error('Attempt to create existing output');
+    }
+    state.balances[out.address] =
+      (state.balances[out.address] || 0) + out.value;
+    state.unspent[outpoint.hex()] = out;
+  });
 };

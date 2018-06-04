@@ -1,4 +1,4 @@
-const { Tx } = require('parsec-lib');
+const { Tx, Outpoint } = require('parsec-lib');
 const ethUtil = require('ethereumjs-util');
 
 const makeTransfer = require('./makeTransfer');
@@ -16,8 +16,8 @@ const client = {
       [ADDR_1]: Promise.resolve(300),
     },
     unspent: Promise.resolve({
-      [deposit1.hash()]: deposit1.toJSON(),
-      [deposit2.hash()]: deposit2.toJSON(),
+      [new Outpoint(deposit1.hash(), 0).hex()]: deposit1.outputs[0],
+      [new Outpoint(deposit2.hash(), 0).hex()]: deposit2.outputs[0],
     }),
   },
 };
