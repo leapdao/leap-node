@@ -1,10 +1,16 @@
+const Web3 = require('web3');
 const { Tx } = require('parsec-lib');
 const lotion = require('lotion');
 
+const bridgeABI = require('../src/bridgeABI');
 const validateTx = require('./validateTx');
 const validateBlock = require('./validateBlock');
 
-// const bridgeAddr = '0xa0a368325920b028e4da0ee2d7ccd8468b7ad1ee';
+const bridgeAddr = '0x6b12ff9d695459ce4a840f7f70e43d3b300a1432';
+const web3 = new Web3();
+web3.setProvider(new web3.providers.HttpProvider('https://rinkeby.infura.io'));
+
+const bridge = new web3.eth.Contract(bridgeABI, bridgeAddr);
 
 const app = lotion({
   initialState: {
@@ -15,7 +21,7 @@ const app = lotion({
 });
 
 app.useTx((state, { encoded }) => {
-  validateTx(state, Tx.fromRaw(encoded));
+  validateTx(state, Tx.fromRaw(encoded), bridge);
 });
 
 app.useBlock(validateBlock);

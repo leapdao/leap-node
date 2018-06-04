@@ -8,7 +8,7 @@ const web3 = new Web3('https://rinkeby.infura.io');
 const privKey =
   '0xad8e31c8862f5f86459e7cca97ac9302c5e1817077902540779eef66e21f394a';
 const account = web3.eth.accounts.privateKeyToAccount(privKey);
-const GCI = '8e09f26d6375506979f74d71b2899f0a0f36aaa2ebf8d238160b91bb0c787d18';
+const GCI = '79d6d87c9b21d4aefed9dc2d716fa10d489ea4f298eb96c7cd7302535bf8a9cb';
 
 async function run() {
   const client = await connect(GCI);

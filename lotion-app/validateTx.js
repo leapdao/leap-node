@@ -3,7 +3,7 @@ const { Type, Outpoint } = require('parsec-lib');
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 const sumOuts = (value, out) => value + out.value;
 
-module.exports = async (state, tx) => {
+module.exports = async (state, tx, bridge) => {
   if (
     tx.type !== Type.DEPOSIT &&
     tx.type !== Type.EXIT &&
@@ -20,8 +20,13 @@ module.exports = async (state, tx) => {
   });
 
   if (tx.type === Type.DEPOSIT) {
-    // check deposit from contract here
-    await delay(200); // simulates network (contract calls, etc)
+    const deposit = await bridge.methods.deposits(tx.options.depositId).call();
+    if (
+      Number(deposit.value) !== tx.outputs[0].value ||
+      deposit.owner !== tx.outputs[0].address
+    ) {
+      throw new Error('Trying to submit incorrect deposit');
+    }
   }
 
   if (tx.type === Type.EXIT) {

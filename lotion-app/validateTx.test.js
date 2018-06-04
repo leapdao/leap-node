@@ -2,6 +2,7 @@ const { Tx, Input, Outpoint, Output } = require('parsec-lib');
 
 const validateTx = require('./validateTx');
 
+const EMPTY_ADDR = '0x0000000000000000000000000000000000000000';
 const ADDR_1 = '0x4436373705394267350db2c06613990d34621d69';
 const PRIV_1 =
   '0xad8e31c8862f5f86459e7cca97ac9302c5e1817077902540779eef66e21f394a';
@@ -16,24 +17,88 @@ const getInitialState = () => ({
   unspent: {},
 });
 
+const makeBridgeWithDepositMock = deposit => {
+  return {
+    methods: {
+      deposits: () => ({ call: () => Promise.resolve(deposit) }),
+    },
+  };
+};
+
+const defaultDepositMock = makeBridgeWithDepositMock({
+  owner: ADDR_1,
+  value: '500',
+});
+
 test('successful deposit tx', async () => {
   const state = getInitialState();
   const tx = Tx.deposit(12, 500, ADDR_1);
-  await validateTx(state, tx);
+  await validateTx(state, tx, defaultDepositMock);
   expect(state.balances[ADDR_1]).toBe(500);
   const outpoint = new Outpoint(tx.hash(), 0);
   expect(state.unspent[outpoint.hex()]).toBeDefined();
 });
 
+test('non-existent deposit', async () => {
+  const state = getInitialState();
+  const tx = Tx.deposit(12, 500, ADDR_1);
+  try {
+    await validateTx(
+      state,
+      tx,
+      makeBridgeWithDepositMock({
+        owner: EMPTY_ADDR,
+        value: '0',
+      })
+    );
+  } catch (e) {
+    expect(e.message).toBe('Trying to submit incorrect deposit');
+  }
+});
+
+test('deposit with wrong owner', async () => {
+  const state = getInitialState();
+  const tx = Tx.deposit(12, 500, ADDR_1);
+  try {
+    await validateTx(
+      state,
+      tx,
+      makeBridgeWithDepositMock({
+        owner: ADDR_2,
+        value: '0',
+      })
+    );
+  } catch (e) {
+    expect(e.message).toBe('Trying to submit incorrect deposit');
+  }
+});
+
+test('deposit with wrong value', async () => {
+  const state = getInitialState();
+  const tx = Tx.deposit(12, 500, ADDR_1);
+  try {
+    await validateTx(
+      state,
+      tx,
+      makeBridgeWithDepositMock({
+        owner: ADDR_1,
+        value: '600',
+      })
+    );
+  } catch (e) {
+    expect(e.message).toBe('Trying to submit incorrect deposit');
+  }
+});
+
 test('prevent double deposit', async () => {
   const state = getInitialState();
   const tx = Tx.deposit(12, 500, ADDR_1);
-  await validateTx(state, tx);
+  await validateTx(state, tx, defaultDepositMock);
   expect(state.balances[ADDR_1]).toBe(500);
   const outpoint = new Outpoint(tx.hash(), 0);
   expect(state.unspent[outpoint.hex()]).toBeDefined();
   try {
-    await validateTx(state, tx);
+    await validateTx(state, tx, defaultDepositMock);
   } catch (e) {
     expect(e.message).toBe('Attempt to create existing output');
   }
@@ -42,7 +107,7 @@ test('prevent double deposit', async () => {
 test('prevent double deposit (spent)', async () => {
   const state = getInitialState();
   const deposit = Tx.deposit(12, 500, ADDR_1);
-  await validateTx(state, deposit);
+  await validateTx(state, deposit, defaultDepositMock);
   expect(state.balances[ADDR_1]).toBe(500);
   const outpoint = new Outpoint(deposit.hash(), 0);
   expect(state.unspent[outpoint.hex()]).toBeDefined();
@@ -58,7 +123,7 @@ test('prevent double deposit (spent)', async () => {
   // Jest doesn't support toThrow with async/await currently https://github.com/facebook/jest/issues/1700
   let error;
   try {
-    await validateTx(state, deposit);
+    await validateTx(state, deposit, defaultDepositMock);
   } catch (e) {
     error = e.message;
   }
@@ -67,13 +132,13 @@ test('prevent double deposit (spent)', async () => {
 
 test('successful exit tx', async () => {
   const state = getInitialState();
-  const tx = Tx.deposit(12, 500, ADDR_1);
-  await validateTx(state, tx);
+  const deposit = Tx.deposit(12, 500, ADDR_1);
+  await validateTx(state, deposit, defaultDepositMock);
   expect(state.balances[ADDR_1]).toBe(500);
-  const outpoint = new Outpoint(tx.hash(), 0);
+  const outpoint = new Outpoint(deposit.hash(), 0);
   expect(state.unspent[outpoint.hex()]).toBeDefined();
 
-  const exit = Tx.exit(new Input(new Outpoint(tx.hash(), 0)));
+  const exit = Tx.exit(new Input(new Outpoint(deposit.hash(), 0)));
   await validateTx(state, exit);
   expect(state.balances[ADDR_1]).toBe(0);
   expect(state.unspent[outpoint.hex()]).toBeNull();
@@ -82,7 +147,7 @@ test('successful exit tx', async () => {
 test('successful transfer tx', async () => {
   const state = getInitialState();
   const deposit = Tx.deposit(12, 500, ADDR_1);
-  await validateTx(state, deposit);
+  await validateTx(state, deposit, defaultDepositMock);
   expect(state.balances[ADDR_1]).toBe(500);
   let outpoint = new Outpoint(deposit.hash(), 0);
   expect(state.unspent[outpoint.hex()]).toBeDefined();
@@ -103,9 +168,9 @@ test('successful transfer tx', async () => {
 test('duplicate tx', async () => {
   const state = getInitialState();
   const tx = Tx.deposit(12, 500, ADDR_1);
-  await validateTx(state, tx);
+  await validateTx(state, tx, defaultDepositMock);
   try {
-    await validateTx(state, tx);
+    await validateTx(state, tx, defaultDepositMock);
   } catch (e) {
     expect(e.message).toBe('Attempt to create existing output');
   }
@@ -114,7 +179,14 @@ test('duplicate tx', async () => {
 test('transfer tx with unowned output', async () => {
   const state = getInitialState();
   const deposit = Tx.deposit(12, 500, ADDR_2);
-  await validateTx(state, deposit);
+  await validateTx(
+    state,
+    deposit,
+    makeBridgeWithDepositMock({
+      owner: ADDR_2,
+      value: '500',
+    })
+  );
   expect(state.balances[ADDR_2]).toBe(500);
   const outpoint = new Outpoint(deposit.hash(), 0);
   expect(state.unspent[outpoint.hex()]).toBeDefined();
@@ -167,7 +239,7 @@ test('transfer tx with several outputs', async () => {
   const state = getInitialState();
 
   const deposit = Tx.deposit(12, 500, ADDR_1);
-  await validateTx(state, deposit);
+  await validateTx(state, deposit, defaultDepositMock);
 
   const transfer = Tx.transfer(
     0,
@@ -193,9 +265,9 @@ test('transfer tx with several inputs', async () => {
   const state = getInitialState();
 
   const deposit = Tx.deposit(12, 500, ADDR_1);
-  await validateTx(state, deposit);
+  await validateTx(state, deposit, defaultDepositMock);
   const deposit2 = Tx.deposit(13, 500, ADDR_1);
-  await validateTx(state, deposit2);
+  await validateTx(state, deposit2, defaultDepositMock);
   expect(state.balances[ADDR_1]).toBe(1000);
 
   const transfer = Tx.transfer(
@@ -215,9 +287,9 @@ test('transfer tx with inputs/outputs mismatch', async () => {
   const state = getInitialState();
 
   const deposit = Tx.deposit(12, 500, ADDR_1);
-  await validateTx(state, deposit);
+  await validateTx(state, deposit, defaultDepositMock);
   const deposit2 = Tx.deposit(13, 500, ADDR_1);
-  await validateTx(state, deposit2);
+  await validateTx(state, deposit2, defaultDepositMock);
   expect(state.balances[ADDR_1]).toBe(1000);
 
   const transfer = Tx.transfer(
