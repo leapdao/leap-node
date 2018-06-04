@@ -6,7 +6,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "test": "echo \"no tests yet\" && exit 0",
+    "test": "./node_modules/.bin/jest",
+    "test:watch": "./node_modules/.bin/jest --watch",
     "precommit": "./node_modules/.bin/lint-staged"
   },
   "lint-staged": {
@@ -26,10 +27,11 @@
     "bracketSpacing": true
   },
   "dependencies": {
-    "body-parser": "^1.18.2",
     "dashdash": "^1.14.1",
-    "express": "^4.16.3",
-    "parsec-lib": "parsec-labs/parsec-lib",
+    "ethereumjs-util": "^5.2.0",
+    "lotion": "parsec-labs/lotion#bab1ed07cffdec4c64622d0196d8f367a72d98b4",
+    "lotion-connect": "parsec-labs/lotion-connect#bump-tendermint",
+    "parsec-lib": "github:parsec-labs/parsec-lib",
     "web3": "^1.0.0-beta.34"
   },
   "devDependencies": {
@@ -41,7 +43,9 @@
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-import": "^2.11.0",
+    "eslint-plugin-jest": "^21.17.0",
     "husky": "^0.14.3",
+    "jest": "^23.0.1",
     "lint-staged": "^7.0.5",
     "prettier": "^1.12.1"
   }

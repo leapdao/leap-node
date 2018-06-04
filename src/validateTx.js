@@ -1,0 +1,85 @@
+const { Type, Outpoint } = require('parsec-lib');
+const { addrCmp } = require('./utils');
+
+const sumOuts = (value, out) => value + out.value;
+
+module.exports = async (state, tx, bridge) => {
+  if (
+    tx.type !== Type.DEPOSIT &&
+    tx.type !== Type.EXIT &&
+    tx.type !== Type.TRANSFER
+  ) {
+    throw new Error('Unsupported tx type. Only deposits, exits and transfers');
+  }
+
+  tx.inputs.forEach(input => {
+    const outpointId = input.prevout.hex();
+    if (!state.unspent[outpointId]) {
+      throw new Error('Trying to spend non-existing output');
+    }
+  });
+
+  if (tx.type === Type.DEPOSIT) {
+    const deposit = await bridge.methods.deposits(tx.options.depositId).call();
+    if (
+      Number(deposit.amount) !== tx.outputs[0].value ||
+      !addrCmp(deposit.owner, tx.outputs[0].address)
+    ) {
+      throw new Error('Trying to submit incorrect deposit');
+    }
+  }
+
+  if (tx.type === Type.EXIT) {
+    if (!tx.inputs.length === 1) {
+      throw new Error('Exit tx should have one input');
+    }
+
+    const [{ prevout }] = tx.inputs;
+    const unspent = state.unspent[prevout.hex()];
+    const exit = await bridge.methods.exits(prevout.getUtxoId()).call();
+    if (Number(exit.amount) !== unspent.value) {
+      throw new Error('Trying to submit incorrect exit');
+    }
+  }
+
+  if (tx.type === Type.TRANSFER) {
+    const inputTransactions = tx.inputs
+      .map(input => state.unspent[input.prevout.hex()])
+      .filter(({ address }, i) => {
+        if (address !== tx.inputs[i].signer) {
+          return false;
+        }
+        return true;
+      });
+
+    if (tx.inputs.length !== inputTransactions.length) {
+      throw new Error('Wrong inputs');
+    }
+
+    const insValue = inputTransactions.reduce(sumOuts, 0);
+    const outsValue = tx.outputs.reduce(sumOuts, 0);
+
+    if (insValue !== outsValue) {
+      throw new Error('Ins and outs values are mismatch');
+    }
+  }
+
+  // remove inputs
+  tx.inputs.forEach(input => {
+    const outpointId = input.prevout.hex();
+    const { address, value } = state.unspent[outpointId];
+    state.balances[address] -= value;
+    state.unspent[outpointId] = null;
+  });
+
+  // add outputs
+  tx.outputs.forEach((out, outPos) => {
+    const outpoint = new Outpoint(tx.hash(), outPos);
+    if (state.unspent[outpoint.hex()] !== undefined) {
+      throw new Error('Attempt to create existing output');
+    }
+    state.balances[out.address] =
+      (state.balances[out.address] || 0) + out.value;
+    state.unspent[outpoint.hex()] = out;
+  });
+};
