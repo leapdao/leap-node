@@ -39,9 +39,9 @@ module.exports = async (state, tx, bridge) => {
     const unspent = state.unspent[prevout.hex()];
     const exit = await bridge.methods.exits(prevout.getUtxoId()).call();
     if (
-      Number(exit.amount) !== unspent.value ||
-      ethUtil.toChecksumAddress(exit.owner) !==
-        ethUtil.toChecksumAddress(unspent.address)
+      Number(exit.amount) !== unspent.value
+      // ethUtil.toChecksumAddress(exit.owner) !==
+      //   ethUtil.toChecksumAddress(unspent.address)
     ) {
       throw new Error('Trying to submit incorrect exit');
     }

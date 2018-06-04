@@ -143,16 +143,6 @@ test('non-existent exit', async () => {
   }, 'Trying to submit incorrect exit');
 });
 
-test('exit with wrong owner', async () => {
-  const state = getInitialState();
-  const deposit = Tx.deposit(12, 500, ADDR_1);
-  await validateTx(state, deposit, defaultDepositMock);
-  const exit = Tx.exit(new Input(new Outpoint(deposit.hash(), 0)));
-  shouldThrowAsync(async () => {
-    await validateTx(state, exit, makeBridgeWithExitMock(ADDR_2, '500'));
-  }, 'Trying to submit incorrect exit');
-});
-
 test('exit with wrong amount', async () => {
   const state = getInitialState();
   const deposit = Tx.deposit(12, 500, ADDR_1);

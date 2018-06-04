@@ -1,7 +1,7 @@
 const Web3 = require('web3');
 const dashdash = require('dashdash');
 const connect = require('lotion-connect');
-const { Tx } = require('parsec-lib');
+const { Tx, Input, Outpoint } = require('parsec-lib');
 const lotion = require('lotion');
 
 const bridgeABI = require('./src/bridgeABI');
@@ -73,8 +73,7 @@ app.listen(options.port).then(async params => {
   console.log(params);
   const client = await connect(params.GCI);
 
-  const eventSubscription = new ContractEventsSubscription(web3, bridge, 1000);
-  eventSubscription.on('NewDeposit', async event => {
+  const handleDeposit = async event => {
     const deposit = await bridge.methods
       .deposits(event.returnValues.depositId)
       .call();
@@ -84,5 +83,25 @@ app.listen(options.port).then(async params => {
       deposit.owner
     );
     await client.send({ encoded: tx.hex() });
-  });
+  };
+
+  const map = mapFn => arr => arr.map(mapFn);
+
+  const handleExit = async event => {
+    const { txHash, outIndex } = event.returnValues;
+    const tx = Tx.exit(new Input(new Outpoint(txHash, Number(outIndex))));
+    await client.send({ encoded: tx.hex() });
+  };
+
+  const eventSubscription = new ContractEventsSubscription(web3, bridge, 1000);
+  const {
+    NewDeposit: deposits,
+    ExitStarted: exits,
+  } = await eventSubscription.init();
+
+  await Promise.all(deposits.map(handleDeposit));
+  await Promise.all(exits.map(handleExit));
+
+  eventSubscription.on('NewDeposit', map(handleDeposit));
+  eventSubscription.on('ExitStarted', map(handleExit));
 });
