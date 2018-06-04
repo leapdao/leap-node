@@ -1,7 +1,6 @@
 const ethUtil = require('ethereumjs-util');
 const { Type, Outpoint } = require('parsec-lib');
 
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 const sumOuts = (value, out) => value + out.value;
 
 module.exports = async (state, tx, bridge) => {
@@ -32,8 +31,20 @@ module.exports = async (state, tx, bridge) => {
   }
 
   if (tx.type === Type.EXIT) {
-    // check exit from contract here
-    await delay(200); // simulates network (contract calls, etc)
+    if (!tx.inputs.length === 1) {
+      throw new Error('Exit tx should have one input');
+    }
+
+    const [{ prevout }] = tx.inputs;
+    const unspent = state.unspent[prevout.hex()];
+    const exit = await bridge.methods.exits(prevout.getUtxoId()).call();
+    if (
+      Number(exit.amount) !== unspent.value ||
+      ethUtil.toChecksumAddress(exit.owner) !==
+        ethUtil.toChecksumAddress(unspent.address)
+    ) {
+      throw new Error('Trying to submit incorrect exit');
+    }
   }
 
   if (tx.type === Type.TRANSFER) {

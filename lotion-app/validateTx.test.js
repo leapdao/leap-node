@@ -25,7 +25,25 @@ const makeBridgeWithDepositMock = (owner, amount) => {
   };
 };
 
+const makeBridgeWithExitMock = (owner, amount) => {
+  return {
+    methods: {
+      exits: () => ({ call: () => Promise.resolve({ owner, amount }) }),
+    },
+  };
+};
+
 const defaultDepositMock = makeBridgeWithDepositMock(ADDR_1, '500');
+
+async function shouldThrowAsync(fn, message) {
+  let error;
+  try {
+    await fn();
+  } catch (e) {
+    error = e.message;
+  }
+  expect(error).toBe(message);
+}
 
 test('successful deposit tx', async () => {
   const state = getInitialState();
@@ -96,14 +114,9 @@ test('prevent double deposit (spent)', async () => {
   await validateTx(state, transfer);
   expect(state.unspent[outpoint.hex()]).toBeNull();
 
-  // Jest doesn't support toThrow with async/await currently https://github.com/facebook/jest/issues/1700
-  let error;
-  try {
+  await shouldThrowAsync(async () => {
     await validateTx(state, deposit, defaultDepositMock);
-  } catch (e) {
-    error = e.message;
-  }
-  expect(error).toBe('Attempt to create existing output');
+  }, 'Attempt to create existing output');
 });
 
 test('successful exit tx', async () => {
@@ -115,9 +128,39 @@ test('successful exit tx', async () => {
   expect(state.unspent[outpoint.hex()]).toBeDefined();
 
   const exit = Tx.exit(new Input(new Outpoint(deposit.hash(), 0)));
-  await validateTx(state, exit);
+  await validateTx(state, exit, makeBridgeWithExitMock(ADDR_1, '500'));
   expect(state.balances[ADDR_1]).toBe(0);
   expect(state.unspent[outpoint.hex()]).toBeNull();
+});
+
+test('non-existent exit', async () => {
+  const state = getInitialState();
+  const deposit = Tx.deposit(12, 500, ADDR_1);
+  await validateTx(state, deposit, defaultDepositMock);
+  const exit = Tx.exit(new Input(new Outpoint(deposit.hash(), 0)));
+  shouldThrowAsync(async () => {
+    await validateTx(state, exit, makeBridgeWithExitMock(EMPTY_ADDR, '0'));
+  }, 'Trying to submit incorrect exit');
+});
+
+test('exit with wrong owner', async () => {
+  const state = getInitialState();
+  const deposit = Tx.deposit(12, 500, ADDR_1);
+  await validateTx(state, deposit, defaultDepositMock);
+  const exit = Tx.exit(new Input(new Outpoint(deposit.hash(), 0)));
+  shouldThrowAsync(async () => {
+    await validateTx(state, exit, makeBridgeWithExitMock(ADDR_2, '500'));
+  }, 'Trying to submit incorrect exit');
+});
+
+test('exit with wrong amount', async () => {
+  const state = getInitialState();
+  const deposit = Tx.deposit(12, 500, ADDR_1);
+  await validateTx(state, deposit, defaultDepositMock);
+  const exit = Tx.exit(new Input(new Outpoint(deposit.hash(), 0)));
+  shouldThrowAsync(async () => {
+    await validateTx(state, exit, makeBridgeWithExitMock(ADDR_1, '600'));
+  }, 'Trying to submit incorrect exit');
 });
 
 test('successful transfer tx', async () => {
