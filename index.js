@@ -95,8 +95,8 @@ app.listen(options.port).then(async params => {
 
   const eventSubscription = new ContractEventsSubscription(web3, bridge, 1000);
   const {
-    NewDeposit: deposits,
-    ExitStarted: exits,
+    NewDeposit: deposits = [],
+    ExitStarted: exits = [],
   } = await eventSubscription.init();
 
   await Promise.all(deposits.map(handleDeposit));
