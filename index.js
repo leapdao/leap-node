@@ -1,33 +1,26 @@
-const express = require('express');
-const bodyParser = require('body-parser');
 const Web3 = require('web3');
 const dashdash = require('dashdash');
-const Node = require('./src/Node');
+const connect = require('lotion-connect');
+const { Tx } = require('parsec-lib');
+const lotion = require('lotion');
+
+const bridgeABI = require('./src/bridgeABI');
+const ContractEventsSubscription = require('./src/ContractEventsSubscription');
+const validateTx = require('./src/validateTx');
+const validateBlock = require('./src/validateBlock');
 
 const dashParser = dashdash.createParser({
   options: [
     {
       names: ['port', 'p'],
       type: 'number',
-      default: 8545,
+      default: 3000,
       help: 'REST API port',
-    },
-    {
-      names: ['host', 'h'],
-      type: 'string',
-      default: '127.0.0.1',
-      help: 'REST API host',
     },
     {
       names: ['bridgeAddr'],
       type: 'string',
       help: 'ParsecBridge contract address',
-    },
-    {
-      names: ['interval'],
-      type: 'number',
-      default: 1,
-      help: 'Interval in minutes for submitting new block',
     },
     {
       names: ['help'],
@@ -40,7 +33,8 @@ const options = dashParser.parse();
 
 if (options.help) {
   const help = dashParser.help({ includeEnv: true }).trimRight();
-  console.log('Options:', help);
+  console.log('Options:');
+  console.log(help);
   process.exit(0);
 }
 
@@ -52,53 +46,37 @@ if (!options.bridgeAddr) {
 const web3 = new Web3();
 web3.setProvider(new web3.providers.HttpProvider('https://rinkeby.infura.io'));
 
-const privKey =
-  '0xad8e31c8862f5f86459e7cca97ac9302c5e1817077902540779eef66e21f394a';
-const node = new Node(web3, options.bridgeAddr, privKey);
-const app = express();
+// const bridgeAddr = '0xE5a9bDAFF671Dc0f9e32b6aa356E4D8938a49869';
+const bridge = new web3.eth.Contract(bridgeABI, options.bridgeAddr);
 
-app.use(
-  bodyParser.json({
-    type: 'application/*+json',
-  })
-);
-
-app.get('/block/:hash', async (req, res) => {
-  const block = await node.getBlock(req.params.hash);
-  res.send(block);
-});
-
-app.get('/tx/:hash', async (req, res) => {
-  const tx = await node.getTransaction(req.params.hash);
-  res.send(tx);
-});
-
-app.get('/currentBlock', async (req, res) => {
-  const hash = await node.getCurrentBlock();
-  res.send(hash);
-});
-
-app.post('/sendRawTransaction', async (req, res) => {
-  const hash = await node.sendRawTransaction(req.body.transaction);
-  res.send(hash);
-});
-
-console.log('Initializing node');
-node.init().then(
-  () => {
-    setInterval(() => {
-      node.submitBlock();
-    }, (options.interval || 1) * 60 * 1000);
-
-    app.listen(options.port, options.host, err => {
-      if (err) {
-        console.error(err);
-      } else {
-        console.log(`Running on ${options.host}:${options.port}`);
-      }
-    });
+const app = lotion({
+  initialState: {
+    balances: {}, // stores account balances
+    unspent: {}, // stores unspent outputs (deposits, transfers)
   },
-  error => {
-    console.error('Initialization failed with error:', error);
-  }
-);
+  abciPort: 46658,
+});
+
+app.useTx(async (state, { encoded }) => {
+  await validateTx(state, Tx.fromRaw(encoded), bridge);
+});
+
+app.useBlock(validateBlock);
+
+app.listen(options.port).then(async params => {
+  console.log(params);
+  const client = await connect(params.GCI);
+
+  const eventSubscription = new ContractEventsSubscription(web3, bridge, 1000);
+  eventSubscription.on('NewDeposit', async event => {
+    const deposit = await bridge.methods
+      .deposits(event.returnValues.depositId)
+      .call();
+    const tx = Tx.deposit(
+      event.returnValues.depositId,
+      Number(deposit.amount),
+      deposit.owner
+    );
+    await client.send({ encoded: tx.hex() });
+  });
+});
