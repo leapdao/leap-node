@@ -27,6 +27,12 @@ const dashParser = dashdash.createParser({
       type: 'bool',
       help: 'Print this help and exit.',
     },
+    {
+      names: ['network'],
+      type: 'string',
+      default: 'https://rinkeby.infura.io',
+      help: 'Ethereum node URL',
+    },
   ],
 });
 const options = dashParser.parse();
@@ -44,7 +50,7 @@ if (!options.bridgeAddr) {
 }
 
 const web3 = new Web3();
-web3.setProvider(new web3.providers.HttpProvider('https://rinkeby.infura.io'));
+web3.setProvider(new web3.providers.HttpProvider(options.network));
 
 // const bridgeAddr = '0xE5a9bDAFF671Dc0f9e32b6aa356E4D8938a49869';
 const bridge = new web3.eth.Contract(bridgeABI, options.bridgeAddr);
