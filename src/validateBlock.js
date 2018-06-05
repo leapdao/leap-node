@@ -14,6 +14,7 @@ module.exports = async (state, chainInfo) => {
     // how to find slot?
     // define order of submission by list of validator addresses
     // build period and submit
-    await delay(200); // simulates network (contract calls, etc)
+    await delay(200); // simulates submit
+    state.mempool = []; // clear mempool
   }
 };

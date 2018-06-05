@@ -11,6 +11,7 @@ const lotion = require('lotion');
 
 const bridgeABI = require('./src/bridgeABI');
 const validateTx = require('./src/validateTx');
+const accumulateTx = require('./src/accumulateTx');
 const validateBlock = require('./src/validateBlock');
 const eventsRelay = require('./src/eventsRelay');
 
@@ -28,6 +29,7 @@ const bridge = new web3.eth.Contract(bridgeABI, config.bridgeAddr);
 
 const app = lotion({
   initialState: {
+    mempool: [],
     balances: {}, // stores account balances
     unspent: {}, // stores unspent outputs (deposits, transfers)
   },
@@ -35,7 +37,9 @@ const app = lotion({
 });
 
 app.useTx(async (state, { encoded }) => {
-  await validateTx(state, Tx.fromRaw(encoded), bridge);
+  const tx = Tx.fromRaw(encoded);
+  await validateTx(state, tx, bridge);
+  accumulateTx(state, tx);
 });
 
 app.useBlock(validateBlock);
