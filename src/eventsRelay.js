@@ -7,7 +7,7 @@ const { map } = require('./utils');
 module.exports = async (GCI, web3, bridge) => {
   const client = await connect(GCI);
 
-  const handleDeposit = async event => {
+  const handleDeposits = map(async event => {
     const deposit = await bridge.methods
       .deposits(event.returnValues.depositId)
       .call();
@@ -17,13 +17,13 @@ module.exports = async (GCI, web3, bridge) => {
       deposit.owner
     );
     await client.send({ encoded: tx.hex() });
-  };
+  });
 
-  const handleExit = async event => {
+  const handleExits = map(async event => {
     const { txHash, outIndex } = event.returnValues;
     const tx = Tx.exit(new Input(new Outpoint(txHash, Number(outIndex))));
     await client.send({ encoded: tx.hex() });
-  };
+  });
 
   const eventSubscription = new ContractEventsSubscription(web3, bridge, 1000);
   const {
@@ -31,9 +31,9 @@ module.exports = async (GCI, web3, bridge) => {
     ExitStarted: exits = [],
   } = await eventSubscription.init();
 
-  await Promise.all(deposits.map(handleDeposit));
-  await Promise.all(exits.map(handleExit));
+  await Promise.all(handleDeposits(deposits));
+  await Promise.all(handleExits(exits));
 
-  eventSubscription.on('NewDeposit', map(handleDeposit));
-  eventSubscription.on('ExitStarted', map(handleExit));
+  eventSubscription.on('NewDeposit', handleDeposits);
+  eventSubscription.on('ExitStarted', handleExits);
 };
