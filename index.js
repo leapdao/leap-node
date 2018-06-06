@@ -36,6 +36,33 @@ const app = lotion({
   abciPort: 46658,
 });
 
+app.useInitializer(async state => {
+  /*
+   * Check if addr in validators list here (how? read all events?)
+   * ----------------------------------------------------------
+   * Join here if add is not a validator. How to set a stake?
+   * Maybe we should handle it outside the node.
+   * So validator should join somewhere (on join page)
+   * and after that run the node? Or init handler can wait for
+   * ValidatorJoin event with validator addr
+   * ----------------------------------------------------------
+   * How to update voting power in tendermint here?
+   * As an option, ValidatorJoin/ValidatorLeave events
+   * can be used to broadcast special tx (not from parsec-lib)
+   *
+   * Each node should check address from event with own
+   * address (we need private key?). If it's match, then
+   * node should update voting power of validator that run it.
+   *
+   * Voting power can be changed in useTx handler
+   * by mutating validators object in chainInfo param
+   *
+   * Validator address/pubKey (pubKey base64 using for validators object keys)
+   * can be found in $LOTION_PATH/config/priv_validator.json
+   */
+  console.log(state);
+});
+
 app.useTx(async (state, { encoded }) => {
   const tx = Tx.fromRaw(encoded);
   await validateTx(state, tx, bridge);
