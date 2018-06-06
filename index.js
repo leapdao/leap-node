@@ -64,6 +64,7 @@ async function run() {
 
       await delay(2000); // waiting for join here
     }
+
     /*
      * Check if addr in validators list here (how? read all events?)
      * ----------------------------------------------------------
@@ -96,7 +97,12 @@ async function run() {
   });
 
   app.useBlock(async (state, chainInfo) => {
-    await validateBlock(state, chainInfo, bridge, config.privKey);
+    await validateBlock(state, chainInfo, {
+      web3,
+      bridge,
+      account,
+      privKey: config.privKey,
+    });
   });
 
   app.listen(config.port).then(params => {
