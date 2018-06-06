@@ -1064,7 +1064,7 @@ body-parser@1.18.2:
     raw-body "2.3.2"
     type-is "~1.6.15"
 
-body-parser@^1.16.0, body-parser@^1.17.2, body-parser@^1.18.2:
+body-parser@^1.16.0, body-parser@^1.17.2:
   version "1.18.3"
   resolved "https://registry.yarnpkg.com/body-parser/-/body-parser-1.18.3.tgz#5b292198ffdd553b3a0f20ded0592b956955c8b4"
   dependencies:
@@ -1689,7 +1689,7 @@ cuid@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/cuid/-/cuid-2.1.1.tgz#3b0fccbda1089ff123a127320c860b975200d62b"
 
-dashdash@^1.12.0, dashdash@^1.14.1:
+dashdash@^1.12.0:
   version "1.14.1"
   resolved "https://registry.yarnpkg.com/dashdash/-/dashdash-1.14.1.tgz#853cfa0f7cbe2fed5de20326b8dd581035f6e2f0"
   dependencies:
@@ -2441,7 +2441,7 @@ express-http-proxy@^1.0.7:
     es6-promise "^4.1.1"
     raw-body "^2.3.0"
 
-express@^4.14.0, express@^4.15.4, express@^4.16.3:
+express@^4.14.0, express@^4.15.4:
   version "4.16.3"
   resolved "https://registry.yarnpkg.com/express/-/express-4.16.3.tgz#6af8a502350db3246ecc4becf6b5a34d22f7ed53"
   dependencies:

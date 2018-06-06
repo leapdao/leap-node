@@ -1,5 +1,4 @@
 const Web3 = require('web3');
-const dashdash = require('dashdash');
 const connect = require('lotion-connect');
 const { Tx, Input, Outpoint } = require('parsec-lib');
 const lotion = require('lotion');
@@ -10,51 +9,18 @@ const validateTx = require('./src/validateTx');
 const validateBlock = require('./src/validateBlock');
 const { map } = require('./src/utils');
 
-const dashParser = dashdash.createParser({
-  options: [
-    {
-      names: ['port', 'p'],
-      type: 'number',
-      default: 3000,
-      help: 'REST API port',
-    },
-    {
-      names: ['bridgeAddr'],
-      type: 'string',
-      help: 'ParsecBridge contract address',
-    },
-    {
-      names: ['help'],
-      type: 'bool',
-      help: 'Print this help and exit.',
-    },
-    {
-      names: ['network'],
-      type: 'string',
-      default: 'https://rinkeby.infura.io',
-      help: 'Ethereum node URL',
-    },
-  ],
-});
-const options = dashParser.parse();
+const config = require('./config.json');
 
-if (options.help) {
-  const help = dashParser.help({ includeEnv: true }).trimRight();
-  console.log('Options:');
-  console.log(help);
-  process.exit(0);
-}
-
-if (!options.bridgeAddr) {
+if (!config.bridgeAddr) {
   console.error('bridgeAddr is required');
   process.exit(0);
 }
 
 const web3 = new Web3();
-web3.setProvider(new web3.providers.HttpProvider(options.network));
+web3.setProvider(new web3.providers.HttpProvider(config.network));
 
 // const bridgeAddr = '0xE5a9bDAFF671Dc0f9e32b6aa356E4D8938a49869';
-const bridge = new web3.eth.Contract(bridgeABI, options.bridgeAddr);
+const bridge = new web3.eth.Contract(bridgeABI, config.bridgeAddr);
 
 const app = lotion({
   initialState: {
@@ -70,7 +36,7 @@ app.useTx(async (state, { encoded }) => {
 
 app.useBlock(validateBlock);
 
-app.listen(options.port).then(async params => {
+app.listen(config.port).then(async params => {
   console.log(params);
   const client = await connect(params.GCI);
 

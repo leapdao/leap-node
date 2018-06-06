@@ -27,7 +27,6 @@
     "bracketSpacing": true
   },
   "dependencies": {
-    "dashdash": "^1.14.1",
     "ethereumjs-util": "^5.2.0",
     "lotion": "parsec-labs/lotion#bab1ed07cffdec4c64622d0196d8f367a72d98b4",
     "lotion-connect": "parsec-labs/lotion-connect#bump-tendermint",
