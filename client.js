@@ -13,6 +13,7 @@ const makeTransfer = require('./src/txHelpers/makeTransfer');
 const sendTx = require('./src/txHelpers/sendTx');
 
 const web3 = new Web3('https://rinkeby.infura.io');
+const parsecWeb3 = new Web3('http://localhost:8645');
 
 const privKey =
   '0xad8e31c8862f5f86459e7cca97ac9302c5e1817077902540779eef66e21f394a';
@@ -29,6 +30,17 @@ async function run() {
   console.log((await getState()).balances);
   console.log('------');
 
+  console.log(`From account: ${account.address}`);
+  console.log(`Balance: ${await parsecWeb3.eth.getBalance(account.address)}`);
+
+  let latestBlockData = await parsecWeb3.eth.getBlock('latest');
+  console.log(`Latest block: ${JSON.stringify(latestBlockData, null, 2)}`);
+
+  console.log(latestBlockData.number);
+  latestBlockData = await parsecWeb3.eth.getBlock(latestBlockData.number);
+  console.log(
+    `Latest block by number: ${JSON.stringify(latestBlockData, null, 2)}`
+  );
   const transfer1 = await makeTransfer(
     await getState(),
     account.address,
@@ -38,6 +50,11 @@ async function run() {
   );
   await sendTx(config.port, transfer1.hex());
   console.log('Transfer:', transfer1.hex());
+  console.log(transfer1.hash());
+  const txData = await parsecWeb3.eth.getTransaction(transfer1.hash());
+  const blockData = await parsecWeb3.eth.getBlock(txData.blockHash);
+  console.log(`getTransaction: ${JSON.stringify(txData, null, 2)}`);
+  console.log(`Block data: ${JSON.stringify(blockData, null, 2)}`);
   console.log('------');
   console.log((await getState()).balances);
   console.log('------');

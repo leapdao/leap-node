@@ -33,6 +33,10 @@
     "ethereumjs-util": "^5.2.0",
     "lotion": "parsec-labs/lotion#6b8aba9dce62c230646eb962cd452615d4414d73",
     "parsec-lib": "parsec-labs/parsec-lib#08b7c303fa68152583cc4ae71ba2ce4f7a3913b8",
+    "connect-jsonrpc": "github:parsec-labs/connect-jsonrpc",
+    "rpc-websockets": "^4.1.2",
+    "express": "^4.16.3",
+    "level": "^4.0.0",
     "tendermint": "^3.1.9",
     "web3": "^1.0.0-beta.34"
   },
