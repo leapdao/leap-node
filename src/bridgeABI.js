@@ -1,8 +1,65 @@
 module.exports = [
   {
     constant: true,
+    inputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    name: 'slots',
+    outputs: [
+      {
+        name: 'owner',
+        type: 'address',
+      },
+      {
+        name: 'stake',
+        type: 'uint64',
+      },
+      {
+        name: 'signer',
+        type: 'address',
+      },
+      {
+        name: 'activationEpoch',
+        type: 'uint32',
+      },
+      {
+        name: 'newOwner',
+        type: 'address',
+      },
+      {
+        name: 'newStake',
+        type: 'uint64',
+      },
+      {
+        name: 'newSigner',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
     inputs: [],
     name: 'lastCompleteEpoch',
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'epochLength',
     outputs: [
       {
         name: '',
@@ -33,6 +90,20 @@ module.exports = [
       },
       {
         name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'averageGasPrice',
+    outputs: [
+      {
+        name: '',
         type: 'uint256',
       },
     ],
