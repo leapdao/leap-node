@@ -6,6 +6,7 @@
   "license": "MPLv2",
   "private": true,
   "scripts": {
+    "start": "node index.js",
     "test": "./node_modules/.bin/jest",
     "test:watch": "./node_modules/.bin/jest --watch",
     "precommit": "./node_modules/.bin/lint-staged"
