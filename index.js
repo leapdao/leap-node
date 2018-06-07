@@ -10,11 +10,12 @@
 const fs = require('fs');
 const { promisify } = require('util');
 const Web3 = require('web3');
-const { Tx } = require('parsec-lib');
+const { Tx, Period } = require('parsec-lib');
 const lotion = require('lotion');
 
 const bridgeABI = require('./src/bridgeABI');
 const validateTx = require('./src/validateTx');
+const checkBridge = require('./src/checkBridge');
 const accumulateTx = require('./src/accumulateTx');
 const validateBlock = require('./src/validateBlock');
 const eventsRelay = require('./src/eventsRelay');
@@ -42,6 +43,11 @@ async function run() {
   }
 
   const account = web3.eth.accounts.privateKeyToAccount(config.privKey);
+
+  const node = {
+    currentPeriod: new Period(),
+    previousPeriod: null,
+  };
 
   const app = lotion({
     initialState: {
@@ -102,6 +108,14 @@ async function run() {
       bridge,
       account,
       privKey: config.privKey,
+      node,
+    });
+  });
+
+  app.usePeriod(async (rsp, chainInfo, height) => {
+    await checkBridge(rsp, chainInfo, height, {
+      node,
+      web3,
     });
   });
 
