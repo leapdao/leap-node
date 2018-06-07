@@ -1,4 +1,3 @@
-import Web3 from 'web3';
 import React from 'react'; // eslint-disable-line
 import ReactDOM from 'react-dom';
 
@@ -12,10 +11,6 @@ if (!window.web3) {
   alert('You need to instal MetaMask first');
 }
 
-const metamask = new Web3();
-metamask.setProvider(window.web3.currentProvider);
-
-// const bridge = web3.eth.contract(abis.bridge).at(bridgeAddress);
 const token = getWeb3()
   .eth.contract(abis.token)
   .at(tokenAddress);

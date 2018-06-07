@@ -1,10 +1,8 @@
 import React, { Fragment } from 'react'; // eslint-disable-line
-import ethUtil from 'ethereumjs-util';
 import getWeb3 from './getWeb3';
 import promisifyWeb3Call from './promisifyWeb3Call';
 import { bridge as bridgeAbi, token as tokenAbi } from './abis';
 import { bridgeAddress, tokenAddress } from './addrs';
-import config from '../config.json';
 
 const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000';
 
@@ -45,16 +43,14 @@ export default class Slots extends React.Component {
   constructor(props) {
     super(props);
 
-    const privKeyBuffer = ethUtil.toBuffer(config.privKey);
-    const signerAddr = `0x${ethUtil
-      .privateToAddress(privKeyBuffer)
-      .toString('hex')}`;
+    const signerAddr = window.localStorage.getItem('signerAddr');
     this.state = {
       slots: [],
       stakes: {},
       signerAddr,
     };
     this.renderSlot = this.renderSlot.bind(this);
+    this.handleSignerChange = this.handleSignerChange.bind(this);
   }
 
   componentDidMount() {
@@ -169,11 +165,22 @@ export default class Slots extends React.Component {
         {symbol}
         {minValue > 0 && ` >= ${minValue}`}
         <br />
-        <button disabled={!stakes[i]} onClick={() => this.handleBet(i)}>
+        <button
+          disabled={!stakes[i] || !signerAddr}
+          onClick={() => this.handleBet(i)}
+        >
           Bet
         </button>
       </li>
     );
+  }
+
+  handleSignerChange(e) {
+    const signerAddr = e.target.value.trim();
+    window.localStorage.setItem('signerAddr', signerAddr);
+    this.setState({
+      signerAddr,
+    });
   }
 
   render() {
@@ -181,7 +188,14 @@ export default class Slots extends React.Component {
     return (
       <div>
         <h2>Slots</h2>
-        <p>Signer address: {signerAddr}</p>
+        <p>
+          Signer address:{' '}
+          <input
+            value={signerAddr}
+            onChange={this.handleSignerChange}
+            style={{ width: 250 }}
+          />
+        </p>
         <ul style={{ display: 'flex', flexWrap: 'wrap' }}>
           {slots.map(this.renderSlot)}
         </ul>

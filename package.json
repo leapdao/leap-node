@@ -28,7 +28,8 @@
   },
   "dependencies": {
     "ethereumjs-util": "^5.2.0",
-    "lotion": "parsec-labs/lotion#develop",
+    "express": "^4.16.3",
+    "lotion": "parsec-labs/lotion#f85beb67ec158b39387185bb5140c366e3037447",
     "lotion-connect": "parsec-labs/lotion-connect#bump-tendermint",
     "parsec-lib": "github:parsec-labs/parsec-lib",
     "web3": "^1.0.0-beta.34"

@@ -12,6 +12,7 @@ const { promisify } = require('util');
 const Web3 = require('web3');
 const { Tx, Period } = require('parsec-lib');
 const lotion = require('lotion');
+const express = require('express');
 
 const bridgeABI = require('./src/bridgeABI');
 const validateTx = require('./src/validateTx');
@@ -29,6 +30,9 @@ if (!config.bridgeAddr) {
   console.error('bridgeAddr is required');
   process.exit(0);
 }
+
+const webUiApp = express();
+webUiApp.use('/', express.static('./joinPage/dist'));
 
 async function run() {
   const web3 = new Web3();
@@ -64,7 +68,7 @@ async function run() {
     if (!isValidator) {
       console.log('=====');
       console.log('You need to become a validator first');
-      console.log('Open http://localhost:/3001 and follow instruction');
+      console.log('Open http://localhost:3001 and follow instruction');
       console.log(`Your validator address will be: ${account.address}`);
       console.log('=====');
 
@@ -119,6 +123,7 @@ async function run() {
     });
   });
 
+  webUiApp.listen(3001);
   app.listen(config.port).then(params => {
     console.log(params);
     eventsRelay(params.GCI, web3, bridge);
