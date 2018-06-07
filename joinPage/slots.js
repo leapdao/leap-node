@@ -123,7 +123,7 @@ export default class Slots extends React.Component {
   }
 
   renderSlot(slot, i) {
-    const { symbol, decimals } = this.props;
+    const { symbol, decimals, balance } = this.props;
     const { signerAddr, stakes } = this.state;
     const isFree = slot.owner === EMPTY_ADDRESS;
     const isOwned = slot.signer === signerAddr;
@@ -131,6 +131,7 @@ export default class Slots extends React.Component {
     const { BigNumber } = getWeb3();
     const minStake = BigNumber.max(slot.stake, slot.newStake).mul(1.05);
     const minValue = minStake.div(decimals).toNumber();
+    const bal = balance.div(decimals).toNumber();
 
     return (
       <li key={i} style={{ width: 500, marginBottom: 20 }}>
@@ -166,7 +167,7 @@ export default class Slots extends React.Component {
         {minValue > 0 && ` >= ${minValue}`}
         <br />
         <button
-          disabled={!stakes[i] || !signerAddr}
+          disabled={!stakes[i] || !signerAddr || stakes[i] > bal}
           onClick={() => this.handleBet(i)}
         >
           Bet

@@ -23,13 +23,19 @@ const readSlots = async (web3, bridge) => {
   );
 };
 
-const getSlotByAddr = async (web3, bridge, address) => {
+const getSlotIdByAddr = async (web3, bridge, address) => {
   const slots = await readSlots(web3, bridge);
   return slots.findIndex(slot => addrCmp(slot.signer, address));
+};
+
+const getSlotsByAddr = async (web3, bridge, address) => {
+  const slots = await readSlots(web3, bridge);
+  return slots.filter(slot => addrCmp(slot.signer, address));
 };
 
 exports.map = map;
 exports.delay = delay;
 exports.range = range;
 exports.addrCmp = addrCmp;
-exports.getSlotByAddr = getSlotByAddr;
+exports.getSlotIdByAddr = getSlotIdByAddr;
+exports.getSlotsByAddr = getSlotsByAddr;

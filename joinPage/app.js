@@ -1,5 +1,6 @@
 import React from 'react';
 import Slots from './slots'; // eslint-disable-line
+import Deposit from './deposit'; // eslint-disable-line
 import promisifyWeb3Call from './promisifyWeb3Call';
 import getWeb3 from './getWeb3';
 import { token as tokenAbi, bridge as bridgeAbi } from './abis';
@@ -35,14 +36,18 @@ export default class App extends React.Component {
   render() {
     const { balance } = this.state;
     const { decimals, symbol } = this.props;
+    if (!balance) {
+      return null;
+    }
     return (
       <div>
-        {balance && (
-          <p>
-            Balance: {Number(balance.div(decimals))} {symbol}
-          </p>
-        )}
-        <Slots {...this.props} />
+        <p>
+          Balance: {Number(balance.div(decimals))} {symbol}
+        </p>
+        <hr />
+        <Deposit {...this.props} balance={balance} />
+        <hr />
+        <Slots {...this.props} balance={balance} />
       </div>
     );
   }

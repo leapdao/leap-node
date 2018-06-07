@@ -13,9 +13,6 @@ module.exports = async (
   chainInfo,
   { bridge, web3, account, privKey, node }
 ) => {
-  // check if this is a validator
-  // how to get address of this validator?
-
   if (chainInfo.height % 32 === 0) {
     node.previousPeriod = node.currentPeriod;
     node.currentPeriod = new Period();
