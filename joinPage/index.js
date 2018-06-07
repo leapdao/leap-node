@@ -8,7 +8,7 @@ import promisifyWeb3Call from './promisifyWeb3Call';
 import { tokenAddress } from './addrs';
 
 if (!window.web3) {
-  alert('You need to instal MetaMask first');
+  alert('You need to instal MetaMask first'); // eslint-disable-line
 }
 
 const token = getWeb3()

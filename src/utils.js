@@ -18,27 +18,14 @@ const range = (s, e) => Array.from(new Array(e - s + 1), (_, i) => i + s);
 
 const readSlots = async (web3, bridge) => {
   const epochLength = await bridge.methods.epochLength().call();
-  return new Promise(resolve => {
-    const result = [];
-    const callback = slotId => (err, slot) => {
-      result[slotId] = slot;
-      if (Object.keys(result).length === epochLength) {
-        resolve(result);
-      }
-    };
-    const slotsBatch = new web3.BatchRequest();
-    for (let slotId = 0; slotId < epochLength; slotId += 1) {
-      slotsBatch.add(
-        bridge.methods.slots(slotId).call.request(callback(slotId))
-      );
-    }
-    slotsBatch.execute();
-  });
+  return Promise.all(
+    range(0, epochLength).map(slotId => bridge.methods.slots(slotId).call())
+  );
 };
 
 const getSlotByAddr = async (web3, bridge, address) => {
   const slots = await readSlots(web3, bridge);
-  return slots.findIndex(slot => addrCmp(slot.signerAddr, address));
+  return slots.findIndex(slot => addrCmp(slot.signer, address));
 };
 
 exports.map = map;

@@ -107,7 +107,7 @@ export default class Slots extends React.Component {
       from: account,
     })
       .then(approveTxHash => {
-        console.log('approve', approveTxHash);
+        console.log('approve', approveTxHash); // eslint-disable-line
         return promisifyWeb3Call(
           bridge.bet.sendTransaction,
           slotId,
@@ -117,7 +117,7 @@ export default class Slots extends React.Component {
         );
       })
       .then(betTxHash => {
-        console.log('bet', betTxHash);
+        console.log('bet', betTxHash); // eslint-disable-line
         this.setStake(slotId, undefined);
       });
   }

@@ -20,7 +20,7 @@ const checkBridge = require('./src/checkBridge');
 const accumulateTx = require('./src/accumulateTx');
 const validateBlock = require('./src/validateBlock');
 const eventsRelay = require('./src/eventsRelay');
-const { delay } = require('./src/utils');
+const { delay, getSlotByAddr } = require('./src/utils');
 
 const config = require('./config.json');
 
@@ -63,9 +63,9 @@ async function run() {
   });
 
   app.useInitializer(async () => {
-    const isValidator = false; // check if account.address in validators list
+    const slotId = await getSlotByAddr(web3, bridge, account.address); // check if account.address in validators list
 
-    if (!isValidator) {
+    if (slotId === -1) {
       console.log('=====');
       console.log('You need to become a validator first');
       console.log('Open http://localhost:3001 and follow instruction');
