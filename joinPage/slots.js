@@ -132,47 +132,72 @@ export default class Slots extends React.Component {
     const minStake = BigNumber.max(slot.stake, slot.newStake).mul(1.05);
     const minValue = minStake.div(decimals).toNumber();
     const bal = balance.div(decimals).toNumber();
+    const currentValuesStyle = {
+      display: 'block',
+      textDecoration: willChange ? 'line-through' : 'none',
+      color: willChange ? '#999' : '#000',
+    };
+    const cellStyle = {
+      verticalAlign: 'top',
+      paddingRight: 10,
+      paddingBottom: 10,
+      paddingTop: 10,
+      borderBottom: '1px solid #ccc',
+    };
 
     return (
-      <li key={i} style={{ width: 500, marginBottom: 20 }}>
-        <h4>
-          Slot {i} {isOwned && '(owner)'} {isFree && '(free)'}
-        </h4>
-        {!isFree && (
+      <tr key={i}>
+        <td style={cellStyle}>
+          {i}
+          <br />
+          {isOwned && '(owner)'}
+        </td>
+        {isFree && (
           <Fragment>
-            <p>Owner: {slot.owner}</p>
-            <p>
-              Stake: {slot.stake.div(decimals).toNumber()} {symbol}
-            </p>
-            <p>Signer: {slot.signer}</p>
-            {willChange && (
-              <Fragment>
-                <p>New owner: {slot.newOwner}</p>
-                <p>New signer: {slot.newSigner}</p>
-                <p>
-                  New stake: {slot.newStake.div(decimals).toNumber()} {symbol}
-                </p>
-                <p>Activation epoch: {slot.activationEpoch.toNumber()}</p>
-              </Fragment>
-            )}
+            <td style={cellStyle} colSpan={4} />
           </Fragment>
         )}
-        <input
-          value={stakes[i] || ''}
-          onChange={e => {
-            this.setStake(i, e.target.value);
-          }}
-        />{' '}
-        {symbol}
-        {minValue > 0 && ` >= ${minValue}`}
-        <br />
-        <button
-          disabled={!stakes[i] || !signerAddr || stakes[i] > bal}
-          onClick={() => this.handleBet(i)}
-        >
-          Bet
-        </button>
-      </li>
+        {!isFree && (
+          <Fragment>
+            <td style={cellStyle}>
+              <span style={currentValuesStyle}>{slot.owner}</span>
+              {willChange && <span>{slot.newOwner}</span>}
+            </td>
+            <td style={cellStyle}>
+              <span style={currentValuesStyle}>{slot.signer}</span>
+              {willChange && <span>{slot.newSigner}</span>}
+            </td>
+            <td style={cellStyle}>
+              <span style={currentValuesStyle}>
+                {slot.stake.div(decimals).toNumber()} {symbol}
+              </span>
+              {willChange && (
+                <span>
+                  {slot.newStake.div(decimals).toNumber()} {symbol}
+                </span>
+              )}
+            </td>
+            <td style={cellStyle}>{slot.activationEpoch.toNumber()}</td>
+          </Fragment>
+        )}
+        <td style={cellStyle}>
+          <input
+            value={stakes[i] || ''}
+            onChange={e => {
+              this.setStake(i, e.target.value);
+            }}
+          />{' '}
+          {symbol}{' '}
+          <button
+            disabled={!stakes[i] || !signerAddr || stakes[i] > bal}
+            onClick={() => this.handleBet(i)}
+          >
+            Bet
+          </button>
+          <br />
+          {minValue > 0 && <span style={{ fontSize: 11 }}> >= {minValue}</span>}
+        </td>
+      </tr>
     );
   }
 
@@ -186,6 +211,10 @@ export default class Slots extends React.Component {
 
   render() {
     const { slots, signerAddr } = this.state;
+    const headerStyle = {
+      textAlign: 'left',
+      paddingRight: 10,
+    };
     return (
       <div>
         <h2>Slots</h2>
@@ -197,9 +226,19 @@ export default class Slots extends React.Component {
             style={{ width: 250 }}
           />
         </p>
-        <ul style={{ display: 'flex', flexWrap: 'wrap' }}>
-          {slots.map(this.renderSlot)}
-        </ul>
+        <table style={{ borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              <th style={headerStyle}>ID</th>
+              <th style={headerStyle}>Owner</th>
+              <th style={headerStyle}>Signer</th>
+              <th style={headerStyle}>Stake</th>
+              <th style={headerStyle}>Act. epoch</th>
+              <th style={headerStyle} />
+            </tr>
+          </thead>
+          <tbody>{slots.map(this.renderSlot)}</tbody>
+        </table>
       </div>
     );
   }
