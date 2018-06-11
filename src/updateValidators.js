@@ -3,8 +3,8 @@ const { readSlots } = require('./utils');
 /*
  * Removes validators except those having a slot
  */
-module.exports = async (state, chainInfo) => {
-  const slots = await readSlots();
+module.exports = async (state, chainInfo, { web3, bridge }) => {
+  const slots = await readSlots(web3, bridge);
 
   Object.keys(chainInfo.validators).forEach(addr => {
     chainInfo.validators[addr] = 0;

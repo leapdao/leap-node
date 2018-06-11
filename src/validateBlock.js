@@ -6,12 +6,7 @@
  */
 
 const { Period, Block, Tx } = require('parsec-lib');
-const {
-  delay,
-  getSlotsByAddr,
-  readSlots,
-  sendTransaction,
-} = require('./utils');
+const { getSlotsByAddr, readSlots, sendTransaction } = require('./utils');
 
 module.exports = async (
   state,
@@ -21,15 +16,12 @@ module.exports = async (
   if (chainInfo.height % 32 === 0) {
     node.previousPeriod = node.currentPeriod;
     node.currentPeriod = new Period();
+    node.checkCallsCount = 0;
     const slots = await readSlots(web3, bridge);
     const mySlots = getSlotsByAddr(slots, account.address);
     const currentSlotId = chainInfo.height % slots.length;
     const currentSlot = mySlots.find(slot => slot.id === currentSlotId);
     if (currentSlot) {
-      // check if there is current slot in slots array
-      // how to find slot?
-      // define order of submission by list of validator addresses
-      // build period and submit
       sendTransaction(
         web3,
         bridge.methods.submitPeriod(
@@ -39,12 +31,6 @@ module.exports = async (
         bridge.address,
         privKey
       );
-      console.log(
-        'Mining new period',
-        chainInfo.height,
-        node.previousPeriod.merkleRoot()
-      );
-      await delay(200); // simulates submit
     }
   }
 

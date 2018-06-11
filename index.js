@@ -97,13 +97,19 @@ async function run() {
       privKey,
       node,
     });
-    await updateValidators(state, chainInfo);
+    await updateValidators(state, chainInfo, {
+      web3,
+      bridge,
+    });
   });
 
   app.usePeriod(async (rsp, chainInfo, height) => {
     await checkBridge(rsp, chainInfo, height, {
       node,
       web3,
+      bridge,
+      account,
+      privKey,
     });
   });
 
