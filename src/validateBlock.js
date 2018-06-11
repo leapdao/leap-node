@@ -23,7 +23,9 @@ module.exports = async (
     node.currentPeriod = new Period();
     const slots = await readSlots(web3, bridge);
     const mySlots = getSlotsByAddr(slots, account.address);
-    if (mySlots.length > 0) {
+    const currentSlotId = chainInfo.height % slots.length;
+    const currentSlot = mySlots.find(slot => slot.id === currentSlotId);
+    if (currentSlot) {
       // check if there is current slot in slots array
       // how to find slot?
       // define order of submission by list of validator addresses
@@ -31,7 +33,7 @@ module.exports = async (
       sendTransaction(
         web3,
         bridge.methods.submitPeriod(
-          slots[0].id,
+          currentSlot.id,
           node.previousPeriod.merkleRoot()
         ),
         bridge.address,
