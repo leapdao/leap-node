@@ -56,8 +56,7 @@ const getSlotIdByAddr = async (web3, bridge, address) => {
   return slots.findIndex(slot => addrCmp(slot.signer, address));
 };
 
-const getSlotsByAddr = async (web3, bridge, address) => {
-  const slots = await readSlots(web3, bridge);
+const getSlotsByAddr = (slots, address) => {
   return slots.filter(slot => addrCmp(slot.signer, address));
 };
 
@@ -83,4 +82,5 @@ exports.range = range;
 exports.addrCmp = addrCmp;
 exports.getSlotIdByAddr = getSlotIdByAddr;
 exports.getSlotsByAddr = getSlotsByAddr;
+exports.readSlots = readSlots;
 exports.sendTransaction = sendTransaction;

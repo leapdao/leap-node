@@ -21,6 +21,7 @@ const validateTx = require('./src/validateTx');
 const checkBridge = require('./src/checkBridge');
 const accumulateTx = require('./src/accumulateTx');
 const validateBlock = require('./src/validateBlock');
+const updateValidators = require('./src/updateValidators');
 const eventsRelay = require('./src/eventsRelay');
 const { getSlotIdByAddr } = require('./src/utils');
 
@@ -96,6 +97,7 @@ async function run() {
       privKey,
       node,
     });
+    await updateValidators(state, chainInfo);
   });
 
   app.usePeriod(async (rsp, chainInfo, height) => {

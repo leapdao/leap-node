@@ -6,7 +6,12 @@
  */
 
 const { Period, Block, Tx } = require('parsec-lib');
-const { delay, getSlotsByAddr, sendTransaction } = require('./utils');
+const {
+  delay,
+  getSlotsByAddr,
+  readSlots,
+  sendTransaction,
+} = require('./utils');
 
 module.exports = async (
   state,
@@ -16,8 +21,9 @@ module.exports = async (
   if (chainInfo.height % 32 === 0) {
     node.previousPeriod = node.currentPeriod;
     node.currentPeriod = new Period();
-    const slots = await getSlotsByAddr(web3, bridge, account.address);
-    if (slots.length > 0) {
+    const slots = await readSlots(web3, bridge);
+    const mySlots = getSlotsByAddr(slots, account.address);
+    if (mySlots.length > 0) {
       // check if there is current slot in slots array
       // how to find slot?
       // define order of submission by list of validator addresses
