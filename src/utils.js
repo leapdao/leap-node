@@ -19,12 +19,12 @@ const range = (s, e) => Array.from(new Array(e - s + 1), (_, i) => i + s);
 const readSlots = async (web3, bridge) => {
   const epochLength = await bridge.methods.epochLength().call();
   const slots = await Promise.all(
-    range(0, epochLength).map(slotId => bridge.methods.getSlot(slotId).call())
+    range(0, epochLength).map(slotId => bridge.methods.slots(slotId).call())
   );
 
   return slots.map(
     (
-      [
+      {
         owner,
         stake,
         signer,
@@ -34,7 +34,7 @@ const readSlots = async (web3, bridge) => {
         newStake,
         newSigner,
         newTendermint,
-      ],
+      },
       i
     ) => ({
       id: i,

@@ -14,6 +14,7 @@ const Web3 = require('web3');
 const { Tx, Period } = require('parsec-lib');
 const lotion = require('lotion');
 const express = require('express');
+const ethUtil = require('ethereumjs-util');
 
 const bridgeABI = require('./src/bridgeABI');
 const validateTx = require('./src/validateTx');
@@ -26,7 +27,6 @@ const { getSlotIdByAddr } = require('./src/utils');
 const config = require('./config.json');
 
 const readFile = promisify(fs.readFile);
-const writeFile = promisify(fs.writeFile);
 
 if (!config.bridgeAddr) {
   console.error('bridgeAddr is required');
@@ -40,15 +40,6 @@ async function run() {
   const web3 = new Web3();
   web3.setProvider(new web3.providers.HttpProvider(config.network));
   const bridge = new web3.eth.Contract(bridgeABI, config.bridgeAddr);
-
-  if (!config.privKey) {
-    // ToDo: try to use private key from tendermint
-    const { privateKey } = web3.eth.accounts.create();
-    config.privKey = privateKey;
-    await writeFile('./config.json', JSON.stringify(config, null, 2));
-  }
-
-  const account = web3.eth.accounts.privateKeyToAccount(config.privKey);
 
   const node = {
     currentPeriod: new Period(),
@@ -69,7 +60,14 @@ async function run() {
     'config',
     'priv_validator.json'
   );
+
   const validatorKey = JSON.parse(await readFile(validatorKeyPath, 'utf-8'));
+  const privKeyBuf = Buffer.from(validatorKey.priv_key.value, 'base64').slice(
+    0,
+    32
+  );
+  const privKey = ethUtil.bufferToHex(privKeyBuf);
+  const account = web3.eth.accounts.privateKeyToAccount(privKey);
 
   app.useInitializer(async () => {
     const slotId = await getSlotIdByAddr(web3, bridge, account.address); // check if account.address in validators list
@@ -95,7 +93,7 @@ async function run() {
       web3,
       bridge,
       account,
-      privKey: config.privKey,
+      privKey,
       node,
     });
   });
