@@ -18,8 +18,36 @@ const range = (s, e) => Array.from(new Array(e - s + 1), (_, i) => i + s);
 
 const readSlots = async (web3, bridge) => {
   const epochLength = await bridge.methods.epochLength().call();
-  return Promise.all(
-    range(0, epochLength).map(slotId => bridge.methods.slots(slotId).call())
+  const slots = await Promise.all(
+    range(0, epochLength).map(slotId => bridge.methods.getSlot(slotId).call())
+  );
+
+  return slots.map(
+    (
+      [
+        owner,
+        stake,
+        signer,
+        tendermint,
+        activationEpoch,
+        newOwner,
+        newStake,
+        newSigner,
+        newTendermint,
+      ],
+      i
+    ) => ({
+      id: i,
+      owner,
+      stake,
+      signer,
+      tendermint,
+      activationEpoch,
+      newOwner,
+      newStake,
+      newSigner,
+      newTendermint,
+    })
   );
 };
 
@@ -33,9 +61,26 @@ const getSlotsByAddr = async (web3, bridge, address) => {
   return slots.filter(slot => addrCmp(slot.signer, address));
 };
 
+async function sendTransaction(web3, method, to, privKey) {
+  const data = method.encodeABI();
+  const gas = Math.round((await method.estimateGas()) * 1.2);
+  const tx = {
+    to,
+    data,
+    gas,
+  };
+  console.log({ tx });
+  const signedTx = await web3.eth.accounts.signTransaction(tx, privKey);
+  console.log({ signedTx });
+  const txResult = web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+  console.log({ txResult });
+  return txResult;
+}
+
 exports.map = map;
 exports.delay = delay;
 exports.range = range;
 exports.addrCmp = addrCmp;
 exports.getSlotIdByAddr = getSlotIdByAddr;
 exports.getSlotsByAddr = getSlotsByAddr;
+exports.sendTransaction = sendTransaction;

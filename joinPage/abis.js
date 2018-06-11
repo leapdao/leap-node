@@ -22,6 +22,10 @@ export const bridge = [
         type: 'address',
       },
       {
+        name: 'tendermint',
+        type: 'address',
+      },
+      {
         name: 'activationEpoch',
         type: 'uint32',
       },
@@ -35,6 +39,10 @@ export const bridge = [
       },
       {
         name: 'newSigner',
+        type: 'address',
+      },
+      {
+        name: 'newTendermint',
         type: 'address',
       },
     ],
@@ -296,6 +304,16 @@ export const bridge = [
         type: 'address',
       },
       {
+        indexed: true,
+        name: 'slotId',
+        type: 'uint256',
+      },
+      {
+        indexed: true,
+        name: 'tenderAddr',
+        type: 'address',
+      },
+      {
         indexed: false,
         name: 'epoch',
         type: 'uint256',
@@ -310,6 +328,43 @@ export const bridge = [
       {
         indexed: true,
         name: 'signerAddr',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        name: 'slotId',
+        type: 'uint256',
+      },
+      {
+        indexed: true,
+        name: 'tenderAddr',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        name: 'epoch',
+        type: 'uint256',
+      },
+    ],
+    name: 'ValidatorLogout',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        name: 'signerAddr',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        name: 'slotId',
+        type: 'uint256',
+      },
+      {
+        indexed: true,
+        name: 'tenderAddr',
         type: 'address',
       },
       {
@@ -345,6 +400,10 @@ export const bridge = [
       },
       {
         name: '',
+        type: 'address',
+      },
+      {
+        name: '',
         type: 'uint32',
       },
       {
@@ -354,6 +413,10 @@ export const bridge = [
       {
         name: '',
         type: 'uint64',
+      },
+      {
+        name: '',
+        type: 'address',
       },
       {
         name: '',
@@ -395,6 +458,10 @@ export const bridge = [
       },
       {
         name: '_signerAddr',
+        type: 'address',
+      },
+      {
+        name: '_tenderAddr',
         type: 'address',
       },
     ],

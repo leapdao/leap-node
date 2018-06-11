@@ -40,7 +40,7 @@ export default class App extends React.Component {
       return null;
     }
     return (
-      <div style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>
+      <div style={{ fontFamily: 'Helvetica, Arial, sans-serif', fontSize: 15 }}>
         <p>
           Balance: {Number(balance.div(decimals))} {symbol}
         </p>

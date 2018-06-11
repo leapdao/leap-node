@@ -5,8 +5,8 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-const { delay, getSlotByAddr } = require('./utils');
 const { Period, Block, Tx } = require('parsec-lib');
+const { delay, getSlotsByAddr, sendTransaction } = require('./utils');
 
 module.exports = async (
   state,
@@ -16,17 +16,26 @@ module.exports = async (
   if (chainInfo.height % 32 === 0) {
     node.previousPeriod = node.currentPeriod;
     node.currentPeriod = new Period();
-    const slotId = await getSlotByAddr(web3, bridge, account.address);
-    if (slotId !== -1) {
+    const slots = await getSlotsByAddr(web3, bridge, account.address);
+    if (slots.length > 0) {
+      // check if there is current slot in slots array
       // how to find slot?
       // define order of submission by list of validator addresses
       // build period and submit
+      sendTransaction(
+        web3,
+        bridge.methods.submitPeriod(
+          slots[0].id,
+          node.previousPeriod.merkleRoot()
+        ),
+        bridge.address,
+        privKey
+      );
       console.log(
         'Mining new period',
         chainInfo.height,
         node.previousPeriod.merkleRoot()
       );
-      console.log('signTransaction', privKey);
       await delay(200); // simulates submit
     }
   }

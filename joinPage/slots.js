@@ -11,7 +11,7 @@ const readSlots = (web3, bridge) => {
     .then(epochLength => {
       const proms = [];
       for (let slotId = 0; slotId < epochLength; slotId += 1) {
-        proms.push(promisifyWeb3Call(bridge.slots, slotId));
+        proms.push(promisifyWeb3Call(bridge.getSlot, slotId));
       }
 
       return Promise.all(proms);
@@ -22,18 +22,22 @@ const readSlots = (web3, bridge) => {
           owner,
           stake,
           signer,
+          tendermint,
           activationEpoch,
           newOwner,
           newStake,
           newSigner,
+          newTendermint,
         ]) => ({
           owner,
           stake,
           signer,
+          tendermint,
           activationEpoch,
           newOwner,
           newStake,
           newSigner,
+          newTendermint,
         })
       )
     );
@@ -44,13 +48,24 @@ export default class Slots extends React.Component {
     super(props);
 
     const signerAddr = window.localStorage.getItem('signerAddr');
+    const tenderAddr = window.localStorage.getItem('tenderAddr');
     this.state = {
       slots: [],
       stakes: {},
       signerAddr,
+      tenderAddr,
     };
     this.renderSlot = this.renderSlot.bind(this);
-    this.handleSignerChange = this.handleSignerChange.bind(this);
+    this.handleSignerChange = this.handleChange.bind(this, 'signerAddr');
+    this.handleTenderAddrChange = this.handleChange.bind(this, 'tenderAddr');
+  }
+
+  handleChange(key, e) {
+    const value = e.target.value.trim();
+    window.localStorage.setItem(key, value);
+    this.setState({
+      [key]: value,
+    });
   }
 
   componentDidMount() {
@@ -96,7 +111,7 @@ export default class Slots extends React.Component {
 
   handleBet(slotId) {
     const { decimals, account } = this.props;
-    const { signerAddr } = this.state;
+    const { signerAddr, tenderAddr } = this.state;
     const { BigNumber } = getWeb3();
     const stake = new BigNumber(this.state.stakes[slotId]).mul(decimals);
     const web3 = getWeb3(true);
@@ -113,6 +128,7 @@ export default class Slots extends React.Component {
           slotId,
           stake,
           signerAddr,
+          `0x${tenderAddr}`, // ToDo: workaround while tenderAddr should be address instead string
           { from: account }
         );
       })
@@ -154,7 +170,7 @@ export default class Slots extends React.Component {
         </td>
         {isFree && (
           <Fragment>
-            <td style={cellStyle} colSpan={4} />
+            <td style={cellStyle} colSpan={5} />
           </Fragment>
         )}
         {!isFree && (
@@ -166,6 +182,16 @@ export default class Slots extends React.Component {
             <td style={cellStyle}>
               <span style={currentValuesStyle}>{slot.signer}</span>
               {willChange && <span>{slot.newSigner}</span>}
+            </td>
+            <td style={cellStyle}>
+              <span style={currentValuesStyle}>
+                {slot.tendermint.replace('0x', '').toUpperCase()}
+              </span>
+              {willChange && (
+                <span>
+                  {slot.newTendermint.replace('0x', '').toUpperCase()}
+                </span>
+              )}
             </td>
             <td style={cellStyle}>
               <span style={currentValuesStyle}>
@@ -201,16 +227,8 @@ export default class Slots extends React.Component {
     );
   }
 
-  handleSignerChange(e) {
-    const signerAddr = e.target.value.trim();
-    window.localStorage.setItem('signerAddr', signerAddr);
-    this.setState({
-      signerAddr,
-    });
-  }
-
   render() {
-    const { slots, signerAddr } = this.state;
+    const { slots, signerAddr, tenderAddr } = this.state;
     const headerStyle = {
       textAlign: 'left',
       paddingRight: 10,
@@ -219,11 +237,19 @@ export default class Slots extends React.Component {
       <div>
         <h2>Slots</h2>
         <p>
-          Signer address:{' '}
+          Validator address:{' '}
           <input
             value={signerAddr}
             onChange={this.handleSignerChange}
-            style={{ width: 250 }}
+            style={{ width: 300 }}
+          />
+        </p>
+        <p>
+          Validator ID:{' '}
+          <input
+            value={tenderAddr}
+            onChange={this.handleTenderAddrChange}
+            style={{ width: 300 }}
           />
         </p>
         <table style={{ borderCollapse: 'collapse' }}>
@@ -231,9 +257,12 @@ export default class Slots extends React.Component {
             <tr>
               <th style={headerStyle}>ID</th>
               <th style={headerStyle}>Owner</th>
-              <th style={headerStyle}>Signer</th>
+              <th style={headerStyle}>Validator address</th>
+              <th style={headerStyle}>Validator ID</th>
               <th style={headerStyle}>Stake</th>
-              <th style={headerStyle}>Act. epoch</th>
+              <th style={headerStyle} colSpan={2}>
+                Act. epoch
+              </th>
               <th style={headerStyle} />
             </tr>
           </thead>

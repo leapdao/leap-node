@@ -8,6 +8,7 @@
 /* eslint-disable no-console */
 
 const fs = require('fs');
+const path = require('path');
 const { promisify } = require('util');
 const Web3 = require('web3');
 const { Tx, Period } = require('parsec-lib');
@@ -24,6 +25,7 @@ const { getSlotIdByAddr } = require('./src/utils');
 
 const config = require('./config.json');
 
+const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
 
 if (!config.bridgeAddr) {
@@ -62,6 +64,13 @@ async function run() {
     abciPort: 46658,
   });
 
+  const validatorKeyPath = path.join(
+    app.lotionPath(),
+    'config',
+    'priv_validator.json'
+  );
+  const validatorKey = JSON.parse(await readFile(validatorKeyPath, 'utf-8'));
+
   app.useInitializer(async () => {
     const slotId = await getSlotIdByAddr(web3, bridge, account.address); // check if account.address in validators list
 
@@ -69,7 +78,8 @@ async function run() {
       console.log('=====');
       console.log('You need to become a validator first');
       console.log('Open http://localhost:3001 and follow instruction');
-      console.log(`Your validator address will be: ${account.address}`);
+      console.log(`Validator address: ${account.address}`);
+      console.log(`Validator ID: ${validatorKey.address}`);
       console.log('=====');
     }
   });
