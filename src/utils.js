@@ -7,6 +7,9 @@
 
 const ethUtil = require('ethereumjs-util');
 
+const GENESIS =
+  '0x4920616d207665727920616e6772792c20627574206974207761732066756e21';
+
 const map = mapFn => arr => arr.map(mapFn);
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -84,3 +87,4 @@ exports.getSlotIdByAddr = getSlotIdByAddr;
 exports.getSlotsByAddr = getSlotsByAddr;
 exports.readSlots = readSlots;
 exports.sendTransaction = sendTransaction;
+exports.GENESIS = GENESIS;

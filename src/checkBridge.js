@@ -1,4 +1,9 @@
-const { getSlotsByAddr, readSlots, sendTransaction } = require('./utils');
+const {
+  getSlotsByAddr,
+  readSlots,
+  sendTransaction,
+  GENESIS,
+} = require('./utils');
 
 module.exports = async (
   rsp,
@@ -22,6 +27,7 @@ module.exports = async (
         web3,
         bridge.methods.submitPeriod(
           currentSlot.id,
+          node.previousPeriod.prevHash || GENESIS,
           node.previousPeriod.merkleRoot()
         ),
         bridge.address,
