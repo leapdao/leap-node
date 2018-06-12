@@ -13,7 +13,6 @@ const { promisify } = require('util');
 const Web3 = require('web3');
 const { Tx, Period } = require('parsec-lib');
 const lotion = require('lotion');
-const express = require('express');
 const ethUtil = require('ethereumjs-util');
 
 const bridgeABI = require('./src/bridgeABI');
@@ -33,9 +32,6 @@ if (!config.bridgeAddr) {
   console.error('bridgeAddr is required');
   process.exit(0);
 }
-
-const webUiApp = express();
-webUiApp.use('/', express.static('./joinPage/dist'));
 
 async function run() {
   const web3 = new Web3();
@@ -113,7 +109,6 @@ async function run() {
     });
   });
 
-  webUiApp.listen(3001);
   app.listen(config.port).then(params => {
     console.log(params);
     eventsRelay(params.GCI, web3, bridge);
