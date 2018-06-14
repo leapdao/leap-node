@@ -20,8 +20,7 @@ module.exports = async (
 ) => {
   if (chainInfo.height % 32 === 0) {
     node.previousPeriod = node.currentPeriod;
-    node.currentPeriod = new Period();
-    node.currentPeriod.prevHash = node.previousPeriod.merkleRoot(); // add to lib?
+    node.currentPeriod = new Period(node.previousPeriod.merkleRoot());
     node.checkCallsCount = 0;
     const slots = await readSlots(web3, bridge);
     const mySlots = getSlotsByAddr(slots, account.address);
@@ -42,10 +41,9 @@ module.exports = async (
     }
   }
 
-  const b = new Block('0x01', chainInfo.height);
+  const b = new Block(chainInfo.height);
   b.addTx(Tx.coinbase(1, account.address));
   state.mempool.forEach(tx => b.addTx(tx));
-  b.sign(privKey);
   node.currentPeriod.addBlock(b);
   state.mempool = [];
 };

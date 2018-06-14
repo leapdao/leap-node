@@ -50,8 +50,11 @@ async function run() {
       unspent: {}, // stores unspent outputs (deposits, transfers)
     },
     abciPort: 46658,
+    createEmptyBlocks: false, // why it's not working?
+    logTendermint: false,
   });
 
+  console.log(app);
   const validatorKeyPath = path.join(
     app.lotionPath(),
     'config',

@@ -2601,8 +2601,8 @@ filename-reserved-regex@^2.0.0:
   resolved "https://registry.yarnpkg.com/filename-reserved-regex/-/filename-reserved-regex-2.0.0.tgz#abf73dfab735d045440abfea2d91f389ebbfa229"
 
 filenamify@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/filenamify/-/filenamify-2.0.0.tgz#bd162262c0b6e94bfbcdcf19a3bbb3764f785695"
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/filenamify/-/filenamify-2.1.0.tgz#88faf495fb1b47abfd612300002a16228c677ee9"
   dependencies:
     filename-reserved-regex "^2.0.0"
     strip-outer "^1.0.0"
@@ -5147,9 +5147,9 @@ parse5@4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/parse5/-/parse5-4.0.0.tgz#6d78656e3da8d78b4ec0b906f7c08ef1dfe3f608"
 
-"parsec-lib@github:parsec-labs/parsec-lib":
+parsec-lib@parsec-labs/parsec-lib#de85fa18f1d59ae3d76627664df810d538cbdac6:
   version "0.2.1"
-  resolved "https://codeload.github.com/parsec-labs/parsec-lib/tar.gz/6cf3f9a17c303ebd017c2fa44d119328b9a0c096"
+  resolved "https://codeload.github.com/parsec-labs/parsec-lib/tar.gz/de85fa18f1d59ae3d76627664df810d538cbdac6"
   dependencies:
     ethereumjs-util "^4.5.0"
     fast-equals "^1.5.0"
