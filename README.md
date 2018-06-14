@@ -19,7 +19,7 @@ ToDo: Install from npm with bin
 
 Change config in `config.json` file
 
-Deployed bridge (rinkeby): `0xE5a9bDAFF671Dc0f9e32b6aa356E4D8938a49869`
+Deployed bridge (rinkeby): `0x59298cae9934ea981a60f216fe4bd508be9e804b`
 
 ## Run
 
