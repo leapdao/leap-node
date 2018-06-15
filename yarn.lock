@@ -1309,8 +1309,8 @@ camelcase@^4.0.0, camelcase@^4.1.0:
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-4.1.0.tgz#d545635be1e33c542649c69173e5de6acfae34dd"
 
 caniuse-lite@^1.0.30000844:
-  version "1.0.30000855"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000855.tgz#d5a26a9093b932d6266bf4ed9294b41b84945d14"
+  version "1.0.30000856"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000856.tgz#ecc16978135a6f219b138991eb62009d25ee8daa"
 
 capture-exit@^1.2.0:
   version "1.2.0"
@@ -5147,9 +5147,9 @@ parse5@4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/parse5/-/parse5-4.0.0.tgz#6d78656e3da8d78b4ec0b906f7c08ef1dfe3f608"
 
-parsec-lib@parsec-labs/parsec-lib#de85fa18f1d59ae3d76627664df810d538cbdac6:
+parsec-lib@parsec-labs/parsec-lib#0cc90801e96db83c4ba1d3e1b4e413e72ee397ae:
   version "0.2.1"
-  resolved "https://codeload.github.com/parsec-labs/parsec-lib/tar.gz/de85fa18f1d59ae3d76627664df810d538cbdac6"
+  resolved "https://codeload.github.com/parsec-labs/parsec-lib/tar.gz/0cc90801e96db83c4ba1d3e1b4e413e72ee397ae"
   dependencies:
     ethereumjs-util "^4.5.0"
     fast-equals "^1.5.0"
