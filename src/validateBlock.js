@@ -43,7 +43,7 @@ module.exports = async (
 
   const b = new Block(chainInfo.height);
   b.addTx(Tx.coinbase(1, account.address));
-  state.mempool.forEach(tx => b.addTx(tx));
+  state.mempool.forEach(tx => b.addTx(Tx.fromJSON(tx)));
   node.currentPeriod.addBlock(b);
   state.mempool = [];
 };
