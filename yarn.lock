@@ -4397,9 +4397,9 @@ lotion-connect@parsec-labs/lotion-connect#bump-tendermint:
     tendermint "^3.1.9"
     varstruct "^6.1.2"
 
-lotion@parsec-labs/lotion#838145aaa877a76ff9ade557518bf76d16b8f805:
+lotion@parsec-labs/lotion#28918208859537960590e94bfc47922248d48f13:
   version "0.1.18"
-  resolved "https://codeload.github.com/parsec-labs/lotion/tar.gz/838145aaa877a76ff9ade557518bf76d16b8f805"
+  resolved "https://codeload.github.com/parsec-labs/lotion/tar.gz/28918208859537960590e94bfc47922248d48f13"
   dependencies:
     abci "github:parsec-labs/js-abci#e563f087e84f49479a5fb289075ce8f2bd4da7a0"
     axios "^0.16.2"
@@ -4418,7 +4418,7 @@ lotion@parsec-labs/lotion#838145aaa877a76ff9ade557518bf76d16b8f805:
     lotion-connect "^0.1.0"
     merk "^1.3.1"
     peer-channel "0.1.1"
-    tendermint-node "github:parsec-labs/tendermint-node"
+    tendermint-node "github:parsec-labs/tendermint-node#e2c530bc817678ec5d380e6a8f73250c7ef1afde"
     varstruct "^6.1.1"
 
 lowercase-keys@^1.0.0:
@@ -6524,9 +6524,9 @@ tar@^4:
     safe-buffer "^5.1.2"
     yallist "^3.0.2"
 
-"tendermint-node@github:parsec-labs/tendermint-node":
+"tendermint-node@github:parsec-labs/tendermint-node#e2c530bc817678ec5d380e6a8f73250c7ef1afde":
   version "2.0.4"
-  resolved "https://codeload.github.com/parsec-labs/tendermint-node/tar.gz/06c83a1a81041051619675ac3b27808a92b48da6"
+  resolved "https://codeload.github.com/parsec-labs/tendermint-node/tar.gz/e2c530bc817678ec5d380e6a8f73250c7ef1afde"
   dependencies:
     axios "^0.18.0"
     cross-spawn "^6.0.5"
