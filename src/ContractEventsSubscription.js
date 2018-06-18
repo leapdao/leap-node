@@ -18,7 +18,7 @@ module.exports = class ContractEventsSubscription extends EventEmitter {
   }
 
   async init() {
-    setInterval(() => this.fetchEvents(), 60 * 1000);
+    setInterval(() => this.fetchEvents(), 5 * 1000);
     return this.fetchEvents();
   }
 
@@ -32,6 +32,7 @@ module.exports = class ContractEventsSubscription extends EventEmitter {
       };
 
       const events = await this.contract.getPastEvents('allEvents', options);
+      console.log(events);
 
       events.forEach(event => {
         groups[event.event] = groups[event.event] || [];
