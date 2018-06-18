@@ -22,7 +22,7 @@ module.exports = async (
     node.previousPeriod = node.currentPeriod;
     node.currentPeriod = new Period(node.previousPeriod.merkleRoot());
     node.checkCallsCount = 0;
-    const slots = await readSlots(web3, bridge);
+    const slots = await readSlots(bridge);
     const mySlots = getSlotsByAddr(slots, account.address);
     const currentSlotId = chainInfo.height % slots.length;
     const currentSlot = mySlots.find(slot => slot.id === currentSlotId);

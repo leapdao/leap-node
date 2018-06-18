@@ -21,7 +21,7 @@ const accumulateTx = require('./src/accumulateTx');
 const validateBlock = require('./src/validateBlock');
 const updateValidators = require('./src/updateValidators');
 const eventsRelay = require('./src/eventsRelay');
-const { getSlotIdByAddr } = require('./src/utils');
+const { readSlots, getSlotsByAddr } = require('./src/utils');
 
 const config = require('./config.json');
 
@@ -50,7 +50,7 @@ async function run() {
       unspent: {}, // stores unspent outputs (deposits, transfers)
     },
     abciPort: 46658,
-    createEmptyBlocks: false, // why it's not working?
+    createEmptyBlocks: false,
     logTendermint: false,
   });
 
@@ -103,9 +103,23 @@ async function run() {
     );
 
     const validatorKey = JSON.parse(await readFile(validatorKeyPath, 'utf-8'));
-    const slotId = await getSlotIdByAddr(web3, bridge, account.address); // check if account.address in validators list
+    const slots = await readSlots(bridge);
+    const mySlots = await getSlotsByAddr(slots, account.address);
 
-    if (slotId === -1) {
+    mySlots.forEach(slot => {
+      if (
+        slot.tendermint.replace('0x', '').toLowerCase() !==
+        validatorKey.address.toLowerCase()
+      ) {
+        console.log(
+          `You need to update validator ID in slot ${slot.id} to ${
+            validatorKey.address
+          }`
+        );
+      }
+    });
+
+    if (mySlots.length === 0) {
       console.log('=====');
       console.log('You need to become a validator first');
       console.log('Open http://localhost:3001 and follow instruction');

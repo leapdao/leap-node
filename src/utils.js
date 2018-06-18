@@ -19,7 +19,7 @@ const addrCmp = (a1, a2) =>
 
 const range = (s, e) => Array.from(new Array(e - s + 1), (_, i) => i + s);
 
-const readSlots = async (web3, bridge) => {
+const readSlots = async bridge => {
   const epochLength = await bridge.methods.epochLength().call();
   const slots = await Promise.all(
     range(0, epochLength).map(slotId => bridge.methods.slots(slotId).call())
@@ -55,7 +55,7 @@ const readSlots = async (web3, bridge) => {
 };
 
 const getSlotIdByAddr = async (web3, bridge, address) => {
-  const slots = await readSlots(web3, bridge);
+  const slots = await readSlots(bridge);
   return slots.findIndex(slot => addrCmp(slot.signer, address));
 };
 
