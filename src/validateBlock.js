@@ -26,7 +26,7 @@ module.exports = async (
     const mySlots = getSlotsByAddr(slots, account.address);
     const currentSlotId = chainInfo.height % slots.length;
     const currentSlot = mySlots.find(slot => slot.id === currentSlotId);
-
+    console.log(currentSlot, currentSlotId, 'submitting');
     if (currentSlot) {
       sendTransaction(
         web3,
