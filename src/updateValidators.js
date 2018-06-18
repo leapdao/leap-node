@@ -13,7 +13,6 @@ module.exports = async (state, chainInfo, { web3, bridge }) => {
     .map(addr => Buffer.from(addr, 'hex').toString('base64'));
 
   Object.keys(chainInfo.validators).forEach(addr => {
-    chainInfo.validators[addr].power.low =
-      validatorAddrs.indexOf(addr) === -1 ? 0 : 10;
+    chainInfo.validators[addr] = validatorAddrs.indexOf(addr) === -1 ? 0 : 10;
   });
 };
