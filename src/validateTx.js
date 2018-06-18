@@ -34,6 +34,17 @@ module.exports = async (state, tx, bridge) => {
     ) {
       throw new Error('Trying to submit incorrect deposit');
     }
+    if (tx.options.depositId <= state.processedDeposit) {
+      throw new Error('Deposit ID already used.');
+    }
+    if (tx.options.depositId > state.processedDeposit + 1) {
+      throw new Error(
+        `Deposit ID skipping ahead. want ${state.processedDeposit + 1}, found ${
+          tx.options.depositId
+        }`
+      );
+    }
+    state.processedDeposit += 1;
   }
 
   if (tx.type === Type.EXIT) {
@@ -76,7 +87,7 @@ module.exports = async (state, tx, bridge) => {
     const outpointId = input.prevout.hex();
     const { address, value } = state.unspent[outpointId];
     state.balances[address] -= value;
-    state.unspent[outpointId] = null;
+    delete state.unspent[outpointId];
   });
 
   // add outputs

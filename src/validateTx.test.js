@@ -15,6 +15,7 @@ const getInitialState = () => ({
   txs: {},
   balances: {},
   unspent: {},
+  processedDeposit: 11,
 });
 
 const makeBridgeWithDepositMock = (owner, amount) => {
@@ -52,6 +53,7 @@ test('successful deposit tx', async () => {
   expect(state.balances[ADDR_1]).toBe(500);
   const outpoint = new Outpoint(tx.hash(), 0);
   expect(state.unspent[outpoint.hex()]).toBeDefined();
+  expect(state.processedDeposit).toBe(12);
 });
 
 test('non-existent deposit', async () => {
@@ -61,6 +63,16 @@ test('non-existent deposit', async () => {
     await validateTx(state, tx, makeBridgeWithDepositMock(EMPTY_ADDR, '0'));
   } catch (e) {
     expect(e.message).toBe('Trying to submit incorrect deposit');
+  }
+});
+
+test('deposit skipping depositId', async () => {
+  const state = getInitialState();
+  const tx = Tx.deposit(13, 500, ADDR_1);
+  try {
+    await validateTx(state, tx, defaultDepositMock);
+  } catch (e) {
+    expect(e.message).toBe('Deposit ID skipping ahead. want 12, found 13');
   }
 });
 
@@ -94,7 +106,7 @@ test('prevent double deposit', async () => {
   try {
     await validateTx(state, tx, defaultDepositMock);
   } catch (e) {
-    expect(e.message).toBe('Attempt to create existing output');
+    expect(e.message).toBe('Deposit ID already used.');
   }
 });
 
@@ -112,11 +124,11 @@ test('prevent double deposit (spent)', async () => {
     [new Output(500, ADDR_2)]
   ).sign([PRIV_1]);
   await validateTx(state, transfer);
-  expect(state.unspent[outpoint.hex()]).toBeNull();
+  expect(state.unspent[outpoint.hex()]).toBeUndefined();
 
   await shouldThrowAsync(async () => {
     await validateTx(state, deposit, defaultDepositMock);
-  }, 'Attempt to create existing output');
+  }, 'Deposit ID already used.');
 });
 
 test('successful exit tx', async () => {
@@ -130,7 +142,7 @@ test('successful exit tx', async () => {
   const exit = Tx.exit(new Input(new Outpoint(deposit.hash(), 0)));
   await validateTx(state, exit, makeBridgeWithExitMock(ADDR_1, '500'));
   expect(state.balances[ADDR_1]).toBe(0);
-  expect(state.unspent[outpoint.hex()]).toBeNull();
+  expect(state.unspent[outpoint.hex()]).toBeUndefined();
 });
 
 test('non-existent exit', async () => {
@@ -169,7 +181,7 @@ test('successful transfer tx', async () => {
   await validateTx(state, transfer);
   expect(state.balances[ADDR_1]).toBe(0);
   expect(state.balances[ADDR_2]).toBe(500);
-  expect(state.unspent[transfer.inputs[0].prevout.hex()]).toBeNull();
+  expect(state.unspent[transfer.inputs[0].prevout.hex()]).toBeUndefined();
   outpoint = new Outpoint(transfer.hash(), 0);
   expect(state.unspent[outpoint.hex()]).toBeDefined();
 });
@@ -181,7 +193,7 @@ test('duplicate tx', async () => {
   try {
     await validateTx(state, tx, defaultDepositMock);
   } catch (e) {
-    expect(e.message).toBe('Attempt to create existing output');
+    expect(e.message).toBe('Deposit ID already used.');
   }
 });
 
