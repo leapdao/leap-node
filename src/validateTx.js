@@ -87,6 +87,6 @@ module.exports = async (state, tx, bridge) => {
     }
     state.balances[out.address] =
       (state.balances[out.address] || 0) + out.value;
-    state.unspent[outpoint.hex()] = out;
+    state.unspent[outpoint.hex()] = out.toJSON();
   });
 };
