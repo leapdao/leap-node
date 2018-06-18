@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "author": "Alex Lunyov <isuntc@gmail.com>",
-  "license": "MIT",
+  "license": "MPLv2",
   "private": true,
   "scripts": {
     "test": "./node_modules/.bin/jest",
