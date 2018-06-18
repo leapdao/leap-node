@@ -35,7 +35,7 @@ module.exports = async (
           node.previousPeriod.prevHash || GENESIS,
           node.previousPeriod.merkleRoot()
         ),
-        bridge.address,
+        bridge.options.address,
         privKey
       );
     }
