@@ -16,7 +16,7 @@ module.exports = async (
   rsp,
   chainInfo,
   height,
-  { node, web3, bridge, account, privKey }
+  { node, web3, bridge, account }
 ) => {
   const period = await bridge.methods
     .periods(node.previousPeriod.merkleRoot())
@@ -38,7 +38,7 @@ module.exports = async (
           node.previousPeriod.merkleRoot()
         ),
         bridge.address,
-        privKey
+        account
       );
     }
 

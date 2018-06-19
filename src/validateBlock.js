@@ -24,7 +24,7 @@ module.exports = async (state, chainInfo, { bridge, web3, account, node }) => {
     const currentSlot = mySlots.find(slot => slot.id === currentSlotId);
     console.log(currentSlot, currentSlotId, 'submitting');
     if (currentSlot) {
-      sendTransaction(
+      await sendTransaction(
         web3,
         bridge.methods.submitPeriod(
           currentSlot.id,
@@ -32,7 +32,7 @@ module.exports = async (state, chainInfo, { bridge, web3, account, node }) => {
           node.previousPeriod.merkleRoot()
         ),
         bridge.options.address,
-        account.privKey
+        account
       );
     }
   }
