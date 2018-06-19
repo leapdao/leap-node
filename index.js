@@ -51,7 +51,7 @@ async function run() {
     },
     abciPort: 46658,
     createEmptyBlocks: false,
-    logTendermint: false,
+    logTendermint: true,
   });
 
   if (!config.privKey) {
@@ -103,6 +103,10 @@ async function run() {
     );
 
     const validatorKey = JSON.parse(await readFile(validatorKeyPath, 'utf-8'));
+    const validatorID = Buffer.from(
+      validatorKey.pub_key.value,
+      'base64'
+    ).toString('hex');
     const slots = await readSlots(bridge);
     const mySlots = await getSlotsByAddr(slots, account.address);
 
@@ -112,9 +116,7 @@ async function run() {
         validatorKey.address.toLowerCase()
       ) {
         console.log(
-          `You need to update validator ID in slot ${slot.id} to ${
-            validatorKey.address
-          }`
+          `You need to update validator ID in slot ${slot.id} to ${validatorID}`
         );
       }
     });
@@ -124,7 +126,7 @@ async function run() {
       console.log('You need to become a validator first');
       console.log('Open http://localhost:3001 and follow instruction');
       console.log(`Validator address: ${account.address}`);
-      console.log(`Validator ID: ${validatorKey.address}`);
+      console.log(`Validator ID: ${validatorID}`);
       console.log('=====');
     }
   });

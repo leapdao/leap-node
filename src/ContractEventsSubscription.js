@@ -32,7 +32,6 @@ module.exports = class ContractEventsSubscription extends EventEmitter {
       };
 
       const events = await this.contract.getPastEvents('allEvents', options);
-      console.log(events);
 
       events.forEach(event => {
         groups[event.event] = groups[event.event] || [];

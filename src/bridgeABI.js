@@ -1,55 +1,5 @@
 module.exports = [
   {
-    constant: false,
-    inputs: [
-      {
-        name: '_proof',
-        type: 'bytes32[]',
-      },
-    ],
-    name: 'withdrawBurn',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        name: '_proof',
-        type: 'bytes32[]',
-      },
-      {
-        name: '_prevProof',
-        type: 'bytes32[]',
-      },
-    ],
-    name: 'challengeExit',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        name: '_proof',
-        type: 'bytes32[]',
-      },
-      {
-        name: '_prevProof',
-        type: 'bytes32[]',
-      },
-    ],
-    name: 'reportDoubleSpend',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
     constant: true,
     inputs: [
       {
@@ -73,7 +23,7 @@ module.exports = [
       },
       {
         name: 'tendermint',
-        type: 'address',
+        type: 'bytes32',
       },
       {
         name: 'activationEpoch',
@@ -93,55 +43,11 @@ module.exports = [
       },
       {
         name: 'newTendermint',
-        type: 'address',
+        type: 'bytes32',
       },
     ],
     payable: false,
     stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        name: '_slotId',
-        type: 'uint256',
-      },
-      {
-        name: '_prevHash',
-        type: 'bytes32',
-      },
-      {
-        name: '_root',
-        type: 'bytes32',
-      },
-      {
-        name: 'orphans',
-        type: 'bytes32[]',
-      },
-    ],
-    name: 'submitAndPrune',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        name: '_owner',
-        type: 'address',
-      },
-      {
-        name: '_amount',
-        type: 'uint256',
-      },
-    ],
-    name: 'deposit',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -202,127 +108,6 @@ module.exports = [
   {
     constant: true,
     inputs: [],
-    name: 'getTip',
-    outputs: [
-      {
-        name: '',
-        type: 'bytes32',
-      },
-      {
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        name: '_slotId',
-        type: 'uint256',
-      },
-      {
-        name: '_value',
-        type: 'uint256',
-      },
-      {
-        name: '_signerAddr',
-        type: 'address',
-      },
-      {
-        name: '_tenderAddr',
-        type: 'address',
-      },
-      {
-        name: '_owner',
-        type: 'address',
-      },
-    ],
-    name: 'bet',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        name: '_slotId',
-        type: 'uint256',
-      },
-    ],
-    name: 'getSlot',
-    outputs: [
-      {
-        name: '',
-        type: 'address',
-      },
-      {
-        name: '',
-        type: 'uint64',
-      },
-      {
-        name: '',
-        type: 'address',
-      },
-      {
-        name: '',
-        type: 'address',
-      },
-      {
-        name: '',
-        type: 'uint32',
-      },
-      {
-        name: '',
-        type: 'address',
-      },
-      {
-        name: '',
-        type: 'uint64',
-      },
-      {
-        name: '',
-        type: 'address',
-      },
-      {
-        name: '',
-        type: 'address',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        name: '_slotId',
-        type: 'uint256',
-      },
-      {
-        name: '_prevHash',
-        type: 'bytes32',
-      },
-      {
-        name: '_root',
-        type: 'bytes32',
-      },
-    ],
-    name: 'submitPeriod',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
     name: 'averageGasPrice',
     outputs: [
       {
@@ -332,66 +117,6 @@ module.exports = [
     ],
     payable: false,
     stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        name: '_proof',
-        type: 'bytes32[]',
-      },
-    ],
-    name: 'startExit',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        name: '_txData',
-        type: 'bytes32[]',
-      },
-    ],
-    name: 'reportInvalidDeposit',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        name: '_slotId',
-        type: 'uint256',
-      },
-      {
-        name: '_value',
-        type: 'uint256',
-      },
-    ],
-    name: 'slash',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        name: '_slotId',
-        type: 'uint256',
-      },
-    ],
-    name: 'activate',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -431,15 +156,6 @@ module.exports = [
     ],
     payable: false,
     stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [],
-    name: 'finalizeExits',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -600,7 +316,7 @@ module.exports = [
       {
         indexed: true,
         name: 'tenderAddr',
-        type: 'address',
+        type: 'bytes32',
       },
       {
         indexed: false,
@@ -627,7 +343,7 @@ module.exports = [
       {
         indexed: true,
         name: 'tenderAddr',
-        type: 'address',
+        type: 'bytes32',
       },
       {
         indexed: false,
@@ -654,7 +370,7 @@ module.exports = [
       {
         indexed: true,
         name: 'tenderAddr',
-        type: 'address',
+        type: 'bytes32',
       },
       {
         indexed: false,
@@ -681,10 +397,294 @@ module.exports = [
       {
         indexed: true,
         name: 'tenderAddr',
-        type: 'address',
+        type: 'bytes32',
       },
     ],
     name: 'ValidatorUpdate',
     type: 'event',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        name: '_slotId',
+        type: 'uint256',
+      },
+    ],
+    name: 'getSlot',
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+      {
+        name: '',
+        type: 'uint64',
+      },
+      {
+        name: '',
+        type: 'address',
+      },
+      {
+        name: '',
+        type: 'bytes32',
+      },
+      {
+        name: '',
+        type: 'uint32',
+      },
+      {
+        name: '',
+        type: 'address',
+      },
+      {
+        name: '',
+        type: 'uint64',
+      },
+      {
+        name: '',
+        type: 'address',
+      },
+      {
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'getTip',
+    outputs: [
+      {
+        name: '',
+        type: 'bytes32',
+      },
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        name: '_slotId',
+        type: 'uint256',
+      },
+      {
+        name: '_value',
+        type: 'uint256',
+      },
+      {
+        name: '_signerAddr',
+        type: 'address',
+      },
+      {
+        name: '_tenderAddr',
+        type: 'bytes32',
+      },
+      {
+        name: '_owner',
+        type: 'address',
+      },
+    ],
+    name: 'bet',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        name: '_slotId',
+        type: 'uint256',
+      },
+    ],
+    name: 'activate',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        name: '_slotId',
+        type: 'uint256',
+      },
+      {
+        name: '_prevHash',
+        type: 'bytes32',
+      },
+      {
+        name: '_root',
+        type: 'bytes32',
+      },
+      {
+        name: 'orphans',
+        type: 'bytes32[]',
+      },
+    ],
+    name: 'submitAndPrune',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        name: '_slotId',
+        type: 'uint256',
+      },
+      {
+        name: '_prevHash',
+        type: 'bytes32',
+      },
+      {
+        name: '_root',
+        type: 'bytes32',
+      },
+    ],
+    name: 'submitPeriod',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        name: '_txData',
+        type: 'bytes32[]',
+      },
+    ],
+    name: 'reportInvalidDeposit',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        name: '_proof',
+        type: 'bytes32[]',
+      },
+      {
+        name: '_prevProof',
+        type: 'bytes32[]',
+      },
+    ],
+    name: 'reportDoubleSpend',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        name: '_slotId',
+        type: 'uint256',
+      },
+      {
+        name: '_value',
+        type: 'uint256',
+      },
+    ],
+    name: 'slash',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        name: '_owner',
+        type: 'address',
+      },
+      {
+        name: '_amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'deposit',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        name: '_proof',
+        type: 'bytes32[]',
+      },
+    ],
+    name: 'withdrawBurn',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        name: '_proof',
+        type: 'bytes32[]',
+      },
+    ],
+    name: 'startExit',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        name: '_proof',
+        type: 'bytes32[]',
+      },
+      {
+        name: '_prevProof',
+        type: 'bytes32[]',
+      },
+    ],
+    name: 'challengeExit',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [],
+    name: 'finalizeExits',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
 ];
