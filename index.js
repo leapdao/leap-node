@@ -15,11 +15,12 @@ const { Tx, Period } = require('parsec-lib');
 const lotion = require('lotion');
 
 const bridgeABI = require('./src/bridgeABI');
-const validateTx = require('./src/validateTx');
-const checkBridge = require('./src/checkBridge');
-const accumulateTx = require('./src/accumulateTx');
-const validateBlock = require('./src/validateBlock');
-const updateValidators = require('./src/updateValidators');
+const validateTx = require('./src/tx/validateTx');
+const accumulateTx = require('./src/tx/accumulateTx');
+const validateBlock = require('./src/block/validateBlock');
+const submitPeriod = require('./src/block/submitPeriod');
+const updateValidators = require('./src/block/updateValidators');
+const checkBridge = require('./src/period/checkBridge');
 const eventsRelay = require('./src/eventsRelay');
 const { readSlots, getSlotsByAddr } = require('./src/utils');
 
@@ -51,7 +52,7 @@ async function run() {
     },
     abciPort: 46658,
     createEmptyBlocks: false,
-    logTendermint: true,
+    logTendermint: false,
   });
 
   if (!config.privKey) {
@@ -69,16 +70,19 @@ async function run() {
   });
 
   app.useBlock(async (state, chainInfo) => {
-    await validateBlock(state, chainInfo, {
-      web3,
+    await submitPeriod(state, chainInfo, {
       bridge,
+      web3,
       account,
-      privKey: config.privKey,
+      node,
+    });
+    await validateBlock(state, chainInfo, {
+      account,
       node,
     });
     await updateValidators(state, chainInfo, {
-      web3,
       bridge,
+      web3,
     });
   });
 

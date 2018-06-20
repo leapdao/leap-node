@@ -5,24 +5,30 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-const { Period, Block, Tx } = require('parsec-lib');
 const {
   getSlotsByAddr,
   readSlots,
   sendTransaction,
   GENESIS,
-} = require('./utils');
+} = require('../utils');
 
-module.exports = async (state, chainInfo, { bridge, web3, account, node }) => {
-  if (chainInfo.height % 32 === 0) {
-    node.previousPeriod = node.currentPeriod;
-    node.currentPeriod = new Period(node.previousPeriod.merkleRoot());
-    node.checkCallsCount = 0;
+module.exports = async (
+  rsp,
+  chainInfo,
+  height,
+  { node, web3, bridge, account }
+) => {
+  const period = await bridge.methods
+    .periods(node.previousPeriod.merkleRoot())
+    .call();
+
+  // period not found
+  if (period.timestamp === '0') {
     const slots = await readSlots(bridge);
     const mySlots = getSlotsByAddr(slots, account.address);
-    const currentSlotId = chainInfo.height % slots.length;
+    const currentSlotId = (height + node.checkCallsCount) % slots.length;
     const currentSlot = mySlots.find(slot => slot.id === currentSlotId);
-    console.log(currentSlot, currentSlotId, 'submitting');
+
     if (currentSlot) {
       await sendTransaction(
         web3,
@@ -31,15 +37,15 @@ module.exports = async (state, chainInfo, { bridge, web3, account, node }) => {
           node.previousPeriod.prevHash || GENESIS,
           node.previousPeriod.merkleRoot()
         ),
-        bridge.options.address,
+        bridge.address,
         account
       );
     }
+
+    rsp.status = 1;
+  } else {
+    rsp.status = 0;
   }
 
-  const b = new Block(chainInfo.height);
-  b.addTx(Tx.coinbase(1, account.address));
-  state.mempool.forEach(tx => b.addTx(Tx.fromJSON(tx)));
-  node.currentPeriod.addBlock(b);
-  state.mempool = [];
+  node.checkCallsCount += 1;
 };

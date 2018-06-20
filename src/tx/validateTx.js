@@ -6,7 +6,7 @@
  */
 
 const { Type, Outpoint } = require('parsec-lib');
-const { addrCmp } = require('./utils');
+const { addrCmp } = require('../utils');
 
 const sumOuts = (value, out) => value + out.value;
 
