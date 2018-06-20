@@ -15,12 +15,15 @@ const { Tx, Period } = require('parsec-lib');
 const lotion = require('lotion');
 
 const bridgeABI = require('./src/bridgeABI');
-const validateTx = require('./src/tx/validateTx');
+const applyTx = require('./src/tx/applyTx');
 const accumulateTx = require('./src/tx/accumulateTx');
-const validateBlock = require('./src/block/validateBlock');
+
+const addBlock = require('./src/block/addBlock');
 const submitPeriod = require('./src/block/submitPeriod');
 const updateValidators = require('./src/block/updateValidators');
+
 const checkBridge = require('./src/period/checkBridge');
+
 const eventsRelay = require('./src/eventsRelay');
 const { readSlots, getSlotsByAddr } = require('./src/utils');
 
@@ -66,7 +69,7 @@ async function run() {
 
   app.useTx(async (state, { encoded }) => {
     const tx = Tx.fromRaw(encoded);
-    await validateTx(state, tx, bridge);
+    await applyTx(state, tx, bridge);
     accumulateTx(state, tx);
   });
 
@@ -77,7 +80,7 @@ async function run() {
       account,
       node,
     });
-    await validateBlock(state, chainInfo, {
+    await addBlock(state, chainInfo, {
       account,
       node,
     });

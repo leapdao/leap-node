@@ -9,7 +9,7 @@ const connect = require('lotion-connect');
 const { Tx, Input, Outpoint } = require('parsec-lib');
 
 const ContractEventsSubscription = require('./ContractEventsSubscription');
-const { map } = require('./utils');
+const { map } = require('../utils');
 
 module.exports = async (GCI, web3, bridge) => {
   const client = await connect(GCI);
