@@ -15,13 +15,17 @@
 ToDo: Install from npm with bin
 ```
 
+## Staking UI
+
+Dev: http://stake-dev.parseclabs.org/
+Testnet: N/A
+Mainnet: N/A
+
 ## Configure
 
-Change config in `config.json` file
-
-Deployed bridge (rinkeby): `0x59298cae9934ea981a60f216fe4bd508be9e804b`
+Change config in `config.json` file (can be found in staking UI)
 
 ## Run
 
-`node index.js`
+`yarn start`
 
