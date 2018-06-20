@@ -10,6 +10,7 @@ const {
   getSlotsByAddr,
   readSlots,
   sendTransaction,
+  getCurrentSlotId,
   GENESIS,
 } = require('../utils');
 
@@ -20,7 +21,7 @@ module.exports = async (state, chainInfo, { bridge, web3, account, node }) => {
     node.checkCallsCount = 0;
     const slots = await readSlots(bridge);
     const mySlots = getSlotsByAddr(slots, account.address);
-    const currentSlotId = chainInfo.height % slots.length;
+    const currentSlotId = getCurrentSlotId(slots, chainInfo.height);
     const currentSlot = mySlots.find(slot => slot.id === currentSlotId);
     console.log(currentSlot, currentSlotId, 'submitting');
     if (currentSlot) {

@@ -8,9 +8,7 @@
 const { PubKey } = require('tendermint/lib/types');
 const { ripemd160 } = require('tendermint/lib/hash');
 
-const { readSlots } = require('../utils');
-
-const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000';
+const { readSlots, EMPTY_ADDRESS } = require('../utils');
 
 function getAddress(pubkey) {
   const bytes = PubKey.encode(pubkey);

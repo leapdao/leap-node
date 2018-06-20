@@ -10,6 +10,8 @@ const ethUtil = require('ethereumjs-util');
 const GENESIS =
   '0x4920616d207665727920616e6772792c20627574206974207761732066756e21';
 
+const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000';
+
 const map = mapFn => arr => arr.map(mapFn);
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -84,6 +86,12 @@ async function sendTransaction(web3, method, to, account) {
   return txResult;
 }
 
+function getCurrentSlotId(slots, height) {
+  const activeSlots = slots.filter(s => s.owner !== EMPTY_ADDRESS);
+  const index = height % activeSlots.length;
+  return activeSlots[index].id;
+}
+
 exports.map = map;
 exports.delay = delay;
 exports.range = range;
@@ -91,5 +99,7 @@ exports.addrCmp = addrCmp;
 exports.getSlotIdByAddr = getSlotIdByAddr;
 exports.getSlotsByAddr = getSlotsByAddr;
 exports.readSlots = readSlots;
+exports.getCurrentSlotId = getCurrentSlotId;
 exports.sendTransaction = sendTransaction;
 exports.GENESIS = GENESIS;
+exports.EMPTY_ADDRESS = EMPTY_ADDRESS;
