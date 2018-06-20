@@ -32,7 +32,7 @@ module.exports = async (GCI, web3, bridge) => {
     await client.send({ encoded: tx.hex() });
   });
 
-  const eventSubscription = new ContractEventsSubscription(web3, bridge, 1000);
+  const eventSubscription = new ContractEventsSubscription(web3, bridge);
   const {
     NewDeposit: deposits = [],
     ExitStarted: exits = [],

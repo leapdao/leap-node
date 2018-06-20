@@ -8,13 +8,12 @@
 const EventEmitter = require('events');
 
 module.exports = class ContractEventsSubscription extends EventEmitter {
-  constructor(web3, contract, lookAheadPeriod) {
+  constructor(web3, contract) {
     super();
 
     this.fromBlock = null;
     this.web3 = web3;
     this.contract = contract;
-    this.lookAheadPeriod = lookAheadPeriod;
   }
 
   async init() {
@@ -25,19 +24,17 @@ module.exports = class ContractEventsSubscription extends EventEmitter {
   async fetchEvents() {
     const blockNumber = await this.web3.eth.getBlockNumber();
     const groups = {};
-    if (this.fromBlock || this.lookAheadPeriod) {
-      const options = {
-        fromBlock: this.fromBlock || blockNumber - this.lookAheadPeriod,
-        toBlock: 'latest',
-      };
+    const options = {
+      fromBlock: this.fromBlock || 0,
+      toBlock: 'latest',
+    };
 
-      const events = await this.contract.getPastEvents('allEvents', options);
+    const events = await this.contract.getPastEvents('allEvents', options);
 
-      events.forEach(event => {
-        groups[event.event] = groups[event.event] || [];
-        groups[event.event].push(event);
-      });
-    }
+    events.forEach(event => {
+      groups[event.event] = groups[event.event] || [];
+      groups[event.event].push(event);
+    });
 
     if (!this.fromBlock) {
       Object.keys(groups).forEach(group => {
