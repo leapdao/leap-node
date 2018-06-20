@@ -7,7 +7,7 @@
 
 const connect = require('lotion-connect');
 const Web3 = require('web3');
-const makeTransfer = require('./makeTransfer');
+const makeTransfer = require('./src/txHelpers/makeTransfer');
 
 const web3 = new Web3('https://rinkeby.infura.io');
 
