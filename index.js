@@ -49,6 +49,7 @@ async function run() {
       mempool: [],
       balances: {}, // stores account balances
       unspent: {}, // stores unspent outputs (deposits, transfers)
+      processedDeposit: 1,
     },
     abciPort: 46658,
     createEmptyBlocks: false,
@@ -117,7 +118,7 @@ async function run() {
     mySlots.forEach(slot => {
       if (
         slot.tendermint.replace('0x', '').toLowerCase() !==
-        validatorKey.address.toLowerCase()
+        validatorID.toLowerCase()
       ) {
         console.log(
           `You need to update validator ID in slot ${slot.id} to ${validatorID}`

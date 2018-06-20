@@ -27,13 +27,6 @@ module.exports = async (state, tx, bridge) => {
   });
 
   if (tx.type === Type.DEPOSIT) {
-    const deposit = await bridge.methods.deposits(tx.options.depositId).call();
-    if (
-      Number(deposit.amount) !== tx.outputs[0].value ||
-      !addrCmp(deposit.owner, tx.outputs[0].address)
-    ) {
-      throw new Error('Trying to submit incorrect deposit');
-    }
     if (tx.options.depositId <= state.processedDeposit) {
       throw new Error('Deposit ID already used.');
     }
@@ -43,6 +36,13 @@ module.exports = async (state, tx, bridge) => {
           tx.options.depositId
         }`
       );
+    }
+    const deposit = await bridge.methods.deposits(tx.options.depositId).call();
+    if (
+      Number(deposit.amount) !== tx.outputs[0].value ||
+      !addrCmp(deposit.owner, tx.outputs[0].address)
+    ) {
+      throw new Error('Trying to submit incorrect deposit');
     }
     state.processedDeposit += 1;
   }
