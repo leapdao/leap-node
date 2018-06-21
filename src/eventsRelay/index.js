@@ -43,4 +43,6 @@ module.exports = async (GCI, web3, bridge) => {
 
   eventSubscription.on('NewDeposit', handleDeposits);
   eventSubscription.on('ExitStarted', handleExits);
+
+  return eventSubscription;
 };

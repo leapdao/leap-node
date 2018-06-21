@@ -46,6 +46,7 @@ async function run() {
     currentPeriod: new Period(),
     previousPeriod: null,
   };
+  node.slots = await readSlots(bridge);
 
   const app = lotion({
     initialState: {
@@ -55,8 +56,9 @@ async function run() {
       processedDeposit: 1,
     },
     abciPort: 46658,
+    tendermintPort: 46659,
     createEmptyBlocks: false,
-    logTendermint: false,
+    logTendermint: true,
   });
 
   if (!config.privKey) {
@@ -67,27 +69,28 @@ async function run() {
 
   const account = web3.eth.accounts.privateKeyToAccount(config.privKey);
 
+  app.useInitChain(chainInfo => {
+    updateValidators(chainInfo, node.slots);
+  });
+
   app.useTx(async (state, { encoded }) => {
     const tx = Tx.fromRaw(encoded);
     await applyTx(state, tx, bridge);
     accumulateTx(state, tx);
   });
 
-  app.useBlock(async (state, chainInfo) => {
-    await submitPeriod(state, chainInfo, {
+  app.useBlock((state, chainInfo) => {
+    submitPeriod(chainInfo, {
       bridge,
       web3,
       account,
       node,
     });
-    await addBlock(state, chainInfo, {
+    addBlock(state, chainInfo, {
       account,
       node,
     });
-    await updateValidators(state, chainInfo, {
-      bridge,
-      web3,
-    });
+    updateValidators(chainInfo, node.slots);
   });
 
   app.usePeriod(async (rsp, chainInfo, height) => {
@@ -102,7 +105,14 @@ async function run() {
 
   app.listen(config.port).then(async params => {
     console.log(params);
-    eventsRelay(params.GCI, web3, bridge);
+    const subscription = await eventsRelay(params.GCI, web3, bridge);
+    const updateSlots = async () => {
+      node.slots = await readSlots(bridge);
+    };
+    subscription.on('ValidatorJoin', updateSlots);
+    subscription.on('ValidatorLogout', updateSlots);
+    subscription.on('ValidatorLeave', updateSlots);
+    subscription.on('ValidatorUpdate', updateSlots);
 
     const validatorKeyPath = path.join(
       params.lotionPath,
@@ -115,8 +125,7 @@ async function run() {
       validatorKey.pub_key.value,
       'base64'
     ).toString('hex');
-    const slots = await readSlots(bridge);
-    const mySlots = await getSlotsByAddr(slots, account.address);
+    const mySlots = await getSlotsByAddr(node.slots, account.address);
 
     mySlots.forEach(slot => {
       if (

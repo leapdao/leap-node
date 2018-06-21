@@ -8,7 +8,7 @@
 const { PubKey } = require('tendermint/lib/types');
 const { ripemd160 } = require('tendermint/lib/hash');
 
-const { readSlots, EMPTY_ADDRESS } = require('../utils');
+const { EMPTY_ADDRESS } = require('../utils');
 
 function getAddress(pubkey) {
   const bytes = PubKey.encode(pubkey);
@@ -18,8 +18,7 @@ function getAddress(pubkey) {
 /*
  * Removes validators except those having a slot
  */
-module.exports = async (state, chainInfo, { bridge }) => {
-  const slots = await readSlots(bridge);
+module.exports = (chainInfo, slots) => {
   const validatorPubKeys = slots
     .filter(s => s.owner !== EMPTY_ADDRESS)
     .map(s => s.tendermint.replace('0x', ''))

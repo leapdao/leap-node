@@ -8,24 +8,22 @@
 const { Period } = require('parsec-lib');
 const {
   getSlotsByAddr,
-  readSlots,
   sendTransaction,
   getCurrentSlotId,
   GENESIS,
 } = require('../utils');
 
-module.exports = async (state, chainInfo, { bridge, web3, account, node }) => {
+module.exports = (chainInfo, { bridge, web3, account, node }) => {
   if (chainInfo.height % 32 === 0) {
     node.previousPeriod = node.currentPeriod;
     node.currentPeriod = new Period(node.previousPeriod.merkleRoot());
     node.checkCallsCount = 0;
-    const slots = await readSlots(bridge);
-    const mySlots = getSlotsByAddr(slots, account.address);
-    const currentSlotId = getCurrentSlotId(slots, chainInfo.height);
+    const mySlots = getSlotsByAddr(node.slots, account.address);
+    const currentSlotId = getCurrentSlotId(node.slots, chainInfo.height);
     const currentSlot = mySlots.find(slot => slot.id === currentSlotId);
     console.log(currentSlot, currentSlotId, 'submitting');
     if (currentSlot) {
-      await sendTransaction(
+      sendTransaction(
         web3,
         bridge.methods.submitPeriod(
           currentSlot.id,

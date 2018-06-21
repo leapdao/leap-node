@@ -7,7 +7,7 @@
 
 const { Block, Tx } = require('parsec-lib');
 
-module.exports = async (state, chainInfo, { account, node }) => {
+module.exports = (state, chainInfo, { account, node }) => {
   const b = new Block(chainInfo.height);
   b.addTx(Tx.coinbase(1, account.address));
   state.mempool.forEach(tx => b.addTx(Tx.fromJSON(tx)));
