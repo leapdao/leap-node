@@ -15,8 +15,8 @@ const { Tx, Period } = require('parsec-lib');
 const lotion = require('lotion');
 
 const cliArgs = require('./src/cliArgs');
-const Db = require('./src/db');
-const jsonrpc = require('./src/jsonrpc');
+const Db = require('./src/api/db');
+const jsonrpc = require('./src/api/jsonrpc');
 
 const bridgeABI = require('./src/bridgeABI');
 const applyTx = require('./src/tx/applyTx');
