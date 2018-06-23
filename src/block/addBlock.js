@@ -7,7 +7,7 @@
 
 const { Block, Tx } = require('parsec-lib');
 
-module.exports = (state, chainInfo, { node, db }) => {
+module.exports = async (state, chainInfo, { node, db }) => {
   const b = new Block(chainInfo.height, {
     timestamp: Math.round(Date.now() / 1000),
   });
