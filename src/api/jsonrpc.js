@@ -95,7 +95,7 @@ module.exports = async (node, config, CGI, db) => {
     };
   };
 
-  const getBlockByNumber = async (heightOrTag, ...args) => {
+  const getBlockByNumber = async (heightOrTag, showFullTxs = false) => {
     let height = heightOrTag;
     if (heightOrTag === 'latest') {
       height = node.blockHeight;
@@ -103,7 +103,7 @@ module.exports = async (node, config, CGI, db) => {
       height = parseInt(height, 16);
     }
     const blockDoc = await db.getBlock(height);
-    return getBlockByHash(blockDoc, ...args);
+    return getBlockByHash(blockDoc, showFullTxs);
   };
 
   const withCallback = method => {
