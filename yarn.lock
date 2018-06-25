@@ -285,8 +285,8 @@ ap@~0.1.0:
   resolved "https://registry.yarnpkg.com/ap/-/ap-0.1.0.tgz#d8a3f26615379398a1b53ca6cc1a666a0fbfe150"
 
 app-root-path@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/app-root-path/-/app-root-path-2.0.1.tgz#cd62dcf8e4fd5a417efc664d2e5b10653c651b46"
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/app-root-path/-/app-root-path-2.1.0.tgz#98bf6599327ecea199309866e8140368fd2e646a"
 
 append-transform@^1.0.0:
   version "1.0.0"
@@ -475,8 +475,8 @@ babel-core@^6.0.0, babel-core@^6.26.0, babel-core@^6.26.3:
     source-map "^0.5.7"
 
 babel-eslint@^8.2.3:
-  version "8.2.3"
-  resolved "https://registry.yarnpkg.com/babel-eslint/-/babel-eslint-8.2.3.tgz#1a2e6681cc9bc4473c32899e59915e19cd6733cf"
+  version "8.2.5"
+  resolved "https://registry.yarnpkg.com/babel-eslint/-/babel-eslint-8.2.5.tgz#dc2331c259d36782aa189da510c43dedd5adc7a3"
   dependencies:
     "@babel/code-frame" "7.0.0-beta.44"
     "@babel/traverse" "7.0.0-beta.44"
@@ -1309,8 +1309,8 @@ camelcase@^4.0.0, camelcase@^4.1.0:
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-4.1.0.tgz#d545635be1e33c542649c69173e5de6acfae34dd"
 
 caniuse-lite@^1.0.30000844:
-  version "1.0.30000856"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000856.tgz#ecc16978135a6f219b138991eb62009d25ee8daa"
+  version "1.0.30000858"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000858.tgz#f6f203a9128bac507136de1cf6cfd966d2df027c"
 
 capture-exit@^1.2.0:
   version "1.2.0"
@@ -2028,8 +2028,8 @@ ee-first@1.1.1:
   resolved "https://registry.yarnpkg.com/ee-first/-/ee-first-1.1.1.tgz#590c61156b0ae2f4f0255732a158b266bc56b21d"
 
 electron-to-chromium@^1.3.47:
-  version "1.3.49"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.49.tgz#651384b0d81f078a96639b2b36975141b7915004"
+  version "1.3.50"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.50.tgz#7438b76f92b41b919f3fbdd350fbd0757dacddf7"
 
 elegant-spinner@^1.0.1:
   version "1.0.1"
@@ -2052,8 +2052,8 @@ encodeurl@~1.0.2:
   resolved "https://registry.yarnpkg.com/encodeurl/-/encodeurl-1.0.2.tgz#ad3ff4c86ec2d029322f5a02c3a9a606c95b3f59"
 
 encoding-down@~5.0.0:
-  version "5.0.3"
-  resolved "https://registry.yarnpkg.com/encoding-down/-/encoding-down-5.0.3.tgz#b2b2305b2b810ff6d0bda85583bfc71bda56dc49"
+  version "5.0.4"
+  resolved "https://registry.yarnpkg.com/encoding-down/-/encoding-down-5.0.4.tgz#1e477da8e9e9d0f7c8293d320044f8b2cd8e9614"
   dependencies:
     abstract-leveldown "^5.0.0"
     inherits "^2.0.3"
@@ -2153,8 +2153,8 @@ eslint-module-utils@^2.2.0:
     pkg-dir "^1.0.0"
 
 eslint-plugin-import@^2.11.0:
-  version "2.12.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-import/-/eslint-plugin-import-2.12.0.tgz#dad31781292d6664b25317fd049d2e2b2f02205d"
+  version "2.13.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-import/-/eslint-plugin-import-2.13.0.tgz#df24f241175e312d91662dc91ca84064caec14ed"
   dependencies:
     contains-path "^0.1.0"
     debug "^2.6.8"
@@ -4208,8 +4208,8 @@ leveldown@^4.0.0:
     prebuild-install "^4.0.0"
 
 levelup@^3.0.0:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/levelup/-/levelup-3.0.1.tgz#07794639fd0af185089130aaea09d03023637b8d"
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/levelup/-/levelup-3.1.0.tgz#4a14724d53132a673ad49a821594cf0faee005bd"
   dependencies:
     deferred-leveldown "~4.0.0"
     level-errors "~2.0.0"
@@ -4397,9 +4397,9 @@ lotion-connect@parsec-labs/lotion-connect#bump-tendermint:
     tendermint "^3.1.9"
     varstruct "^6.1.2"
 
-lotion@parsec-labs/lotion#6d339dc4d3479114379ab89c1b7acb808af7887a:
+lotion@parsec-labs/lotion#09ad5ad4eb7d9a7e7eef96cfcbd5a21101bcfec8:
   version "0.1.18"
-  resolved "https://codeload.github.com/parsec-labs/lotion/tar.gz/6d339dc4d3479114379ab89c1b7acb808af7887a"
+  resolved "https://codeload.github.com/parsec-labs/lotion/tar.gz/09ad5ad4eb7d9a7e7eef96cfcbd5a21101bcfec8"
   dependencies:
     abci "github:parsec-labs/js-abci#e563f087e84f49479a5fb289075ce8f2bd4da7a0"
     axios "^0.16.2"
@@ -4418,7 +4418,7 @@ lotion@parsec-labs/lotion#6d339dc4d3479114379ab89c1b7acb808af7887a:
     lotion-connect "^0.1.0"
     merk "^1.3.1"
     peer-channel "0.1.1"
-    tendermint-node "github:parsec-labs/tendermint-node#e2c530bc817678ec5d380e6a8f73250c7ef1afde"
+    tendermint-node "github:parsec-labs/tendermint-node#6133e4b590a62911aeb637c459dfa6a65d108d04"
     varstruct "^6.1.1"
 
 lowercase-keys@^1.0.0:
@@ -4759,8 +4759,8 @@ nice-try@^1.0.4:
   resolved "https://registry.yarnpkg.com/nice-try/-/nice-try-1.0.4.tgz#d93962f6c52f2c1558c0fbda6d512819f1efe1c4"
 
 node-abi@^2.2.0:
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/node-abi/-/node-abi-2.4.1.tgz#7628c4d4ec4e9cd3764ceb3652f36b2e7f8d4923"
+  version "2.4.3"
+  resolved "https://registry.yarnpkg.com/node-abi/-/node-abi-2.4.3.tgz#43666b7b17e57863e572409edbb82115ac7af28b"
   dependencies:
     semver "^5.4.1"
 
@@ -4773,8 +4773,8 @@ node-cmake@2.3.2:
     yargs "^7.0.2"
 
 node-gyp-build@^3.0.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/node-gyp-build/-/node-gyp-build-3.3.0.tgz#df755c8dba1120c7c5e3179bbfd4203aa495e9a3"
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/node-gyp-build/-/node-gyp-build-3.4.0.tgz#f8f62507e65f152488b28aac25d04b9d79748cf7"
 
 node-int64@^0.4.0:
   version "0.4.0"
@@ -4806,8 +4806,8 @@ node-pre-gyp@0.6.x:
     tar-pack "^3.4.0"
 
 node-pre-gyp@^0.10.0:
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/node-pre-gyp/-/node-pre-gyp-0.10.0.tgz#6e4ef5bb5c5203c6552448828c852c40111aac46"
+  version "0.10.2"
+  resolved "https://registry.yarnpkg.com/node-pre-gyp/-/node-pre-gyp-0.10.2.tgz#e8945c20ef6795a20aac2b44f036eb13cf5146e3"
   dependencies:
     detect-libc "^1.0.2"
     mkdirp "^0.5.1"
@@ -4815,7 +4815,7 @@ node-pre-gyp@^0.10.0:
     nopt "^4.0.1"
     npm-packlist "^1.1.6"
     npmlog "^4.0.2"
-    rc "^1.1.7"
+    rc "^1.2.7"
     rimraf "^2.6.1"
     semver "^5.3.0"
     tar "^4"
@@ -5539,7 +5539,7 @@ raw-body@2.3.3, raw-body@^2.3.0:
     iconv-lite "0.4.23"
     unpipe "1.0.0"
 
-rc@^1.1.6, rc@^1.1.7:
+rc@^1.1.6, rc@^1.1.7, rc@^1.2.7:
   version "1.2.8"
   resolved "https://registry.yarnpkg.com/rc/-/rc-1.2.8.tgz#cd924bf5200a075b83c188cd6b9e211b7fc0d3ed"
   dependencies:
@@ -6524,9 +6524,9 @@ tar@^4:
     safe-buffer "^5.1.2"
     yallist "^3.0.2"
 
-"tendermint-node@github:parsec-labs/tendermint-node#e2c530bc817678ec5d380e6a8f73250c7ef1afde":
+"tendermint-node@github:parsec-labs/tendermint-node#6133e4b590a62911aeb637c459dfa6a65d108d04":
   version "2.0.4"
-  resolved "https://codeload.github.com/parsec-labs/tendermint-node/tar.gz/e2c530bc817678ec5d380e6a8f73250c7ef1afde"
+  resolved "https://codeload.github.com/parsec-labs/tendermint-node/tar.gz/6133e4b590a62911aeb637c459dfa6a65d108d04"
   dependencies:
     axios "^0.18.0"
     cross-spawn "^6.0.5"
@@ -6718,8 +6718,8 @@ trim@0.0.1:
   resolved "https://registry.yarnpkg.com/trim/-/trim-0.0.1.tgz#5858547f6b290757ee95cccc666fb50084c460dd"
 
 tslib@^1.9.0:
-  version "1.9.2"
-  resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.9.2.tgz#8be0cc9a1f6dc7727c38deb16c2ebd1a2892988e"
+  version "1.9.3"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.9.3.tgz#d7e4dd79245d85428c4d7e4822a79917954ca286"
 
 tunnel-agent@^0.6.0:
   version "0.6.0"
