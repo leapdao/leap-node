@@ -55,8 +55,8 @@ async function run() {
       unspent: {}, // stores unspent outputs (deposits, transfers)
       processedDeposit: 1,
     },
-    abciPort: 46658,
-    tendermintPort: 46659,
+    abciPort: 26658,
+    tendermintPort: 26659,
     createEmptyBlocks: false,
     logTendermint: true,
   });
