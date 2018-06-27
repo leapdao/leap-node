@@ -12,8 +12,6 @@ const api = express();
 * Starts JSON RPC server
 */
 module.exports = async (node, config, CGI, db) => {
-  const client = await connect(CGI);
-
   const getNetwork = async () => node.networkId;
 
   const getBalance = async (address, tag = 'latest') => {
@@ -35,6 +33,7 @@ module.exports = async (node, config, CGI, db) => {
 
   const sendRawTransaction = async data => {
     const tx = Tx.fromRaw(data);
+    const client = await connect(CGI);
     client.send({ encoded: data });
     return tx.hash();
   };
