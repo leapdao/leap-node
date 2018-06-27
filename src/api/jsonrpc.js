@@ -32,6 +32,7 @@ module.exports = async (node, config, CGI, db) => {
   };
 
   const getUnspent = async address => {
+    const client = await connect(CGI);
     const unspent = await client.state.unspent;
     return Object.keys(unspent)
       .map(k => ({
