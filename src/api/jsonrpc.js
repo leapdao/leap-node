@@ -31,6 +31,21 @@ module.exports = async (node, config, CGI, db) => {
     return `0x${node.blockHeight.toString(16)}`;
   };
 
+  const getUnspent = async address => {
+    const unspent = await client.state.unspent;
+    return Object.keys(unspent)
+      .map(k => ({
+        outpoint: k,
+        output: unspent[k],
+      }))
+      .filter(unspend => {
+        return unspend.output && unspend.output.address === address;
+      })
+      .sort((a, b) => {
+        return a.output.value - b.output.value;
+      });
+  };
+
   const sendRawTransaction = async data => {
     const tx = Tx.fromRaw(data);
     const client = await connect(CGI);
@@ -126,6 +141,7 @@ module.exports = async (node, config, CGI, db) => {
     eth_getTransactionByHash: getTransactionByHash,
     eth_getBlockByHash: getBlockByHash,
     eth_getBlockByNumber: getBlockByNumber,
+    parsec_unspent: getUnspent,
   };
 
   api.use(
