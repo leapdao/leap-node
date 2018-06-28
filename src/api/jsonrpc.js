@@ -1,11 +1,12 @@
 const express = require('express');
 const cors = require('cors');
-const connect = require('lotion-connect');
 const jsonrpc = require('connect-jsonrpc');
 const WsJsonRpcServer = require('rpc-websockets').Server;
 
 const { INVALID_PARAMS } = jsonrpc;
 const { Tx, Block, Util } = require('parsec-lib');
+
+const sendTx = require('../txHelpers/sendTx.js');
 
 const api = express();
 
@@ -18,7 +19,7 @@ api.use(
 /*
 * Starts JSON RPC server
 */
-module.exports = async (node, config, CGI, db) => {
+module.exports = async (node, config, lotionPort, db) => {
   const getNetwork = async () => node.networkId;
 
   const getBalance = async (address, tag = 'latest') => {
@@ -45,19 +46,20 @@ module.exports = async (node, config, CGI, db) => {
         outpoint: k,
         output: unspent[k],
       }))
-      .filter(unspend => {
-        return unspend.output && unspend.output.address === address;
+      .filter(u => {
+        return (
+          u.output && u.output.address.toLowerCase() === address.toLowerCase()
+        );
       })
       .sort((a, b) => {
         return a.output.value - b.output.value;
       });
   };
 
-  const client = await connect(CGI);
   const sendRawTransaction = async rawTx => {
     const data = Buffer.from(rawTx.data);
     const tx = Tx.fromRaw(data);
-    await client.send({ encoded: `0x${data.toString('hex')}` });
+    await sendTx(lotionPort, `0x${data.toString('hex')}`);
     return tx.hash();
   };
 
