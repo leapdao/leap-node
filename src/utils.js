@@ -98,6 +98,22 @@ function getCurrentSlotId(slots, height) {
   return activeSlots[index].id;
 }
 
+function unspentForAddress(unspent, address) {
+  return Object.keys(unspent)
+    .map(k => ({
+      outpoint: k,
+      output: unspent[k],
+    }))
+    .filter(u => {
+      return (
+        u.output && u.output.address.toLowerCase() === address.toLowerCase()
+      );
+    })
+    .sort((a, b) => {
+      return a.output.value - b.output.value;
+    });
+}
+
 exports.map = map;
 exports.seq = seq;
 exports.delay = delay;
@@ -108,5 +124,6 @@ exports.getSlotsByAddr = getSlotsByAddr;
 exports.readSlots = readSlots;
 exports.getCurrentSlotId = getCurrentSlotId;
 exports.sendTransaction = sendTransaction;
+exports.unspentForAddress = unspentForAddress;
 exports.GENESIS = GENESIS;
 exports.EMPTY_ADDRESS = EMPTY_ADDRESS;

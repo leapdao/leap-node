@@ -4293,7 +4293,7 @@ lotion@parsec-labs/lotion#6b8aba9dce62c230646eb962cd452615d4414d73:
   version "0.1.18"
   resolved "https://codeload.github.com/parsec-labs/lotion/tar.gz/6b8aba9dce62c230646eb962cd452615d4414d73"
   dependencies:
-    abci "github:parsec-labs/js-abci#a4be8a213afb3a2974b32f8434664009d1cfae1b"
+    abci "github:parsec-labs/js-abci#375f5408075a0b0f0f216069534a5af209e1e909"
     axios "^0.16.2"
     body-parser "^1.17.2"
     cors "^2.8.4"
@@ -4310,7 +4310,7 @@ lotion@parsec-labs/lotion#6b8aba9dce62c230646eb962cd452615d4414d73:
     lotion-connect "^0.1.0"
     merk "^1.3.1"
     peer-channel "0.1.1"
-    tendermint-node "github:parsec-labs/tendermint-node#2d59b42874550ee91e36f82ad842095db93ffed9"
+    tendermint-node "^2.0.4"
     varstruct "^6.1.1"
 
 lowercase-keys@^1.0.0:
@@ -5000,9 +5000,9 @@ parse5@4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/parse5/-/parse5-4.0.0.tgz#6d78656e3da8d78b4ec0b906f7c08ef1dfe3f608"
 
-parsec-lib@parsec-labs/parsec-lib#0cc90801e96db83c4ba1d3e1b4e413e72ee397ae:
-  version "0.2.1"
-  resolved "https://codeload.github.com/parsec-labs/parsec-lib/tar.gz/0cc90801e96db83c4ba1d3e1b4e413e72ee397ae"
+parsec-lib@parsec-labs/parsec-lib#08b7c303fa68152583cc4ae71ba2ce4f7a3913b8:
+  version "0.5.0"
+  resolved "https://codeload.github.com/parsec-labs/parsec-lib/tar.gz/08b7c303fa68152583cc4ae71ba2ce4f7a3913b8"
   dependencies:
     ethereumjs-util "^4.5.0"
     fast-equals "^1.5.0"
