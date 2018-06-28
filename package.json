@@ -28,6 +28,7 @@
     "bracketSpacing": true
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "ethereumjs-util": "^5.2.0",
     "lotion": "parsec-labs/lotion#6b8aba9dce62c230646eb962cd452615d4414d73",
     "lotion-connect": "parsec-labs/lotion-connect#61329505e9aa5d0d82ff8a932db15375267f4d2c",

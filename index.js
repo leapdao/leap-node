@@ -139,7 +139,7 @@ async function run() {
       console.log('=====');
     }
 
-    const subscription = await eventsRelay(params.GCI, web3, bridge);
+    const subscription = await eventsRelay(params.txServerPort, web3, bridge);
     const updateSlots = async () => {
       node.slots = await readSlots(bridge);
     };

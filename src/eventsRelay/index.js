@@ -5,15 +5,13 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-const connect = require('lotion-connect');
 const { Tx, Input, Outpoint } = require('parsec-lib');
 
 const ContractEventsSubscription = require('./ContractEventsSubscription');
 const { seq } = require('../utils');
+const sendTx = require('../txHelpers/sendTx');
 
-module.exports = async (GCI, web3, bridge) => {
-  const client = await connect(GCI);
-
+module.exports = async (txServerPort, web3, bridge) => {
   const handleDeposit = async event => {
     const deposit = await bridge.methods
       .deposits(event.returnValues.depositId)
@@ -23,14 +21,14 @@ module.exports = async (GCI, web3, bridge) => {
       Number(deposit.amount),
       deposit.owner
     );
-    await client.send({ encoded: tx.hex() });
+    await sendTx(txServerPort, tx.hex());
   };
   const handleDeposits = seq(handleDeposit);
 
   const handleExit = async event => {
     const { txHash, outIndex } = event.returnValues;
     const tx = Tx.exit(new Input(new Outpoint(txHash, Number(outIndex))));
-    await client.send({ encoded: tx.hex() });
+    await sendTx(txServerPort, tx.hex());
   };
   const handleExits = seq(handleExit);
 
