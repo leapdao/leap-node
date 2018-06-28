@@ -9,12 +9,12 @@ const connect = require('lotion-connect');
 const { Tx, Input, Outpoint } = require('parsec-lib');
 
 const ContractEventsSubscription = require('./ContractEventsSubscription');
-const { map } = require('../utils');
+const { seq } = require('../utils');
 
 module.exports = async (GCI, web3, bridge) => {
   const client = await connect(GCI);
 
-  const handleDeposits = map(async event => {
+  const handleDeposit = async event => {
     const deposit = await bridge.methods
       .deposits(event.returnValues.depositId)
       .call();
@@ -24,13 +24,15 @@ module.exports = async (GCI, web3, bridge) => {
       deposit.owner
     );
     await client.send({ encoded: tx.hex() });
-  });
+  };
+  const handleDeposits = seq(handleDeposit);
 
-  const handleExits = map(async event => {
+  const handleExit = async event => {
     const { txHash, outIndex } = event.returnValues;
     const tx = Tx.exit(new Input(new Outpoint(txHash, Number(outIndex))));
     await client.send({ encoded: tx.hex() });
-  });
+  };
+  const handleExits = seq(handleExit);
 
   const eventSubscription = new ContractEventsSubscription(web3, bridge);
   const {
@@ -38,10 +40,10 @@ module.exports = async (GCI, web3, bridge) => {
     ExitStarted: exits = [],
   } = await eventSubscription.init();
 
-  await Promise.all(handleDeposits(deposits));
-  await Promise.all(handleExits(exits));
-
+  await handleDeposits(deposits);
   eventSubscription.on('NewDeposit', handleDeposits);
+
+  await handleExits(exits);
   eventSubscription.on('ExitStarted', handleExits);
 
   return eventSubscription;

@@ -53,7 +53,7 @@ async function run() {
       mempool: [],
       balances: {}, // stores account balances
       unspent: {}, // stores unspent outputs (deposits, transfers)
-      processedDeposit: 1,
+      processedDeposit: 0,
     },
     abciPort: 26658,
     tendermintPort: 26659,
@@ -105,14 +105,6 @@ async function run() {
 
   app.listen(config.port).then(async params => {
     console.log(params);
-    const subscription = await eventsRelay(params.GCI, web3, bridge);
-    const updateSlots = async () => {
-      node.slots = await readSlots(bridge);
-    };
-    subscription.on('ValidatorJoin', updateSlots);
-    subscription.on('ValidatorLogout', updateSlots);
-    subscription.on('ValidatorLeave', updateSlots);
-    subscription.on('ValidatorUpdate', updateSlots);
 
     const validatorKeyPath = path.join(
       params.lotionPath,
@@ -146,6 +138,15 @@ async function run() {
       console.log(`Validator ID: ${validatorID}`);
       console.log('=====');
     }
+
+    const subscription = await eventsRelay(params.GCI, web3, bridge);
+    const updateSlots = async () => {
+      node.slots = await readSlots(bridge);
+    };
+    subscription.on('ValidatorJoin', updateSlots);
+    subscription.on('ValidatorLogout', updateSlots);
+    subscription.on('ValidatorLeave', updateSlots);
+    subscription.on('ValidatorUpdate', updateSlots);
   });
 }
 

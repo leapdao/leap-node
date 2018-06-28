@@ -14,6 +14,12 @@ const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 const map = mapFn => arr => arr.map(mapFn);
 
+const seq = mapFn => async arr => {
+  for (const item of arr) {
+    await mapFn(item); // eslint-disable-line no-await-in-loop
+  }
+};
+
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 const addrCmp = (a1, a2) =>
@@ -93,6 +99,7 @@ function getCurrentSlotId(slots, height) {
 }
 
 exports.map = map;
+exports.seq = seq;
 exports.delay = delay;
 exports.range = range;
 exports.addrCmp = addrCmp;
