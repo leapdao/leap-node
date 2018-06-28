@@ -6,5 +6,5 @@
   "rpcport": 8545,
   "wsaddr": "localhost",
   "wsport": 8546,
-  "network": "",
+  "network": ""
 }

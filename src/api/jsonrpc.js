@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const connect = require('lotion-connect');
 const jsonrpc = require('connect-jsonrpc');
 const WsJsonRpcServer = require('rpc-websockets').Server;
@@ -7,6 +8,12 @@ const { INVALID_PARAMS } = jsonrpc;
 const { Tx, Block, Util } = require('parsec-lib');
 
 const api = express();
+
+api.use(
+  cors({
+    origin: '*',
+  })
+);
 
 /*
 * Starts JSON RPC server
@@ -158,6 +165,7 @@ module.exports = async (node, config, CGI, db) => {
     listenHttp: async ({ host, port }) => {
       return new Promise(resolve => {
         const server = api.listen(port || 8545, host || 'localhost', () => {
+          console.log(server.address());
           resolve(server.address());
         });
       });
