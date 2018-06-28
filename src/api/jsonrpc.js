@@ -39,8 +39,7 @@ module.exports = async (node, config, CGI, db) => {
   };
 
   const getUnspent = async address => {
-    const client = await connect(CGI);
-    const unspent = await client.state.unspent;
+    const { unspent } = node.currentState;
     return Object.keys(unspent)
       .map(k => ({
         outpoint: k,
@@ -54,10 +53,11 @@ module.exports = async (node, config, CGI, db) => {
       });
   };
 
-  const sendRawTransaction = async data => {
+  const client = await connect(CGI);
+  const sendRawTransaction = async rawTx => {
+    const data = Buffer.from(rawTx.data);
     const tx = Tx.fromRaw(data);
-    const client = await connect(CGI);
-    client.send({ encoded: data });
+    await client.send({ encoded: `0x${data.toString('hex')}` });
     return tx.hash();
   };
 
@@ -147,6 +147,7 @@ module.exports = async (node, config, CGI, db) => {
     eth_getBalance: getBalance,
     eth_sendRawTransaction: sendRawTransaction,
     eth_getTransactionByHash: getTransactionByHash,
+    eth_getTransactionReceipt: getTransactionByHash,
     eth_getBlockByHash: getBlockByHash,
     eth_getBlockByNumber: getBlockByNumber,
     parsec_unspent: getUnspent,
