@@ -6,7 +6,8 @@ const WsJsonRpcServer = require('rpc-websockets').Server;
 const { INVALID_PARAMS } = jsonrpc;
 const { Tx, Block, Util } = require('parsec-lib');
 
-const sendTx = require('../txHelpers/sendTx.js');
+const sendTx = require('../txHelpers/sendTx');
+const { unspentForAddress } = require('../utils');
 
 const api = express();
 
@@ -41,19 +42,7 @@ module.exports = async (node, config, lotionPort, db) => {
 
   const getUnspent = async address => {
     const { unspent } = node.currentState;
-    return Object.keys(unspent)
-      .map(k => ({
-        outpoint: k,
-        output: unspent[k],
-      }))
-      .filter(u => {
-        return (
-          u.output && u.output.address.toLowerCase() === address.toLowerCase()
-        );
-      })
-      .sort((a, b) => {
-        return a.output.value - b.output.value;
-      });
+    return unspentForAddress(unspent, address);
   };
 
   const sendRawTransaction = async rawTx => {
@@ -168,7 +157,6 @@ module.exports = async (node, config, lotionPort, db) => {
     listenHttp: async ({ host, port }) => {
       return new Promise(resolve => {
         const server = api.listen(port || 8545, host || 'localhost', () => {
-          console.log(server.address());
           resolve(server.address());
         });
       });
