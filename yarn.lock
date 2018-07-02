@@ -4277,23 +4277,11 @@ lotion-connect@^0.1.0:
     tendermint "3.1.9"
     varstruct "^6.1.2"
 
-lotion-connect@parsec-labs/lotion-connect#61329505e9aa5d0d82ff8a932db15375267f4d2c:
-  version "0.1.0"
-  resolved "https://codeload.github.com/parsec-labs/lotion-connect/tar.gz/61329505e9aa5d0d82ff8a932db15375267f4d2c"
-  dependencies:
-    deterministic-json "^1.0.4"
-    jpfs "0.0.3"
-    lodash.get "^4.4.2"
-    peer-channel "^0.1.1"
-    proxmise "^1.0.0"
-    tendermint "^3.1.9"
-    varstruct "^6.1.2"
-
 lotion@parsec-labs/lotion#6b8aba9dce62c230646eb962cd452615d4414d73:
   version "0.1.18"
   resolved "https://codeload.github.com/parsec-labs/lotion/tar.gz/6b8aba9dce62c230646eb962cd452615d4414d73"
   dependencies:
-    abci "github:parsec-labs/js-abci#375f5408075a0b0f0f216069534a5af209e1e909"
+    abci "github:parsec-labs/js-abci#a4be8a213afb3a2974b32f8434664009d1cfae1b"
     axios "^0.16.2"
     body-parser "^1.17.2"
     cors "^2.8.4"
@@ -4310,7 +4298,7 @@ lotion@parsec-labs/lotion#6b8aba9dce62c230646eb962cd452615d4414d73:
     lotion-connect "^0.1.0"
     merk "^1.3.1"
     peer-channel "0.1.1"
-    tendermint-node "^2.0.4"
+    tendermint-node "github:parsec-labs/tendermint-node#2d59b42874550ee91e36f82ad842095db93ffed9"
     varstruct "^6.1.1"
 
 lowercase-keys@^1.0.0:
