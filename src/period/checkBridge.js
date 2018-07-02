@@ -46,9 +46,9 @@ module.exports = async (
       );
     }
 
-    rsp.status = 1;
-  } else {
     rsp.status = 0;
+  } else {
+    rsp.status = 1;
   }
 
   node.checkCallsCount += 1;
