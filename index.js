@@ -19,7 +19,7 @@ const applyTx = require('./src/tx/applyTx');
 const accumulateTx = require('./src/tx/accumulateTx');
 
 const addBlock = require('./src/block/addBlock');
-const submitPeriod = require('./src/block/submitPeriod');
+const updatePeriod = require('./src/block/updatePeriod');
 const updateValidators = require('./src/block/updateValidators');
 
 const checkBridge = require('./src/period/checkBridge');
@@ -58,7 +58,7 @@ async function run() {
     abciPort: 26658,
     tendermintPort: 26659,
     createEmptyBlocks: false,
-    logTendermint: true,
+    // logTendermint: true,
   });
 
   if (!config.privKey) {
@@ -80,7 +80,7 @@ async function run() {
   });
 
   app.useBlock((state, chainInfo) => {
-    submitPeriod(chainInfo, {
+    updatePeriod(chainInfo, {
       bridge,
       web3,
       account,
@@ -91,6 +91,7 @@ async function run() {
       node,
     });
     updateValidators(chainInfo, node.slots);
+    console.log('Height:', chainInfo.height);
   });
 
   app.usePeriod(async (rsp, chainInfo, height) => {

@@ -5,47 +5,17 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-const {
-  getSlotsByAddr,
-  readSlots,
-  sendTransaction,
-  getCurrentSlotId,
-  GENESIS,
-} = require('../utils');
+const submitPeriod = require('../txHelpers/submitPeriod');
 
-module.exports = async (
-  rsp,
-  chainInfo,
-  height,
-  { node, web3, bridge, account }
-) => {
-  const period = await bridge.methods
-    .periods(node.previousPeriod.merkleRoot())
-    .call();
+module.exports = async (rsp, chainInfo, height, options) => {
+  const { node } = options;
+  const contractPeriod = await submitPeriod(
+    node.previousPeriod,
+    height + node.checkCallsCount,
+    options
+  );
 
-  // period not found
-  if (period.timestamp === '0') {
-    const slots = await readSlots(bridge);
-    const mySlots = getSlotsByAddr(slots, account.address);
-    const currentSlotId = getCurrentSlotId(
-      slots,
-      chainInfo.height + node.checkCallsCount
-    );
-    const currentSlot = mySlots.find(slot => slot.id === currentSlotId);
-
-    if (currentSlot) {
-      await sendTransaction(
-        web3,
-        bridge.methods.submitPeriod(
-          currentSlot.id,
-          node.previousPeriod.prevHash || GENESIS,
-          node.previousPeriod.merkleRoot()
-        ),
-        bridge.address,
-        account
-      );
-    }
-
+  if (contractPeriod.timestamp === '0') {
     rsp.status = 0;
   } else {
     rsp.status = 1;

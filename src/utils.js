@@ -72,10 +72,10 @@ const getSlotsByAddr = (slots, address) => {
 };
 
 async function sendTransaction(web3, method, to, account) {
-  const data = method.encodeABI();
   const gas = Math.round(
     (await method.estimateGas({ from: account.address })) * 1.2
   );
+  const data = method.encodeABI();
   const tx = {
     to,
     data,
