@@ -161,10 +161,10 @@ module.exports = async (node, config, lotionPort, db) => {
         });
       });
     },
-    listenWs: ({ wsHost, wsPort }) => {
+    listenWs: ({ host, port }) => {
       const wsServer = new WsJsonRpcServer({
-        port: wsPort || 8546,
-        host: wsHost || 'localhost',
+        port: port || 8546,
+        host: host || 'localhost',
       });
 
       // register an RPC method
@@ -174,8 +174,10 @@ module.exports = async (node, config, lotionPort, db) => {
 
       return new Promise(resolve => {
         wsServer.on('listening', () => {
-          const { host, port } = wsServer.wss.options;
-          return resolve({ address: host, port });
+          return resolve({
+            address: wsServer.wss.options.host,
+            port: wsServer.wss.options.port,
+          });
         });
       });
     },
