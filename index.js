@@ -114,7 +114,7 @@ async function run() {
     accumulateTx(state, tx);
   });
 
-  app.useBlock((state, chainInfo) => {
+  app.useBlock(async (state, chainInfo) => {
     updatePeriod(chainInfo, {
       bridge,
       web3,
