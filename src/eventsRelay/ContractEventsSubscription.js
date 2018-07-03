@@ -23,10 +23,15 @@ module.exports = class ContractEventsSubscription extends EventEmitter {
 
   async fetchEvents() {
     const blockNumber = await this.web3.eth.getBlockNumber();
+
+    if (this.fromBlock === blockNumber) {
+      return null;
+    }
+
     const groups = {};
     const options = {
       fromBlock: this.fromBlock || 0,
-      toBlock: 'latest',
+      toBlock: blockNumber,
     };
 
     const events = await this.contract.getPastEvents('allEvents', options);
@@ -36,7 +41,7 @@ module.exports = class ContractEventsSubscription extends EventEmitter {
       groups[event.event].push(event);
     });
 
-    if (!this.fromBlock) {
+    if (this.fromBlock) {
       Object.keys(groups).forEach(group => {
         this.emit(group, groups[group]);
       });
