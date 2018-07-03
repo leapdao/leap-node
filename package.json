@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "dashdash": "^1.14.1",
     "ethereumjs-util": "^5.2.0",
     "lotion": "parsec-labs/lotion#6b8aba9dce62c230646eb962cd452615d4414d73",
     "parsec-lib": "parsec-labs/parsec-lib#08b7c303fa68152583cc4ae71ba2ce4f7a3913b8",

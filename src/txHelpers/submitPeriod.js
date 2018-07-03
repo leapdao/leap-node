@@ -23,6 +23,7 @@ module.exports = async (period, height, { web3, bridge, node, account }) => {
     const currentSlotId = getCurrentSlotId(node.slots, height);
     const currentSlot = mySlots.find(slot => slot.id === currentSlotId);
     if (currentSlot) {
+      console.log('submitPeriod', currentSlot, submittedPeriod);
       const txHash = await sendTransaction(
         web3,
         bridge.methods.submitPeriod(

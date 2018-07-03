@@ -14,6 +14,8 @@ const Web3 = require('web3');
 const { Tx, Period } = require('parsec-lib');
 const lotion = require('lotion');
 
+const cliArgs = require('./src/cliArgs');
+
 const bridgeABI = require('./src/bridgeABI');
 const applyTx = require('./src/tx/applyTx');
 const accumulateTx = require('./src/tx/accumulateTx');
@@ -70,7 +72,9 @@ async function run() {
   const account = web3.eth.accounts.privateKeyToAccount(config.privKey);
 
   app.useInitChain(chainInfo => {
-    updateValidators(chainInfo, node.slots);
+    if (!cliArgs.no_validators_updates) {
+      updateValidators(chainInfo, node.slots);
+    }
   });
 
   app.useTx(async (state, { encoded }) => {
@@ -90,7 +94,9 @@ async function run() {
       account,
       node,
     });
-    updateValidators(chainInfo, node.slots);
+    if (!cliArgs.no_validators_updates) {
+      updateValidators(chainInfo, node.slots);
+    }
     console.log('Height:', chainInfo.height);
   });
 
