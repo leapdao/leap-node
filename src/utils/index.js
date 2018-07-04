@@ -7,7 +7,7 @@
 
 const constants = require('./constants');
 
-Object.assing(exports, constants);
+Object.assign(exports, constants);
 
 exports.getCurrentSlotId = require('./getCurrentSlotId');
 exports.readSlots = require('./readSlots');
