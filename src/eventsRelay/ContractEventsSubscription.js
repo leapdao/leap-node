@@ -8,10 +8,10 @@
 const EventEmitter = require('events');
 
 module.exports = class ContractEventsSubscription extends EventEmitter {
-  constructor(web3, contract) {
+  constructor(web3, contract, fromBlock = null) {
     super();
 
-    this.fromBlock = null;
+    this.fromBlock = fromBlock;
     this.web3 = web3;
     this.contract = contract;
   }
@@ -41,11 +41,9 @@ module.exports = class ContractEventsSubscription extends EventEmitter {
       groups[event.event].push(event);
     });
 
-    if (this.fromBlock) {
-      Object.keys(groups).forEach(group => {
-        this.emit(group, groups[group]);
-      });
-    }
+    Object.keys(groups).forEach(group => {
+      this.emit(group, groups[group]);
+    });
 
     this.fromBlock = blockNumber;
 
