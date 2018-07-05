@@ -1,26 +1,22 @@
 ---
-title: The `net` Module
+title: web3.net
 ---
-
-## JSON-RPC methods
 
 - [net_version](#net_version)
 
-## JSON-RPC API Reference
-
-### net_version
+# net_version
 
 Returns the current network protocol version.
 
-#### Parameters
+## Parameters
 
 None
 
-#### Returns
+## Returns
 
 - `String` - The current network protocol version
 
-#### Example
+## Example
 
 Request
 ```bash

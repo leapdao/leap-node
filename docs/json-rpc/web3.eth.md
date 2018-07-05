@@ -1,28 +1,6 @@
 ---
-title: The `eth` Module
+title: web3.eth
 ---
-
-## The default block parameter
-
-The following methods have an optional extra `defaultBlock` parameter:
-
-- [eth_estimateGas](#eth_estimategas)
-- [eth_getBalance](#eth_getbalance)
-- [eth_getCode](#eth_getcode)
-- [eth_getTransactionCount](#eth_gettransactioncount)
-- [eth_getStorageAt](#eth_getstorageat)
-- [eth_call](#eth_call)
-
-When requests are made that act on the state of Ethereum, the last parameter determines the height of the block.
-
-The following options are possible for the `defaultBlock` parameter:
-
-- `Quantity`/`Integer` - an integer block number;
-- `String "earliest"` - for the earliest/genesis block;
-- `String "latest"` - for the latest mined block;
-- `String "pending"` - for the pending state/transactions.
-
-## JSON-RPC methods
 
 - [eth_blockNumber](#eth_blocknumber)
 - [eth_getBalance](#eth_getbalance)
@@ -33,21 +11,19 @@ The following options are possible for the `defaultBlock` parameter:
 - [eth_sendRawTransaction](#eth_sendrawtransaction)
 
 
-## JSON-RPC API Reference
-
-### eth_blockNumber
+# eth_blockNumber
 
 Returns the number of most recent block.
 
-#### Parameters
+## Parameters
 
 None
 
-#### Returns
+## Returns
 
 - `Quantity` - integer of the current block number the client is on.
 
-#### Example
+## Example
 
 Request
 ```bash
@@ -65,11 +41,11 @@ Response
 
 ***
 
-### eth_getBalance
+# eth_getBalance
 
 Returns the balance of the account of given address.
 
-#### Parameters
+## Parameters
 
 0. `Address` - 20 Bytes - address to check for balance.
 
@@ -77,11 +53,11 @@ Returns the balance of the account of given address.
 params: ["0x407d73d8a49eeb85d32cf465507dd71d507100c1"]
 ```
 
-#### Returns
+## Returns
 
 - `Quantity` - integer of the current balance in PSC cents.
 
-#### Example
+## Example
 
 Request
 ```bash
@@ -99,11 +75,11 @@ Response
 
 ***
 
-### eth_getBlockByHash
+# eth_getBlockByHash
 
 Returns information about a block by hash.
 
-#### Parameters
+## Parameters
 
 0. `Hash` - Hash of a block.
 0. `Boolean` - If `true` it returns the full transaction objects, if `false` only the hashes of the transactions.
@@ -115,7 +91,7 @@ params: [
 ]
 ```
 
-#### Returns
+## Returns
 
 - `Object` - A block object, or `null` when no block was found.
     - `number`: `Quantity` - The block number. `null` when its pending block
@@ -125,7 +101,7 @@ params: [
     - `timestamp`: `Quantity` - the unix timestamp for when the block was collated
     - `transactions`: `Array` - Array of transaction objects, or 32 Bytes transaction hashes depending on the last given parameter
 
-#### Example
+## Example
 
 Request
 ```bash
@@ -150,11 +126,11 @@ Response
 
 ***
 
-### eth_getBlockByNumber
+# eth_getBlockByNumber
 
 Returns information about a block by block number.
 
-#### Parameters
+## Parameters
 
 0. `Quantity` | `Tag` - integer of a block number, or the string `'latest'`.
 0. `Boolean` - If `true` it returns the full transaction objects, if `false` only the hashes of the transactions.
@@ -166,11 +142,11 @@ params: [
 ]
 ```
 
-#### Returns
+## Returns
 
 - See [eth_getBlockByHash](#eth_getblockbyhash)
 
-#### Example
+## Example
 
 Request
 ```bash
@@ -180,11 +156,11 @@ curl --data '{"method":"eth_getBlockByNumber","params":["0x1b4",true],"id":1,"js
 ***
 
 
-### eth_getTransactionByHash
+# eth_getTransactionByHash
 
 Returns the information about a transaction requested by transaction hash.
 
-#### Parameters
+## Parameters
 
 0. `Hash` - 32 Bytes - hash of a transaction.
 
@@ -193,7 +169,7 @@ params: ["0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238"]
 ```
 
 
-#### Returns
+## Returns
 
 - `Object` - A transaction object, or `null` when no transaction was found:
     - `hash`: `Hash` - 32 Bytes - hash of the transaction.
@@ -207,7 +183,7 @@ params: ["0xb903239f8543d04b5dc1ba6579132b143087c68db1b2168786408fcbce568238"]
     - `gas`: `Quantity` - gas provided by the sender.
     - `raw`: `Data` - raw transaction data
 
-#### Example
+## Example
 
 Request
 ```bash
@@ -236,7 +212,7 @@ Response
 ***
 
 
-### eth_getTransactionReceipt
+# eth_getTransactionReceipt
 
 Returns the receipt of a transaction by transaction hash. Currently works the same as
 [eth_getTransactionByHash](#eth_getTransactionByHash)
@@ -247,11 +223,11 @@ See [eth_getTransactionByHash](#eth_getTransactionByHash)
 ***
 
 
-### eth_sendRawTransaction
+# eth_sendRawTransaction
 
 Creates new message call transaction or a contract creation for signed transactions.
 
-#### Parameters
+## Parameters
 
 0. `Data` - The signed transaction data.
 
@@ -259,13 +235,13 @@ Creates new message call transaction or a contract creation for signed transacti
 params: ["0xd46e8dd67c5d32be8d46e8dd67c5d32be8058bb8eb970870f072445675058bb8eb970870f072445675"]
 ```
 
-#### Returns
+## Returns
 
 - `Hash` - 32 Bytes - the transaction hash, or the zero hash if the transaction is not yet available
 
 Use [eth_getTransactionReceipt](#eth_gettransactionreceipt) to get the contract address, after the transaction was mined, when you created a contract.
 
-#### Example
+## Example
 
 Request
 ```bash
