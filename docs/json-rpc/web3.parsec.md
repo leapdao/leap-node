@@ -6,7 +6,7 @@ title: "web3.parsec"
 
 Returns the list of UTXOs for a given address.
 
-## Parameters
+#### Parameters
 
 `Address` - 20 Bytes - address to get UTXOs for.
 
@@ -14,7 +14,7 @@ Returns the list of UTXOs for a given address.
 params: ["0x407d73d8a49eeb85d32cf465507dd71d507100c1"]
 ```
 
-## Returns
+#### Returns
 
 - `Array` - Array of `Object`
   - `outpoint`: `String` - Hex-encoded binary of the outpoint
@@ -22,7 +22,7 @@ params: ["0x407d73d8a49eeb85d32cf465507dd71d507100c1"]
     - `address`: `Address` - 20 bytes - address of the output
     - `value`: `Quantity` - value of the output in PSC cents
 
-## Example
+#### Example
 
 Request
 ```bash

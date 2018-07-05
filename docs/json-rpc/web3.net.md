@@ -1,5 +1,5 @@
 ---
-title: web3.net
+title: "web3.net"
 ---
 
 - [net_version](#net_version)
@@ -8,15 +8,15 @@ title: web3.net
 
 Returns the current network protocol version.
 
-## Parameters
+#### Parameters
 
 None
 
-## Returns
+#### Returns
 
 - `String` - The current network protocol version
 
-## Example
+#### Example
 
 Request
 ```bash
