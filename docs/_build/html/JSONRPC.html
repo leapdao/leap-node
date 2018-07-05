@@ -1,0 +1,128 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>title: JSON RPC API &#8212; PARSEC JSON RPC  documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="#">PARSEC JSON RPC  documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <hr class="docutils" />
+<div class="section" id="title-json-rpc-api">
+<span id="title-json-rpc-api"></span><h1>title: JSON RPC API<a class="headerlink" href="#title-json-rpc-api" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="http://json.org/">JSON</a> is a lightweight data-interchange format. It can represent numbers, strings, ordered sequences of values, and collections of name/value pairs.</p>
+<p><a class="reference external" href="http://www.jsonrpc.org/specification">JSON-RPC</a> is a stateless, light-weight remote procedure call (RPC) protocol. Primarily this specification defines several data structures and the rules around their processing. It is transport agnostic in that the concepts can be used within the same process, over sockets, over HTTP, or in many various message passing environments. It uses JSON (<a class="reference external" href="http://www.ietf.org/rfc/rfc4627.txt">RFC 4627</a>) as data format.</p>
+</div>
+<div class="section" id="transport">
+<span id="transport"></span><h1>Transport<a class="headerlink" href="#transport" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>HTTP: Listens on port <code class="docutils literal notranslate"><span class="pre">8545</span></code></li>
+<li>WebSockets: Listens on port <code class="docutils literal notranslate"><span class="pre">8546</span></code></li>
+</ul>
+</div>
+<div class="section" id="types-in-the-jsonrpc">
+<span id="types-in-the-jsonrpc"></span><h1>Types in the JSONRPC<a class="headerlink" href="#types-in-the-jsonrpc" title="Permalink to this headline">¶</a></h1>
+<p>There are several datatypes that are passed over JSON. Of these two are “special” types used particularly for the Ethereum API since Javascript/JSON has no native means of encoding unformatted byte arrays nor large quantities. Both are passed with a hex encoding, however with different requirements to formatting:</p>
+<p>When encoding <strong>QUANTITIES</strong> (integers, numbers): encode as hex, prefix with “0x”, the most compact representation (slight exception: zero should be represented as “0x0”). Examples:</p>
+<ul class="simple">
+<li>0x41 (65 in decimal)</li>
+<li>0x400 (1024 in decimal)</li>
+<li>WRONG: 0x (should always have at least one digit - zero is “0x0”)</li>
+<li>WRONG: 0x0400 (no leading zeroes allowed)</li>
+<li>WRONG: ff (must be prefixed 0x)</li>
+</ul>
+<p>When encoding <strong>UNFORMATTED DATA</strong> (byte arrays, account addresses, hashes, bytecode arrays): encode as hex, prefix with “0x”, two hex digits per byte. Examples:</p>
+<ul class="simple">
+<li>0x41 (size 1, “A”)</li>
+<li>0x004200 (size 3, “\0B\0”)</li>
+<li>0x (size 0, “”)</li>
+<li>WRONG: 0xf0f0f (must be even number of digits)</li>
+<li>WRONG: 004200 (must be prefixed 0x)</li>
+</ul>
+<p>Aside from <code class="docutils literal notranslate"><span class="pre">DATA</span></code> and <code class="docutils literal notranslate"><span class="pre">QUANTITIES</span></code>, there are also normative JSON types, which we describe as <code class="docutils literal notranslate"><span class="pre">STR</span></code> (strings) and <code class="docutils literal notranslate"><span class="pre">INT</span></code> (integer numbers).</p>
+</div>
+<div class="section" id="full-api-documentation">
+<span id="full-api-documentation"></span><h1>Full API Documentation<a class="headerlink" href="#full-api-documentation" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference external" href="JSONRPC-net-module.html">net</a></li>
+<li><a class="reference external" href="JSONRPC-eth-module.html">eth</a></li>
+<li><a class="reference external" href="JSONRPC-parsec-module.html">parsec</a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">title: JSON RPC API</a></li>
+<li><a class="reference internal" href="#transport">Transport</a></li>
+<li><a class="reference internal" href="#types-in-the-jsonrpc">Types in the JSONRPC</a></li>
+<li><a class="reference internal" href="#full-api-documentation">Full API Documentation</a></li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/JSONRPC.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="#">PARSEC JSON RPC  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, PARSEC Labs.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.5.
+    </div>
+  </body>
+</html>
