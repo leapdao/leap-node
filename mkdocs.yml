@@ -4,7 +4,7 @@ theme: readthedocs
 pages:
   - Home: index.md
   - 'JSON RPC':
-    - Overview: JSON-RPC/overview.md
-    - 'web3.eth': JSON-RPC/web3.eth.md
-    - 'web3.net': JSON-RPC/web3.net.md
-    - 'web3.parsec': JSON-RPC/web3.parsec.md
+    - Overview: json-rpc/overview.md
+    - 'web3.eth': json-rpc/web3.eth.md
+    - 'web3.net': json-rpc/web3.net.md
+    - 'web3.parsec': json-rpc/web3.parsec.md

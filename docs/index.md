@@ -1,3 +1,3 @@
 ---
-title: PARSEC Labs
+title: Home
 ---
