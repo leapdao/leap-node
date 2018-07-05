@@ -8,15 +8,15 @@ title: "web3.net"
 
 Returns the current network protocol version.
 
-#### Parameters
+**Parameters**
 
 None
 
-#### Returns
+**Returns**
 
 - `String` - The current network protocol version
 
-#### Example
+**Example**
 
 Request
 ```bash
