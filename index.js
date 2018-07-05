@@ -15,6 +15,8 @@ const { Tx, Period } = require('parsec-lib');
 const lotion = require('lotion');
 
 const cliArgs = require('./src/cliArgs');
+const Db = require('./src/api/db');
+const jsonrpc = require('./src/api/jsonrpc');
 
 const bridgeABI = require('./src/bridgeABI');
 const applyTx = require('./src/tx/applyTx');
@@ -57,14 +59,13 @@ async function handleSlots(node, web3, bridge) {
 
 async function run() {
   const web3 = new Web3();
-  web3.setProvider(new web3.providers.HttpProvider(config.network));
+  web3.setProvider(new web3.providers.HttpProvider(config.rootNetwork));
   const bridge = new web3.eth.Contract(bridgeABI, config.bridgeAddr);
 
-  const node = {
-    currentPeriod: new Period(),
-    previousPeriod: null,
-  };
-  handleSlots(node, web3, bridge);
+  // if empty Lotion will deterministically generate random chain id
+  // TODO: create genesis object per network (e.g. for parsec-testnet and parsec-mainnet)
+  // and pass it to tenderming via Lotion (as genesis option to `lotion`)
+  const networkId = config.network;
 
   const app = lotion({
     initialState: {
@@ -73,6 +74,7 @@ async function run() {
       unspent: {}, // stores unspent outputs (deposits, transfers)
       processedDeposit: 0,
     },
+    networkId,
     abciPort: 26658,
     tendermintPort: 26659,
     createEmptyBlocks: false,
@@ -84,6 +86,19 @@ async function run() {
     config.privKey = privateKey;
     await writeFile('./config.json', JSON.stringify(config, null, 2));
   }
+
+  const db = Db(app);
+
+  const node = {
+    blockHeight: 0,
+    currentState: null,
+    networkId,
+    currentPeriod: new Period(),
+    previousPeriod: null,
+    lastBlockSynced: await db.getLastBlockSynced()
+  };
+
+  handleSlots(node, web3, bridge);
 
   const account = web3.eth.accounts.privateKeyToAccount(config.privKey);
 
@@ -99,21 +114,28 @@ async function run() {
     accumulateTx(state, tx);
   });
 
-  app.useBlock((state, chainInfo) => {
+  app.useBlock(async (state, chainInfo) => {
     updatePeriod(chainInfo, {
       bridge,
       web3,
       account,
       node,
     });
-    addBlock(state, chainInfo, {
+    await addBlock(state, chainInfo, {
       account,
       node,
+      db,
     });
     if (!cliArgs.no_validators_updates) {
       updateValidators(chainInfo, node.slots);
     }
     console.log('Height:', chainInfo.height);
+  });
+
+  app.useBlock((state, { height }) => {
+    // state is merk here. TODO: assign object copy or something immutable
+    node.currentState = state;
+    node.blockHeight = height;
   });
 
   app.usePeriod(async (rsp, chainInfo, height) => {
@@ -128,6 +150,8 @@ async function run() {
 
   app.listen(config.port).then(async params => {
     console.log(params);
+
+    console.log(`Last block synced: ${node.lastBlockSynced}`);
 
     const validatorKeyPath = path.join(
       params.lotionPath,
@@ -163,6 +187,21 @@ async function run() {
     }
 
     await eventsRelay(params.txServerPort, web3, bridge);
+    const api = await jsonrpc(node, config, params.txServerPort, db);
+    api
+      .listenHttp({ port: config.rpcport, host: config.rpcaddr })
+      .then(addr => {
+        console.log(
+          `Http JSON RPC server is listening at ${addr.address}:${addr.port}`
+        );
+      });
+
+    api.listenWs({ port: config.wsport, host: config.wsaddr }).then(addr => {
+      console.log(
+        `Ws JSON RPC server is listening at ${addr.address}:${addr.port}`
+      );
+    });
+
   });
 }
 

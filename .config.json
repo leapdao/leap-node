@@ -1,5 +1,10 @@
 {
   "port": 3000,
   "bridgeAddr": "",
-  "network": "https://rinkeby.infura.io"
+  "rootNetwork": "https://rinkeby.infura.io",
+  "rpcaddr": "localhost",
+  "rpcport": 8545,
+  "wsaddr": "localhost",
+  "wsport": 8546,
+  "network": ""
 }
