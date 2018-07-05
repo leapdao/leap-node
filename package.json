@@ -18,6 +18,9 @@
       "eslint"
     ]
   },
+  "eslintIgnore": [
+    "docs/"
+  ],
   "prettier": {
     "printWidth": 80,
     "tabWidth": 2,
