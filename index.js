@@ -27,6 +27,7 @@ const updateValidators = require('./src/block/updateValidators');
 const checkBridge = require('./src/period/checkBridge');
 
 const eventsRelay = require('./src/eventsRelay');
+const ContractEventsSubscription = require('./src/eventsRelay/ContractEventsSubscription');
 const { readSlots, getSlotsByAddr } = require('./src/utils');
 
 const config = require('./config.json');
@@ -39,6 +40,21 @@ if (!config.bridgeAddr) {
   process.exit(0);
 }
 
+async function handleSlots(node, web3, bridge) {
+  node.slots = await readSlots(bridge);
+
+  const eventsSubscription = new ContractEventsSubscription(web3, bridge);
+  await eventsSubscription.init();
+
+  const updateSlots = async () => {
+    node.slots = await readSlots(bridge);
+  };
+  eventsSubscription.on('ValidatorJoin', updateSlots);
+  eventsSubscription.on('ValidatorLogout', updateSlots);
+  eventsSubscription.on('ValidatorLeave', updateSlots);
+  eventsSubscription.on('ValidatorUpdate', updateSlots);
+}
+
 async function run() {
   const web3 = new Web3();
   web3.setProvider(new web3.providers.HttpProvider(config.network));
@@ -48,7 +64,7 @@ async function run() {
     currentPeriod: new Period(),
     previousPeriod: null,
   };
-  node.slots = await readSlots(bridge);
+  handleSlots(node, web3, bridge);
 
   const app = lotion({
     initialState: {
@@ -146,14 +162,7 @@ async function run() {
       console.log('=====');
     }
 
-    const subscription = await eventsRelay(params.txServerPort, web3, bridge);
-    const updateSlots = async () => {
-      node.slots = await readSlots(bridge);
-    };
-    subscription.on('ValidatorJoin', updateSlots);
-    subscription.on('ValidatorLogout', updateSlots);
-    subscription.on('ValidatorLeave', updateSlots);
-    subscription.on('ValidatorUpdate', updateSlots);
+    await eventsRelay(params.txServerPort, web3, bridge);
   });
 }
 
