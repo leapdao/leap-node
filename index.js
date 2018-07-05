@@ -76,7 +76,7 @@ async function run() {
     abciPort: 26658,
     tendermintPort: 26659,
     createEmptyBlocks: false,
-    // logTendermint: true,
+    logTendermint: true,
   });
 
   if (!config.privKey) {
