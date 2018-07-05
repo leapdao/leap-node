@@ -1,5 +1,5 @@
 ---
-title: web3.parsec
+title: "web3.parsec"
 ---
 
 # parsec_unspent
