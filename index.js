@@ -76,6 +76,7 @@ async function run() {
     },
     networkId,
     abciPort: 26658,
+    peers: config.peers,
     tendermintPort: 26659,
     createEmptyBlocks: false,
     logTendermint: true,
@@ -95,7 +96,7 @@ async function run() {
     networkId,
     currentPeriod: new Period(),
     previousPeriod: null,
-    lastBlockSynced: await db.getLastBlockSynced()
+    lastBlockSynced: await db.getLastBlockSynced(),
   };
 
   handleSlots(node, web3, bridge);
@@ -201,7 +202,6 @@ async function run() {
         `Ws JSON RPC server is listening at ${addr.address}:${addr.port}`
       );
     });
-
   });
 }
 
