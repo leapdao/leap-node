@@ -1,6 +1,7 @@
 {
   "bridgeAddr": "",
   "rootNetwork": "https://rinkeby.infura.io",
+  "genesis": null,
   "network": "",
   "peers": []
 }

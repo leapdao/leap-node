@@ -62,11 +62,6 @@ async function run() {
   web3.setProvider(new web3.providers.HttpProvider(config.rootNetwork));
   const bridge = new web3.eth.Contract(bridgeABI, config.bridgeAddr);
 
-  // if empty Lotion will deterministically generate random chain id
-  // TODO: create genesis object per network (e.g. for parsec-testnet and parsec-mainnet)
-  // and pass it to tenderming via Lotion (as genesis option to `lotion`)
-  const networkId = config.network;
-
   const app = lotion({
     initialState: {
       mempool: [],
@@ -74,7 +69,8 @@ async function run() {
       unspent: {}, // stores unspent outputs (deposits, transfers)
       processedDeposit: 0,
     },
-    networkId,
+    networkId: config.network,
+    genesis: config.genesis,
     abciPort: 26658,
     peers: cliArgs.peers,
     p2pPort: cliArgs.p2pPort,
@@ -94,7 +90,7 @@ async function run() {
   const node = {
     blockHeight: 0,
     currentState: null,
-    networkId,
+    networkId: config.network,
     currentPeriod: new Period(),
     previousPeriod: null,
     lastBlockSynced: await db.getLastBlockSynced(),
