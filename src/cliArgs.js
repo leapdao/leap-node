@@ -39,6 +39,12 @@ const options = [
     help: 'Host for websocket RPC server',
   },
   {
+    names: ['wsport'],
+    type: 'number',
+    default: 8546,
+    help: 'Port for websocket RPC server',
+  },
+  {
     names: ['p2pPort'],
     type: 'number',
     default: undefined,
@@ -49,6 +55,7 @@ const options = [
     type: 'string',
     default: './config.json',
     help: 'Path to config file',
+    required: true,
   },
 ];
 
