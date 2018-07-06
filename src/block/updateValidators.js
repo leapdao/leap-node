@@ -32,15 +32,12 @@ module.exports = (chainInfo, slots) => {
 
   // Change existing validators
   Object.keys(chainInfo.validators).forEach(addr => {
-    if (
-      validatorAddrs.indexOf(addr) === -1 &&
-      chainInfo.validators[addr].power !== 0
-    ) {
+    const idx = validatorAddrs.findIndex(
+      a => a.toLowerCase() === addr.toLowerCase()
+    );
+    if (idx === -1 && chainInfo.validators[addr].power !== 0) {
       chainInfo.validators[addr] = 0;
-    } else if (
-      validatorAddrs.indexOf(addr) !== -1 &&
-      chainInfo.validators[addr].power === 0
-    ) {
+    } else if (idx !== -1 && chainInfo.validators[addr].power === 0) {
       chainInfo.validators[addr] = 10;
     }
   });
