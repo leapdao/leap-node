@@ -44,6 +44,12 @@ const options = [
     default: undefined,
     help: 'Port for p2p connection',
   },
+  {
+    names: ['config'],
+    type: 'string',
+    default: './config.json',
+    help: 'Path to config file',
+  },
 ];
 
 const parser = dashdash.createParser({ options });

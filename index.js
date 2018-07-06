@@ -32,15 +32,8 @@ const eventsRelay = require('./src/eventsRelay');
 const ContractEventsSubscription = require('./src/eventsRelay/ContractEventsSubscription');
 const { readSlots, getSlotsByAddr } = require('./src/utils');
 
-const config = require('./config.json');
-
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
-
-if (!config.bridgeAddr) {
-  console.error('bridgeAddr is required');
-  process.exit(0);
-}
 
 async function handleSlots(node, web3, bridge) {
   node.slots = await readSlots(bridge);
@@ -58,6 +51,13 @@ async function handleSlots(node, web3, bridge) {
 }
 
 async function run() {
+  const config = JSON.parse(await readFile('./config.json'));
+
+  if (!config.bridgeAddr) {
+    console.error('bridgeAddr is required');
+    process.exit(0);
+  }
+
   const web3 = new Web3();
   web3.setProvider(new web3.providers.HttpProvider(config.rootNetwork));
   const bridge = new web3.eth.Contract(bridgeABI, config.bridgeAddr);
