@@ -11,6 +11,9 @@
     "test:watch": "./node_modules/.bin/jest --watch",
     "precommit": "./node_modules/.bin/lint-staged"
   },
+  "bin": {
+    "parsec": "./bin.js"
+  },
   "lint-staged": {
     "*.js": [
       "prettier --write",
