@@ -76,8 +76,8 @@ async function run() {
     },
     networkId,
     abciPort: 26658,
-    peers: config.peers,
-    p2pPort: config.p2pPort,
+    peers: cliArgs.peers,
+    p2pPort: cliArgs.p2pPort,
     tendermintPort: 26659,
     createEmptyBlocks: false,
     logTendermint: true,
@@ -150,7 +150,7 @@ async function run() {
     });
   });
 
-  app.listen(config.port).then(async params => {
+  app.listen(cliArgs.port).then(async params => {
     console.log(params);
 
     console.log(`Last block synced: ${node.lastBlockSynced}`);
@@ -189,16 +189,16 @@ async function run() {
     }
 
     await eventsRelay(params.txServerPort, web3, bridge);
-    const api = await jsonrpc(node, config, params.txServerPort, db);
+    const api = await jsonrpc(node, params.txServerPort, db);
     api
-      .listenHttp({ port: config.rpcport, host: config.rpcaddr })
+      .listenHttp({ port: cliArgs.rpcport, host: cliArgs.rpcaddr })
       .then(addr => {
         console.log(
           `Http JSON RPC server is listening at ${addr.address}:${addr.port}`
         );
       });
 
-    api.listenWs({ port: config.wsport, host: config.wsaddr }).then(addr => {
+    api.listenWs({ port: cliArgs.wsport, host: cliArgs.wsaddr }).then(addr => {
       console.log(
         `Ws JSON RPC server is listening at ${addr.address}:${addr.port}`
       );

@@ -14,6 +14,36 @@ const options = [
     default: false,
     help: 'Disabling validators set updates',
   },
+  {
+    names: ['port'],
+    type: 'number',
+    default: 3000,
+    help: 'Tx endpoint port',
+  },
+  {
+    names: ['rpcaddr'],
+    type: 'string',
+    default: 'localhost',
+    help: 'Host for http RPC server',
+  },
+  {
+    names: ['rpcport'],
+    type: 'number',
+    default: 8545,
+    help: 'Port for http RPC server',
+  },
+  {
+    names: ['wsaddr'],
+    type: 'string',
+    default: 'localhost',
+    help: 'Host for websocket RPC server',
+  },
+  {
+    names: ['p2pPort'],
+    type: 'number',
+    default: undefined,
+    help: 'Port for p2p connection',
+  },
 ];
 
 const parser = dashdash.createParser({ options });

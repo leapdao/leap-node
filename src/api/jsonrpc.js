@@ -20,7 +20,7 @@ api.use(
 /*
 * Starts JSON RPC server
 */
-module.exports = async (node, config, lotionPort, db) => {
+module.exports = async (node, lotionPort, db) => {
   const getNetwork = async () => node.networkId;
 
   const getBalance = async (address, tag = 'latest') => {
