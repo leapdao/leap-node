@@ -34,6 +34,7 @@ const { readSlots, getSlotsByAddr } = require('./src/utils');
 
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
+const exists = promisify(fs.exists);
 
 async function handleSlots(node, web3, bridge) {
   node.slots = await readSlots(bridge);
@@ -79,10 +80,12 @@ async function run() {
     logTendermint: true,
   });
 
-  if (!config.privKey) {
+  if (await exists('./.priv')) {
+    config.privKey = await readFile('./.priv');
+  } else {
     const { privateKey } = web3.eth.accounts.create();
     config.privKey = privateKey;
-    await writeFile('./config.json', JSON.stringify(config, null, 2));
+    await writeFile('./.priv', privateKey);
   }
 
   const db = Db(app);
