@@ -7,5 +7,6 @@
   "wsaddr": "localhost",
   "wsport": 8546,
   "network": "",
-  "peers": []
+  "peers": [],
+  "p2pPort": null
 }

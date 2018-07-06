@@ -77,6 +77,7 @@ async function run() {
     networkId,
     abciPort: 26658,
     peers: config.peers,
+    p2pPort: config.p2pPort,
     tendermintPort: 26659,
     createEmptyBlocks: false,
     logTendermint: true,
