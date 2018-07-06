@@ -33,6 +33,6 @@ Aside from `DATA` and `QUANTITIES`, there are also normative JSON types, which w
 
 **Full API Documentation**
 
-- [net](JSONRPC-net-module)
-- [eth](JSONRPC-eth-module)
-- [parsec](JSONRPC-parsec-module)
+- [net](web3.net)
+- [eth](web3.eth)
+- [parsec](web3.parsec)
