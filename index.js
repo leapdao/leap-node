@@ -100,7 +100,7 @@ async function run() {
     lastBlockSynced: await db.getLastBlockSynced(),
   };
 
-  handleSlots(node, web3, bridge);
+  await handleSlots(node, web3, bridge);
 
   const account = web3.eth.accounts.privateKeyToAccount(config.privKey);
 
