@@ -66,7 +66,7 @@ async function run() {
   const app = lotion({
     initialState: {
       mempool: [],
-      balances: {}, // stores account balances
+      balances: {}, // stores account balances like this { [colorIndex]: { address1: 0, ... } }
       unspent: {}, // stores unspent outputs (deposits, transfers)
       processedDeposit: 0,
     },

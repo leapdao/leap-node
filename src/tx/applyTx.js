@@ -85,8 +85,8 @@ module.exports = async (state, tx, bridge) => {
   // remove inputs
   tx.inputs.forEach(input => {
     const outpointId = input.prevout.hex();
-    const { address, value } = state.unspent[outpointId];
-    state.balances[address] -= value;
+    const { address, value, color } = state.unspent[outpointId];
+    state.balances[color][address] -= value;
     delete state.unspent[outpointId];
   });
 
@@ -96,8 +96,10 @@ module.exports = async (state, tx, bridge) => {
     if (state.unspent[outpoint.hex()] !== undefined) {
       throw new Error('Attempt to create existing output');
     }
-    state.balances[out.address] =
-      (state.balances[out.address] || 0) + out.value;
+    state.balances[out.color] = state.balances[out.color] || {};
+    state.balances[out.color][out.address] =
+      state.balances[out.color][out.address] || 0;
+    state.balances[out.color][out.address] += out.value;
     state.unspent[outpoint.hex()] = out.toJSON();
   });
 };

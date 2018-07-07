@@ -5056,9 +5056,16 @@ parse5@4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/parse5/-/parse5-4.0.0.tgz#6d78656e3da8d78b4ec0b906f7c08ef1dfe3f608"
 
-parsec-lib@parsec-labs/parsec-lib#08b7c303fa68152583cc4ae71ba2ce4f7a3913b8:
-  version "0.5.0"
-  resolved "https://codeload.github.com/parsec-labs/parsec-lib/tar.gz/08b7c303fa68152583cc4ae71ba2ce4f7a3913b8"
+parsec-lib@parsec-labs/parsec-lib#454bebc9658313a0f0effda65943025135890fff:
+  version "0.8.0"
+  resolved "https://codeload.github.com/parsec-labs/parsec-lib/tar.gz/454bebc9658313a0f0effda65943025135890fff"
+  dependencies:
+    ethereumjs-util "^4.5.0"
+    fast-equals "^1.5.0"
+
+parsec-lib@parsec-labs/parsec-lib#ab1b83bf76e364f8cebd7a8b198e7683c7d41394:
+  version "0.8.1"
+  resolved "https://codeload.github.com/parsec-labs/parsec-lib/tar.gz/ab1b83bf76e364f8cebd7a8b198e7683c7d41394"
   dependencies:
     ethereumjs-util "^4.5.0"
     fast-equals "^1.5.0"
