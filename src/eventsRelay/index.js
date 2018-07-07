@@ -19,7 +19,8 @@ module.exports = async (txServerPort, web3, bridge) => {
     const tx = Tx.deposit(
       event.returnValues.depositId,
       Number(deposit.amount),
-      deposit.owner
+      deposit.owner,
+      Number(deposit.color)
     );
     await sendTx(txServerPort, tx.hex());
   };
