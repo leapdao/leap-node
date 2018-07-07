@@ -1,4 +1,6 @@
-# PARSEC Labs plasma tx validation node
+---
+title: How to use
+---
 
 ## Prerequisite
 
@@ -38,11 +40,3 @@ Dev config file: N/A
 Testnet config file: N/A
 
 Mainnet config file: N/A
-
-## Staking UI
-
-Dev: http://stake-dev.parseclabs.org/
-
-Testnet: N/A
-
-Mainnet: N/A

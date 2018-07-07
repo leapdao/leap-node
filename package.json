@@ -5,9 +5,13 @@
   "author": "Alex Lunyov <isuntc@gmail.com>",
   "license": "MPLv2",
   "scripts": {
+    "start": "node index.js",
     "test": "./node_modules/.bin/jest",
     "test:watch": "./node_modules/.bin/jest --watch",
     "precommit": "./node_modules/.bin/lint-staged"
+  },
+  "bin": {
+    "parsec": "./bin.js"
   },
   "lint-staged": {
     "*.js": [
@@ -16,6 +20,9 @@
       "eslint"
     ]
   },
+  "eslintIgnore": [
+    "docs/"
+  ],
   "prettier": {
     "printWidth": 80,
     "tabWidth": 2,
@@ -26,10 +33,17 @@
     "bracketSpacing": true
   },
   "dependencies": {
+    "axios": "^0.18.0",
+    "dashdash": "^1.14.1",
     "ethereumjs-util": "^5.2.0",
-    "lotion": "parsec-labs/lotion#bab1ed07cffdec4c64622d0196d8f367a72d98b4",
-    "lotion-connect": "parsec-labs/lotion-connect#bump-tendermint",
-    "parsec-lib": "github:parsec-labs/parsec-lib",
+    "lotion": "parsec-labs/lotion#ca540debb3894ce049b81a735ea8cfbb54b8d284",
+    "parsec-lib": "parsec-labs/parsec-lib#08b7c303fa68152583cc4ae71ba2ce4f7a3913b8",
+    "connect-jsonrpc": "github:parsec-labs/connect-jsonrpc",
+    "rpc-websockets": "^4.1.2",
+    "express": "^4.16.3",
+    "level": "^4.0.0",
+    "cors": "^2.8.4",
+    "tendermint": "^3.1.9",
     "web3": "^1.0.0-beta.34"
   },
   "devDependencies": {

@@ -6,7 +6,7 @@
  */
 
 const { Type, Outpoint } = require('parsec-lib');
-const { addrCmp } = require('./utils');
+const { addrCmp } = require('../utils');
 
 const sumOuts = (value, out) => value + out.value;
 
@@ -27,6 +27,16 @@ module.exports = async (state, tx, bridge) => {
   });
 
   if (tx.type === Type.DEPOSIT) {
+    if (tx.options.depositId <= state.processedDeposit) {
+      throw new Error('Deposit ID already used.');
+    }
+    if (tx.options.depositId > state.processedDeposit + 1) {
+      throw new Error(
+        `Deposit ID skipping ahead. want ${state.processedDeposit + 1}, found ${
+          tx.options.depositId
+        }`
+      );
+    }
     const deposit = await bridge.methods.deposits(tx.options.depositId).call();
     if (
       Number(deposit.amount) !== tx.outputs[0].value ||
@@ -34,6 +44,7 @@ module.exports = async (state, tx, bridge) => {
     ) {
       throw new Error('Trying to submit incorrect deposit');
     }
+    state.processedDeposit += 1;
   }
 
   if (tx.type === Type.EXIT) {
@@ -76,7 +87,7 @@ module.exports = async (state, tx, bridge) => {
     const outpointId = input.prevout.hex();
     const { address, value } = state.unspent[outpointId];
     state.balances[address] -= value;
-    state.unspent[outpointId] = null;
+    delete state.unspent[outpointId];
   });
 
   // add outputs
@@ -87,6 +98,6 @@ module.exports = async (state, tx, bridge) => {
     }
     state.balances[out.address] =
       (state.balances[out.address] || 0) + out.value;
-    state.unspent[outpoint.hex()] = out;
+    state.unspent[outpoint.hex()] = out.toJSON();
   });
 };

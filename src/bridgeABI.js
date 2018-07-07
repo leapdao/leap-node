@@ -1,8 +1,73 @@
 module.exports = [
   {
     constant: true,
+    inputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    name: 'slots',
+    outputs: [
+      {
+        name: 'owner',
+        type: 'address',
+      },
+      {
+        name: 'stake',
+        type: 'uint64',
+      },
+      {
+        name: 'signer',
+        type: 'address',
+      },
+      {
+        name: 'tendermint',
+        type: 'bytes32',
+      },
+      {
+        name: 'activationEpoch',
+        type: 'uint32',
+      },
+      {
+        name: 'newOwner',
+        type: 'address',
+      },
+      {
+        name: 'newStake',
+        type: 'uint64',
+      },
+      {
+        name: 'newSigner',
+        type: 'address',
+      },
+      {
+        name: 'newTendermint',
+        type: 'bytes32',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
     inputs: [],
     name: 'lastCompleteEpoch',
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'epochLength',
     outputs: [
       {
         name: '',
@@ -33,6 +98,20 @@ module.exports = [
       },
       {
         name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'averageGasPrice',
+    outputs: [
+      {
+        name: '',
         type: 'uint256',
       },
     ],
@@ -181,9 +260,14 @@ module.exports = [
         type: 'uint32',
       },
       {
-        indexed: false,
+        indexed: true,
         name: 'depositor',
         type: 'address',
+      },
+      {
+        indexed: false,
+        name: 'amount',
+        type: 'uint256',
       },
     ],
     name: 'NewDeposit',
@@ -225,6 +309,16 @@ module.exports = [
         type: 'address',
       },
       {
+        indexed: true,
+        name: 'slotId',
+        type: 'uint256',
+      },
+      {
+        indexed: true,
+        name: 'tenderAddr',
+        type: 'bytes32',
+      },
+      {
         indexed: false,
         name: 'epoch',
         type: 'uint256',
@@ -242,12 +336,71 @@ module.exports = [
         type: 'address',
       },
       {
+        indexed: true,
+        name: 'slotId',
+        type: 'uint256',
+      },
+      {
+        indexed: true,
+        name: 'tenderAddr',
+        type: 'bytes32',
+      },
+      {
+        indexed: false,
+        name: 'epoch',
+        type: 'uint256',
+      },
+    ],
+    name: 'ValidatorLogout',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        name: 'signerAddr',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        name: 'slotId',
+        type: 'uint256',
+      },
+      {
+        indexed: true,
+        name: 'tenderAddr',
+        type: 'bytes32',
+      },
+      {
         indexed: false,
         name: 'epoch',
         type: 'uint256',
       },
     ],
     name: 'ValidatorLeave',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        name: 'signerAddr',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        name: 'slotId',
+        type: 'uint256',
+      },
+      {
+        indexed: true,
+        name: 'tenderAddr',
+        type: 'bytes32',
+      },
+    ],
+    name: 'ValidatorUpdate',
     type: 'event',
   },
   {
@@ -274,6 +427,10 @@ module.exports = [
       },
       {
         name: '',
+        type: 'bytes32',
+      },
+      {
+        name: '',
         type: 'uint32',
       },
       {
@@ -287,6 +444,10 @@ module.exports = [
       {
         name: '',
         type: 'address',
+      },
+      {
+        name: '',
+        type: 'bytes32',
       },
     ],
     payable: false,
@@ -324,6 +485,14 @@ module.exports = [
       },
       {
         name: '_signerAddr',
+        type: 'address',
+      },
+      {
+        name: '_tenderAddr',
+        type: 'bytes32',
+      },
+      {
+        name: '_owner',
         type: 'address',
       },
     ],
@@ -449,7 +618,11 @@ module.exports = [
     constant: false,
     inputs: [
       {
-        name: 'amount',
+        name: '_owner',
+        type: 'address',
+      },
+      {
+        name: '_amount',
         type: 'uint256',
       },
     ],
