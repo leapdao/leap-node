@@ -1,4 +1,4 @@
-# PARSEC Labs plasma tx validation node
+# PARSEC Labs validation node
 
 ## Prerequisite
 
