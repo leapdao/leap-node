@@ -46,24 +46,27 @@ module.exports = async (node, lotionPort, db, web3, bridge) => {
     return unspentForAddress(unspent, address);
   };
 
+  let tokens;
   const getColor = async address => {
     const tokenCount = await bridge.methods.tokenCount().call();
-    const tokens = await new Promise(resolve => {
-      const batch = new web3.eth.BatchRequest();
-      const result = [];
-      let received = 0;
-      const callback = i => (err, block) => {
-        result[i] = block;
-        if (received === tokenCount - 1) {
-          resolve(result);
+    if (tokenCount !== tokens.length) {
+      tokens = await new Promise(resolve => {
+        const batch = new web3.eth.BatchRequest();
+        const result = [];
+        let received = 0;
+        const callback = i => (err, block) => {
+          result[i] = block;
+          if (received === tokenCount - 1) {
+            resolve(result);
+          }
+          received += 1;
+        };
+        for (let i = 0; i < tokenCount; i += 1) {
+          batch.add(bridge.methods.tokens(i).call.request(callback));
         }
-        received += 1;
-      };
-      for (let i = 0; i < tokenCount; i += 1) {
-        batch.add(bridge.methods.tokens(i).call.request(callback));
-      }
-      batch.execute();
-    });
+        batch.execute();
+      });
+    }
 
     const color = tokens.indexOf(address);
     return color === -1 ? null : color;
