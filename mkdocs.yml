@@ -3,6 +3,8 @@ theme: readthedocs
 
 pages:
   - Home: index.md
+  - How to use: how-to-use.md
+  - Becomin validator: becoming-validator.md
   - 'JSON RPC':
     - Overview: json-rpc/overview.md
     - 'web3.eth': json-rpc/web3.eth.md

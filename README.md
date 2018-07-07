@@ -3,7 +3,6 @@
 ## Prerequisite
 
 - Node.js 8+
-- Yarn
 
 ## Install
 
@@ -47,9 +46,3 @@ Dev: http://stake-dev.parseclabs.org/
 Testnet: N/A
 
 Mainnet: N/A
-
-
-## Run
-
-`yarn start`
-
