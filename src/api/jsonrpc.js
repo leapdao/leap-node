@@ -32,7 +32,8 @@ module.exports = async (node, lotionPort, db) => {
       };
       /* eslint-enable no-throw-literal */
     }
-    const balance = node.currentState.balances[address] || 0;
+    const balances = node.currentState.balances[0] || {};
+    const balance = balances[address] || 0;
     return `0x${balance.toString(16)}`;
   };
 
