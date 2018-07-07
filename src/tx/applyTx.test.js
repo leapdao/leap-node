@@ -283,6 +283,29 @@ test('successful transfer tx', async () => {
   expect(state.unspent[outpoint.hex()]).toBeDefined();
 });
 
+test('successful transfer tx with multiple colors', async () => {
+  const state = getInitialState();
+  const deposit1 = Tx.deposit(12, 500, ADDR_1, 0);
+  await applyTx(state, deposit1, defaultDepositMock);
+  expect(state.balances[0][ADDR_1]).toBe(500);
+  const deposit2 = Tx.deposit(13, 500, ADDR_1, 1);
+  await applyTx(state, deposit2, makeBridgeWithDepositMock(ADDR_1, 500, 1));
+  expect(state.balances[1][ADDR_1]).toBe(500);
+
+  const transfer = Tx.transfer(
+    [
+      new Input(new Outpoint(deposit1.hash(), 0)),
+      new Input(new Outpoint(deposit2.hash(), 0)),
+    ],
+    [new Output(500, ADDR_2, 0), new Output(500, ADDR_2, 1)]
+  ).signAll(PRIV_1);
+  await applyTx(state, transfer);
+  expect(state.balances[0][ADDR_1]).toBe(0);
+  expect(state.balances[0][ADDR_2]).toBe(500);
+  expect(state.balances[1][ADDR_1]).toBe(0);
+  expect(state.balances[1][ADDR_2]).toBe(500);
+});
+
 test('transfer tx with wrong color', async () => {
   const state = getInitialState();
   const deposit = Tx.deposit(12, 500, ADDR_1, 0);
