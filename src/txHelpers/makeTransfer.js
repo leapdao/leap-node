@@ -17,28 +17,31 @@ module.exports = async function makeTransfer(
   from,
   to,
   amount,
-  { height, privKey } = {}
+  color,
+  privKey
 ) {
   let fromAddr = from.toLowerCase(); // eslint-disable-line
   to = to.toLowerCase(); // eslint-disable-line
-  const balance = balances[fromAddr] || 0;
+  const colorBalances = balances[color] || {};
+  const balance = colorBalances[fromAddr] || 0;
 
   if (balance < amount) {
     throw new Error('Insufficient balance');
   }
 
-  const senderUnspent = unspentForAddress(unspent, from).map(u => ({
+  const senderUnspent = unspentForAddress(unspent, from, color).map(u => ({
     output: u.output,
     outpoint: Outpoint.fromRaw(u.outpoint),
   }));
 
-  const inputs = helpers.calcInputs(senderUnspent, amount);
+  const inputs = helpers.calcInputs(senderUnspent, from, amount, color);
   const outputs = helpers.calcOutputs(
     senderUnspent,
     inputs,
     fromAddr,
     to,
-    amount
+    amount,
+    color
   );
-  return Tx.transfer(height, inputs, outputs).signAll(privKey);
+  return Tx.transfer(inputs, outputs).signAll(privKey);
 };
