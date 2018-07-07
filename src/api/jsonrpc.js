@@ -20,7 +20,7 @@ api.use(
 /*
 * Starts JSON RPC server
 */
-module.exports = async (node, lotionPort, db) => {
+module.exports = async (node, lotionPort, db, web3, bridge) => {
   const getNetwork = async () => node.networkId;
 
   const getBalance = async (address, tag = 'latest') => {
@@ -44,6 +44,29 @@ module.exports = async (node, lotionPort, db) => {
   const getUnspent = async address => {
     const { unspent } = node.currentState;
     return unspentForAddress(unspent, address);
+  };
+
+  const getColor = async address => {
+    const tokenCount = await bridge.methods.tokenCount().call();
+    const tokens = await new Promise(resolve => {
+      const batch = new web3.eth.BatchRequest();
+      const result = [];
+      let received = 0;
+      const callback = i => (err, block) => {
+        result[i] = block;
+        if (received === tokenCount - 1) {
+          resolve(result);
+        }
+        received += 1;
+      };
+      for (let i = 0; i < tokenCount; i += 1) {
+        batch.add(bridge.methods.tokens(i).call.request(callback));
+      }
+      batch.execute();
+    });
+
+    const color = tokens.indexOf(address);
+    return color === -1 ? null : color;
   };
 
   const sendRawTransaction = async rawTx => {
@@ -143,6 +166,7 @@ module.exports = async (node, lotionPort, db) => {
     eth_getBlockByHash: getBlockByHash,
     eth_getBlockByNumber: getBlockByNumber,
     parsec_unspent: getUnspent,
+    parsec_getColor: getColor,
   };
 
   api.use(
