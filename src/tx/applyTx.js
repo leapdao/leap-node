@@ -13,8 +13,27 @@ const groupValuesByColor = (values, { color, value }) =>
     [color]: (values[color] || 0) + value,
   });
 
+const checkInsAndOuts = (tx, state, unspentFilter) => {
+  const inputTransactions = tx.inputs
+    .map(input => state.unspent[input.prevout.hex()])
+    .filter(unspentFilter);
+  if (tx.inputs.length !== inputTransactions.length) {
+    throw new Error('Wrong inputs');
+  }
+
+  const insValues = inputTransactions.reduce(groupValuesByColor, {});
+  const outsValues = tx.outputs.reduce(groupValuesByColor, {});
+  const colors = Object.keys(insValues);
+  for (const color of colors) {
+    if (insValues[color] !== outsValues[color]) {
+      throw new Error('Ins and outs values are mismatch');
+    }
+  }
+};
+
 module.exports = async (state, tx, bridge) => {
   if (
+    tx.type !== Type.CONSOLIDATE &&
     tx.type !== Type.DEPOSIT &&
     tx.type !== Type.EXIT &&
     tx.type !== Type.TRANSFER
@@ -67,28 +86,28 @@ module.exports = async (state, tx, bridge) => {
     }
   }
 
+  if (tx.type === Type.CONSOLIDATE) {
+    if (tx.inputs.length <= 1) {
+      throw new Error('Consolidate tx should have > 1 input');
+    }
+
+    if (tx.outputs.length !== 1) {
+      throw new Error('Consolidate tx should have only 1 output');
+    }
+
+    checkInsAndOuts(
+      tx,
+      state,
+      ({ address }) => address === tx.outputs[0].address
+    );
+  }
+
   if (tx.type === Type.TRANSFER) {
-    const inputTransactions = tx.inputs
-      .map(input => state.unspent[input.prevout.hex()])
-      .filter(({ address }, i) => {
-        if (address !== tx.inputs[i].signer) {
-          return false;
-        }
-        return true;
-      });
-
-    if (tx.inputs.length !== inputTransactions.length) {
-      throw new Error('Wrong inputs');
-    }
-
-    const insValues = inputTransactions.reduce(groupValuesByColor, {});
-    const outsValues = tx.outputs.reduce(groupValuesByColor, {});
-    const colors = Object.keys(insValues);
-    for (const color of colors) {
-      if (insValues[color] !== outsValues[color]) {
-        throw new Error('Ins and outs values are mismatch');
-      }
-    }
+    checkInsAndOuts(
+      tx,
+      state,
+      ({ address }, i) => address === tx.inputs[i].signer
+    );
   }
 
   // remove inputs

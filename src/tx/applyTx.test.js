@@ -196,6 +196,73 @@ test('exit with wrong color', async () => {
   }, 'Trying to submit incorrect exit');
 });
 
+test('successful consolidate tx', async () => {
+  const state = getInitialState();
+  const deposit1 = Tx.deposit(12, 500, ADDR_1, 0);
+  await applyTx(state, deposit1, defaultDepositMock);
+  expect(state.balances[0][ADDR_1]).toBe(500);
+  const outpoint1 = new Outpoint(deposit1.hash(), 0);
+  expect(state.unspent[outpoint1.hex()]).toBeDefined();
+  const deposit2 = Tx.deposit(13, 500, ADDR_1, 0);
+  await applyTx(state, deposit2, defaultDepositMock);
+  expect(state.balances[0][ADDR_1]).toBe(1000);
+  const outpoint2 = new Outpoint(deposit2.hash(), 0);
+  expect(state.unspent[outpoint2.hex()]).toBeDefined();
+
+  const consolidate = Tx.consolidate(
+    [
+      new Input(new Outpoint(deposit1.hash(), 0)),
+      new Input(new Outpoint(deposit2.hash(), 0)),
+    ],
+    new Output(1000, ADDR_1, 0)
+  );
+  await applyTx(state, consolidate);
+  expect(state.balances[0][ADDR_1]).toBe(1000);
+  expect(state.unspent[consolidate.inputs[0].prevout.hex()]).toBeUndefined();
+  expect(state.unspent[consolidate.inputs[1].prevout.hex()]).toBeUndefined();
+  const outpoint3 = new Outpoint(consolidate.hash(), 0);
+  expect(state.unspent[outpoint3.hex()]).toBeDefined();
+});
+
+test('consolidate tx with 1 input', async () => {
+  const state = getInitialState();
+  const deposit = Tx.deposit(12, 500, ADDR_1, 0);
+  await applyTx(state, deposit, defaultDepositMock);
+  shouldThrowAsync(async () => {
+    await applyTx(
+      state,
+      Tx.consolidate(
+        [new Input(new Outpoint(deposit.hash(), 0))],
+        new Output(1000, ADDR_1, 0)
+      )
+    );
+  }, 'Consolidate tx should have > 1 input');
+});
+
+test('consolidate tx with !== 1 output', async () => {
+  const state = getInitialState();
+  const deposit1 = Tx.deposit(12, 500, ADDR_1, 0);
+  await applyTx(state, deposit1, defaultDepositMock);
+  const deposit2 = Tx.deposit(13, 500, ADDR_1, 0);
+  await applyTx(state, deposit2, defaultDepositMock);
+  const consolidate = Tx.consolidate(
+    [
+      new Input(new Outpoint(deposit1.hash(), 0)),
+      new Input(new Outpoint(deposit2.hash(), 0)),
+    ],
+    new Output(1000, ADDR_1, 0)
+  );
+  consolidate.outputs.push(new Output(1000, ADDR_1, 0));
+  await shouldThrowAsync(async () => {
+    await applyTx(state, consolidate);
+  }, 'Consolidate tx should have only 1 output');
+
+  consolidate.outputs = [];
+  await shouldThrowAsync(async () => {
+    await applyTx(state, consolidate);
+  }, 'Consolidate tx should have only 1 output');
+});
+
 test('successful transfer tx', async () => {
   const state = getInitialState();
   const deposit = Tx.deposit(12, 500, ADDR_1, 0);
