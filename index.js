@@ -188,7 +188,7 @@ async function run() {
     }
 
     await eventsRelay(params.txServerPort, web3, bridge);
-    const api = await jsonrpc(node, params.txServerPort, db);
+    const api = await jsonrpc(node, params.txServerPort, db, web3, bridge);
     api
       .listenHttp({ port: cliArgs.rpcport, host: cliArgs.rpcaddr })
       .then(addr => {
