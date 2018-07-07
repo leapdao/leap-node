@@ -8,7 +8,10 @@
 const { Type, Outpoint } = require('parsec-lib');
 const { addrCmp } = require('../utils');
 
-const sumOuts = (value, out) => value + out.value;
+const groupValuesByColor = (values, { color, value }) =>
+  Object.assign({}, values, {
+    [color]: (values[color] || 0) + value,
+  });
 
 module.exports = async (state, tx, bridge) => {
   if (
@@ -78,11 +81,13 @@ module.exports = async (state, tx, bridge) => {
       throw new Error('Wrong inputs');
     }
 
-    const insValue = inputTransactions.reduce(sumOuts, 0);
-    const outsValue = tx.outputs.reduce(sumOuts, 0);
-
-    if (insValue !== outsValue) {
-      throw new Error('Ins and outs values are mismatch');
+    const insValues = inputTransactions.reduce(groupValuesByColor, {});
+    const outsValues = tx.outputs.reduce(groupValuesByColor, {});
+    const colors = Object.keys(insValues);
+    for (const color of colors) {
+      if (insValues[color] !== outsValues[color]) {
+        throw new Error('Ins and outs values are mismatch');
+      }
     }
   }
 

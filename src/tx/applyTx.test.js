@@ -216,6 +216,23 @@ test('successful transfer tx', async () => {
   expect(state.unspent[outpoint.hex()]).toBeDefined();
 });
 
+test('transfer tx with wrong color', async () => {
+  const state = getInitialState();
+  const deposit = Tx.deposit(12, 500, ADDR_1, 0);
+  await applyTx(state, deposit, defaultDepositMock);
+  expect(state.balances[0][ADDR_1]).toBe(500);
+  const outpoint = new Outpoint(deposit.hash(), 0);
+  expect(state.unspent[outpoint.hex()]).toBeDefined();
+
+  const transfer = Tx.transfer(
+    [new Input(new Outpoint(deposit.hash(), 0))],
+    [new Output(500, ADDR_2, 1)]
+  ).signAll(PRIV_1);
+  shouldThrowAsync(async () => {
+    await applyTx(state, transfer);
+  }, 'Ins and outs values are mismatch');
+});
+
 test('duplicate tx', async () => {
   const state = getInitialState();
   const tx = Tx.deposit(12, 500, ADDR_1, 0);
