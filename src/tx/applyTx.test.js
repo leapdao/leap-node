@@ -18,23 +18,25 @@ const getInitialState = () => ({
   processedDeposit: 11,
 });
 
-const makeBridgeWithDepositMock = (owner, amount) => {
+const makeBridgeWithDepositMock = (owner, amount, color) => {
   return {
     methods: {
-      deposits: () => ({ call: () => Promise.resolve({ owner, amount }) }),
+      deposits: () => ({
+        call: () => Promise.resolve({ owner, amount, color }),
+      }),
     },
   };
 };
 
-const makeBridgeWithExitMock = (owner, amount) => {
+const makeBridgeWithExitMock = (owner, amount, color) => {
   return {
     methods: {
-      exits: () => ({ call: () => Promise.resolve({ owner, amount }) }),
+      exits: () => ({ call: () => Promise.resolve({ owner, amount, color }) }),
     },
   };
 };
 
-const defaultDepositMock = makeBridgeWithDepositMock(ADDR_1, '500');
+const defaultDepositMock = makeBridgeWithDepositMock(ADDR_1, '500', 0);
 
 async function shouldThrowAsync(fn, message) {
   let error;
@@ -51,6 +53,16 @@ test('successful deposit tx', async () => {
   const tx = Tx.deposit(12, 500, ADDR_1, 0);
   await applyTx(state, tx, defaultDepositMock);
   expect(state.balances[0][ADDR_1]).toBe(500);
+  const outpoint = new Outpoint(tx.hash(), 0);
+  expect(state.unspent[outpoint.hex()]).toBeDefined();
+  expect(state.processedDeposit).toBe(12);
+});
+
+test('successful deposit tx (non-default color)', async () => {
+  const state = getInitialState();
+  const tx = Tx.deposit(12, 500, ADDR_1, 1);
+  await applyTx(state, tx, makeBridgeWithDepositMock(ADDR_1, '500', '1'));
+  expect(state.balances[1][ADDR_1]).toBe(500);
   const outpoint = new Outpoint(tx.hash(), 0);
   expect(state.unspent[outpoint.hex()]).toBeDefined();
   expect(state.processedDeposit).toBe(12);
@@ -80,7 +92,7 @@ test('deposit with wrong owner', async () => {
   const state = getInitialState();
   const tx = Tx.deposit(12, 500, ADDR_1, 0);
   try {
-    await applyTx(state, tx, makeBridgeWithDepositMock(ADDR_2, '500'));
+    await applyTx(state, tx, makeBridgeWithDepositMock(ADDR_2, '500', 0));
   } catch (e) {
     expect(e.message).toBe('Trying to submit incorrect deposit');
   }
@@ -90,7 +102,17 @@ test('deposit with wrong value', async () => {
   const state = getInitialState();
   const tx = Tx.deposit(12, 500, ADDR_1, 0);
   try {
-    await applyTx(state, tx, makeBridgeWithDepositMock(ADDR_1, '600'));
+    await applyTx(state, tx, makeBridgeWithDepositMock(ADDR_1, '600', 0));
+  } catch (e) {
+    expect(e.message).toBe('Trying to submit incorrect deposit');
+  }
+});
+
+test('deposit with wrong color', async () => {
+  const state = getInitialState();
+  const tx = Tx.deposit(12, 500, ADDR_1, 0);
+  try {
+    await applyTx(state, tx, makeBridgeWithDepositMock(ADDR_1, '600', 1));
   } catch (e) {
     expect(e.message).toBe('Trying to submit incorrect deposit');
   }
@@ -198,7 +220,7 @@ test('duplicate tx', async () => {
 test('transfer tx with unowned output', async () => {
   const state = getInitialState();
   const deposit = Tx.deposit(12, 500, ADDR_2, 0);
-  await applyTx(state, deposit, makeBridgeWithDepositMock(ADDR_2, '500'));
+  await applyTx(state, deposit, makeBridgeWithDepositMock(ADDR_2, '500', 0));
   expect(state.balances[0][ADDR_2]).toBe(500);
   const outpoint = new Outpoint(deposit.hash(), 0);
   expect(state.unspent[outpoint.hex()]).toBeDefined();
