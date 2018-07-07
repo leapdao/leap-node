@@ -93,6 +93,10 @@ module.exports = [
         type: 'uint64',
       },
       {
+        name: 'color',
+        type: 'uint16',
+      },
+      {
         name: 'owner',
         type: 'address',
       },
@@ -113,6 +117,20 @@ module.exports = [
       {
         name: '',
         type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'tokenCount',
+    outputs: [
+      {
+        name: '',
+        type: 'uint16',
       },
     ],
     payable: false,
@@ -177,6 +195,29 @@ module.exports = [
     inputs: [
       {
         name: '',
+        type: 'uint16',
+      },
+    ],
+    name: 'tokens',
+    outputs: [
+      {
+        name: 'addr',
+        type: 'address',
+      },
+      {
+        name: 'currentSize',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        name: '',
         type: 'bytes32',
       },
     ],
@@ -185,6 +226,10 @@ module.exports = [
       {
         name: 'amount',
         type: 'uint64',
+      },
+      {
+        name: 'color',
+        type: 'uint16',
       },
       {
         name: 'owner',
@@ -198,7 +243,7 @@ module.exports = [
   {
     inputs: [
       {
-        name: '_token',
+        name: '_psc',
         type: 'address',
       },
       {
@@ -265,6 +310,11 @@ module.exports = [
         type: 'address',
       },
       {
+        indexed: true,
+        name: 'color',
+        type: 'uint256',
+      },
+      {
         indexed: false,
         name: 'amount',
         type: 'uint256',
@@ -284,6 +334,11 @@ module.exports = [
       {
         indexed: true,
         name: 'outIndex',
+        type: 'uint256',
+      },
+      {
+        indexed: true,
+        name: 'color',
         type: 'uint256',
       },
       {
@@ -402,6 +457,20 @@ module.exports = [
     ],
     name: 'ValidatorUpdate',
     type: 'event',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        name: '_token',
+        type: 'address',
+      },
+    ],
+    name: 'registerToken',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     constant: true,
@@ -565,6 +634,33 @@ module.exports = [
     type: 'function',
   },
   {
+    constant: true,
+    inputs: [
+      {
+        name: '_txData',
+        type: 'bytes32[]',
+      },
+    ],
+    name: 'readInvalidDepositProof',
+    outputs: [
+      {
+        name: 'depositId',
+        type: 'uint32',
+      },
+      {
+        name: 'value',
+        type: 'uint64',
+      },
+      {
+        name: 'signer',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'pure',
+    type: 'function',
+  },
+  {
     constant: false,
     inputs: [
       {
@@ -625,22 +721,12 @@ module.exports = [
         name: '_amount',
         type: 'uint256',
       },
-    ],
-    name: 'deposit',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
       {
-        name: '_proof',
-        type: 'bytes32[]',
+        name: '_color',
+        type: 'uint16',
       },
     ],
-    name: 'withdrawBurn',
+    name: 'deposit',
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
@@ -680,7 +766,12 @@ module.exports = [
   },
   {
     constant: false,
-    inputs: [],
+    inputs: [
+      {
+        name: '_color',
+        type: 'uint16',
+      },
+    ],
     name: 'finalizeExits',
     outputs: [],
     payable: false,
