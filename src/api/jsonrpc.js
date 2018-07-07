@@ -69,7 +69,16 @@ module.exports = async (node, lotionPort, db, web3, bridge) => {
     }
 
     const color = tokens.indexOf(address);
-    return color === -1 ? null : color;
+    if (color === -1) {
+      /* eslint-disable no-throw-literal */
+      throw {
+        code: INVALID_PARAMS,
+        message: 'Unknown token address',
+      };
+      /* eslint-enable no-throw-literal */
+    }
+
+    return `0x${color.toString(16)}`;
   };
 
   const sendRawTransaction = async rawTx => {
