@@ -161,7 +161,7 @@ test('successful exit tx', async () => {
   expect(state.unspent[outpoint.hex()]).toBeDefined();
 
   const exit = Tx.exit(new Input(new Outpoint(deposit.hash(), 0)));
-  await applyTx(state, exit, makeBridgeWithExitMock(ADDR_1, '500'));
+  await applyTx(state, exit, makeBridgeWithExitMock(ADDR_1, '500', 0));
   expect(state.balances[0][ADDR_1]).toBe(0);
   expect(state.unspent[outpoint.hex()]).toBeUndefined();
 });
@@ -182,7 +182,17 @@ test('exit with wrong amount', async () => {
   await applyTx(state, deposit, defaultDepositMock);
   const exit = Tx.exit(new Input(new Outpoint(deposit.hash(), 0)));
   shouldThrowAsync(async () => {
-    await applyTx(state, exit, makeBridgeWithExitMock(ADDR_1, '600'));
+    await applyTx(state, exit, makeBridgeWithExitMock(ADDR_1, '600', 0));
+  }, 'Trying to submit incorrect exit');
+});
+
+test('exit with wrong color', async () => {
+  const state = getInitialState();
+  const deposit = Tx.deposit(12, 500, ADDR_1, 0);
+  await applyTx(state, deposit, defaultDepositMock);
+  const exit = Tx.exit(new Input(new Outpoint(deposit.hash(), 0)));
+  shouldThrowAsync(async () => {
+    await applyTx(state, exit, makeBridgeWithExitMock(ADDR_1, '500', 1));
   }, 'Trying to submit incorrect exit');
 });
 
