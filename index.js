@@ -66,7 +66,7 @@ async function run() {
   const app = lotion({
     initialState: {
       mempool: [],
-      balances: {}, // stores account balances
+      balances: {}, // stores account balances like this { [colorIndex]: { address1: 0, ... } }
       unspent: {}, // stores unspent outputs (deposits, transfers)
       processedDeposit: 0,
     },
@@ -188,7 +188,7 @@ async function run() {
     }
 
     await eventsRelay(params.txServerPort, web3, bridge);
-    const api = await jsonrpc(node, params.txServerPort, db);
+    const api = await jsonrpc(node, params.txServerPort, db, web3, bridge);
     api
       .listenHttp({ port: cliArgs.rpcport, host: cliArgs.rpcaddr })
       .then(addr => {

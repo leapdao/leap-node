@@ -15,6 +15,7 @@ exports.sendTransaction = require('./sendTransaction');
 exports.addrCmp = require('./addrCmp');
 exports.getSlotsByAddr = require('./getSlotsByAddr');
 exports.unspentForAddress = require('./unspentForAddress');
+exports.range = require('./range');
 
 exports.seq = mapFn => async arr => {
   for (const item of arr) {

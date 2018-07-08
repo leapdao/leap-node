@@ -1,13 +1,47 @@
-const { Tx, Period } = require('parsec-lib');
+const { Tx, Period, Input, Outpoint, Output } = require('parsec-lib');
 const addBlock = require('./addBlock');
+
+const PRIV_1 =
+  '0xad8e31c8862f5f86459e7cca97ac9302c5e1817077902540779eef66e21f394a';
 
 const ADDR_1 = '0x4436373705394267350db2c06613990d34621d69';
 
 test('addBlock', () => {
-  const tx1 = Tx.coinbase(2, ADDR_1);
-  const tx2 = Tx.coinbase(3, ADDR_1);
-  const tx3 = Tx.coinbase(4, ADDR_1);
-  const state = { mempool: [tx1, tx2, tx3] };
+  const tx1 = Tx.transfer(
+    [
+      new Input(
+        new Outpoint(
+          '0x7777777777777777777777777777777777777777777777777777777777777777',
+          0
+        )
+      ),
+    ],
+    [new Output(99000000, ADDR_1, 1337)]
+  ).signAll(PRIV_1);
+  const tx2 = Tx.transfer(
+    [
+      new Input(
+        new Outpoint(
+          '0x7777777777777777777777777777777777777777777777777777777777777777',
+          0
+        )
+      ),
+    ],
+    [new Output(99000001, ADDR_1, 1337)]
+  ).signAll(PRIV_1);
+  const tx3 = Tx.transfer(
+    [
+      new Input(
+        new Outpoint(
+          '0x7777777777777777777777777777777777777777777777777777777777777777',
+          0
+        )
+      ),
+    ],
+    [new Output(99000002, ADDR_1, 1337)]
+  ).signAll(PRIV_1);
+
+  const state = { mempool: [tx1.toJSON(), tx2.toJSON(), tx3.toJSON()] };
   const node = {
     currentPeriod: new Period(),
   };

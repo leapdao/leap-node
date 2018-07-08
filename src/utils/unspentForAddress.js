@@ -5,18 +5,25 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-module.exports = function unspentForAddress(unspent, address) {
+const { Outpoint } = require('parsec-lib');
+
+module.exports = function unspentForAddress(unspent, address, color) {
   return Object.keys(unspent)
     .map(k => ({
       outpoint: k,
       output: unspent[k],
     }))
-    .filter(u => {
-      return (
-        u.output && u.output.address.toLowerCase() === address.toLowerCase()
-      );
-    })
+    .filter(
+      u =>
+        u.output &&
+        u.output.address.toLowerCase() === address.toLowerCase() &&
+        u.output.color === color
+    )
     .sort((a, b) => {
       return a.output.value - b.output.value;
-    });
+    })
+    .map(u => ({
+      output: u.output,
+      outpoint: Outpoint.fromRaw(u.outpoint),
+    }));
 };

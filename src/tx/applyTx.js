@@ -8,10 +8,32 @@
 const { Type, Outpoint } = require('parsec-lib');
 const { addrCmp } = require('../utils');
 
-const sumOuts = (value, out) => value + out.value;
+const groupValuesByColor = (values, { color, value }) =>
+  Object.assign({}, values, {
+    [color]: (values[color] || 0) + value,
+  });
+
+const checkInsAndOuts = (tx, state, unspentFilter) => {
+  const inputTransactions = tx.inputs
+    .map(input => state.unspent[input.prevout.hex()])
+    .filter(unspentFilter);
+  if (tx.inputs.length !== inputTransactions.length) {
+    throw new Error('Wrong inputs');
+  }
+
+  const insValues = inputTransactions.reduce(groupValuesByColor, {});
+  const outsValues = tx.outputs.reduce(groupValuesByColor, {});
+  const colors = Object.keys(insValues);
+  for (const color of colors) {
+    if (insValues[color] !== outsValues[color]) {
+      throw new Error('Ins and outs values are mismatch');
+    }
+  }
+};
 
 module.exports = async (state, tx, bridge) => {
   if (
+    tx.type !== Type.CONSOLIDATE &&
     tx.type !== Type.DEPOSIT &&
     tx.type !== Type.EXIT &&
     tx.type !== Type.TRANSFER
@@ -40,6 +62,7 @@ module.exports = async (state, tx, bridge) => {
     const deposit = await bridge.methods.deposits(tx.options.depositId).call();
     if (
       Number(deposit.amount) !== tx.outputs[0].value ||
+      Number(deposit.color) !== tx.outputs[0].color ||
       !addrCmp(deposit.owner, tx.outputs[0].address)
     ) {
       throw new Error('Trying to submit incorrect deposit');
@@ -55,38 +78,43 @@ module.exports = async (state, tx, bridge) => {
     const [{ prevout }] = tx.inputs;
     const unspent = state.unspent[prevout.hex()];
     const exit = await bridge.methods.exits(prevout.getUtxoId()).call();
-    if (Number(exit.amount) !== unspent.value) {
+    if (
+      Number(exit.amount) !== unspent.value ||
+      Number(exit.color) !== unspent.color
+    ) {
       throw new Error('Trying to submit incorrect exit');
     }
   }
 
+  if (tx.type === Type.CONSOLIDATE) {
+    if (tx.inputs.length <= 1) {
+      throw new Error('Consolidate tx should have > 1 input');
+    }
+
+    if (tx.outputs.length !== 1) {
+      throw new Error('Consolidate tx should have only 1 output');
+    }
+
+    checkInsAndOuts(
+      tx,
+      state,
+      ({ address }) => address === tx.outputs[0].address
+    );
+  }
+
   if (tx.type === Type.TRANSFER) {
-    const inputTransactions = tx.inputs
-      .map(input => state.unspent[input.prevout.hex()])
-      .filter(({ address }, i) => {
-        if (address !== tx.inputs[i].signer) {
-          return false;
-        }
-        return true;
-      });
-
-    if (tx.inputs.length !== inputTransactions.length) {
-      throw new Error('Wrong inputs');
-    }
-
-    const insValue = inputTransactions.reduce(sumOuts, 0);
-    const outsValue = tx.outputs.reduce(sumOuts, 0);
-
-    if (insValue !== outsValue) {
-      throw new Error('Ins and outs values are mismatch');
-    }
+    checkInsAndOuts(
+      tx,
+      state,
+      ({ address }, i) => address === tx.inputs[i].signer
+    );
   }
 
   // remove inputs
   tx.inputs.forEach(input => {
     const outpointId = input.prevout.hex();
-    const { address, value } = state.unspent[outpointId];
-    state.balances[address] -= value;
+    const { address, value, color } = state.unspent[outpointId];
+    state.balances[color][address] -= value;
     delete state.unspent[outpointId];
   });
 
@@ -96,8 +124,10 @@ module.exports = async (state, tx, bridge) => {
     if (state.unspent[outpoint.hex()] !== undefined) {
       throw new Error('Attempt to create existing output');
     }
-    state.balances[out.address] =
-      (state.balances[out.address] || 0) + out.value;
+    state.balances[out.color] = state.balances[out.color] || {};
+    state.balances[out.color][out.address] =
+      state.balances[out.color][out.address] || 0;
+    state.balances[out.color][out.address] += out.value;
     state.unspent[outpoint.hex()] = out.toJSON();
   });
 };

@@ -1,6 +1,6 @@
 {
   "name": "parsec-node",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "main": "index.js",
   "author": "Alex Lunyov <isuntc@gmail.com>",
   "license": "MPLv2",
@@ -32,17 +32,23 @@
     "trailingComma": "es5",
     "bracketSpacing": true
   },
+  "keywords": [
+    "blockchain",
+    "ethereum",
+    "proof-of-stake",
+    "plasma"
+  ],
   "dependencies": {
     "axios": "^0.18.0",
+    "connect-jsonrpc": "github:parsec-labs/connect-jsonrpc",
+    "cors": "^2.8.4",
     "dashdash": "^1.14.1",
     "ethereumjs-util": "^5.2.0",
-    "lotion": "parsec-labs/lotion#ca540debb3894ce049b81a735ea8cfbb54b8d284",
-    "parsec-lib": "parsec-labs/parsec-lib#08b7c303fa68152583cc4ae71ba2ce4f7a3913b8",
-    "connect-jsonrpc": "github:parsec-labs/connect-jsonrpc",
-    "rpc-websockets": "^4.1.2",
     "express": "^4.16.3",
     "level": "^4.0.0",
-    "cors": "^2.8.4",
+    "lotion": "parsec-labs/lotion#ca540debb3894ce049b81a735ea8cfbb54b8d284",
+    "parsec-lib": "parsec-labs/parsec-lib#516d47fe2711e3e7a137b4ab65f333b98a31abff",
+    "rpc-websockets": "^4.1.2",
     "tendermint": "^3.1.9",
     "web3": "^1.0.0-beta.34"
   },

@@ -7,7 +7,7 @@ const { INVALID_PARAMS } = jsonrpc;
 const { Tx, Block, Util } = require('parsec-lib');
 
 const sendTx = require('../txHelpers/sendTx');
-const { unspentForAddress } = require('../utils');
+const { unspentForAddress, range } = require('../utils');
 
 const api = express();
 
@@ -20,7 +20,7 @@ api.use(
 /*
 * Starts JSON RPC server
 */
-module.exports = async (node, lotionPort, db) => {
+module.exports = async (node, lotionPort, db, web3, bridge) => {
   const getNetwork = async () => node.networkId;
 
   const getBalance = async (address, tag = 'latest') => {
@@ -32,7 +32,8 @@ module.exports = async (node, lotionPort, db) => {
       };
       /* eslint-enable no-throw-literal */
     }
-    const balance = node.currentState.balances[address] || 0;
+    const balances = node.currentState.balances['0'] || {};
+    const balance = balances[address] || 0;
     return `0x${balance.toString(16)}`;
   };
 
@@ -43,6 +44,30 @@ module.exports = async (node, lotionPort, db) => {
   const getUnspent = async address => {
     const { unspent } = node.currentState;
     return unspentForAddress(unspent, address);
+  };
+
+  let tokens = [];
+  const getColor = async address => {
+    const tokenCount = await bridge.methods.tokenCount().call();
+    if (tokenCount !== tokens.length) {
+      const tokenData = range(0, tokenCount - 1).map(i =>
+        bridge.methods.tokens(i).call()
+      );
+
+      tokens = (await Promise.all(tokenData)).map(o => o.addr.toLowerCase());
+    }
+
+    const color = tokens.indexOf(address);
+    if (color === -1) {
+      /* eslint-disable no-throw-literal */
+      throw {
+        code: INVALID_PARAMS,
+        message: 'Unknown token address',
+      };
+      /* eslint-enable no-throw-literal */
+    }
+
+    return `0x${color.toString(16)}`;
   };
 
   const sendRawTransaction = async rawTx => {
@@ -119,6 +144,33 @@ module.exports = async (node, lotionPort, db) => {
     return getBlockByHash(blockDoc, showFullTxs);
   };
 
+  const executeCall = async (txObj, tag) => {
+    if (tag !== 'latest') {
+      /* eslint-disable no-throw-literal */
+      throw {
+        code: INVALID_PARAMS,
+        message: 'Only call for latest block is supported.',
+      };
+      /* eslint-enable no-throw-literal */
+    }
+
+    const method = txObj.data.substring(0, 10);
+    if (method === '0x70a08231') {
+      // balanceOf
+      const color = String(parseInt(await getColor(txObj.to), 16));
+      const address = `0x${txObj.data.substring(txObj.data.length - 40)}`;
+      const balances = node.currentState.balances[color] || {};
+      const balance = balances[address] || 0;
+      return `0x${balance.toString(16)}`;
+    }
+    /* eslint-disable no-throw-literal */
+    throw {
+      code: INVALID_PARAMS,
+      message: `Method call ${method} is not supported`,
+    };
+    /* eslint-enable no-throw-literal */
+  };
+
   const withCallback = method => {
     return (...args) => {
       const cb = args.pop();
@@ -141,7 +193,9 @@ module.exports = async (node, lotionPort, db) => {
     eth_getTransactionReceipt: getTransactionByHash,
     eth_getBlockByHash: getBlockByHash,
     eth_getBlockByNumber: getBlockByNumber,
+    eth_call: executeCall,
     parsec_unspent: getUnspent,
+    parsec_getColor: getColor,
   };
 
   api.use(

@@ -7,20 +7,26 @@
 
 const Web3 = require('web3');
 const axios = require('axios');
+const { helpers, Output, Tx } = require('parsec-lib');
 
-const config = require('./config.json');
 const makeTransfer = require('./src/txHelpers/makeTransfer');
+const unspentForAddress = require('./src/utils/unspentForAddress');
 const sendTx = require('./src/txHelpers/sendTx');
 
 const web3 = new Web3('https://rinkeby.infura.io');
-const parsecWeb3 = new Web3('http://localhost:8645');
+const parsecWeb3 = new Web3('http://localhost:8545');
 
 const privKey =
   '0xad8e31c8862f5f86459e7cca97ac9302c5e1817077902540779eef66e21f394a';
 const account = web3.eth.accounts.privateKeyToAccount(privKey);
 
+const ADDR_2 = '0x8AB21C65041778DFc7eC7995F9cDef3d5221a5ad';
+const ADDR_3 = '0xe69d7406f2de9032c0512c1b75938a5db92123f7';
+
+const PORT = 3000;
+
 const getState = async () => {
-  const url = `http://localhost:${config.port}/state`;
+  const url = `http://localhost:${PORT}/state`;
   const { data } = await axios.get(url);
   return data;
 };
@@ -44,11 +50,12 @@ async function run() {
   const transfer1 = await makeTransfer(
     await getState(),
     account.address,
-    '0x8AB21C65041778DFc7eC7995F9cDef3d5221a5ad',
+    ADDR_2,
     1000,
-    { privKey: account.privateKey }
+    0,
+    account.privateKey
   );
-  await sendTx(config.port, transfer1.hex());
+  await sendTx(PORT, transfer1.hex());
   console.log('Transfer:', transfer1.hex());
   console.log(transfer1.hash());
   const txData = await parsecWeb3.eth.getTransaction(transfer1.hash());
@@ -62,15 +69,29 @@ async function run() {
   const transfer2 = await makeTransfer(
     await getState(),
     account.address,
-    '0x9caa3424cb91900ef7ac41a7b04a246304c02d3a',
+    ADDR_2,
     1000,
-    { privKey: account.privateKey }
+    0,
+    account.privateKey
   );
-  await sendTx(config.port, transfer2.hex());
+  await sendTx(PORT, transfer2.hex());
   console.log('Transfer:', transfer2.hex());
   console.log('------');
   console.log((await getState()).balances);
   console.log('------');
+
+  const consolidateAddress = async address => {
+    console.log(await getState());
+    const balance = await parsecWeb3.eth.getBalance(address);
+    const unspent = unspentForAddress((await getState()).unspent, address, 0);
+    const consolidateInputs = helpers.calcInputs(unspent, address, balance, 0);
+    const consolidateOutput = new Output(balance, address, 0);
+    const consolidate = Tx.consolidate(consolidateInputs, consolidateOutput);
+    await sendTx(PORT, consolidate.hex());
+    console.log(await getState());
+  };
+
+  await consolidateAddress(ADDR_3);
 }
 
 run();
