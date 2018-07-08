@@ -19,7 +19,7 @@ title: How to use
 - `no-validators-updates` — disabling validators set updates (default: false)
 - `port` — tx endpoint port (default: 3000)
 - `rpcaddr` — host for http RPC server (default: localhost)
-- `rpcport` — port for http RPC server (default: 8546)
+- `rpcport` — port for http RPC server (default: 8545)
 - `wsaddr` — host for websocket RPC server (default: localhost)
 - `wsport` — port for websocket RPC server (default: 8546)
 - `p2pPort` — port for p2p connection (default: random)
