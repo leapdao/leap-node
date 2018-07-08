@@ -3,7 +3,7 @@
   "version": "1.1.1",
   "main": "index.js",
   "author": "Alex Lunyov <isuntc@gmail.com>",
-  "license": "MPLv2",
+  "license": "MPL-2.0",
   "scripts": {
     "start": "node index.js",
     "test": "./node_modules/.bin/jest",
@@ -46,7 +46,7 @@
     "ethereumjs-util": "^5.2.0",
     "express": "^4.16.3",
     "level": "^4.0.0",
-    "lotion": "parsec-labs/lotion#ca540debb3894ce049b81a735ea8cfbb54b8d284",
+    "lotion": "parsec-labs/lotion#00b54230562fe44fba730f13c2e3436435b4a506",
     "parsec-lib": "parsec-labs/parsec-lib#516d47fe2711e3e7a137b4ab65f333b98a31abff",
     "rpc-websockets": "^4.1.2",
     "tendermint": "^3.1.9",
