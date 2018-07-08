@@ -73,7 +73,7 @@ async function run() {
     networkId: config.network,
     genesis: config.genesis,
     abciPort: 26658,
-    peers: cliArgs.peers,
+    peers: config.peers,
     p2pPort: cliArgs.p2pPort,
     tendermintPort: 26659,
     createEmptyBlocks: false,
