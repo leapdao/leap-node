@@ -1,4 +1,6 @@
-# PARSEC Labs plasma tx validation node
+# PARSEC Labs transactions validation node
+
+https://parseclabs.readthedocs.io/en/latest/
 
 ## Prerequisite
 
