@@ -35,7 +35,7 @@ https://parseclabs.readthedocs.io/en/latest/
 
 ### Config presets
 
-Dev config file: N/A
+Dev config file: [presets/parsec-rainbow.json](https://github.com/parsec-labs/parsec-node/blob/master/presets/parsec-rainbow.json)
 
 Testnet config file: N/A
 
