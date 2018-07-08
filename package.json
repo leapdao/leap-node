@@ -46,7 +46,7 @@
     "ethereumjs-util": "^5.2.0",
     "express": "^4.16.3",
     "level": "^4.0.0",
-    "lotion": "parsec-labs/lotion#a19c940156c73844dbcabff90d724e39e329913f",
+    "lotion": "parsec-labs/lotion#2be49e0fdebc6a5b4a884954608350478a7eaa64",
     "parsec-lib": "parsec-labs/parsec-lib#516d47fe2711e3e7a137b4ab65f333b98a31abff",
     "rpc-websockets": "^4.1.2",
     "tendermint": "^3.1.9",
