@@ -52,7 +52,7 @@ async function handleSlots(node, web3, bridge) {
 }
 
 async function run() {
-  const config = JSON.parse(await readFile('./config.json'));
+  const config = JSON.parse(await readFile(cliArgs.config));
 
   if (!config.bridgeAddr) {
     console.error('bridgeAddr is required');
