@@ -32,6 +32,12 @@
     "trailingComma": "es5",
     "bracketSpacing": true
   },
+  "keywords": [
+    "blockchain",
+    "ethereum",
+    "proof-of-stake",
+    "plasma"
+  ],
   "dependencies": {
     "axios": "^0.18.0",
     "connect-jsonrpc": "github:parsec-labs/connect-jsonrpc",
