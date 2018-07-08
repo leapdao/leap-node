@@ -5,6 +5,7 @@ https://parseclabs.readthedocs.io/en/latest/
 ## Prerequisite
 
 - Node.js 8+
+- build-essential
 
 ## Install
 

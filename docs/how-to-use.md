@@ -5,6 +5,7 @@ title: How to use
 ## Prerequisite
 
 - Node.js 8+
+- build-essential
 
 ## Install
 
@@ -35,7 +36,7 @@ title: How to use
 
 ### Config presets
 
-Dev config file: N/A
+Dev config file: [presets/parsec-rainbow.json](https://github.com/parsec-labs/parsec-node/blob/master/presets/parsec-rainbow.json)
 
 Testnet config file: N/A
 
