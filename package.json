@@ -4,7 +4,6 @@
   "main": "index.js",
   "author": "Alex Lunyov <isuntc@gmail.com>",
   "license": "MPLv2",
-  "private": true,
   "scripts": {
     "start": "node index.js",
     "test": "./node_modules/.bin/jest",
