@@ -14,6 +14,7 @@ exports.readSlots = require('./readSlots');
 exports.sendTransaction = require('./sendTransaction');
 exports.addrCmp = require('./addrCmp');
 exports.getSlotsByAddr = require('./getSlotsByAddr');
+exports.getAuctionedByAddr = require('./getAuctionedByAddr');
 exports.unspentForAddress = require('./unspentForAddress');
 exports.range = require('./range');
 
