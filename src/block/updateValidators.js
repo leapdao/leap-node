@@ -5,14 +5,13 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-const { PubKey } = require('tendermint/lib/types');
-const { ripemd160 } = require('tendermint/lib/hash');
-
+const utils = require('ethereumjs-util');
 const { EMPTY_ADDRESS } = require('../utils');
 
 function getAddress(pubkey) {
-  const bytes = PubKey.encode(pubkey);
-  return ripemd160(bytes).toString('base64');
+  const bytes = Buffer.from(pubkey.value, 'base64');
+  const hash = utils.sha256(bytes).slice(0, 20);
+  return hash.toString('base64');
 }
 
 /*
