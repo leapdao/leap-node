@@ -7,9 +7,9 @@
 
 const submitPeriod = require('../txHelpers/submitPeriod');
 
-module.exports = async (rsp, chainInfo, height, options) => {
+module.exports = async (rsp, chainInfo, _, options) => {
+  const height = chainInfo.height - 32;
   const { node } = options;
-
   if (height === 0) {
     // genesis height doesn't need check
     rsp.status = 1;
