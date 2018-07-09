@@ -1,6 +1,7 @@
 const { Tx, Input, Outpoint, Output } = require('parsec-lib');
 
 const applyTx = require('./applyTx');
+const runComputation = require('../txHelpers/runComputation');
 
 const EMPTY_ADDR = '0x0000000000000000000000000000000000000000';
 const CONTRACT_ADDR_1 = '0x258daf43d711831b8fd59137f42030784293e9e6';
@@ -17,6 +18,7 @@ const getInitialState = () => ({
   txs: {},
   balances: {},
   unspent: {},
+  storageRoots: {},
   processedDeposit: 11,
 });
 
@@ -567,6 +569,39 @@ test('computation request tx with wrong outputs', async () => {
   await shouldThrowAsync(async () => {
     await applyTx(state, compReq);
   }, 'Wrong outputs. First output should hold msgData, other input should be just transfers');
+});
+
+test('successful computation response tx', async () => {
+  const { state, tx: deploymentTx } = await prepareForCompRequest();
+
+  const compOutpoint = new Outpoint(deploymentTx.hash(), 0);
+  const spentOutpoint = new Outpoint(deploymentTx.hash(), 1);
+  const compOutput = new Output({
+    value: 100,
+    color: 0,
+    address: CONTRACT_ADDR_1,
+    gasPrice: 0,
+    msgData: '0x1234',
+  });
+  const changeOutput = new Output(400, ADDR_1, 0);
+  const compReq = Tx.compRequest(
+    [new Input(compOutpoint), new Input(spentOutpoint)],
+    [compOutput, changeOutput]
+  );
+  await applyTx(state, compReq);
+
+  const compResp = runComputation(state, compReq);
+  await applyTx(state, compResp);
+
+  expect(state.unspent[compOutpoint.hex()]).toBeUndefined();
+  expect(state.unspent[spentOutpoint.hex()]).toBeUndefined();
+  expect(state.unspent[new Outpoint(compReq.hash(), 0).hex()]).toBeUndefined();
+
+  compResp.outputs.forEach((respOutput, i) => {
+    expect(state.unspent[new Outpoint(compResp.hash(), i).hex()]).toEqual(
+      respOutput.toJSON()
+    );
+  });
 });
 
 // Check if storageRoot is the same

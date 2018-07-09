@@ -11,7 +11,7 @@ const fs = require('fs');
 const path = require('path');
 const { promisify } = require('util');
 const Web3 = require('web3');
-const { Tx, Period } = require('parsec-lib');
+const { Tx, Period, Type } = require('parsec-lib');
 const lotion = require('lotion');
 
 const cliArgs = require('./src/cliArgs');
@@ -21,6 +21,7 @@ const jsonrpc = require('./src/api/jsonrpc');
 const bridgeABI = require('./src/bridgeABI');
 const applyTx = require('./src/tx/applyTx');
 const accumulateTx = require('./src/tx/accumulateTx');
+const runComputation = require('./src/txHelpers/runComputation');
 
 const addBlock = require('./src/block/addBlock');
 const updatePeriod = require('./src/block/updatePeriod');
@@ -67,6 +68,7 @@ async function run() {
     initialState: {
       mempool: [],
       balances: {}, // stores account balances like this { [colorIndex]: { address1: 0, ... } }
+      storageRoots: {},
       unspent: {}, // stores unspent outputs (deposits, transfers)
       processedDeposit: 0,
     },
@@ -114,6 +116,12 @@ async function run() {
     const tx = Tx.fromRaw(encoded);
     await applyTx(state, tx, bridge);
     accumulateTx(state, tx);
+
+    if (tx.type === Type.COMP_REQ) {
+      const compResponse = runComputation(state, tx);
+      await applyTx(state, compResponse, bridge);
+      accumulateTx(state, compResponse);
+    }
   });
 
   app.useBlock(async (state, chainInfo) => {

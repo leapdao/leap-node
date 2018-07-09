@@ -40,7 +40,8 @@ const SUPPORTED_TYPES = [
   Type.COMP_RESP,
 ];
 
-module.exports = async (state, tx, bridge) => {
+const applyTx = async (state, tx, bridge) => {
+  const result = [tx];
   if (SUPPORTED_TYPES.indexOf(tx.type) === -1) {
     throw new Error('Unsupported tx type');
   }
@@ -144,6 +145,16 @@ module.exports = async (state, tx, bridge) => {
     }
   }
 
+  if (tx.type === Type.COMP_RESP) {
+    if (tx.inputs.length !== 1) {
+      throw new Error('Computation response should have only 1 input');
+    }
+
+    if (tx.outputs.length < 1) {
+      throw new Error('Computation response should have 1+ outputs');
+    }
+  }
+
   // remove inputs
   tx.inputs.forEach(input => {
     const outpointId = input.prevout.hex();
@@ -163,5 +174,13 @@ module.exports = async (state, tx, bridge) => {
       state.balances[out.color][out.address] || 0;
     state.balances[out.color][out.address] += out.value;
     state.unspent[outpoint.hex()] = out.toJSON();
+
+    if (out.storageRoot) {
+      state.storageRoots[out.address] = out.storageRoot;
+    }
   });
+
+  return result;
 };
+
+module.exports = applyTx;
