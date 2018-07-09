@@ -588,9 +588,10 @@ test('successful computation response tx', async () => {
     [new Input(compOutpoint), new Input(spentOutpoint)],
     [compOutput, changeOutput]
   );
+  compReq.sign([null, PRIV_1]);
   await applyTx(state, compReq);
 
-  const compResp = runComputation(state, compReq);
+  const compResp = await runComputation(state, compReq);
   await applyTx(state, compResp);
 
   expect(state.unspent[compOutpoint.hex()]).toBeUndefined();
@@ -602,6 +603,10 @@ test('successful computation response tx', async () => {
       respOutput.toJSON()
     );
   });
+  // check that storage root updated
+  expect(state.storageRoots[CONTRACT_ADDR_1]).toBe(
+    compResp.outputs[0].storageRoot
+  );
 });
 
 // Check if storageRoot is the same
