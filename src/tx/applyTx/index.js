@@ -12,6 +12,7 @@ const { checkOutpoints, removeInputs, addOutputs } = require('./utils');
 
 const checks = {
   [Type.COMP_REQ]: require('./checkCompReq'),
+  [Type.COMP_RESP]: require('./checkCompResp'),
   [Type.CONSOLIDATE]: require('./checkConsolidate'),
   [Type.DEPOSIT]: require('./checkDeposit'),
   [Type.EPOCH_LENGTH]: require('./checkEpochLength'),

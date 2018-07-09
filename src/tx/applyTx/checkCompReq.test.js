@@ -8,44 +8,46 @@ const ADDR_1 = '0x4436373705394267350db2c06613990d34621d69';
 const PRIV_1 =
   '0xad8e31c8862f5f86459e7cca97ac9302c5e1817077902540779eef66e21f394a';
 
-describe('checkCompReq', () => {
-  const prepareForCompRequest = () => {
-    // const state = getInitialState();
-    // applyTx(state, deposit, defaultDepositMock);
+const prepareForCompRequest = () => {
+  // const state = getInitialState();
+  // applyTx(state, deposit, defaultDepositMock);
 
-    const deposit = Tx.deposit(12, 500, ADDR_1, 0);
-    const outpoint = new Outpoint(deposit.hash(), 0);
-    const fakeDeploy = Tx.transfer(
-      [new Input(outpoint)],
-      [
-        new Output({
-          value: 0,
-          address: CONTRACT_ADDR_1,
-          color: 0,
-          storageRoot: PRIV_1,
-        }),
-        new Output(500, ADDR_1, 0),
-      ]
-    ).signAll(PRIV_1);
-    const state = {
-      unspent: {
-        [new Outpoint(
-          fakeDeploy.hash(),
-          0
-        ).hex()]: fakeDeploy.outputs[0].toJSON(),
-        [new Outpoint(
-          fakeDeploy.hash(),
-          1
-        ).hex()]: fakeDeploy.outputs[1].toJSON(),
-      },
-      storageRoots: {
-        [CONTRACT_ADDR_1]: PRIV_1,
-      },
-    };
-
-    return { state, tx: fakeDeploy };
+  const deposit = Tx.deposit(12, 500, ADDR_1, 0);
+  const outpoint = new Outpoint(deposit.hash(), 0);
+  const fakeDeploy = Tx.transfer(
+    [new Input(outpoint)],
+    [
+      new Output({
+        value: 0,
+        address: CONTRACT_ADDR_1,
+        color: 0,
+        storageRoot: PRIV_1,
+      }),
+      new Output(500, ADDR_1, 0),
+    ]
+  ).signAll(PRIV_1);
+  const state = {
+    unspent: {
+      [new Outpoint(
+        fakeDeploy.hash(),
+        0
+      ).hex()]: fakeDeploy.outputs[0].toJSON(),
+      [new Outpoint(
+        fakeDeploy.hash(),
+        1
+      ).hex()]: fakeDeploy.outputs[1].toJSON(),
+    },
+    storageRoots: {
+      [CONTRACT_ADDR_1]: PRIV_1,
+    },
   };
 
+  return { state, tx: fakeDeploy };
+};
+
+exports.prepareForCompRequest = prepareForCompRequest;
+
+describe('checkCompReq', () => {
   test('successful computation request tx', () => {
     const { state, tx: deploymentTx } = prepareForCompRequest();
 
