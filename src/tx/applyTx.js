@@ -31,14 +31,18 @@ const checkInsAndOuts = (tx, state, unspentFilter) => {
   }
 };
 
+const SUPPORTED_TYPES = [
+  Type.CONSOLIDATE,
+  Type.DEPOSIT,
+  Type.EXIT,
+  Type.TRANSFER,
+  Type.COMP_REQ,
+  Type.COMP_RESP,
+];
+
 module.exports = async (state, tx, bridge) => {
-  if (
-    tx.type !== Type.CONSOLIDATE &&
-    tx.type !== Type.DEPOSIT &&
-    tx.type !== Type.EXIT &&
-    tx.type !== Type.TRANSFER
-  ) {
-    throw new Error('Unsupported tx type. Only deposits, exits and transfers');
+  if (SUPPORTED_TYPES.indexOf(tx.type) === -1) {
+    throw new Error('Unsupported tx type');
   }
 
   tx.inputs.forEach(input => {
@@ -108,6 +112,27 @@ module.exports = async (state, tx, bridge) => {
       state,
       ({ address }, i) => address === tx.inputs[i].signer
     );
+  }
+
+  if (tx.type === Type.COMP_REQ) {
+    if (tx.inputs.length < 2) {
+      throw new Error('Computation request should have 2+ inputs');
+    }
+
+    const inputs = tx.inputs.map(inp => state.unspent[inp.prevout.hex()]);
+    if (inputs.length !== tx.inputs.length) {
+      throw new Error('Wrong inputs');
+    }
+
+    if (!inputs[0].msgData && !inputs[0].storageRoot) {
+      throw new Error(
+        'Unknown input. It should be deployment or computation response output'
+      );
+    }
+
+    if (inputs[0].address !== tx.outputs[0].address) {
+      throw new Error('Input and output contract address mismatch');
+    }
   }
 
   // remove inputs

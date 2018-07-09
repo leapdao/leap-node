@@ -3,6 +3,8 @@ const { Tx, Input, Outpoint, Output } = require('parsec-lib');
 const applyTx = require('./applyTx');
 
 const EMPTY_ADDR = '0x0000000000000000000000000000000000000000';
+const CONTRACT_ADDR_1 = '0x258daf43d711831b8fd59137f42030784293e9e6';
+const CONTRACT_ADDR_2 = '0x238daf43d711831b8fd59137f42030784293e9e6';
 const ADDR_1 = '0x4436373705394267350db2c06613990d34621d69';
 const PRIV_1 =
   '0xad8e31c8862f5f86459e7cca97ac9302c5e1817077902540779eef66e21f394a';
@@ -450,3 +452,99 @@ test('transfer tx with inputs/outputs mismatch', async () => {
     expect(e.message).toBe('Ins and outs values are mismatch');
   }
 });
+
+const prepareForCompRequest = async () => {
+  const state = getInitialState();
+  const deposit = Tx.deposit(12, 500, ADDR_1, 0);
+  await applyTx(state, deposit, defaultDepositMock);
+  const tx = Tx.transfer(
+    [new Input(new Outpoint(deposit.hash(), 0))],
+    [
+      new Output({
+        value: 0,
+        address: CONTRACT_ADDR_1,
+        color: 0,
+        storageRoot: PRIV_1,
+      }),
+      new Output(500, ADDR_1, 0),
+    ]
+  ).signAll(PRIV_1);
+  await applyTx(state, tx);
+
+  return { state, tx };
+};
+
+test('successful computation request tx', async () => {
+  const { state, tx: deploymentTx } = await prepareForCompRequest();
+
+  const compOutpoint = new Outpoint(deploymentTx.hash(), 0);
+  const spentOutpoint = new Outpoint(deploymentTx.hash(), 1);
+  const compOutput = new Output({
+    value: 100,
+    color: 0,
+    address: CONTRACT_ADDR_1,
+    gasPrice: 0,
+    msgData: '0x1234',
+  });
+  const changeOutput = new Output(400, ADDR_1, 0);
+  const compReq = Tx.compRequest(
+    [new Input(compOutpoint), new Input(spentOutpoint)],
+    [compOutput, changeOutput]
+  );
+  await applyTx(state, compReq);
+
+  expect(state.unspent[compOutpoint.hex()]).toBeUndefined();
+  expect(state.unspent[spentOutpoint.hex()]).toBeUndefined();
+  expect(state.unspent[new Outpoint(compReq.hash(), 0).hex()]).toEqual(
+    compOutput.toJSON()
+  );
+  expect(state.unspent[new Outpoint(compReq.hash(), 1).hex()]).toEqual(
+    changeOutput.toJSON()
+  );
+});
+
+test('computation request tx with wrong contract address', async () => {
+  const { state, tx: deploymentTx } = await prepareForCompRequest();
+
+  const compOutpoint = new Outpoint(deploymentTx.hash(), 0);
+  const spentOutpoint = new Outpoint(deploymentTx.hash(), 1);
+  const compOutput = new Output({
+    value: 100,
+    color: 0,
+    address: CONTRACT_ADDR_2,
+    gasPrice: 0,
+    msgData: '0x1234',
+  });
+  const changeOutput = new Output(400, ADDR_1, 0);
+  const compReq = Tx.compRequest(
+    [new Input(compOutpoint), new Input(spentOutpoint)],
+    [compOutput, changeOutput]
+  );
+  await shouldThrowAsync(async () => {
+    await applyTx(state, compReq);
+  }, 'Input and output contract address mismatch');
+});
+
+test('computation request tx with non-computation input', async () => {
+  const { state, tx: deploymentTx } = await prepareForCompRequest();
+
+  const compOutpoint = new Outpoint(deploymentTx.hash(), 0);
+  const spentOutpoint = new Outpoint(deploymentTx.hash(), 1);
+  const compOutput = new Output({
+    value: 100,
+    color: 0,
+    address: CONTRACT_ADDR_2,
+    gasPrice: 0,
+    msgData: '0x1234',
+  });
+  const changeOutput = new Output(400, ADDR_1, 0);
+  const compReq = Tx.compRequest(
+    [new Input(spentOutpoint), new Input(compOutpoint)],
+    [compOutput, changeOutput]
+  );
+  await shouldThrowAsync(async () => {
+    await applyTx(state, compReq);
+  }, 'Unknown input. It should be deployment or computation response output');
+});
+
+// Check if storageRoot is the same
