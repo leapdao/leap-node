@@ -21,9 +21,18 @@ module.exports = (state, tx) => {
     throw new Error('Wrong inputs');
   }
 
-  if (!inputs[0].msgData && !inputs[0].storageRoot) {
+  if (!inputs[0].storageRoot) {
     throw new Error(
       'Unknown input. It should be deployment or computation response output'
+    );
+  }
+
+  if (
+    !tx.outputs[0].msgData &&
+    tx.outputs.slice(1).some(output => output.msgData)
+  ) {
+    throw new Error(
+      'Wrong outputs. First output should hold msgData, other input should be just transfers'
     );
   }
 

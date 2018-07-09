@@ -111,4 +111,28 @@ describe('checkCompReq', () => {
       'Unknown input. It should be deployment or computation response output'
     );
   });
+
+  test('computation request tx with wrong outputs', () => {
+    const { state, tx: deploymentTx } = prepareForCompRequest();
+
+    const compOutpoint = new Outpoint(deploymentTx.hash(), 0);
+    const spentOutpoint = new Outpoint(deploymentTx.hash(), 1);
+    const compOutput = new Output({
+      value: 100,
+      color: 0,
+      address: CONTRACT_ADDR_1,
+      gasPrice: 0,
+      msgData: '0x1234',
+    });
+    const changeOutput = new Output(400, ADDR_1, 0);
+    const compReq = Tx.compRequest(
+      [new Input(compOutpoint), new Input(spentOutpoint)],
+      [changeOutput, compOutput]
+    );
+    expect(() => {
+      checkCompReq(state, compReq);
+    }).toThrow(
+      'Wrong outputs. First output should hold msgData, other input should be just transfers'
+    );
+  });
 });
