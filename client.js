@@ -5,6 +5,8 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
+/* eslint-disable no-await-in-loop, no-console */
+
 const Web3 = require('web3');
 const axios = require('axios');
 const { helpers, Output, Tx } = require('parsec-lib');
@@ -32,66 +34,76 @@ const getState = async () => {
 };
 
 async function run() {
-  console.log('------');
-  console.log((await getState()).balances);
-  console.log('------');
+  for (let i = 0; i < 100; i += 1) {
+    console.log('------');
+    console.log((await getState()).balances);
+    console.log('------');
 
-  console.log(`From account: ${account.address}`);
-  console.log(`Balance: ${await parsecWeb3.eth.getBalance(account.address)}`);
+    console.log(`From account: ${account.address}`);
+    console.log(`Balance: ${await parsecWeb3.eth.getBalance(account.address)}`);
 
-  let latestBlockData = await parsecWeb3.eth.getBlock('latest');
-  console.log(`Latest block: ${JSON.stringify(latestBlockData, null, 2)}`);
+    let latestBlockData = await parsecWeb3.eth.getBlock('latest');
+    console.log(`Latest block: ${JSON.stringify(latestBlockData, null, 2)}`);
 
-  console.log(latestBlockData.number);
-  latestBlockData = await parsecWeb3.eth.getBlock(latestBlockData.number);
-  console.log(
-    `Latest block by number: ${JSON.stringify(latestBlockData, null, 2)}`
-  );
-  const transfer1 = await makeTransfer(
-    await getState(),
-    account.address,
-    ADDR_2,
-    1000,
-    0,
-    account.privateKey
-  );
-  await sendTx(PORT, transfer1.hex());
-  console.log('Transfer:', transfer1.hex());
-  console.log(transfer1.hash());
-  const txData = await parsecWeb3.eth.getTransaction(transfer1.hash());
-  const blockData = await parsecWeb3.eth.getBlock(txData.blockHash);
-  console.log(`getTransaction: ${JSON.stringify(txData, null, 2)}`);
-  console.log(`Block data: ${JSON.stringify(blockData, null, 2)}`);
-  console.log('------');
-  console.log((await getState()).balances);
-  console.log('------');
+    console.log(latestBlockData.number);
+    latestBlockData = await parsecWeb3.eth.getBlock(latestBlockData.number);
+    console.log(
+      `Latest block by number: ${JSON.stringify(latestBlockData, null, 2)}`
+    );
+    const transfer1 = await makeTransfer(
+      await getState(),
+      account.address,
+      ADDR_2,
+      1000 + Math.round(100 * Math.random()),
+      0,
+      account.privateKey
+    );
+    await sendTx(PORT, transfer1.hex());
+    console.log('Transfer:', transfer1.hex());
+    console.log(transfer1.hash());
+    const txData = await parsecWeb3.eth.getTransaction(transfer1.hash());
+    const blockData = await parsecWeb3.eth.getBlock(txData.blockHash);
+    console.log(`getTransaction: ${JSON.stringify(txData, null, 2)}`);
+    console.log(`Block data: ${JSON.stringify(blockData, null, 2)}`);
+    console.log('------');
+    console.log((await getState()).balances);
+    console.log('------');
 
-  const transfer2 = await makeTransfer(
-    await getState(),
-    account.address,
-    ADDR_2,
-    1000,
-    0,
-    account.privateKey
-  );
-  await sendTx(PORT, transfer2.hex());
-  console.log('Transfer:', transfer2.hex());
-  console.log('------');
-  console.log((await getState()).balances);
-  console.log('------');
+    const transfer2 = await makeTransfer(
+      await getState(),
+      account.address,
+      ADDR_2,
+      1000,
+      0,
+      account.privateKey
+    );
+    await sendTx(PORT, transfer2.hex());
+    console.log('Transfer:', transfer2.hex());
+    console.log('------');
+    console.log((await getState()).balances);
+    console.log('------');
 
-  const consolidateAddress = async address => {
-    console.log(await getState());
-    const balance = await parsecWeb3.eth.getBalance(address);
-    const unspent = unspentForAddress((await getState()).unspent, address, 0);
-    const consolidateInputs = helpers.calcInputs(unspent, address, balance, 0);
-    const consolidateOutput = new Output(balance, address, 0);
-    const consolidate = Tx.consolidate(consolidateInputs, consolidateOutput);
-    await sendTx(PORT, consolidate.hex());
-    console.log(await getState());
-  };
+    const consolidateAddress = async address => {
+      console.log(await getState());
+      const balance = await parsecWeb3.eth.getBalance(address);
+      const unspent = unspentForAddress((await getState()).unspent, address, 0);
+      const consolidateInputs = helpers.calcInputs(
+        unspent,
+        address,
+        balance,
+        0
+      );
+      const consolidateOutput = new Output(balance, address, 0);
+      const consolidate = Tx.consolidate(consolidateInputs, consolidateOutput);
+      await sendTx(PORT, consolidate.hex());
+      console.log(await getState());
+    };
 
-  await consolidateAddress(ADDR_3);
+    await consolidateAddress(ADDR_3);
+
+    latestBlockData = await parsecWeb3.eth.getBlock('latest');
+    console.log(latestBlockData.number);
+  }
 }
 
 run();
