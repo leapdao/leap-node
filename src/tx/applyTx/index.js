@@ -11,6 +11,7 @@ const { Type } = require('parsec-lib');
 const { checkOutpoints, removeInputs, addOutputs } = require('./utils');
 
 const checks = {
+  [Type.COMP_REQ]: require('./checkCompReq'),
   [Type.CONSOLIDATE]: require('./checkConsolidate'),
   [Type.DEPOSIT]: require('./checkDeposit'),
   [Type.EPOCH_LENGTH]: require('./checkEpochLength'),

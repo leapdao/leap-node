@@ -6,7 +6,7 @@ const PRIV_1 =
 
 const ADDR_1 = '0x4436373705394267350db2c06613990d34621d69';
 
-test('addBlock', () => {
+test('addBlock', async () => {
   const tx1 = Tx.transfer(
     [
       new Input(
@@ -46,7 +46,7 @@ test('addBlock', () => {
     currentPeriod: new Period(),
     account: { address: ADDR_1 },
   };
-  addBlock(state, { height: 1 }, { bridgeState });
+  await addBlock(state, { height: 1 }, { bridgeState });
   const { blockList } = bridgeState.currentPeriod;
   expect(blockList.length).toBe(1);
   const { txList } = blockList[0];
