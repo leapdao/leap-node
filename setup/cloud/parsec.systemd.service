@@ -1,0 +1,16 @@
+[Unit]
+Description=PARSEC node
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Restart=on-failure
+User=ubuntu
+Group=ubuntu
+PermissionsStartOnly=true
+ExecStart=/usr/local/bin/parsec --p2pPort=46691 --config=/home/ubuntu/parsec-rainbow.json
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGTERM
+
+[Install]
+WantedBy=multi-user.target

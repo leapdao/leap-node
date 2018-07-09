@@ -11,7 +11,7 @@ https://parseclabs.readthedocs.io/en/latest/
 
 `npm install parsec-node -g` or `yarn global add parsec-node`
 
-## Run
+## Run locally
 
 `parsec [ARGS] --config=path-to-config.json`
 
@@ -41,6 +41,19 @@ Dev config file: <a href="https://raw.githubusercontent.com/parsec-labs/parsec-n
 Testnet config file: N/A
 
 Mainnet config file: N/A
+
+## Run in the cloud
+
+You can use [Terraform](https://www.terraform.io/) to spin up an Amazon EC2 instance with the node:
+```
+terraform apply -var SSH_KEY_FILE="<your public key for SSH access>" setup/cloud
+```
+
+So far it starts Dev Rainbow network only.
+
+Some usefule commands:
+- check the logs: `ssh ubuntu@<ec2 host> journalctl -u parsec`
+- start/stop/restart/status: `ssh ubuntu@<ec2 host> sudo service parsec start/stop/restart/status`
 
 ## Staking UI
 
