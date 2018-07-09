@@ -80,12 +80,13 @@ async function run() {
     logTendermint: true,
   });
 
-  if (await exists('./.priv')) {
-    config.privKey = await readFile('./.priv');
+  const privFilename = path.join(path.dirname(cliArgs.config), '.priv');
+  if (await exists(privFilename)) {
+    config.privKey = await readFile(privFilename);
   } else {
     const { privateKey } = web3.eth.accounts.create();
     config.privKey = privateKey;
-    await writeFile('./.priv', privateKey);
+    await writeFile(privFilename, privateKey);
   }
 
   const db = Db(app);
