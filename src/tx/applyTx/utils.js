@@ -50,6 +50,10 @@ const addOutputs = (state, tx) => {
       state.balances[out.color][out.address] || 0;
     state.balances[out.color][out.address] += out.value;
     state.unspent[outpoint.hex()] = out.toJSON();
+
+    if (out.storageRoot) {
+      state.storageRoots[out.address] = out.storageRoot;
+    }
   });
 };
 

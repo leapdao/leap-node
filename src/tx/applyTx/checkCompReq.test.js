@@ -9,9 +9,6 @@ const PRIV_1 =
   '0xad8e31c8862f5f86459e7cca97ac9302c5e1817077902540779eef66e21f394a';
 
 const prepareForCompRequest = () => {
-  // const state = getInitialState();
-  // applyTx(state, deposit, defaultDepositMock);
-
   const deposit = Tx.deposit(12, 500, ADDR_1, 0);
   const outpoint = new Outpoint(deposit.hash(), 0);
   const fakeDeploy = Tx.transfer(
