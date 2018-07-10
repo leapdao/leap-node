@@ -16,6 +16,8 @@ exports.addrCmp = require('./addrCmp');
 exports.getSlotsByAddr = require('./getSlotsByAddr');
 exports.getAuctionedByAddr = require('./getAuctionedByAddr');
 exports.unspentForAddress = require('./unspentForAddress');
+exports.getAddress = require('./getAddress');
+exports.hexToBase64 = require('./hexToBase64');
 exports.range = require('./range');
 exports.printStartupInfo = require('./printStartupInfo');
 

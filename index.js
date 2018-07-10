@@ -81,8 +81,22 @@ async function run() {
 
   const db = Db(app);
 
+<<<<<<< HEAD
   const node = new Node(db, web3, bridge, config.network);
   await node.init();
+=======
+  const node = {
+    replay: true,
+    blockHeight: 0,
+    currentState: null,
+    networkId: config.network,
+    currentPeriod: new Period(),
+    previousPeriod: null,
+    lastBlockSynced: await db.getLastBlockSynced(),
+  };
+
+  await handleSlots(node, web3, bridge);
+>>>>>>> Tests for a validator updates
 
   const account = web3.eth.accounts.privateKeyToAccount(config.privKey);
 
@@ -93,6 +107,9 @@ async function run() {
   });
 
   app.useBlock(async (state, chainInfo) => {
+    if (!cliArgs.no_validators_updates) {
+      updateValidators(chainInfo, state.slots);
+    }
     updatePeriod(chainInfo, {
       bridge,
       web3,
@@ -104,9 +121,6 @@ async function run() {
       node,
       db,
     });
-    if (!cliArgs.no_validators_updates || node.replay) {
-      updateValidators(chainInfo, node.slots);
-    }
     console.log('Height:', chainInfo.height);
   });
 
