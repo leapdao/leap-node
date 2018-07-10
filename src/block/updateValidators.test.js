@@ -70,7 +70,7 @@ test('Simple removing of a validator (empty slot)', async () => {
 });
 
 test('Advanced removing of a validator (with activationEpoch)', async () => {
-  const bridge = mockLastCompleteEpoch(2);
+  const bridge = mockLastCompleteEpoch(1);
   const chainInfo = {
     validators: {
       [getAddress(TENDER_KEY_1)]: {
@@ -107,7 +107,7 @@ test('Advanced removing of a validator (with activationEpoch)', async () => {
 });
 
 test('Validator with several slots', async () => {
-  const bridge = mockLastCompleteEpoch(2);
+  const bridge = mockLastCompleteEpoch(1);
   const chainInfo = {
     validators: {
       [getAddress(TENDER_KEY_1)]: {
