@@ -103,7 +103,6 @@ async function run() {
     networkId: config.network,
     currentPeriod: new Period(),
     previousPeriod: null,
-    replay: true,
     lastBlockSynced: await db.getLastBlockSynced(),
   };
 
@@ -118,6 +117,9 @@ async function run() {
   });
 
   app.useBlock(async (state, chainInfo) => {
+    if (!cliArgs.no_validators_updates) {
+      updateValidators(chainInfo, state.slots);
+    }
     updatePeriod(chainInfo, {
       bridge,
       web3,
@@ -129,9 +131,6 @@ async function run() {
       node,
       db,
     });
-    if (!cliArgs.no_validators_updates || node.replay) {
-      updateValidators(chainInfo, node.slots);
-    }
     console.log('Height:', chainInfo.height);
   });
 
