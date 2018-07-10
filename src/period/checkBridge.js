@@ -8,25 +8,29 @@
 const submitPeriod = require('../txHelpers/submitPeriod');
 
 module.exports = async (rsp, chainInfo, _, options) => {
-  const height = chainInfo.height - 32;
-  const { node } = options;
-  if (height === 0) {
-    // genesis height doesn't need check
-    rsp.status = 1;
-    return;
+  try {
+    const height = chainInfo.height - 32;
+    const { node } = options;
+    if (height === 0) {
+      // genesis height doesn't need check
+      rsp.status = 1;
+      return;
+    }
+
+    const contractPeriod = await submitPeriod(
+      node.previousPeriod,
+      height + node.checkCallsCount,
+      options
+    );
+
+    if (contractPeriod.timestamp === '0') {
+      rsp.status = 0;
+    } else {
+      rsp.status = 1;
+    }
+
+    node.checkCallsCount += 1;
+  } catch (err) {
+    console.error(err);
   }
-
-  const contractPeriod = await submitPeriod(
-    node.previousPeriod,
-    height + node.checkCallsCount,
-    options
-  );
-
-  if (contractPeriod.timestamp === '0') {
-    rsp.status = 0;
-  } else {
-    rsp.status = 1;
-  }
-
-  node.checkCallsCount += 1;
 };

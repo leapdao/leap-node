@@ -11,24 +11,28 @@ const activateSlot = require('../txHelpers/activateSlot');
 const { getAuctionedByAddr } = require('../utils');
 
 module.exports = async (chainInfo, options) => {
-  const { node, account } = options;
-  if (chainInfo.height % 32 === 0) {
-    node.previousPeriod = node.currentPeriod;
-    node.currentPeriod = new Period(node.previousPeriod.merkleRoot());
-    node.checkCallsCount = 0;
-    await submitPeriod(node.previousPeriod, chainInfo.height, options);
-  }
-  if (chainInfo.height % 16 === 0) {
-    // check if there is a validator slot that is "waiting for me"
-    const myAuctionedSlots = await getAuctionedByAddr(
-      node.slots,
-      account.address
-    );
-    const activations = [];
-    myAuctionedSlots.forEach(slot => {
-      console.log('found some slot for activation: ', slot.id);
-      activations.push(activateSlot(slot.id, options));
-    });
-    await Promise.all(activations);
+  try {
+    const { node, account } = options;
+    if (chainInfo.height % 32 === 0) {
+      node.previousPeriod = node.currentPeriod;
+      node.currentPeriod = new Period(node.previousPeriod.merkleRoot());
+      node.checkCallsCount = 0;
+      await submitPeriod(node.previousPeriod, chainInfo.height, options);
+    }
+    if (chainInfo.height % 16 === 0) {
+      // check if there is a validator slot that is "waiting for me"
+      const myAuctionedSlots = await getAuctionedByAddr(
+        node.slots,
+        account.address
+      );
+      const activations = [];
+      myAuctionedSlots.forEach(slot => {
+        console.log('found some slot for activation: ', slot.id);
+        activations.push(activateSlot(slot.id, options));
+      });
+      await Promise.all(activations);
+    }
+  } catch (err) {
+    console.error(err);
   }
 };
