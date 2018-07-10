@@ -31,13 +31,17 @@ const checkInsAndOuts = (tx, state, unspentFilter) => {
   }
 };
 
+const SUPPORTED_TYPES = [
+  Type.CONSOLIDATE,
+  Type.DEPOSIT,
+  Type.EXIT,
+  Type.TRANSFER,
+  Type.VALIDATOR_JOIN,
+  Type.VALIDATOR_LOGOUT,
+];
+
 module.exports = async (state, tx, bridge) => {
-  if (
-    tx.type !== Type.CONSOLIDATE &&
-    tx.type !== Type.DEPOSIT &&
-    tx.type !== Type.EXIT &&
-    tx.type !== Type.TRANSFER
-  ) {
+  if (SUPPORTED_TYPES.indexOf(tx.type) === -1) {
     throw new Error('Unsupported tx type. Only deposits, exits and transfers');
   }
 
@@ -47,6 +51,34 @@ module.exports = async (state, tx, bridge) => {
       throw new Error('Trying to spend non-existing output');
     }
   });
+
+  if (tx.type === Type.VALIDATOR_JOIN || tx.type === Type.VALIDATOR_LOGOUT) {
+    if (
+      state.slots[tx.options.slotId] &&
+      tx.options.eventsCount !== state.slots[tx.options.slotId].eventsCount + 1
+    ) {
+      throw new Error('eventsCount expected to be x + 1');
+    }
+  }
+
+  if (tx.type === Type.VALIDATOR_JOIN) {
+    if (!state.slots[tx.options.slotId] && tx.options.eventsCount !== 1) {
+      throw new Error('eventsCount should start from 1');
+    }
+
+    state.slots[tx.options.slotId] = {
+      tenderKey: tx.options.tenderKey,
+      eventsCount: tx.options.eventsCount,
+    };
+  }
+
+  if (tx.type === Type.VALIDATOR_LOGOUT) {
+    if (!state.slots[tx.options.slotId]) {
+      throw new Error(`Slot ${tx.options.slotId} is empty`);
+    }
+    state.slots[tx.options.slotId].activationEpoch = tx.options.activationEpoch;
+    state.slots[tx.options.slotId].eventsCount = tx.options.eventsCount;
+  }
 
   if (tx.type === Type.DEPOSIT) {
     if (tx.options.depositId <= state.processedDeposit) {
