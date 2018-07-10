@@ -5,10 +5,11 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
+/* eslint-disable no-await-in-loop, default-case */
+
 const { Tx, Input, Outpoint } = require('parsec-lib');
 
 const ContractEventsSubscription = require('./ContractEventsSubscription');
-const { seq } = require('../utils');
 const sendTx = require('../txHelpers/sendTx');
 
 module.exports = async (txServerPort, web3, bridge) => {
@@ -24,26 +25,48 @@ module.exports = async (txServerPort, web3, bridge) => {
     );
     await sendTx(txServerPort, tx.hex());
   };
-  const handleDeposits = seq(handleDeposit);
 
   const handleExit = async event => {
     const { txHash, outIndex } = event.returnValues;
     const tx = Tx.exit(new Input(new Outpoint(txHash, Number(outIndex))));
     await sendTx(txServerPort, tx.hex());
   };
-  const handleExits = seq(handleExit);
+
+  const handleJoin = async event => {
+    const { slotId, tenderAddr, eventCounter } = event.returnValues;
+    const tx = Tx.validatorJoin(slotId, tenderAddr, eventCounter);
+    await sendTx(txServerPort, tx.hex());
+  };
+
+  const handleLogout = async event => {
+    const { slotId, tenderAddr, eventCounter, epoch } = event.returnValues;
+    const tx = Tx.validatorLogout(slotId, tenderAddr, eventCounter, epoch + 1);
+    await sendTx(txServerPort, tx.hex());
+  };
+
+  const handleEvents = async contractEvents => {
+    for (const event of contractEvents) {
+      switch (event.event) {
+        case 'NewDeposit':
+          await handleDeposit(event);
+          break;
+        case 'ExitStarted':
+          await handleExit(event);
+          break;
+        case 'ValidatorJoin':
+          await handleJoin(event);
+          break;
+        case 'ValidatorLogout':
+          await handleLogout(event);
+          break;
+      }
+    }
+    return undefined;
+  };
 
   const eventSubscription = new ContractEventsSubscription(web3, bridge);
-  const {
-    NewDeposit: deposits = [],
-    ExitStarted: exits = [],
-  } = await eventSubscription.init();
-
-  await handleDeposits(deposits);
-  eventSubscription.on('NewDeposit', handleDeposits);
-
-  await handleExits(exits);
-  eventSubscription.on('ExitStarted', handleExits);
+  const events = await eventSubscription.init();
+  handleEvents(events);
 
   return eventSubscription;
 };
