@@ -19,17 +19,15 @@ module.exports = async (chainInfo, options) => {
       node.checkCallsCount = 0;
       await submitPeriod(node.previousPeriod, chainInfo.height, options);
     }
-    if (chainInfo.height % 16 === 0) {
+    if (chainInfo.height % 32 === 16) {
+      // ToDo: should try to activate in the right epoch
       // check if there is a validator slot that is "waiting for me"
-      const myAuctionedSlots = await getAuctionedByAddr(
+      const myAuctionedSlots = (await getAuctionedByAddr(
         node.slots,
         account.address
-      );
-      const activations = [];
-      myAuctionedSlots.forEach(slot => {
-        console.log('found some slot for activation: ', slot.id);
-        activations.push(activateSlot(slot.id, options));
-      });
+      )).map(({ id }) => id);
+      console.log('found some slots for activation', myAuctionedSlots);
+      const activations = myAuctionedSlots.map(id => activateSlot(id, options));
       await Promise.all(activations);
     }
   } catch (err) {
