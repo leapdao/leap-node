@@ -104,12 +104,6 @@ async function run() {
 
   const account = web3.eth.accounts.privateKeyToAccount(config.privKey);
 
-  app.useInitChain(chainInfo => {
-    if (!cliArgs.no_validators_updates) {
-      updateValidators(chainInfo, node.slots);
-    }
-  });
-
   app.useTx(async (state, { encoded }) => {
     const tx = Tx.fromRaw(encoded);
     await applyTx(state, tx, bridge);
