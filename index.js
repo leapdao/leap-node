@@ -103,6 +103,7 @@ async function run() {
     networkId: config.network,
     currentPeriod: new Period(),
     previousPeriod: null,
+    replay: true,
     lastBlockSynced: await db.getLastBlockSynced(),
   };
 
