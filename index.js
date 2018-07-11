@@ -70,6 +70,7 @@ async function run() {
       balances: {}, // stores account balances like this { [colorIndex]: { address1: 0, ... } }
       unspent: {}, // stores unspent outputs (deposits, transfers)
       processedDeposit: 0,
+      slots: [],
     },
     networkId: config.network,
     genesis: config.genesis,
@@ -118,7 +119,7 @@ async function run() {
 
   app.useBlock(async (state, chainInfo) => {
     if (!cliArgs.no_validators_updates) {
-      updateValidators(chainInfo, state.slots);
+      updateValidators(chainInfo, state.slots, bridge);
     }
     updatePeriod(chainInfo, {
       bridge,
