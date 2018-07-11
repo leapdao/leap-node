@@ -40,7 +40,12 @@ module.exports = async (txServerPort, web3, bridge) => {
 
   const handleLogout = async event => {
     const { slotId, tenderAddr, eventCounter, epoch } = event.returnValues;
-    const tx = Tx.validatorLogout(slotId, tenderAddr, eventCounter, epoch + 1);
+    const tx = Tx.validatorLogout(
+      slotId,
+      tenderAddr,
+      eventCounter,
+      Number(epoch) + 1
+    );
     await sendTx(txServerPort, tx.hex());
   };
 
@@ -67,6 +72,7 @@ module.exports = async (txServerPort, web3, bridge) => {
   const eventSubscription = new ContractEventsSubscription(web3, bridge);
   const events = await eventSubscription.init();
   handleEvents(events);
+  eventSubscription.on('events', handleEvents);
 
   return eventSubscription;
 };
