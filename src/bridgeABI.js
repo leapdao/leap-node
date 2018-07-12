@@ -10,6 +10,10 @@ module.exports = [
     name: 'slots',
     outputs: [
       {
+        name: 'eventCounter',
+        type: 'uint32',
+      },
+      {
         name: 'owner',
         type: 'address',
       },
@@ -243,10 +247,6 @@ module.exports = [
   {
     inputs: [
       {
-        name: '_psc',
-        type: 'address',
-      },
-      {
         name: '_epochLength',
         type: 'uint256',
       },
@@ -375,6 +375,11 @@ module.exports = [
       },
       {
         indexed: false,
+        name: 'eventCounter',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
         name: 'epoch',
         type: 'uint256',
       },
@@ -399,6 +404,11 @@ module.exports = [
         indexed: true,
         name: 'tenderAddr',
         type: 'bytes32',
+      },
+      {
+        indexed: false,
+        name: 'eventCounter',
+        type: 'uint256',
       },
       {
         indexed: false,
@@ -454,6 +464,11 @@ module.exports = [
         name: 'tenderAddr',
         type: 'bytes32',
       },
+      {
+        indexed: false,
+        name: 'eventCounter',
+        type: 'uint256',
+      },
     ],
     name: 'ValidatorUpdate',
     type: 'event',
@@ -482,6 +497,10 @@ module.exports = [
     ],
     name: 'getSlot',
     outputs: [
+      {
+        name: '',
+        type: 'uint32',
+      },
       {
         name: '',
         type: 'address',
@@ -580,32 +599,6 @@ module.exports = [
       },
     ],
     name: 'activate',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        name: '_slotId',
-        type: 'uint256',
-      },
-      {
-        name: '_prevHash',
-        type: 'bytes32',
-      },
-      {
-        name: '_root',
-        type: 'bytes32',
-      },
-      {
-        name: 'orphans',
-        type: 'bytes32[]',
-      },
-    ],
-    name: 'submitAndPrune',
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
@@ -739,6 +732,10 @@ module.exports = [
         name: '_proof',
         type: 'bytes32[]',
       },
+      {
+        name: '_oindex',
+        type: 'uint256',
+      },
     ],
     name: 'startExit',
     outputs: [],
@@ -756,6 +753,14 @@ module.exports = [
       {
         name: '_prevProof',
         type: 'bytes32[]',
+      },
+      {
+        name: '_oIndex',
+        type: 'uint256',
+      },
+      {
+        name: '_inputIndex',
+        type: 'uint256',
       },
     ],
     name: 'challengeExit',
