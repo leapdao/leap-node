@@ -15,6 +15,7 @@ const { Tx, Period } = require('parsec-lib');
 const lotion = require('lotion');
 
 const cliArgs = require('./src/cliArgs');
+const cleanupLotion = require('./src/cleanupLotion');
 const Db = require('./src/api/db');
 const jsonrpc = require('./src/api/jsonrpc');
 
@@ -80,6 +81,10 @@ async function run() {
     logTendermint: true,
   });
 
+  if (cliArgs.fresh) {
+    await cleanupLotion(app);
+  }
+
   const privFilename = path.join(path.dirname(cliArgs.config), '.priv');
   if (await exists(privFilename)) {
     config.privKey = await readFile(privFilename);
@@ -92,6 +97,7 @@ async function run() {
   const db = Db(app);
 
   const node = {
+    replay: true,
     blockHeight: 0,
     currentState: null,
     networkId: config.network,
@@ -122,7 +128,7 @@ async function run() {
       node,
       db,
     });
-    if (!cliArgs.no_validators_updates) {
+    if (!cliArgs.no_validators_updates || node.replay) {
       updateValidators(chainInfo, node.slots);
     }
     console.log('Height:', chainInfo.height);
@@ -145,6 +151,7 @@ async function run() {
   });
 
   app.listen(cliArgs.port).then(async params => {
+    node.replay = false;
     console.log(params);
 
     console.log(`Last block synced: ${node.lastBlockSynced}`);

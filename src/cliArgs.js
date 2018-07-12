@@ -57,6 +57,12 @@ const options = [
     help: 'Path to config file',
     required: true,
   },
+  {
+    names: ['fresh'],
+    type: 'bool',
+    default: false,
+    help: 'Start node with fresh state',
+  },
 ];
 
 const parser = dashdash.createParser({ options });
