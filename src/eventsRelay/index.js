@@ -32,23 +32,6 @@ module.exports = async (txServerPort, web3, bridge) => {
     await sendTx(txServerPort, tx.hex());
   };
 
-  const handleJoin = async event => {
-    const { slotId, tenderAddr, eventCounter } = event.returnValues;
-    const tx = Tx.validatorJoin(slotId, tenderAddr, eventCounter);
-    await sendTx(txServerPort, tx.hex());
-  };
-
-  const handleLogout = async event => {
-    const { slotId, tenderAddr, eventCounter, epoch } = event.returnValues;
-    const tx = Tx.validatorLogout(
-      slotId,
-      tenderAddr,
-      eventCounter,
-      Number(epoch) + 1
-    );
-    await sendTx(txServerPort, tx.hex());
-  };
-
   const handleEvents = async contractEvents => {
     for (const event of contractEvents) {
       switch (event.event) {
@@ -57,12 +40,6 @@ module.exports = async (txServerPort, web3, bridge) => {
           break;
         case 'ExitStarted':
           await handleExit(event);
-          break;
-        case 'ValidatorJoin':
-          await handleJoin(event);
-          break;
-        case 'ValidatorLogout':
-          await handleLogout(event);
           break;
       }
     }
