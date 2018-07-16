@@ -1,7 +1,10 @@
 const { Tx, Input, Outpoint, Output } = require('parsec-lib');
+const { promisify } = require('util');
 
 const checkCompResp = require('./checkCompResp');
-const runComputation = require('../../txHelpers/runComputation');
+const runComputation = require('../../computation/runComputation');
+const Db = require('../../api/db');
+const rimraf = promisify(require('rimraf'));
 
 const CONTRACT_ADDR_1 = '0x258daf43d711831b8fd59137f42030784293e9e6';
 const ADDR_1 = '0x4436373705394267350db2c06613990d34621d69';
@@ -9,6 +12,7 @@ const ADDR_1 = '0x4436373705394267350db2c06613990d34621d69';
 const { prepareForCompRequest } = require('./checkCompReq.test');
 
 describe('checkCompResp', () => {
+  let db;
   test('valid tx', async () => {
     const { state: initialState, tx: deploymentTx } = prepareForCompRequest();
 
@@ -43,7 +47,17 @@ describe('checkCompResp', () => {
       storageRoots: initialState.storageRoots,
     };
 
-    const compResp = await runComputation(state, compReq);
+    db = Db('./testDb');
+    const compResp = await runComputation(state, compReq, {
+      db: db.source,
+    });
     checkCompResp(state, compResp);
+  });
+
+  afterEach(async () => {
+    if (db) {
+      db.source.close();
+      await rimraf('./testDb');
+    }
   });
 });

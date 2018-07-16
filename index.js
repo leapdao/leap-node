@@ -68,7 +68,7 @@ async function run() {
     await cleanupLotion(app);
   }
 
-  const db = Db(app);
+  const db = Db(path.join(app.lotionPath(), 'parsec.db'));
 
   const privFilename = path.join(path.dirname(cliArgs.config), '.priv');
   if (await exists(privFilename)) {
