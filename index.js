@@ -63,7 +63,6 @@ async function run() {
   const web3 = new Web3();
   web3.setProvider(new web3.providers.HttpProvider(config.rootNetwork));
   const bridge = new web3.eth.Contract(bridgeABI, config.bridgeAddr);
-
   const app = lotion({
     initialState: {
       mempool: [],
@@ -118,20 +117,26 @@ async function run() {
   });
 
   app.useBlock(async (state, chainInfo) => {
-    if (!cliArgs.no_validators_updates) {
-      updateValidators(chainInfo, state.slots, bridge);
+    try {
+      if (!cliArgs.no_validators_updates) {
+        if (!node.replay) {
+          updateValidators(chainInfo, node.slots, bridge);
+        }
+      }
+      updatePeriod(chainInfo, {
+        bridge,
+        web3,
+        account,
+        node,
+      });
+      await addBlock(state, chainInfo, {
+        account,
+        node,
+        db,
+      });
+    } catch (err) {
+      console.log('ERRRBLOCK', err);
     }
-    updatePeriod(chainInfo, {
-      bridge,
-      web3,
-      account,
-      node,
-    });
-    await addBlock(state, chainInfo, {
-      account,
-      node,
-      db,
-    });
     console.log('Height:', chainInfo.height);
   });
 

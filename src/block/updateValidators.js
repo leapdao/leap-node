@@ -4,7 +4,7 @@
  * This source code is licensed under the Mozilla Public License Version 2.0
  * found in the LICENSE file in the root directory of this source tree.
  */
-const { getAddress, hexToBase64 } = require('../utils');
+const { getAddress, hexToBase64, EMPTY_ADDRESS } = require('../utils');
 
 /*
  * Removes validators except those having a slot
@@ -12,12 +12,12 @@ const { getAddress, hexToBase64 } = require('../utils');
 module.exports = async (chainInfo, slots, bridge) => {
   const lastCompleteEpoch = await bridge.methods.lastCompleteEpoch().call();
   const validatorPubKeys = slots
-    .filter(s => !!s)
+    .filter(s => s.owner !== EMPTY_ADDRESS)
     .filter(
       s =>
-        s.activationEpoch ? s.activationEpoch - lastCompleteEpoch > 2 : true
+        s.activationEpoch > 0 ? s.activationEpoch - lastCompleteEpoch > 2 : true
     )
-    .map(s => s.tenderKey.replace('0x', ''))
+    .map(s => s.tendermint.replace('0x', ''))
     .map(hexToBase64);
   const validatorAddrs = validatorPubKeys.map(key => getAddress(key));
 
