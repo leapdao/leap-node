@@ -55,7 +55,14 @@ async function run() {
       balances: {}, // stores account balances like this { [colorIndex]: { address1: 0, ... } }
       unspent: {}, // stores unspent outputs (deposits, transfers)
       processedDeposit: 0,
-      slots: [],
+      slots: [
+        undefined,
+        {
+          tenderKey:
+            '0x7640d69d9edb21592cbdf4cc49956ea53e59656fc2d8bbd1ae3f427bf67d47fa',
+          eventsCount: 1,
+        },
+      ],
     },
     networkId: config.network,
     genesis: config.genesis,
