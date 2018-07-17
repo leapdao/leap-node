@@ -10,6 +10,8 @@ const checkConsolidate = require('./checkConsolidate');
 const checkDeposit = require('./checkDeposit');
 const checkExit = require('./checkExit');
 const checkTransfer = require('./checkTransfer');
+const checkValidatorJoin = require('./checkValidatorJoin');
+const checkValidatorLogout = require('./checkValidatorLogout');
 const { checkOutpoints, removeInputs, addOutputs } = require('./utils');
 
 const checks = {
@@ -17,6 +19,8 @@ const checks = {
   [Type.DEPOSIT]: checkDeposit,
   [Type.EXIT]: checkExit,
   [Type.TRANSFER]: checkTransfer,
+  [Type.VALIDATOR_JOIN]: checkValidatorJoin,
+  [Type.VALIDATOR_LOGOUT]: checkValidatorLogout,
 };
 
 module.exports = (state, tx, node) => {
