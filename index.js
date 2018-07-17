@@ -110,7 +110,7 @@ async function run() {
   app.useBlock(async (state, chainInfo) => {
     try {
       if (!cliArgs.no_validators_updates && state.slots.length > 0) {
-        updateValidators(chainInfo, state.slots, bridge);
+        await updateValidators(chainInfo, state.slots, bridge);
       }
       updatePeriod(chainInfo, {
         bridge,

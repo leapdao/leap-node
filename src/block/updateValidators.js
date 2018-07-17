@@ -11,8 +11,6 @@ const { getAddress, hexToBase64 } = require('../utils');
  */
 module.exports = async (chainInfo, slots, bridge) => {
   const lastCompleteEpoch = await bridge.methods.lastCompleteEpoch().call();
-  const before = JSON.stringify(chainInfo.validators);
-
   const validatorPubKeys = slots
     .filter(s => s) // filter undefined slots
     .filter(
@@ -48,18 +46,6 @@ module.exports = async (chainInfo, slots, bridge) => {
       };
     }
   });
-  console.log('############# slot state: ', slots);
-  if (before !== JSON.stringify(chainInfo.validators)) {
-    console.log(
-      '!!!!!!!!!!!!!!!!!!!!!!   VALIDATORS UPDATE !!!!!!!!!!!!!!!!!!!!!!!!!'
-    );
-    console.log('height: ', chainInfo.height);
-    console.log('before: ', before);
-    console.log('after: ', JSON.stringify(chainInfo.validators));
-    console.log(
-      '!!!!!!!!!!!!!!!!!!!!!!   VALIDATORS UPDATE !!!!!!!!!!!!!!!!!!!!!!!!!'
-    );
-  }
 };
 
 exports.getAddress = getAddress;
