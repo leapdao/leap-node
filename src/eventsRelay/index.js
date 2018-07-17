@@ -64,6 +64,9 @@ module.exports = async (txServerPort, web3, bridge) => {
         case 'ValidatorLogout':
           await handleLogout(event);
           break;
+        case 'ValidatorUpdate':
+          await handleJoin(event);
+          break;
       }
     }
     return undefined;

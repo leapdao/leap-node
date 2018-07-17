@@ -55,14 +55,7 @@ async function run() {
       balances: {}, // stores account balances like this { [colorIndex]: { address1: 0, ... } }
       unspent: {}, // stores unspent outputs (deposits, transfers)
       processedDeposit: 0,
-      slots: [
-        undefined,
-        {
-          tenderKey:
-            '0x7640d69d9edb21592cbdf4cc49956ea53e59656fc2d8bbd1ae3f427bf67d47fa',
-          eventsCount: 1,
-        },
-      ],
+      slots: [],
     },
     networkId: config.network,
     genesis: config.genesis,
@@ -115,8 +108,23 @@ async function run() {
   });
 
   app.useBlock(async (state, chainInfo) => {
-    if (!cliArgs.no_validators_updates) {
-      updateValidators(chainInfo, state.slots, bridge);
+    try {
+      if (!cliArgs.no_validators_updates && state.slots.length > 0) {
+        updateValidators(chainInfo, state.slots, bridge);
+      }
+      updatePeriod(chainInfo, {
+        bridge,
+        web3,
+        account,
+        node,
+      });
+      await addBlock(state, chainInfo, {
+        account,
+        node,
+        db,
+      });
+    } catch (err) {
+      console.log('ERRRBLOCK', err);
     }
     updatePeriod(chainInfo, {
       bridge,
