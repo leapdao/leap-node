@@ -47,7 +47,7 @@ module.exports = async (node, lotionPort, db, web3, bridge) => {
   };
 
   let tokens = [];
-  const getColor = async address => {
+  const getColors = async () => {
     const tokenCount = await bridge.methods.tokenCount().call();
     if (tokenCount !== tokens.length) {
       const tokenData = range(0, tokenCount - 1).map(i =>
@@ -57,7 +57,13 @@ module.exports = async (node, lotionPort, db, web3, bridge) => {
       tokens = (await Promise.all(tokenData)).map(o => o.addr.toLowerCase());
     }
 
-    const color = tokens.indexOf(address);
+    return tokens;
+  };
+
+  const getColor = async address => {
+    const colors = await getColors();
+
+    const color = colors.indexOf(address);
     if (color === -1) {
       /* eslint-disable no-throw-literal */
       throw {
@@ -196,6 +202,7 @@ module.exports = async (node, lotionPort, db, web3, bridge) => {
     eth_call: executeCall,
     parsec_unspent: getUnspent,
     parsec_getColor: getColor,
+    parsec_getColors: getColors,
   };
 
   api.use(
