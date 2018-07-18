@@ -19,14 +19,14 @@ const checks = {
   [Type.TRANSFER]: checkTransfer,
 };
 
-module.exports = async (state, tx, bridge) => {
+module.exports = (state, tx, node) => {
   if (!checks[tx.type]) {
     throw new Error('Unsupported tx type');
   }
 
   checkOutpoints(state, tx);
 
-  await checks[tx.type](state, tx, bridge);
+  checks[tx.type](state, tx, node);
 
   removeInputs(state, tx);
   addOutputs(state, tx);

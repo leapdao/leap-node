@@ -8,7 +8,7 @@
 const { Type } = require('parsec-lib');
 const { checkInsAndOuts } = require('./utils');
 
-module.exports = async (state, tx) => {
+module.exports = (state, tx) => {
   if (tx.type !== Type.TRANSFER) {
     throw new Error('Transfer tx expected');
   }

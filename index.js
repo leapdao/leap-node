@@ -11,7 +11,7 @@ const fs = require('fs');
 const path = require('path');
 const { promisify } = require('util');
 const Web3 = require('web3');
-const { Tx, Period } = require('parsec-lib');
+const { Tx, Period, Outpoint } = require('parsec-lib');
 const lotion = require('lotion');
 
 const cliArgs = require('./src/cliArgs');
@@ -37,10 +37,36 @@ const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
 const exists = promisify(fs.exists);
 
-async function handleSlots(node, web3, bridge) {
+async function handleContractEvents(node, web3, bridge) {
   node.slots = await readSlots(bridge);
 
   const eventsSubscription = new ContractEventsSubscription(web3, bridge);
+  eventsSubscription.on('NewDeposit', events => {
+    console.log(events);
+    events.forEach(
+      ({ returnValues: { depositId, depositor, color, amount } }) => {
+        node.deposits[depositId] = {
+          depositor,
+          color,
+          amount,
+        };
+      }
+    );
+  });
+  eventsSubscription.on('ExitStarted', events => {
+    events.forEach(
+      ({ returnValues: { txHash, outIndex, color, exitor, amount } }) => {
+        const outpoint = new Outpoint(txHash, outIndex);
+        node.exits[outpoint.getUtxoId()] = {
+          txHash,
+          outIndex,
+          exitor,
+          color,
+          amount,
+        };
+      }
+    );
+  });
   await eventsSubscription.init();
 
   const updateSlots = async () => {
@@ -104,15 +130,17 @@ async function run() {
     currentPeriod: new Period(),
     previousPeriod: null,
     lastBlockSynced: await db.getLastBlockSynced(),
+    deposits: {},
+    exits: {},
   };
 
-  await handleSlots(node, web3, bridge);
+  await handleContractEvents(node, web3, bridge);
 
   const account = web3.eth.accounts.privateKeyToAccount(config.privKey);
 
-  app.useTx(async (state, { encoded }) => {
+  app.useTx((state, { encoded }) => {
     const tx = Tx.fromRaw(encoded);
-    await applyTx(state, tx, bridge);
+    applyTx(state, tx, node, bridge);
     accumulateTx(state, tx);
   });
 

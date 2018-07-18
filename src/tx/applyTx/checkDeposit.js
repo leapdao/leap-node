@@ -8,7 +8,7 @@
 const { Type } = require('parsec-lib');
 const { addrCmp } = require('../../utils');
 
-module.exports = async (state, tx, bridge) => {
+module.exports = (state, tx, node) => {
   if (tx.type !== Type.DEPOSIT) {
     throw new Error('Deposit tx expected');
   }
@@ -23,11 +23,12 @@ module.exports = async (state, tx, bridge) => {
       }`
     );
   }
-  const deposit = await bridge.methods.deposits(tx.options.depositId).call();
+  const deposit = node.deposits[tx.options.depositId];
   if (
+    !deposit ||
     Number(deposit.amount) !== tx.outputs[0].value ||
     Number(deposit.color) !== tx.outputs[0].color ||
-    !addrCmp(deposit.owner, tx.outputs[0].address)
+    !addrCmp(deposit.depositor, tx.outputs[0].address)
   ) {
     throw new Error('Trying to submit incorrect deposit');
   }
