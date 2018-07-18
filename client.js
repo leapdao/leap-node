@@ -5,11 +5,11 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-/* eslint-disable no-await-in-loop, no-console */
+/* eslint-disable no-await-in-loop, no-console, no-loop-func */
 
 const Web3 = require('web3');
 const axios = require('axios');
-const { helpers, Output, Tx } = require('parsec-lib');
+const { helpers, Output, Tx, Outpoint } = require('parsec-lib');
 
 const makeTransfer = require('./src/txHelpers/makeTransfer');
 const unspentForAddress = require('./src/utils/unspentForAddress');
@@ -86,7 +86,14 @@ async function run() {
     const consolidateAddress = async address => {
       console.log(await getState());
       const balance = await parsecWeb3.eth.getBalance(address);
-      const unspent = unspentForAddress((await getState()).unspent, address, 0);
+      const unspent = unspentForAddress(
+        (await getState()).unspent,
+        address,
+        0
+      ).map(u => ({
+        output: u.output,
+        outpoint: Outpoint.fromRaw(u.outpoint),
+      }));
       const consolidateInputs = helpers.calcInputs(
         unspent,
         address,

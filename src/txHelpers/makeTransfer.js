@@ -5,7 +5,7 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-const { helpers, Tx } = require('parsec-lib');
+const { helpers, Tx, Outpoint } = require('parsec-lib');
 const { unspentForAddress } = require('../utils');
 
 /*
@@ -29,7 +29,10 @@ module.exports = async function makeTransfer(
     throw new Error('Insufficient balance');
   }
 
-  const senderUnspent = unspentForAddress(unspent, from, color);
+  const senderUnspent = unspentForAddress(unspent, from, color).map(u => ({
+    output: u.output,
+    outpoint: Outpoint.fromRaw(u.outpoint),
+  }));
 
   const inputs = helpers.calcInputs(senderUnspent, from, amount, color);
   const outputs = helpers.calcOutputs(
