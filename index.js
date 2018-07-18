@@ -30,7 +30,7 @@ const updateValidators = require('./src/block/updateValidators');
 const checkBridge = require('./src/period/checkBridge');
 
 const eventsRelay = require('./src/eventsRelay');
-const { getSlotsByAddr } = require('./src/utils');
+const { printStartupInfo } = require('./src/utils');
 const Node = require('./src/node');
 
 const readFile = promisify(fs.readFile);
@@ -128,42 +128,8 @@ async function run() {
 
   app.listen(cliArgs.port).then(async params => {
     node.replay = false;
-    console.log(params);
 
-    console.log(`Last block synced: ${node.lastBlockSynced}`);
-
-    const validatorKeyPath = path.join(
-      params.lotionPath,
-      'config',
-      'priv_validator.json'
-    );
-
-    const validatorKey = JSON.parse(await readFile(validatorKeyPath, 'utf-8'));
-    const validatorID = Buffer.from(
-      validatorKey.pub_key.value,
-      'base64'
-    ).toString('hex');
-    const mySlots = await getSlotsByAddr(node.slots, account.address);
-
-    mySlots.forEach(slot => {
-      if (
-        slot.tendermint.replace('0x', '').toLowerCase() !==
-        validatorID.toLowerCase()
-      ) {
-        console.log(
-          `You need to update validator ID in slot ${slot.id} to ${validatorID}`
-        );
-      }
-    });
-
-    if (mySlots.length === 0) {
-      console.log('=====');
-      console.log('You need to become a validator first');
-      console.log('Open http://localhost:3001 and follow instruction');
-      console.log(`Validator address: ${account.address}`);
-      console.log(`Validator ID: ${validatorID}`);
-      console.log('=====');
-    }
+    await printStartupInfo(params, node, account);
 
     await eventsRelay(params.txServerPort, web3, bridge);
     const api = await jsonrpc(node, params.txServerPort, db, web3, bridge);

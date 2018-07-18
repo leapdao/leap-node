@@ -17,6 +17,7 @@ exports.getSlotsByAddr = require('./getSlotsByAddr');
 exports.getAuctionedByAddr = require('./getAuctionedByAddr');
 exports.unspentForAddress = require('./unspentForAddress');
 exports.range = require('./range');
+exports.printStartupInfo = require('./printStartupInfo');
 
 exports.seq = mapFn => async arr => {
   for (const item of arr) {
