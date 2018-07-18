@@ -456,84 +456,84 @@ describe('Transfer', () => {
 });
 
 describe('Validators set updates', () => {
-  test('successful validatorJoin tx (empty)', async () => {
+  test('successful validatorJoin tx (empty)', () => {
     const state = getInitialState();
 
     const join = Tx.validatorJoin(0, TENDER_KEY_1, 1);
-    await applyTx(state, join);
+    applyTx(state, join);
 
     expect(state.slots[0]).toBeDefined();
     expect(state.slots[0].eventsCount).toBe(1);
     expect(state.slots[0].tenderKey).toBe(TENDER_KEY_1);
   });
 
-  test('successful validatorJoin tx (leaved)', async () => {
+  test('successful validatorJoin tx (leaved)', () => {
     const state = getInitialState();
 
     const join1 = Tx.validatorJoin(0, TENDER_KEY_1, 1);
-    await applyTx(state, join1);
+    applyTx(state, join1);
 
     const logout1 = Tx.validatorLogout(0, TENDER_KEY_1, 2, 1);
-    await applyTx(state, logout1);
+    applyTx(state, logout1);
 
     const join2 = Tx.validatorJoin(0, TENDER_KEY_2, 3);
-    await applyTx(state, join2);
+    applyTx(state, join2);
 
     expect(state.slots[0]).toBeDefined();
     expect(state.slots[0].eventsCount).toBe(3);
     expect(state.slots[0].tenderKey).toBe(TENDER_KEY_2);
   });
 
-  test('validatorJoin tx with wrong eventsCount (too big)', async () => {
+  test('validatorJoin tx with wrong eventsCount (too big)', () => {
     const state = getInitialState();
 
     const join1 = Tx.validatorJoin(0, TENDER_KEY_1, 1);
-    await applyTx(state, join1);
+    applyTx(state, join1);
 
     const logout1 = Tx.validatorLogout(0, TENDER_KEY_1, 2, 10);
-    await applyTx(state, logout1);
+    applyTx(state, logout1);
 
     const join2 = Tx.validatorJoin(0, TENDER_KEY_2, 4);
 
-    await shouldThrowAsync(async () => {
-      await applyTx(state, join2);
-    }, 'eventsCount expected to be x + 1');
+    expect(() => {
+      applyTx(state, join2);
+    }).toThrow('eventsCount expected to be x + 1');
   });
 
-  test('validatorJoin tx with wrong eventsCount (too small)', async () => {
+  test('validatorJoin tx with wrong eventsCount (too small)', () => {
     const state = getInitialState();
 
     const join1 = Tx.validatorJoin(0, TENDER_KEY_1, 1);
-    await applyTx(state, join1);
+    applyTx(state, join1);
 
     const join2 = Tx.validatorJoin(0, TENDER_KEY_2, 2);
-    await applyTx(state, join2);
+    applyTx(state, join2);
 
     const join4 = Tx.validatorJoin(0, TENDER_KEY_2, 1);
 
-    await shouldThrowAsync(async () => {
-      await applyTx(state, join4);
-    }, 'eventsCount expected to be x + 1');
+    expect(() => {
+      applyTx(state, join4);
+    }).toThrow('eventsCount expected to be x + 1');
   });
 
-  test('validatorJoin tx with wrong eventsCount (!== 1)', async () => {
+  test('validatorJoin tx with wrong eventsCount (!== 1)', () => {
     const state = getInitialState();
 
     const join1 = Tx.validatorJoin(0, TENDER_KEY_1, 2);
 
-    await shouldThrowAsync(async () => {
-      await applyTx(state, join1);
-    }, 'eventsCount should start from 1');
+    expect(() => {
+      applyTx(state, join1);
+    }).toThrow('eventsCount should start from 1');
   });
 
-  test('successful validatorLogout tx', async () => {
+  test('successful validatorLogout tx', () => {
     const state = getInitialState();
 
     const join = Tx.validatorJoin(0, TENDER_KEY_1, 1);
-    await applyTx(state, join);
+    applyTx(state, join);
 
     const logout = Tx.validatorLogout(0, TENDER_KEY_1, 2, 10);
-    await applyTx(state, logout);
+    applyTx(state, logout);
 
     expect(state.slots[0]).toBeDefined();
     expect(state.slots[0].eventsCount).toBe(2);
@@ -541,21 +541,21 @@ describe('Validators set updates', () => {
     expect(state.slots[0].activationEpoch).toBe(10);
   });
 
-  test('validatorLogout tx for empty slot', async () => {
+  test('validatorLogout tx for empty slot', () => {
     const state = getInitialState();
 
     const logout = Tx.validatorLogout(0, TENDER_KEY_1, 0, 10);
-    await shouldThrowAsync(async () => {
-      await applyTx(state, logout);
-    }, 'Slot 0 is empty');
+    expect(() => {
+      applyTx(state, logout);
+    }).toThrow('Slot 0 is empty');
   });
 
-  test('validatorLogout tx with different tenderAddr', async () => {
+  test('validatorLogout tx with different tenderAddr', () => {
     const state = getInitialState();
 
     const logout = Tx.validatorLogout(0, TENDER_KEY_1, 0, 10);
-    await shouldThrowAsync(async () => {
-      await applyTx(state, logout);
-    }, 'Slot 0 is empty');
+    expect(() => {
+      applyTx(state, logout);
+    }).toThrow('Slot 0 is empty');
   });
 });
