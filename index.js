@@ -11,7 +11,7 @@ const fs = require('fs');
 const path = require('path');
 const { promisify } = require('util');
 const Web3 = require('web3');
-const { Tx, Period, Outpoint } = require('parsec-lib');
+const { Tx } = require('parsec-lib');
 const lotion = require('lotion');
 
 const cliArgs = require('./src/cliArgs');
@@ -30,53 +30,12 @@ const updateValidators = require('./src/block/updateValidators');
 const checkBridge = require('./src/period/checkBridge');
 
 const eventsRelay = require('./src/eventsRelay');
-const ContractEventsSubscription = require('./src/eventsRelay/ContractEventsSubscription');
-const { readSlots, getSlotsByAddr } = require('./src/utils');
+const { getSlotsByAddr } = require('./src/utils');
+const Node = require('./src/node');
 
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
 const exists = promisify(fs.exists);
-
-async function handleContractEvents(node, web3, bridge) {
-  node.slots = await readSlots(bridge);
-
-  const eventsSubscription = new ContractEventsSubscription(web3, bridge);
-  eventsSubscription.on('NewDeposit', events => {
-    console.log(events);
-    events.forEach(
-      ({ returnValues: { depositId, depositor, color, amount } }) => {
-        node.deposits[depositId] = {
-          depositor,
-          color,
-          amount,
-        };
-      }
-    );
-  });
-  eventsSubscription.on('ExitStarted', events => {
-    events.forEach(
-      ({ returnValues: { txHash, outIndex, color, exitor, amount } }) => {
-        const outpoint = new Outpoint(txHash, outIndex);
-        node.exits[outpoint.getUtxoId()] = {
-          txHash,
-          outIndex,
-          exitor,
-          color,
-          amount,
-        };
-      }
-    );
-  });
-  await eventsSubscription.init();
-
-  const updateSlots = async () => {
-    node.slots = await readSlots(bridge);
-  };
-  eventsSubscription.on('ValidatorJoin', updateSlots);
-  eventsSubscription.on('ValidatorLogout', updateSlots);
-  eventsSubscription.on('ValidatorLeave', updateSlots);
-  eventsSubscription.on('ValidatorUpdate', updateSlots);
-}
 
 async function run() {
   const config = JSON.parse(await readFile(cliArgs.config));
@@ -122,19 +81,8 @@ async function run() {
 
   const db = Db(app);
 
-  const node = {
-    replay: true,
-    blockHeight: 0,
-    currentState: null,
-    networkId: config.network,
-    currentPeriod: new Period(),
-    previousPeriod: null,
-    lastBlockSynced: await db.getLastBlockSynced(),
-    deposits: {},
-    exits: {},
-  };
-
-  await handleContractEvents(node, web3, bridge);
+  const node = new Node(db, web3, bridge, config.network);
+  await node.init();
 
   const account = web3.eth.accounts.privateKeyToAccount(config.privKey);
 
