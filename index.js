@@ -112,17 +112,6 @@ async function run() {
     } catch (err) {
       console.log('ERRRBLOCK', err);
     }
-    updatePeriod(chainInfo, {
-      bridge,
-      web3,
-      account,
-      node,
-    });
-    await addBlock(state, chainInfo, {
-      account,
-      node,
-      db,
-    });
     console.log('Height:', chainInfo.height);
   });
 
