@@ -82,22 +82,8 @@ async function run() {
 
   const db = Db(app);
 
-<<<<<<< HEAD
   const node = new Node(db, web3, bridge, config.network);
   await node.init();
-=======
-  const node = {
-    replay: true,
-    blockHeight: 0,
-    currentState: null,
-    networkId: config.network,
-    currentPeriod: new Period(),
-    previousPeriod: null,
-    lastBlockSynced: await db.getLastBlockSynced(),
-  };
-
-  await handleSlots(node, web3, bridge);
->>>>>>> Tests for a validator updates
 
   const account = web3.eth.accounts.privateKeyToAccount(config.privKey);
 
