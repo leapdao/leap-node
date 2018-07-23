@@ -18,7 +18,6 @@ module.exports = async (state, chainInfo, { node, db }) => {
     await db.storeBlock(b);
     node.lastBlockSynced = chainInfo.height;
   }
-  console.log(b, b.hash());
   node.currentPeriod.addBlock(b);
   state.mempool = [];
 };

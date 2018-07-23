@@ -95,9 +95,6 @@ async function run() {
 
   app.useBlock(async (state, chainInfo) => {
     try {
-      if (!cliArgs.no_validators_updates && state.slots.length > 0) {
-        await updateValidators(chainInfo, state.slots, bridge);
-      }
       updatePeriod(chainInfo, {
         bridge,
         web3,
@@ -109,10 +106,13 @@ async function run() {
         node,
         db,
       });
+      if (!cliArgs.no_validators_updates && state.slots.length > 0) {
+        await updateValidators(chainInfo, state.slots, bridge);
+      }
+      console.log('Height:', chainInfo.height);
     } catch (err) {
-      console.log('ERRRBLOCK', err);
+      console.log('ERRBL', err);
     }
-    console.log('Height:', chainInfo.height);
   });
 
   app.useBlock((state, { height }) => {

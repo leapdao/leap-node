@@ -37,39 +37,44 @@ module.exports = class Node {
       this.web3,
       this.bridge
     );
-    eventsSubscription.on('NewDeposit', events => {
-      events.forEach(
-        ({ returnValues: { depositId, depositor, color, amount } }) => {
-          this.deposits[depositId] = {
-            depositor,
-            color,
-            amount,
-          };
+
+    const handleDeposit = ({
+      returnValues: { depositId, depositor, color, amount },
+    }) => {
+      this.deposits[depositId] = {
+        depositor,
+        color,
+        amount,
+      };
+    };
+
+    const handleExit = ({
+      returnValues: { txHash, outIndex, color, exitor, amount },
+    }) => {
+      const outpoint = new Outpoint(txHash, outIndex);
+      this.exits[outpoint.getUtxoId()] = {
+        txHash,
+        outIndex,
+        exitor,
+        color,
+        amount,
+      };
+    };
+    eventsSubscription.on('events', events => {
+      events.forEach(event => {
+        switch (event.event) {
+          case 'NewDeposit': {
+            handleDeposit(event);
+            break;
+          }
+          case 'ExitStarted': {
+            handleExit(event);
+            break;
+          }
+          default:
         }
-      );
-    });
-    eventsSubscription.on('ExitStarted', events => {
-      events.forEach(
-        ({ returnValues: { txHash, outIndex, color, exitor, amount } }) => {
-          const outpoint = new Outpoint(txHash, outIndex);
-          this.exits[outpoint.getUtxoId()] = {
-            txHash,
-            outIndex,
-            exitor,
-            color,
-            amount,
-          };
-        }
-      );
+      });
     });
     await eventsSubscription.init();
-
-    const updateSlots = async () => {
-      this.slots = await readSlots(this.bridge);
-    };
-    eventsSubscription.on('ValidatorJoin', updateSlots);
-    eventsSubscription.on('ValidatorLogout', updateSlots);
-    eventsSubscription.on('ValidatorLeave', updateSlots);
-    eventsSubscription.on('ValidatorUpdate', updateSlots);
   }
 };
