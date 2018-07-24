@@ -23,8 +23,8 @@ module.exports = async (period, height, { web3, bridge, node, account }) => {
     const currentSlotId = getCurrentSlotId(node.slots, height);
     const currentSlot = mySlots.find(slot => slot.id === currentSlotId);
     if (currentSlot) {
-      console.log('submitPeriod', currentSlot, submittedPeriod);
-      const txHash = await sendTransaction(
+      // console.log('submitPeriod', currentSlot, submittedPeriod);
+      const tx = sendTransaction(
         web3,
         bridge.methods.submitPeriod(
           currentSlot.id,
@@ -33,8 +33,15 @@ module.exports = async (period, height, { web3, bridge, node, account }) => {
         ),
         bridge.options.address,
         account
-      );
-      console.log(txHash);
+      ).catch(err => {
+        console.log('submitPeriod error: %s (height: %d)', err.message, height);
+      });
+
+      if (typeof tx.on === 'function') {
+        tx.on('transactionHash', txHash => {
+          console.log('submitPeriod', txHash);
+        });
+      }
     }
   }
 

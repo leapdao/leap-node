@@ -7,7 +7,7 @@
 
 const { Block, Tx } = require('parsec-lib');
 
-module.exports = async (state, chainInfo, { node, db }) => {
+module.exports = (state, chainInfo, { node, db }) => {
   const b = new Block(chainInfo.height, {
     timestamp: Math.round(Date.now() / 1000),
   });
@@ -15,8 +15,9 @@ module.exports = async (state, chainInfo, { node, db }) => {
 
   // store block data to db if we didn't see this block before
   if (chainInfo.height > node.lastBlockSynced) {
-    await db.storeBlock(b);
-    node.lastBlockSynced = chainInfo.height;
+    db.storeBlock(b).then(() => {
+      node.lastBlockSynced = chainInfo.height;
+    });
   }
   node.currentPeriod.addBlock(b);
   state.mempool = [];

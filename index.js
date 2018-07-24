@@ -64,7 +64,7 @@ async function run() {
     p2pPort: cliArgs.p2pPort,
     tendermintPort: 26659,
     createEmptyBlocks: false,
-    logTendermint: true,
+    // logTendermint: true,
   });
 
   if (cliArgs.fresh) {
@@ -101,7 +101,7 @@ async function run() {
         account,
         node,
       });
-      await addBlock(state, chainInfo, {
+      addBlock(state, chainInfo, {
         account,
         node,
         db,
@@ -122,7 +122,7 @@ async function run() {
   });
 
   app.usePeriod(async (rsp, chainInfo, height) => {
-    await checkBridge(rsp, chainInfo, height, {
+    checkBridge(rsp, chainInfo, height, {
       node,
       web3,
       bridge,

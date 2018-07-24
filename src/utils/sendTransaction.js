@@ -6,27 +6,19 @@
  */
 
 module.exports = async function sendTransaction(web3, method, to, account) {
-  try {
-    const gas = Math.round(
-      (await method.estimateGas({ from: account.address })) * 1.2
-    );
-    const data = method.encodeABI();
-    const tx = {
-      to,
-      data,
-      gas,
-    };
-    console.log({ tx });
-    const signedTx = await web3.eth.accounts.signTransaction(
-      tx,
-      account.privateKey
-    );
-    console.log({ signedTx });
-    const txResult = web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-    txResult.then(result => console.log({ txResult: result }));
-    return txResult;
-  } catch (err) {
-    console.error(err);
-    return Promise.reject();
-  }
+  const gas = Math.round(
+    (await method.estimateGas({ from: account.address })) * 1.2
+  );
+  const data = method.encodeABI();
+  const tx = {
+    to,
+    data,
+    gas,
+  };
+  const signedTx = await web3.eth.accounts.signTransaction(
+    tx,
+    account.privateKey
+  );
+  const txResult = web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+  return txResult;
 };
