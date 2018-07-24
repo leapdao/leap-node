@@ -7,7 +7,7 @@
 
 module.exports = async function sendTransaction(web3, method, to, account) {
   const gas = Math.round(
-    (await method.estimateGas({ from: account.address })) * 1.2
+    (await method.estimateGas({ from: account.address })) * 1.21
   );
   const data = method.encodeABI();
   const tx = {

@@ -15,7 +15,7 @@ const { logPeriod } = require('../debug');
 
 module.exports = async (period, height, { web3, bridge, node, account }) => {
   const submittedPeriod = await bridge.methods
-    .periods(node.previousPeriod.merkleRoot())
+    .periods(period.merkleRoot())
     .call();
 
   // period not found
@@ -29,8 +29,8 @@ module.exports = async (period, height, { web3, bridge, node, account }) => {
         web3,
         bridge.methods.submitPeriod(
           currentSlot.id,
-          node.previousPeriod.prevHash || GENESIS,
-          node.previousPeriod.merkleRoot()
+          period.prevHash || GENESIS,
+          period.merkleRoot()
         ),
         bridge.options.address,
         account
@@ -38,11 +38,9 @@ module.exports = async (period, height, { web3, bridge, node, account }) => {
         logPeriod('submitPeriod error: %s (height: %d)', err.message, height);
       });
 
-      if (typeof tx.on === 'function') {
-        tx.on('transactionHash', txHash => {
-          logPeriod('submitPeriod tx', txHash);
-        });
-      }
+      tx.then(receipt => {
+        logPeriod('submitPeriod tx', receipt);
+      });
     }
   }
 

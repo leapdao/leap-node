@@ -108,7 +108,7 @@ async function run() {
 
   app.useBlock(async (state, chainInfo) => {
     try {
-      updatePeriod(chainInfo, {
+      await updatePeriod(chainInfo, {
         bridge,
         web3,
         account,
@@ -135,7 +135,7 @@ async function run() {
   });
 
   app.usePeriod(async (rsp, chainInfo, height) => {
-    checkBridge(rsp, chainInfo, height, {
+    await checkBridge(rsp, chainInfo, height, {
       node,
       web3,
       bridge,

@@ -11,14 +11,15 @@ const activateSlot = require('../txHelpers/activateSlot');
 const { getAuctionedByAddr } = require('../utils');
 const { logPeriod } = require('../debug');
 
-module.exports = (chainInfo, options) => {
+module.exports = async (chainInfo, options) => {
   try {
     const { node, account } = options;
     if (chainInfo.height % 32 === 0) {
+      logPeriod('updatePeriod');
       node.previousPeriod = node.currentPeriod;
       node.currentPeriod = new Period(node.previousPeriod.merkleRoot());
       node.checkCallsCount = 0;
-      submitPeriod(node.previousPeriod, chainInfo.height, options);
+      await submitPeriod(node.previousPeriod, chainInfo.height, options);
     }
     if (chainInfo.height % 32 === 16) {
       // ToDo: should try to activate in the right epoch
@@ -30,9 +31,15 @@ module.exports = (chainInfo, options) => {
       if (myAuctionedSlots.length > 0) {
         logPeriod('found some slots for activation', myAuctionedSlots);
         myAuctionedSlots.forEach(id => {
-          activateSlot(id, options).on('transactionHash', txHash => {
-            logPeriod('activate', id, txHash);
+          const tx = activateSlot(id, options);
+          tx.catch(err => {
+            logPeriod('activation error', err.message);
           });
+          if (typeof tx.on === 'function') {
+            tx.on('transactionHash', txHash => {
+              logPeriod('activate', id, txHash);
+            });
+          }
         });
       }
     }
