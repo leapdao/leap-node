@@ -4464,9 +4464,9 @@ lotion-connect@^0.1.1:
     tendermint "3.1.9"
     varstruct "^6.1.2"
 
-lotion@parsec-labs/lotion#58bf4c8d85d1cf959b2db9305f38c8fefa362fa7:
+lotion@parsec-labs/lotion#0bb0df0e60a800ad2f61d676d756813e28ed53d6:
   version "0.1.23"
-  resolved "https://codeload.github.com/parsec-labs/lotion/tar.gz/58bf4c8d85d1cf959b2db9305f38c8fefa362fa7"
+  resolved "https://codeload.github.com/parsec-labs/lotion/tar.gz/0bb0df0e60a800ad2f61d676d756813e28ed53d6"
   dependencies:
     abci "github:parsec-labs/js-abci#a4be8a213afb3a2974b32f8434664009d1cfae1b"
     axios "^0.16.2"

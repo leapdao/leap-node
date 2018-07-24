@@ -31,9 +31,10 @@ const checkBridge = require('./src/period/checkBridge');
 
 const eventsRelay = require('./src/eventsRelay');
 const { printStartupInfo } = require('./src/utils');
+const printTx = require('./src/txHelpers/printTx');
 const Node = require('./src/node');
 
-const { logParsec, logTendermint } = require('./src/debug');
+const { logParsec, logTendermint, logTx } = require('./src/debug');
 
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
@@ -95,8 +96,14 @@ async function run() {
 
   app.useTx((state, { encoded }) => {
     const tx = Tx.fromRaw(encoded);
+    const printedTx = printTx(state, tx);
+
     applyTx(state, tx, node, bridge);
     accumulateTx(state, tx);
+
+    if (printedTx) {
+      logTx(printedTx);
+    }
   });
 
   app.useBlock(async (state, chainInfo) => {
