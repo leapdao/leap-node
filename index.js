@@ -33,6 +33,8 @@ const eventsRelay = require('./src/eventsRelay');
 const { printStartupInfo } = require('./src/utils');
 const Node = require('./src/node');
 
+const { logParsec, logTendermint } = require('./src/debug');
+
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
 const exists = promisify(fs.exists);
@@ -64,7 +66,11 @@ async function run() {
     p2pPort: cliArgs.p2pPort,
     tendermintPort: 26659,
     createEmptyBlocks: false,
-    // logTendermint: true,
+    logTendermint: log => {
+      logTendermint(
+        log.replace(/I\[\d{2}-\d{2}\|\d{2}:\d{2}:\d{2}\.\d{3}\] /g, '')
+      );
+    },
   });
 
   if (cliArgs.fresh) {
@@ -109,9 +115,9 @@ async function run() {
       if (!cliArgs.no_validators_updates && state.slots.length > 0) {
         await updateValidators(chainInfo, state.slots, bridge);
       }
-      console.log('Height:', chainInfo.height);
+      logParsec('Height:', chainInfo.height);
     } catch (err) {
-      console.log('ERRBL', err);
+      logParsec('ERRBL', err);
     }
   });
 
@@ -141,13 +147,13 @@ async function run() {
     api
       .listenHttp({ port: cliArgs.rpcport, host: cliArgs.rpcaddr })
       .then(addr => {
-        console.log(
+        logParsec(
           `Http JSON RPC server is listening at ${addr.address}:${addr.port}`
         );
       });
 
     api.listenWs({ port: cliArgs.wsport, host: cliArgs.wsaddr }).then(addr => {
-      console.log(
+      logParsec(
         `Ws JSON RPC server is listening at ${addr.address}:${addr.port}`
       );
     });

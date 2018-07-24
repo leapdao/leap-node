@@ -11,6 +11,7 @@ const {
   getCurrentSlotId,
   GENESIS,
 } = require('../utils');
+const { logPeriod } = require('../debug');
 
 module.exports = async (period, height, { web3, bridge, node, account }) => {
   const submittedPeriod = await bridge.methods
@@ -23,7 +24,7 @@ module.exports = async (period, height, { web3, bridge, node, account }) => {
     const currentSlotId = getCurrentSlotId(node.slots, height);
     const currentSlot = mySlots.find(slot => slot.id === currentSlotId);
     if (currentSlot) {
-      // console.log('submitPeriod', currentSlot, submittedPeriod);
+      logPeriod('submitPeriod. Slot %d', currentSlot.id);
       const tx = sendTransaction(
         web3,
         bridge.methods.submitPeriod(
@@ -34,12 +35,12 @@ module.exports = async (period, height, { web3, bridge, node, account }) => {
         bridge.options.address,
         account
       ).catch(err => {
-        console.log('submitPeriod error: %s (height: %d)', err.message, height);
+        logPeriod('submitPeriod error: %s (height: %d)', err.message, height);
       });
 
       if (typeof tx.on === 'function') {
         tx.on('transactionHash', txHash => {
-          console.log('submitPeriod', txHash);
+          logPeriod('submitPeriod tx', txHash);
         });
       }
     }

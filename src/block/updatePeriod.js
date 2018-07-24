@@ -9,6 +9,7 @@ const { Period } = require('parsec-lib');
 const submitPeriod = require('../txHelpers/submitPeriod');
 const activateSlot = require('../txHelpers/activateSlot');
 const { getAuctionedByAddr } = require('../utils');
+const { logPeriod } = require('../debug');
 
 module.exports = (chainInfo, options) => {
   try {
@@ -27,10 +28,10 @@ module.exports = (chainInfo, options) => {
         account.address
       ).map(({ id }) => id);
       if (myAuctionedSlots.length > 0) {
-        console.log('found some slots for activation', myAuctionedSlots);
+        logPeriod('found some slots for activation', myAuctionedSlots);
         myAuctionedSlots.forEach(id => {
           activateSlot(id, options).on('transactionHash', txHash => {
-            console.log('activate', id, txHash);
+            logPeriod('activate', id, txHash);
           });
         });
       }
