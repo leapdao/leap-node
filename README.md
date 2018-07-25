@@ -15,6 +15,18 @@ https://parseclabs.readthedocs.io/en/latest/
 
 `parsec [ARGS] --config=path-to-config.json`
 
+### Debug
+
+To enable logs use `DEBUG` env variable (see: https://www.npmjs.com/package/debug). Debug namepaces:
+
+- `tendermint`
+- `parsec`
+- `parsec:period`
+- `parsec:tx`
+- `abci` (built-in from js-abci)
+
+Example: `DEBUG=tendermint,parsec:tx parsec`
+
 ### Available cli arguments
 
 - `no-validators-updates` — disabling validators set updates (default: false)

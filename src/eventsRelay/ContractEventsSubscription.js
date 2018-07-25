@@ -28,7 +28,6 @@ module.exports = class ContractEventsSubscription extends EventEmitter {
       return null;
     }
 
-    const groups = {};
     const options = {
       fromBlock: this.fromBlock || 0,
       toBlock: blockNumber,
@@ -36,17 +35,10 @@ module.exports = class ContractEventsSubscription extends EventEmitter {
 
     const events = await this.contract.getPastEvents('allEvents', options);
 
-    events.forEach(event => {
-      groups[event.event] = groups[event.event] || [];
-      groups[event.event].push(event);
-    });
-
-    Object.keys(groups).forEach(group => {
-      this.emit(group, groups[group]);
-    });
+    this.emit('events', events);
 
     this.fromBlock = blockNumber;
 
-    return groups;
+    return events;
   }
 };

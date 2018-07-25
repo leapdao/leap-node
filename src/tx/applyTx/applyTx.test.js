@@ -9,12 +9,15 @@ const ADDR_2 = '0x8ab21c65041778dfc7ec7995f9cdef3d5221a5ad';
 const ADDR_3 = '0x418eaa171b93ed13589377cdbe6abf05840543af';
 const PRIV_3 =
   '0x9ae3ed3d1659a33902644da4ce645cfac1de84bc0889909db83692c8374fc44e';
+const TENDER_KEY_1 = '0x7640D69D9EDB21592CBDF4CC49956EA53E59656FC2D8BBD1AE3F427BF67D47FA'.toLowerCase();
+const TENDER_KEY_2 = '0x0000069D9EDB21592CBDF4CC49956EA53E59656FC2D8BBD1AE3F427BF67D47FA'.toLowerCase();
 
 const getInitialState = () => ({
   txs: {},
   balances: {},
   unspent: {},
   processedDeposit: 11,
+  slots: [],
 });
 
 const makeDepositMock = (depositor, amount, color) => {
@@ -449,5 +452,110 @@ describe('Transfer', () => {
     } catch (e) {
       expect(e.message).toBe('Ins and outs values are mismatch');
     }
+  });
+});
+
+describe('Validators set updates', () => {
+  test('successful validatorJoin tx (empty)', () => {
+    const state = getInitialState();
+
+    const join = Tx.validatorJoin(0, TENDER_KEY_1, 1);
+    applyTx(state, join);
+
+    expect(state.slots[0]).toBeDefined();
+    expect(state.slots[0].eventsCount).toBe(1);
+    expect(state.slots[0].tenderKey).toBe(TENDER_KEY_1);
+  });
+
+  test('successful validatorJoin tx (leaved)', () => {
+    const state = getInitialState();
+
+    const join1 = Tx.validatorJoin(0, TENDER_KEY_1, 1);
+    applyTx(state, join1);
+
+    const logout1 = Tx.validatorLogout(0, TENDER_KEY_1, 2, 1);
+    applyTx(state, logout1);
+
+    const join2 = Tx.validatorJoin(0, TENDER_KEY_2, 3);
+    applyTx(state, join2);
+
+    expect(state.slots[0]).toBeDefined();
+    expect(state.slots[0].eventsCount).toBe(3);
+    expect(state.slots[0].tenderKey).toBe(TENDER_KEY_2);
+  });
+
+  test('validatorJoin tx with wrong eventsCount (too big)', () => {
+    const state = getInitialState();
+
+    const join1 = Tx.validatorJoin(0, TENDER_KEY_1, 1);
+    applyTx(state, join1);
+
+    const logout1 = Tx.validatorLogout(0, TENDER_KEY_1, 2, 10);
+    applyTx(state, logout1);
+
+    const join2 = Tx.validatorJoin(0, TENDER_KEY_2, 4);
+
+    expect(() => {
+      applyTx(state, join2);
+    }).toThrow('eventsCount expected to be x + 1');
+  });
+
+  test('validatorJoin tx with wrong eventsCount (too small)', () => {
+    const state = getInitialState();
+
+    const join1 = Tx.validatorJoin(0, TENDER_KEY_1, 1);
+    applyTx(state, join1);
+
+    const join2 = Tx.validatorJoin(0, TENDER_KEY_2, 2);
+    applyTx(state, join2);
+
+    const join4 = Tx.validatorJoin(0, TENDER_KEY_2, 1);
+
+    expect(() => {
+      applyTx(state, join4);
+    }).toThrow('eventsCount expected to be x + 1');
+  });
+
+  test('validatorJoin tx with wrong eventsCount (!== 1)', () => {
+    const state = getInitialState();
+
+    const join1 = Tx.validatorJoin(0, TENDER_KEY_1, 2);
+
+    expect(() => {
+      applyTx(state, join1);
+    }).toThrow('eventsCount should start from 1');
+  });
+
+  test('successful validatorLogout tx', () => {
+    const state = getInitialState();
+
+    const join = Tx.validatorJoin(0, TENDER_KEY_1, 1);
+    applyTx(state, join);
+
+    const logout = Tx.validatorLogout(0, TENDER_KEY_1, 2, 10);
+    applyTx(state, logout);
+
+    expect(state.slots[0]).toBeDefined();
+    expect(state.slots[0].eventsCount).toBe(2);
+    expect(state.slots[0].tenderKey).toBe(TENDER_KEY_1);
+    expect(state.slots[0].activationEpoch).toBe(10);
+  });
+
+  test('validatorLogout tx for empty slot', () => {
+    const state = getInitialState();
+
+    const logout = Tx.validatorLogout(0, TENDER_KEY_1, 0, 10);
+    expect(() => {
+      applyTx(state, logout);
+    }).toThrow('Slot 0 is empty');
+  });
+
+  test('validatorLogout tx with different tenderAddr', () => {
+    const state = getInitialState();
+
+    const logout = Tx.validatorLogout(0, TENDER_KEY_1, 0, 10);
+    expect(() => {
+      applyTx(state, logout);
+    }).toThrow('Slot 0 is empty');
   });
 });

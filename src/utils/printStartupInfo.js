@@ -11,13 +11,12 @@ const fs = require('fs');
 const path = require('path');
 const { promisify } = require('util');
 const getSlotsByAddr = require('./getSlotsByAddr');
+const { logParsec } = require('../debug');
 
 const readFile = promisify(fs.readFile);
 
 module.exports = async (params, node, account) => {
-  // console.log(params);
-
-  console.log(`Last block synced: ${node.lastBlockSynced}`);
+  logParsec(`Last block synced: ${node.lastBlockSynced}`);
 
   const validatorKeyPath = path.join(
     params.lotionPath,

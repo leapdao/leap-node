@@ -11,10 +11,11 @@ const {
   getCurrentSlotId,
   GENESIS,
 } = require('../utils');
+const { logPeriod } = require('../debug');
 
 module.exports = async (period, height, { web3, bridge, node, account }) => {
   const submittedPeriod = await bridge.methods
-    .periods(node.previousPeriod.merkleRoot())
+    .periods(period.merkleRoot())
     .call();
 
   // period not found
@@ -23,18 +24,23 @@ module.exports = async (period, height, { web3, bridge, node, account }) => {
     const currentSlotId = getCurrentSlotId(node.slots, height);
     const currentSlot = mySlots.find(slot => slot.id === currentSlotId);
     if (currentSlot) {
-      console.log('submitPeriod', currentSlot, submittedPeriod);
-      const txHash = await sendTransaction(
+      logPeriod('submitPeriod. Slot %d', currentSlot.id);
+      const tx = sendTransaction(
         web3,
         bridge.methods.submitPeriod(
           currentSlot.id,
-          node.previousPeriod.prevHash || GENESIS,
-          node.previousPeriod.merkleRoot()
+          period.prevHash || GENESIS,
+          period.merkleRoot()
         ),
         bridge.options.address,
         account
-      );
-      console.log(txHash);
+      ).catch(err => {
+        logPeriod('submitPeriod error: %s (height: %d)', err.message, height);
+      });
+
+      tx.then(receipt => {
+        logPeriod('submitPeriod tx', receipt);
+      });
     }
   }
 

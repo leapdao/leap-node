@@ -7,12 +7,11 @@
 
 const { sendTransaction } = require('../utils');
 
-module.exports = async (slotId, { web3, bridge, account }) => {
-  const txHash = await sendTransaction(
+module.exports = (slotId, { web3, bridge, account }) => {
+  return sendTransaction(
     web3,
     bridge.methods.activate(slotId),
     bridge.options.address,
     account
   );
-  console.log('activation txHash: ', txHash);
 };

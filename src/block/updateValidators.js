@@ -4,30 +4,22 @@
  * This source code is licensed under the Mozilla Public License Version 2.0
  * found in the LICENSE file in the root directory of this source tree.
  */
-
-const utils = require('ethereumjs-util');
-const { EMPTY_ADDRESS } = require('../utils');
-
-function getAddress(pubkey) {
-  const bytes = Buffer.from(pubkey.value, 'base64');
-  const hash = utils.sha256(bytes).slice(0, 20);
-  return hash.toString('base64');
-}
+const { getAddress, hexToBase64 } = require('../utils');
 
 /*
  * Removes validators except those having a slot
  */
-module.exports = (chainInfo, slots) => {
+module.exports = async (chainInfo, slots, bridge) => {
+  const lastCompleteEpoch = await bridge.methods.lastCompleteEpoch().call();
   const validatorPubKeys = slots
-    .filter(s => s.owner !== EMPTY_ADDRESS)
-    .map(s => s.tendermint.replace('0x', ''))
-    .map(addr => Buffer.from(addr, 'hex').toString('base64'));
-  const validatorAddrs = validatorPubKeys.map(key =>
-    getAddress({
-      value: key,
-      type: 'ed25519',
-    })
-  );
+    .filter(s => s) // filter undefined slots
+    .filter(
+      s =>
+        s.activationEpoch ? s.activationEpoch - lastCompleteEpoch > 2 : true
+    )
+    .map(s => s.tenderKey.replace('0x', ''))
+    .map(hexToBase64);
+  const validatorAddrs = validatorPubKeys.map(key => getAddress(key));
 
   // Change existing validators
   Object.keys(chainInfo.validators).forEach(addr => {
@@ -55,3 +47,5 @@ module.exports = (chainInfo, slots) => {
     }
   });
 };
+
+exports.getAddress = getAddress;

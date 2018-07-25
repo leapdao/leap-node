@@ -12,12 +12,12 @@ module.exports = async (state, chainInfo, { node, db }) => {
     timestamp: Math.round(Date.now() / 1000),
   });
   state.mempool.map(Tx.fromJSON).forEach(b.addTx.bind(b));
+  node.currentPeriod.addBlock(b);
+  state.mempool = [];
 
   // store block data to db if we didn't see this block before
   if (chainInfo.height > node.lastBlockSynced) {
     await db.storeBlock(b);
     node.lastBlockSynced = chainInfo.height;
   }
-  node.currentPeriod.addBlock(b);
-  state.mempool = [];
 };

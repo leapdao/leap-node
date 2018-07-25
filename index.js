@@ -31,7 +31,10 @@ const checkBridge = require('./src/period/checkBridge');
 
 const eventsRelay = require('./src/eventsRelay');
 const { printStartupInfo } = require('./src/utils');
+const printTx = require('./src/txHelpers/printTx');
 const Node = require('./src/node');
+
+const { logParsec, logTendermint, logTx } = require('./src/debug');
 
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
@@ -55,6 +58,7 @@ async function run() {
       balances: {}, // stores account balances like this { [colorIndex]: { address1: 0, ... } }
       unspent: {}, // stores unspent outputs (deposits, transfers)
       processedDeposit: 0,
+      slots: [],
     },
     networkId: config.network,
     genesis: config.genesis,
@@ -63,7 +67,11 @@ async function run() {
     p2pPort: cliArgs.p2pPort,
     tendermintPort: 26659,
     createEmptyBlocks: false,
-    logTendermint: true,
+    logTendermint: log => {
+      logTendermint(
+        log.replace(/I\[\d{2}-\d{2}\|\d{2}:\d{2}:\d{2}\.\d{3}\] /g, '')
+      );
+    },
   });
 
   if (cliArgs.fresh) {
@@ -88,26 +96,36 @@ async function run() {
 
   app.useTx((state, { encoded }) => {
     const tx = Tx.fromRaw(encoded);
+    const printedTx = printTx(state, tx);
+
     applyTx(state, tx, node, bridge);
     accumulateTx(state, tx);
+
+    if (printedTx) {
+      logTx(printedTx);
+    }
   });
 
   app.useBlock(async (state, chainInfo) => {
-    updatePeriod(chainInfo, {
-      bridge,
-      web3,
-      account,
-      node,
-    });
-    await addBlock(state, chainInfo, {
-      account,
-      node,
-      db,
-    });
-    if (!cliArgs.no_validators_updates || node.replay) {
-      updateValidators(chainInfo, node.slots);
+    try {
+      await updatePeriod(chainInfo, {
+        bridge,
+        web3,
+        account,
+        node,
+      });
+      await addBlock(state, chainInfo, {
+        account,
+        node,
+        db,
+      });
+      if (!cliArgs.no_validators_updates && state.slots.length > 0) {
+        await updateValidators(chainInfo, state.slots, bridge);
+      }
+      logParsec('Height:', chainInfo.height);
+    } catch (err) {
+      logParsec('ERRBL', err);
     }
-    console.log('Height:', chainInfo.height);
   });
 
   app.useBlock((state, { height }) => {
@@ -136,13 +154,13 @@ async function run() {
     api
       .listenHttp({ port: cliArgs.rpcport, host: cliArgs.rpcaddr })
       .then(addr => {
-        console.log(
+        logParsec(
           `Http JSON RPC server is listening at ${addr.address}:${addr.port}`
         );
       });
 
     api.listenWs({ port: cliArgs.wsport, host: cliArgs.wsaddr }).then(addr => {
-      console.log(
+      logParsec(
         `Ws JSON RPC server is listening at ${addr.address}:${addr.port}`
       );
     });

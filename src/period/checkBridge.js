@@ -6,6 +6,7 @@
  */
 
 const submitPeriod = require('../txHelpers/submitPeriod');
+const { logPeriod } = require('../debug');
 
 module.exports = async (rsp, chainInfo, _, options) => {
   try {
@@ -17,6 +18,7 @@ module.exports = async (rsp, chainInfo, _, options) => {
       return;
     }
 
+    logPeriod('checkBridge');
     const contractPeriod = await submitPeriod(
       node.previousPeriod,
       height + node.checkCallsCount,
