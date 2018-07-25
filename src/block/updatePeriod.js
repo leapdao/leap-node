@@ -19,7 +19,7 @@ module.exports = async (chainInfo, options) => {
       node.previousPeriod = node.currentPeriod;
       node.currentPeriod = new Period(node.previousPeriod.merkleRoot());
       node.checkCallsCount = 0;
-      await submitPeriod(node.previousPeriod, chainInfo.height, options);
+      submitPeriod(node.previousPeriod, chainInfo.height, options);
     }
     if (chainInfo.height % 32 === 16) {
       // ToDo: should try to activate in the right epoch

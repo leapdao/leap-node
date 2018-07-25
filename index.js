@@ -114,7 +114,7 @@ async function run() {
         account,
         node,
       });
-      addBlock(state, chainInfo, {
+      await addBlock(state, chainInfo, {
         account,
         node,
         db,
