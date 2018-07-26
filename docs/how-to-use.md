@@ -6,6 +6,7 @@ title: How to use
 
 - Node.js 8+
 - build-essential
+- Python 2.X (required by node-gyp, only for building)
 
 ## Install
 
