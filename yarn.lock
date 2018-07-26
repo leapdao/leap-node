@@ -5202,9 +5202,15 @@ parse5@4.0.0:
   resolved "https://registry.yarnpkg.com/parse5/-/parse5-4.0.0.tgz#6d78656e3da8d78b4ec0b906f7c08ef1dfe3f608"
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 parsec-lib@0.14.0:
   version "0.14.0"
   resolved "https://registry.yarnpkg.com/parsec-lib/-/parsec-lib-0.14.0.tgz#58ced511d6b55248fcf19dec3dafd0a0e36babef"
+=======
+parsec-lib@0.13.6:
+  version "0.13.6"
+  resolved "https://registry.yarnpkg.com/parsec-lib/-/parsec-lib-0.13.6.tgz#1fc3b0a01a1431d7703409713701499fe3128d47"
+>>>>>>> added checkVote to applyTx
 =======
 parsec-lib@0.13.6:
   version "0.13.6"
