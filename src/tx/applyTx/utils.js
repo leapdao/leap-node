@@ -5,7 +5,7 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-const { Outpoint } = require('parsec-lib');
+const { Outpoint, Type } = require('parsec-lib');
 
 const groupValuesByColor = (values, { color, value }) =>
   Object.assign({}, values, {
@@ -31,12 +31,14 @@ const checkInsAndOuts = (tx, state, unspentFilter) => {
 };
 
 const removeInputs = (state, tx) => {
-  tx.inputs.forEach(input => {
-    const outpointId = input.prevout.hex();
-    const { address, value, color } = state.unspent[outpointId];
-    state.balances[color][address] -= value;
-    delete state.unspent[outpointId];
-  });
+  if (tx.type !== Type.PERIOD_VOTE) {
+    tx.inputs.forEach(input => {
+      const outpointId = input.prevout.hex();
+      const { address, value, color } = state.unspent[outpointId];
+      state.balances[color][address] -= value;
+      delete state.unspent[outpointId];
+    });
+  }
 };
 
 const addOutputs = (state, tx) => {
@@ -54,12 +56,14 @@ const addOutputs = (state, tx) => {
 };
 
 const checkOutpoints = (state, tx) => {
-  tx.inputs.forEach(input => {
-    const outpointId = input.prevout.hex();
-    if (!state.unspent[outpointId]) {
-      throw new Error('Trying to spend non-existing output');
-    }
-  });
+  if (tx.type !== Type.PERIOD_VOTE) {
+    tx.inputs.forEach(input => {
+      const outpointId = input.prevout.hex();
+      if (!state.unspent[outpointId]) {
+        throw new Error('Trying to spend non-existing output');
+      }
+    });
+  }
 };
 
 exports.checkInsAndOuts = checkInsAndOuts;

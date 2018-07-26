@@ -1,4 +1,4 @@
-const { Tx, Input, Outpoint, Output } = require('parsec-lib');
+const { Period, Block, Tx, Input, Outpoint, Output } = require('parsec-lib');
 
 const applyTx = require('./index');
 
@@ -18,6 +18,12 @@ const getInitialState = () => ({
   unspent: {},
   processedDeposit: 11,
   slots: [],
+  latestPeriod: {
+    sigs: [],
+  },
+  prevPeriod: {
+    sigs: [],
+  },
 });
 
 const makeDepositMock = (depositor, amount, color) => {
@@ -40,6 +46,23 @@ const makeExitMock = (exitor, amount, color) => {
       }
     ),
   };
+};
+
+const periodMock = () => {
+  // create a new period
+  const tx1 = Tx.transfer(
+    [
+      new Input(
+        new Outpoint(
+          '0x7777777777777777777777777777777777777777777777777777777777777777',
+          0
+        )
+      ),
+    ],
+    [new Output(99000000, ADDR_1, 1337)]
+  ).signAll(PRIV_1);
+  const block = new Block(32).addTx(tx1);
+  return new Period(null, [block]);
 };
 
 const defaultDepositMock = makeDepositMock(ADDR_1, '500', 0);
@@ -561,5 +584,97 @@ describe('Validators set updates', () => {
     expect(() => {
       applyTx(state, logout);
     }).toThrow('Slot 0 is empty');
+  });
+
+  test('periodVote tx initializing first period vote', () => {
+    const state = getInitialState();
+    state.slots[3] = {
+      signerAddr: ADDR_1,
+    };
+
+    const vote = Tx.periodVote(3, new Input(new Outpoint(TENDER_KEY_1, 0)));
+    vote.sign([PRIV_1]);
+    applyTx(state, vote);
+    expect(state.latestPeriod.root).toBe(TENDER_KEY_1);
+    expect(state.latestPeriod.sigs[3].r).toBe(vote.inputs[0].r);
+  });
+
+  test('periodVote adding to ongoing vote', () => {
+    const state = getInitialState();
+    state.latestPeriod.root = TENDER_KEY_1;
+    state.slots[3] = {
+      signerAddr: ADDR_1,
+    };
+
+    const vote = Tx.periodVote(3, new Input(new Outpoint(TENDER_KEY_1, 0)));
+    vote.sign([PRIV_1]);
+    applyTx(state, vote);
+    expect(state.latestPeriod.root).toBe(TENDER_KEY_1);
+    expect(state.latestPeriod.sigs[3].r).toBe(vote.inputs[0].r);
+  });
+
+  test('periodVote rotating state into next period when validating tip', () => {
+    // have the previous voting period in state
+    const state = getInitialState();
+    state.latestPeriod.root = TENDER_KEY_1;
+    state.slots[3] = {
+      signerAddr: ADDR_1,
+    };
+
+    // a new period is created
+    const period = periodMock();
+    // vote on the new period
+    const vote = Tx.periodVote(
+      3,
+      new Input(new Outpoint(period.merkleRoot(), 0))
+    );
+    vote.sign([PRIV_1]);
+
+    // have the new period in the node object and receive a vote at the same time
+    applyTx(state, vote, {
+      currentPeriod: period,
+    });
+    expect(state.latestPeriod.root).toBe(period.merkleRoot());
+    expect(state.latestPeriod.sigs[3].r).toBe(vote.inputs[0].r);
+    // check period rotation was successful, prevPeriod sigs will be used for RNG
+    expect(state.prevPeriod.root).toBe(TENDER_KEY_1);
+  });
+
+  test('prevent invalid periodVote when validating tip', () => {
+    // have the previous voting period in state
+    const state = getInitialState();
+    const period = periodMock();
+    state.latestPeriod.root = period.merkleRoot();
+
+    // vote on some other period
+    const vote = Tx.periodVote(3, new Input(new Outpoint(TENDER_KEY_2, 0)));
+    vote.sign([PRIV_1]);
+
+    expect(() => {
+      applyTx(state, vote, {
+        currentPeriod: period,
+      });
+    }).toThrow(
+      `Vote for wrong period: ${TENDER_KEY_2}, expected ${period.merkleRoot()}`
+    );
+  });
+
+  test('periodVote rotating state into next period when not validating tip', () => {
+    // have the previous voting period in state
+    const state = getInitialState();
+    state.latestPeriod.root = TENDER_KEY_1;
+    state.slots[3] = {
+      signerAddr: ADDR_1,
+    };
+    // vote on the new period
+    const vote = Tx.periodVote(3, new Input(new Outpoint(TENDER_KEY_2, 0)));
+    vote.sign([PRIV_1]);
+
+    // have the new period in the node object and receive a vote at the same time
+    applyTx(state, vote);
+    expect(state.latestPeriod.root).toBe(TENDER_KEY_2);
+    expect(state.latestPeriod.sigs[3].r).toBe(vote.inputs[0].r);
+    // check period rotation was successful, prevPeriod sigs will be used for RNG
+    expect(state.prevPeriod.root).toBe(TENDER_KEY_1);
   });
 });

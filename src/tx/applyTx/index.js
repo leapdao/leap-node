@@ -12,6 +12,7 @@ const checkExit = require('./checkExit');
 const checkTransfer = require('./checkTransfer');
 const checkValidatorJoin = require('./checkValidatorJoin');
 const checkValidatorLogout = require('./checkValidatorLogout');
+const checkVote = require('./checkVote');
 const { checkOutpoints, removeInputs, addOutputs } = require('./utils');
 
 const checks = {
@@ -21,6 +22,7 @@ const checks = {
   [Type.TRANSFER]: checkTransfer,
   [Type.VALIDATOR_JOIN]: checkValidatorJoin,
   [Type.VALIDATOR_LOGOUT]: checkValidatorLogout,
+  [Type.PERIOD_VOTE]: checkVote,
 };
 
 module.exports = (state, tx, node) => {
