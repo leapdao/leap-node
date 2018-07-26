@@ -1,13 +1,16 @@
 const express = require('express');
 const cors = require('cors');
-const jsonrpc = require('connect-jsonrpc');
+const jayson = require('jayson');
+const jsonParser = require('body-parser').json;
 const WsJsonRpcServer = require('rpc-websockets').Server;
 
-const { INVALID_PARAMS } = jsonrpc;
 const { Tx, Block, Util } = require('parsec-lib');
 
 const sendTx = require('../txHelpers/sendTx');
 const { unspentForAddress, range } = require('../utils');
+
+// JSON RPC 2.0 invalid params error code
+const INVALID_PARAMS = -32602;
 
 const api = express();
 
@@ -17,10 +20,12 @@ api.use(
   })
 );
 
+api.use(jsonParser());
+
 /*
 * Starts JSON RPC server
 */
-module.exports = async (node, lotionPort, db, web3, bridge) => {
+module.exports = async (node, lotionPort, db, bridge) => {
   const getNetwork = async () => node.networkId;
 
   const getBalance = async (address, tag = 'latest') => {
@@ -178,11 +183,10 @@ module.exports = async (node, lotionPort, db, web3, bridge) => {
   };
 
   const withCallback = method => {
-    return (...args) => {
-      const cb = args.pop();
+    return function handler(args, cb) {
       method(...args)
         .then(result => cb(null, result))
-        .catch(e => cb(e));
+        .catch(e => cb(this.error(e.code, e.message)));
     };
   };
 
@@ -205,14 +209,12 @@ module.exports = async (node, lotionPort, db, web3, bridge) => {
     parsec_getColors: getColors,
   };
 
-  api.use(
-    jsonrpc(
-      Object.keys(nodeApi).reduce((set, key) => {
-        set[key] = withCallback(nodeApi[key]);
-        return set;
-      }, {})
-    )
-  );
+  const apiMethodsWithCallback = Object.keys(nodeApi).reduce((set, key) => {
+    set[key] = withCallback(nodeApi[key]);
+    return set;
+  }, {});
+
+  api.use(jayson.server(apiMethodsWithCallback).middleware());
 
   return {
     listenHttp: async ({ host, port }) => {
