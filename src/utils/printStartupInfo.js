@@ -10,12 +10,13 @@
 const fs = require('fs');
 const path = require('path');
 const { promisify } = require('util');
+const colors = require('colors');
 const getSlotsByAddr = require('./getSlotsByAddr');
 const { logParsec } = require('../debug');
 
 const readFile = promisify(fs.readFile);
 
-module.exports = async (params, node, account) => {
+module.exports = async (params, node, bridge, account) => {
   logParsec(`Last block synced: ${node.lastBlockSynced}`);
 
   const validatorKeyPath = path.join(
@@ -43,11 +44,17 @@ module.exports = async (params, node, account) => {
   });
 
   if (mySlots.length === 0) {
-    console.log('=====');
-    console.log('You need to become a validator first');
-    console.log('Open http://localhost:3001 and follow instruction');
-    console.log(`Validator address: ${account.address}`);
-    console.log(`Validator ID: ${validatorID}`);
-    console.log('=====');
+    console.log('\n');
+    console.log(
+      `  ${'You need to become a validator first'.underline.bold.red}`
+    );
+    console.log(
+      `  Open ${colors.bold(
+        `http://stake-dev.parseclabs.org/#${bridge.options.address}`
+      )} and buy a slot`
+    );
+    console.log(`  ${colors.bold('Validator address:')}\t${account.address}`);
+    console.log(`  ${colors.bold('Validator ID:')}\t\t${validatorID}`);
+    console.log('\n');
   }
 };

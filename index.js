@@ -147,7 +147,7 @@ async function run() {
   app.listen(cliArgs.port).then(async params => {
     node.replay = false;
 
-    await printStartupInfo(params, node, account);
+    await printStartupInfo(params, node, bridge, account);
 
     await eventsRelay(params.txServerPort, web3, bridge);
     const api = await jsonrpc(node, params.txServerPort, db, bridge);
