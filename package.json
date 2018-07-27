@@ -70,5 +70,8 @@
     "jest": "^23.0.1",
     "lint-staged": "^7.0.5",
     "prettier": "^1.12.1"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
