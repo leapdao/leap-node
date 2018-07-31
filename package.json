@@ -49,7 +49,7 @@
     "express": "^4.16.3",
     "jayson": "^2.0.6",
     "level": "^4.0.0",
-    "lotion": "parsec-labs/lotion#0bb0df0e60a800ad2f61d676d756813e28ed53d6",
+    "lotion": "parsec-labs/lotion#272b746f594f9be77d89fb768f7ae2aec3b56eee",
     "parsec-lib": "0.11.0",
     "rimraf": "^2.6.2",
     "rpc-websockets": "^4.1.2",
