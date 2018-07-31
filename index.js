@@ -12,7 +12,6 @@ const path = require('path');
 const { promisify } = require('util');
 const Web3 = require('web3');
 const { Tx } = require('parsec-lib');
-const lotion = require('lotion');
 
 const cliArgs = require('./src/cliArgs');
 const cleanupLotion = require('./src/cleanupLotion');
@@ -33,6 +32,7 @@ const eventsRelay = require('./src/eventsRelay');
 const { printStartupInfo } = require('./src/utils');
 const printTx = require('./src/txHelpers/printTx');
 const Node = require('./src/node');
+const lotion = require('./lotion');
 
 const { logParsec, logTendermint, logTx } = require('./src/debug');
 
