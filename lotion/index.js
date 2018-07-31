@@ -247,6 +247,4 @@ function Lotion(opts = {}) {
   return appMethods;
 }
 
-Lotion.connect = require('lotion-connect');
-
 module.exports = Lotion;
