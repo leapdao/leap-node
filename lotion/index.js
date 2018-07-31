@@ -14,16 +14,10 @@ const getRoot = require('./lib/get-root.js');
 const serveGenesisGCI = require('./lib/gci-serve-genesis.js');
 const announceSelfAsFullNode = require('./lib/gci-announce-self.js');
 const os = require('os');
-const axios = require('axios');
 const merk = require('merk');
 const { EventEmitter } = require('events');
-const isElectron = require('is-electron');
 
 const LOTION_HOME = process.env.LOTION_HOME || join(os.homedir(), '.lotion');
-
-if (isElectron()) {
-  axios.defaults.adapter = require('axios/lib/adapters/http'); // eslint-disable-line global-require
-}
 
 async function getPorts(peeringPort, rpcPort, abciAppPort) {
   const p2pPort =
@@ -198,6 +192,7 @@ function Lotion(opts = {}) {
         } catch (e) {
           console.log('error starting tendermint node:');
           console.log(e);
+          throw e;
         }
 
         await tendermint.synced;
