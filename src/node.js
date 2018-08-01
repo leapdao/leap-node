@@ -7,22 +7,21 @@
 
 const { Period, Outpoint } = require('parsec-lib');
 const ContractEventsSubscription = require('./eventsRelay/ContractEventsSubscription');
-const { readSlots } = require('./utils');
 
 module.exports = class Node {
-  constructor(db, web3, bridge, networkId) {
+  constructor(db, web3, bridge, config) {
     this.db = db;
     this.web3 = web3;
     this.bridge = bridge;
     this.replay = true;
     this.blockHeight = 0;
     this.currentState = null;
-    this.networkId = networkId;
+    this.networkId = config.networkId;
     this.currentPeriod = new Period();
     this.previousPeriod = null;
     this.deposits = {};
     this.exits = {};
-    this.slots = [];
+    this.account = web3.eth.accounts.privateKeyToAccount(config.privKey);
   }
 
   async init() {
@@ -31,8 +30,6 @@ module.exports = class Node {
   }
 
   async watchContractEvents() {
-    this.slots = await readSlots(this.bridge);
-
     const eventsSubscription = new ContractEventsSubscription(
       this.web3,
       this.bridge

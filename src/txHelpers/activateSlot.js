@@ -7,11 +7,11 @@
 
 const { sendTransaction } = require('../utils');
 
-module.exports = (slotId, { web3, bridge, account }) => {
+module.exports = (slotId, { web3, bridge, node }) => {
   return sendTransaction(
     web3,
     bridge.methods.activate(slotId),
     bridge.options.address,
-    account
+    node.account
   );
 };

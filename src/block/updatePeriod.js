@@ -11,22 +11,22 @@ const activateSlot = require('../txHelpers/activateSlot');
 const { getAuctionedByAddr } = require('../utils');
 const { logPeriod } = require('../debug');
 
-module.exports = async (chainInfo, options) => {
+module.exports = async (state, chainInfo, options) => {
   try {
-    const { node, account } = options;
+    const { node } = options;
     if (chainInfo.height % 32 === 0) {
       logPeriod('updatePeriod');
       node.previousPeriod = node.currentPeriod;
       node.currentPeriod = new Period(node.previousPeriod.merkleRoot());
       node.checkCallsCount = 0;
-      submitPeriod(node.previousPeriod, chainInfo.height, options);
+      submitPeriod(node.previousPeriod, state.slots, chainInfo.height, options);
     }
     if (chainInfo.height % 32 === 16) {
       // ToDo: should try to activate in the right epoch
       // check if there is a validator slot that is "waiting for me"
       const myAuctionedSlots = getAuctionedByAddr(
-        node.slots,
-        account.address
+        state.slots,
+        node.account.address
       ).map(({ id }) => id);
       if (myAuctionedSlots.length > 0) {
         logPeriod('found some slots for activation', myAuctionedSlots);

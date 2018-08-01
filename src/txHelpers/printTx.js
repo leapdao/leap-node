@@ -33,7 +33,9 @@ module.exports = (state, tx) => {
     case Type.VALIDATOR_JOIN: {
       return `validatorJoin: slotId: ${tx.options.slotId}, tenderKey: ${
         tx.options.tenderKey
-      }, eventsCount: ${tx.options.eventsCount}`;
+      }, signerAddr: ${tx.options.signerAddr}, eventsCount: ${
+        tx.options.eventsCount
+      }`;
     }
     case Type.CONSOLIDATE: {
       return `consolidate: ${tx.outputs[0].address}, color: ${
@@ -43,7 +45,9 @@ module.exports = (state, tx) => {
     case Type.VALIDATOR_LOGOUT: {
       return `validatorLogout: slotId: ${tx.options.slotId}, activationEpoch: ${
         tx.options.activationEpoch
-      }, eventsCount: ${tx.options.eventsCount}`;
+      }, newSigner: ${tx.options.newSigner}, eventsCount: ${
+        tx.options.eventsCount
+      }`;
     }
     default:
       return undefined;

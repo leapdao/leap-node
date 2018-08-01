@@ -24,4 +24,5 @@ module.exports = (state, tx) => {
   }
   state.slots[tx.options.slotId].activationEpoch = tx.options.activationEpoch;
   state.slots[tx.options.slotId].eventsCount = tx.options.eventsCount;
+  state.slots[tx.options.slotId].newSigner = tx.options.newSigner;
 };

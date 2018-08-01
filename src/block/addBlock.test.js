@@ -44,8 +44,9 @@ test('addBlock', () => {
   const state = { mempool: [tx1.toJSON(), tx2.toJSON(), tx3.toJSON()] };
   const node = {
     currentPeriod: new Period(),
+    account: { address: ADDR_1 },
   };
-  addBlock(state, { height: 1 }, { node, account: { address: ADDR_1 } });
+  addBlock(state, { height: 1 }, { node });
   const { blockList } = node.currentPeriod;
   expect(blockList.length).toBe(1);
   const { txList } = blockList[0];

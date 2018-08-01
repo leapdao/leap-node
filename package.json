@@ -61,7 +61,7 @@
     "express": "^4.16.3",
     "jayson": "^2.0.6",
     "level": "^4.0.0",
-    "parsec-lib": "0.11.0",
+    "parsec-lib": "0.14.0",
     "rimraf": "^2.6.2",
     "rpc-websockets": "^4.1.2",
     "tendermint": "^3.1.9",
