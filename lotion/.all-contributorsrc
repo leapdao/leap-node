@@ -1,0 +1,161 @@
+{
+  "projectName": "lotion",
+  "projectOwner": "keppel",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "keppel",
+      "name": "Judd",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1269291?v=4",
+      "profile": "https://twitter.com/juddkeppel",
+      "contributions": [
+        "code",
+        "doc",
+        "ideas",
+        "test"
+      ]
+    },
+    {
+      "login": "mappum",
+      "name": "Matt Bell",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/398285?v=4",
+      "profile": "https://github.com/mappum",
+      "contributions": [
+        "code",
+        "ideas",
+        "test",
+        "plugin"
+      ]
+    },
+    {
+      "login": "jolesbi",
+      "name": "Jordan Bibla",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/6021933?v=4",
+      "profile": "http://www.jordanbibla.com",
+      "contributions": [
+        "design"
+      ]
+    },
+    {
+      "login": "gamarin2",
+      "name": "Gautier Marin",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/18440102?v=4",
+      "profile": "https://github.com/gamarin2",
+      "contributions": [
+        "blog"
+      ]
+    },
+    {
+      "login": "Jaxkr",
+      "name": "Jackson Roberts",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/1147244?v=4",
+      "profile": "https://github.com/Jaxkr",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "spentak",
+      "name": "Mark Price",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/758121?v=4",
+      "profile": "http://spentak.com",
+      "contributions": [
+        "doc",
+        "tutorial",
+        "example",
+        "video"
+      ]
+    },
+    {
+      "login": "evanmayo",
+      "name": "Evan Leong",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/14792822?v=4",
+      "profile": "http://www.fountapp.com",
+      "contributions": [
+        "design"
+      ]
+    },
+    {
+      "login": "Chjango",
+      "name": "Chjango Unchained",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/8525850?v=4",
+      "profile": "https://cosmos.network",
+      "contributions": [
+        "blog",
+        "eventOrganizing"
+      ]
+    },
+    {
+      "login": "SaifRehman",
+      "name": "SaifRehman",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/18755233?v=4",
+      "profile": "https://github.com/SaifRehman",
+      "contributions": [
+        "example"
+      ]
+    },
+    {
+      "login": "rllola",
+      "name": "Lola Dam",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/1772945?v=4",
+      "profile": "https://github.com/rllola",
+      "contributions": [
+        "bug",
+        "code"
+      ]
+    },
+    {
+      "login": "MisterDr",
+      "name": "Djenad Razic",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/2449579?v=4",
+      "profile": "http://www.machinezdesign.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "criticalbh",
+      "name": "Admir Sabanovic",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/5900925?v=4",
+      "profile": "http://dev.ba",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "ameeuw",
+      "name": "Arne Meeuw",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/5405348?v=4",
+      "profile": "http://meeuw.me",
+      "contributions": [
+        "question",
+        "ideas"
+      ]
+    },
+    {
+      "login": "propslove",
+      "name": "Props.love",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/36277340?v=4",
+      "profile": "https://www.props.love",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "nylira",
+      "name": "Peng Zhong",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/172531?v=4",
+      "profile": "http://cosmos.network",
+      "contributions": [
+        "design",
+        "example",
+        "ideas"
+      ]
+    }
+  ],
+  "repoType": "github"
+}
