@@ -21,6 +21,7 @@ module.exports = async (rsp, chainInfo, _, options) => {
     logPeriod('checkBridge');
     const contractPeriod = await submitPeriod(
       node.previousPeriod,
+      node.currentState.slots,
       height + node.checkCallsCount,
       options
     );

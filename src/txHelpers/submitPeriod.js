@@ -13,16 +13,18 @@ const {
 } = require('../utils');
 const { logPeriod } = require('../debug');
 
-module.exports = async (period, height, { web3, bridge, node, account }) => {
+module.exports = async (period, slots, height, { web3, bridge, node }) => {
   const submittedPeriod = await bridge.methods
     .periods(period.merkleRoot())
     .call();
 
   // period not found
+  logPeriod('submittedPeriod', submittedPeriod);
   if (submittedPeriod.timestamp === '0') {
-    const mySlots = getSlotsByAddr(node.slots, account.address);
-    const currentSlotId = getCurrentSlotId(node.slots, height);
+    const mySlots = getSlotsByAddr(slots, node.account.address);
+    const currentSlotId = getCurrentSlotId(slots, height);
     const currentSlot = mySlots.find(slot => slot.id === currentSlotId);
+    logPeriod('mySlots', currentSlotId, mySlots);
     if (currentSlot) {
       logPeriod('submitPeriod. Slot %d', currentSlot.id);
       const tx = sendTransaction(
@@ -33,7 +35,7 @@ module.exports = async (period, height, { web3, bridge, node, account }) => {
           period.merkleRoot()
         ),
         bridge.options.address,
-        account
+        node.account
       ).catch(err => {
         logPeriod('submitPeriod error: %s (height: %d)', err.message, height);
       });

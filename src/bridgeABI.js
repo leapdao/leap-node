@@ -407,6 +407,11 @@ module.exports = [
       },
       {
         indexed: false,
+        name: 'newSigner',
+        type: 'address',
+      },
+      {
+        indexed: false,
         name: 'eventCounter',
         type: 'uint256',
       },

@@ -24,7 +24,9 @@ module.exports = (state, tx) => {
   }
 
   state.slots[tx.options.slotId] = {
+    id: tx.options.slotId,
     tenderKey: tx.options.tenderKey,
+    signerAddr: tx.options.signerAddr,
     eventsCount: tx.options.eventsCount,
   };
 };

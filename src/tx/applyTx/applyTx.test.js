@@ -459,41 +459,43 @@ describe('Validators set updates', () => {
   test('successful validatorJoin tx (empty)', () => {
     const state = getInitialState();
 
-    const join = Tx.validatorJoin(0, TENDER_KEY_1, 1);
+    const join = Tx.validatorJoin(0, TENDER_KEY_1, 1, ADDR_1);
     applyTx(state, join);
 
     expect(state.slots[0]).toBeDefined();
     expect(state.slots[0].eventsCount).toBe(1);
     expect(state.slots[0].tenderKey).toBe(TENDER_KEY_1);
+    expect(state.slots[0].signerAddr).toBe(ADDR_1);
   });
 
   test('successful validatorJoin tx (leaved)', () => {
     const state = getInitialState();
 
-    const join1 = Tx.validatorJoin(0, TENDER_KEY_1, 1);
+    const join1 = Tx.validatorJoin(0, TENDER_KEY_1, 1, ADDR_1);
     applyTx(state, join1);
 
-    const logout1 = Tx.validatorLogout(0, TENDER_KEY_1, 2, 1);
+    const logout1 = Tx.validatorLogout(0, TENDER_KEY_1, 2, 1, ADDR_2);
     applyTx(state, logout1);
 
-    const join2 = Tx.validatorJoin(0, TENDER_KEY_2, 3);
+    const join2 = Tx.validatorJoin(0, TENDER_KEY_2, 3, ADDR_2);
     applyTx(state, join2);
 
     expect(state.slots[0]).toBeDefined();
     expect(state.slots[0].eventsCount).toBe(3);
     expect(state.slots[0].tenderKey).toBe(TENDER_KEY_2);
+    expect(state.slots[0].signerAddr).toBe(ADDR_2);
   });
 
   test('validatorJoin tx with wrong eventsCount (too big)', () => {
     const state = getInitialState();
 
-    const join1 = Tx.validatorJoin(0, TENDER_KEY_1, 1);
+    const join1 = Tx.validatorJoin(0, TENDER_KEY_1, 1, ADDR_1);
     applyTx(state, join1);
 
-    const logout1 = Tx.validatorLogout(0, TENDER_KEY_1, 2, 10);
+    const logout1 = Tx.validatorLogout(0, TENDER_KEY_1, 2, 10, ADDR_2);
     applyTx(state, logout1);
 
-    const join2 = Tx.validatorJoin(0, TENDER_KEY_2, 4);
+    const join2 = Tx.validatorJoin(0, TENDER_KEY_2, 4, ADDR_2);
 
     expect(() => {
       applyTx(state, join2);
@@ -503,13 +505,13 @@ describe('Validators set updates', () => {
   test('validatorJoin tx with wrong eventsCount (too small)', () => {
     const state = getInitialState();
 
-    const join1 = Tx.validatorJoin(0, TENDER_KEY_1, 1);
+    const join1 = Tx.validatorJoin(0, TENDER_KEY_1, 1, ADDR_1);
     applyTx(state, join1);
 
-    const join2 = Tx.validatorJoin(0, TENDER_KEY_2, 2);
+    const join2 = Tx.validatorJoin(0, TENDER_KEY_2, 2, ADDR_2);
     applyTx(state, join2);
 
-    const join4 = Tx.validatorJoin(0, TENDER_KEY_2, 1);
+    const join4 = Tx.validatorJoin(0, TENDER_KEY_2, 1, ADDR_2);
 
     expect(() => {
       applyTx(state, join4);
@@ -519,7 +521,7 @@ describe('Validators set updates', () => {
   test('validatorJoin tx with wrong eventsCount (!== 1)', () => {
     const state = getInitialState();
 
-    const join1 = Tx.validatorJoin(0, TENDER_KEY_1, 2);
+    const join1 = Tx.validatorJoin(0, TENDER_KEY_1, 2, ADDR_1);
 
     expect(() => {
       applyTx(state, join1);
@@ -529,22 +531,24 @@ describe('Validators set updates', () => {
   test('successful validatorLogout tx', () => {
     const state = getInitialState();
 
-    const join = Tx.validatorJoin(0, TENDER_KEY_1, 1);
+    const join = Tx.validatorJoin(0, TENDER_KEY_1, 1, ADDR_1);
     applyTx(state, join);
 
-    const logout = Tx.validatorLogout(0, TENDER_KEY_1, 2, 10);
+    const logout = Tx.validatorLogout(0, TENDER_KEY_1, 2, 10, ADDR_2);
     applyTx(state, logout);
 
     expect(state.slots[0]).toBeDefined();
     expect(state.slots[0].eventsCount).toBe(2);
     expect(state.slots[0].tenderKey).toBe(TENDER_KEY_1);
     expect(state.slots[0].activationEpoch).toBe(10);
+    expect(state.slots[0].signerAddr).toBe(ADDR_1);
+    expect(state.slots[0].newSigner).toBe(ADDR_2);
   });
 
   test('validatorLogout tx for empty slot', () => {
     const state = getInitialState();
 
-    const logout = Tx.validatorLogout(0, TENDER_KEY_1, 0, 10);
+    const logout = Tx.validatorLogout(0, TENDER_KEY_1, 0, 10, ADDR_1);
     expect(() => {
       applyTx(state, logout);
     }).toThrow('Slot 0 is empty');
@@ -553,7 +557,7 @@ describe('Validators set updates', () => {
   test('validatorLogout tx with different tenderAddr', () => {
     const state = getInitialState();
 
-    const logout = Tx.validatorLogout(0, TENDER_KEY_1, 0, 10);
+    const logout = Tx.validatorLogout(0, TENDER_KEY_1, 0, 10, ADDR_1);
     expect(() => {
       applyTx(state, logout);
     }).toThrow('Slot 0 is empty');

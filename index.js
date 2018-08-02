@@ -89,10 +89,8 @@ async function run() {
 
   const db = Db(app);
 
-  const node = new Node(db, web3, bridge, config.network);
+  const node = new Node(db, web3, bridge, config);
   await node.init();
-
-  const account = web3.eth.accounts.privateKeyToAccount(config.privKey);
 
   app.useTx((state, { encoded }) => {
     const tx = Tx.fromRaw(encoded);
@@ -108,14 +106,12 @@ async function run() {
 
   app.useBlock(async (state, chainInfo) => {
     try {
-      await updatePeriod(chainInfo, {
+      await updatePeriod(state, chainInfo, {
         bridge,
         web3,
-        account,
         node,
       });
       await addBlock(state, chainInfo, {
-        account,
         node,
         db,
       });
@@ -139,7 +135,6 @@ async function run() {
       node,
       web3,
       bridge,
-      account,
       privKey: config.privKey,
     });
   });
@@ -147,9 +142,9 @@ async function run() {
   app.listen(cliArgs.port).then(async params => {
     node.replay = false;
 
-    await printStartupInfo(params, node, bridge, account);
-
     await eventsRelay(params.txServerPort, web3, bridge);
+    await printStartupInfo(params, node, bridge);
+
     const api = await jsonrpc(node, params.txServerPort, db, bridge);
     api
       .listenHttp({ port: cliArgs.rpcport, host: cliArgs.rpcaddr })

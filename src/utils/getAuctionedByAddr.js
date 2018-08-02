@@ -8,5 +8,5 @@
 const addrCmp = require('./addrCmp');
 
 module.exports = (slots, address) => {
-  return slots.filter(slot => addrCmp(slot.newSigner, address));
+  return slots.filter(s => s).filter(slot => addrCmp(slot.newSigner, address));
 };

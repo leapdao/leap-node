@@ -12,11 +12,12 @@ const path = require('path');
 const { promisify } = require('util');
 const colors = require('colors');
 const getSlotsByAddr = require('./getSlotsByAddr');
+const readSlots = require('./readSlots');
 const { logParsec } = require('../debug');
 
 const readFile = promisify(fs.readFile);
 
-module.exports = async (params, node, bridge, account) => {
+module.exports = async (params, node, bridge) => {
   logParsec(`Last block synced: ${node.lastBlockSynced}`);
 
   const validatorKeyPath = path.join(
@@ -30,11 +31,12 @@ module.exports = async (params, node, bridge, account) => {
     validatorKey.pub_key.value,
     'base64'
   ).toString('hex');
-  const mySlots = await getSlotsByAddr(node.slots, account.address);
+  const slots = await readSlots(bridge);
+  const mySlots = getSlotsByAddr(slots, node.account.address);
 
   mySlots.forEach(slot => {
     if (
-      slot.tendermint.replace('0x', '').toLowerCase() !==
+      slot.tenderKey.replace('0x', '').toLowerCase() !==
       validatorID.toLowerCase()
     ) {
       console.log(
@@ -53,7 +55,9 @@ module.exports = async (params, node, bridge, account) => {
         `http://stake-dev.parseclabs.org/#${bridge.options.address}`
       )} and buy a slot`
     );
-    console.log(`  ${colors.bold('Validator address:')}\t${account.address}`);
+    console.log(
+      `  ${colors.bold('Validator address:')}\t${node.account.address}`
+    );
     console.log(`  ${colors.bold('Validator ID:')}\t\t${validatorID}`);
     console.log('\n');
   }
