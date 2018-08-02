@@ -451,13 +451,6 @@ aws4@^1.2.1, aws4@^1.6.0:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.7.0.tgz#d4d0e9b9dbfca77bf08eeb0a8a471550fe39e289"
 
-axios@^0.16.2:
-  version "0.16.2"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.16.2.tgz#ba4f92f17167dfbab40983785454b9ac149c3c6d"
-  dependencies:
-    follow-redirects "^1.2.3"
-    is-buffer "^1.1.5"
-
 axios@^0.17.1:
   version "0.17.1"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.17.1.tgz#2d8e3e5d0bdbd7327f91bc814f5c57660f81824d"
@@ -1094,7 +1087,7 @@ body-parser@1.18.2:
     raw-body "2.3.2"
     type-is "~1.6.15"
 
-body-parser@^1.16.0, body-parser@^1.17.2, body-parser@^1.18.3:
+body-parser@^1.16.0, body-parser@^1.18.3:
   version "1.18.3"
   resolved "https://registry.yarnpkg.com/body-parser/-/body-parser-1.18.3.tgz#5b292198ffdd553b3a0f20ded0592b956955c8b4"
   dependencies:
@@ -2086,8 +2079,8 @@ ee-first@1.1.1:
   resolved "https://registry.yarnpkg.com/ee-first/-/ee-first-1.1.1.tgz#590c61156b0ae2f4f0255732a158b266bc56b21d"
 
 electron-to-chromium@^1.3.47:
-  version "1.3.52"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.52.tgz#d2d9f1270ba4a3b967b831c40ef71fb4d9ab5ce0"
+  version "1.3.55"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.55.tgz#f150e10b20b77d9d41afcca312efe0c3b1a7fdce"
 
 elegant-spinner@^1.0.1:
   version "1.0.1"
@@ -2516,7 +2509,7 @@ express-http-proxy@^1.0.7:
     es6-promise "^4.1.1"
     raw-body "^2.3.0"
 
-express@^4.14.0, express@^4.15.4, express@^4.16.3:
+express@^4.14.0, express@^4.16.3:
   version "4.16.3"
   resolved "https://registry.yarnpkg.com/express/-/express-4.16.3.tgz#6af8a502350db3246ecc4becf6b5a34d22f7ed53"
   dependencies:
@@ -2751,9 +2744,9 @@ flat-cache@^1.2.1:
     graceful-fs "^4.1.2"
     write "^0.2.1"
 
-follow-redirects@^1.2.3, follow-redirects@^1.2.5, follow-redirects@^1.3.0:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.5.1.tgz#67a8f14f5a1f67f962c2c46469c79eaec0a90291"
+follow-redirects@^1.2.5, follow-redirects@^1.3.0:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.5.2.tgz#5a9d80e0165957e5ef0c1210678fc5c4acb9fb03"
   dependencies:
     debug "^3.1.0"
 
@@ -3464,10 +3457,6 @@ is-directory@^0.3.1:
 is-dotfile@^1.0.0:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/is-dotfile/-/is-dotfile-1.0.3.tgz#a6a2f32ffd2dfb04f5ca25ecd0f6b83cf798a1e1"
-
-is-electron@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/is-electron/-/is-electron-2.1.0.tgz#37dd2e9e7167efa8bafce86c0c25762bc4b851fa"
 
 is-equal-shallow@^0.1.3:
   version "0.1.3"
@@ -4494,42 +4483,6 @@ loose-envify@^1.0.0:
   dependencies:
     js-tokens "^3.0.0 || ^4.0.0"
 
-lotion-connect@^0.1.1:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/lotion-connect/-/lotion-connect-0.1.2.tgz#377ca98b9c5f3f382b9a483db3fffaef1e1b7167"
-  dependencies:
-    deterministic-json "^1.0.4"
-    jpfs "0.0.3"
-    lodash.get "^4.4.2"
-    peer-channel "^0.1.1"
-    proxmise "^1.0.0"
-    tendermint "3.1.9"
-    varstruct "^6.1.2"
-
-lotion@parsec-labs/lotion#272b746f594f9be77d89fb768f7ae2aec3b56eee:
-  version "0.2.0"
-  resolved "https://codeload.github.com/parsec-labs/lotion/tar.gz/272b746f594f9be77d89fb768f7ae2aec3b56eee"
-  dependencies:
-    abci "github:parsec-labs/js-abci#a4be8a213afb3a2974b32f8434664009d1cfae1b"
-    axios "^0.16.2"
-    body-parser "^1.17.2"
-    cors "^2.8.4"
-    deterministic-json "^1.0.4"
-    express "^4.15.4"
-    express-http-proxy "^1.0.7"
-    fs-extra "^5.0.0"
-    get-port "^3.1.0"
-    is-electron "^2.1.0"
-    jpfs "0.0.3"
-    jsondiffpatch "^0.2.5"
-    level "^4.0.0"
-    lodash.get "^4.4.2"
-    lotion-connect "^0.1.1"
-    merk "^1.3.1"
-    peer-channel "0.1.1"
-    tendermint-node "github:parsec-labs/tendermint-node#10d7d9939fab29e8f7d5fc53cfe378fbe4b252cc"
-    varstruct "^6.1.1"
-
 lowercase-keys@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/lowercase-keys/-/lowercase-keys-1.0.1.tgz#6f9e30b47084d971a7c820ff15a6c5167b74c26f"
@@ -5017,8 +4970,8 @@ number-to-bn@1.7.0:
     strip-hex-prefix "1.0.0"
 
 nwsapi@^2.0.7:
-  version "2.0.7"
-  resolved "https://registry.yarnpkg.com/nwsapi/-/nwsapi-2.0.7.tgz#6fc54c254621f10cac5225b76e81c74120139b78"
+  version "2.0.8"
+  resolved "https://registry.yarnpkg.com/nwsapi/-/nwsapi-2.0.8.tgz#e3603579b7e162b3dbedae4fb24e46f771d8fa24"
 
 oauth-sign@~0.8.1, oauth-sign@~0.8.2:
   version "0.8.2"
@@ -5503,10 +5456,6 @@ protocol-buffers-encodings@^1.1.0:
   dependencies:
     signed-varint "^2.0.1"
     varint "^5.0.0"
-
-proxmise@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/proxmise/-/proxmise-1.0.0.tgz#088e2d178dc4d3453dafd228199e976d5c487f79"
 
 proxy-addr@~2.0.3:
   version "2.0.4"
@@ -6645,8 +6594,8 @@ tar@^2.1.1, tar@^2.2.1:
     inherits "2"
 
 tar@^4:
-  version "4.4.4"
-  resolved "https://registry.yarnpkg.com/tar/-/tar-4.4.4.tgz#ec8409fae9f665a4355cc3b4087d0820232bb8cd"
+  version "4.4.6"
+  resolved "https://registry.yarnpkg.com/tar/-/tar-4.4.6.tgz#63110f09c00b4e60ac8bcfe1bf3c8660235fbc9b"
   dependencies:
     chownr "^1.0.1"
     fs-minipass "^1.2.5"
@@ -6668,22 +6617,6 @@ tar@^4:
     progress "^2.0.0"
     tendermint "^3.1.3"
     unzip "^0.1.11"
-
-tendermint@3.1.9:
-  version "3.1.9"
-  resolved "https://registry.yarnpkg.com/tendermint/-/tendermint-3.1.9.tgz#018f6956d5b01ddf16592c915fa57e251329cb57"
-  dependencies:
-    axios "^0.17.1"
-    camelcase "^4.0.0"
-    create-hash "^1.1.3"
-    debug "^3.1.0"
-    json-stable-stringify "^1.0.1"
-    ndjson "^1.5.0"
-    old "^0.1.3"
-    pumpify "^1.3.5"
-    supercop.js "^2.0.1"
-    varstruct "^6.1.1"
-    websocket-stream "^5.1.1"
 
 tendermint@^3.1.3, tendermint@^3.1.9:
   version "3.1.11"
@@ -7040,7 +6973,7 @@ varint@^5.0.0, varint@~5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/varint/-/varint-5.0.0.tgz#d826b89f7490732fabc0c0ed693ed475dcb29ebf"
 
-varstruct@^6.1.1, varstruct@^6.1.2:
+varstruct@^6.1.1:
   version "6.1.2"
   resolved "https://registry.yarnpkg.com/varstruct/-/varstruct-6.1.2.tgz#9eba2115d9d86f6fd00daa72c3af2798e8506b24"
   dependencies:
