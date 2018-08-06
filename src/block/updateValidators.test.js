@@ -5,23 +5,16 @@ const TENDER_KEY_1 = '0x7640D69D9EDB21592CBDF4CC49956EA53E59656FC2D8BBD1AE3F427B
 const TENDER_KEY_2 = '0x0000069D9EDB21592CBDF4CC49956EA53E59656FC2D8BBD1AE3F427BF67D47FA'.toLowerCase();
 const TENDER_KEY_3 = '0x0000069D9EDB21592CBDF0000000000000000000C2D8BBD1AE3F427BF67D47FA'.toLowerCase();
 
-const mockLastCompleteEpoch = epoch => ({
-  methods: {
-    lastCompleteEpoch: () => ({
-      call: () => Promise.resolve(epoch),
-    }),
-  },
-});
-
 test('Adding new validators', async () => {
-  const bridge = mockLastCompleteEpoch(10);
   const chainInfo = {
     validators: {},
   };
   await updateValidators(
-    chainInfo,
-    [{ tenderKey: TENDER_KEY_1 }, { tenderKey: TENDER_KEY_2 }],
-    bridge
+    {
+      slots: [{ tenderKey: TENDER_KEY_1 }, { tenderKey: TENDER_KEY_2 }],
+      epoch: 10,
+    },
+    chainInfo
   );
 
   expect(Object.keys(chainInfo.validators).length).toBe(2);
@@ -36,7 +29,6 @@ test('Adding new validators', async () => {
 });
 
 test('Simple removing of a validator (empty slot)', async () => {
-  const bridge = mockLastCompleteEpoch(10);
   const chainInfo = {
     validators: {
       [getAddress(TENDER_KEY_1)]: {
@@ -56,9 +48,8 @@ test('Simple removing of a validator (empty slot)', async () => {
     },
   };
   await updateValidators(
-    chainInfo,
-    [{ tenderKey: TENDER_KEY_2 }, undefined],
-    bridge
+    { slots: [{ tenderKey: TENDER_KEY_2 }, undefined], epoch: 10 },
+    chainInfo
   );
 
   expect(Object.keys(chainInfo.validators).length).toBe(2);
@@ -70,7 +61,6 @@ test('Simple removing of a validator (empty slot)', async () => {
 });
 
 test('Advanced removing of a validator (with activationEpoch)', async () => {
-  const bridge = mockLastCompleteEpoch(1);
   const chainInfo = {
     validators: {
       [getAddress(TENDER_KEY_1)]: {
@@ -90,12 +80,14 @@ test('Advanced removing of a validator (with activationEpoch)', async () => {
     },
   };
   await updateValidators(
-    chainInfo,
-    [
-      { tenderKey: TENDER_KEY_2 },
-      { tenderKey: TENDER_KEY_1, activationEpoch: 3 },
-    ],
-    bridge
+    {
+      slots: [
+        { tenderKey: TENDER_KEY_2 },
+        { tenderKey: TENDER_KEY_1, activationEpoch: 3 },
+      ],
+      epoch: 1,
+    },
+    chainInfo
   );
 
   expect(Object.keys(chainInfo.validators).length).toBe(2);
@@ -107,7 +99,6 @@ test('Advanced removing of a validator (with activationEpoch)', async () => {
 });
 
 test('Validator with several slots', async () => {
-  const bridge = mockLastCompleteEpoch(1);
   const chainInfo = {
     validators: {
       [getAddress(TENDER_KEY_1)]: {
@@ -127,14 +118,16 @@ test('Validator with several slots', async () => {
     },
   };
   await updateValidators(
-    chainInfo,
-    [
-      { tenderKey: TENDER_KEY_2 },
-      { tenderKey: TENDER_KEY_1, activationEpoch: 3 },
-      { tenderKey: TENDER_KEY_2, activationEpoch: 3 },
-      { tenderKey: TENDER_KEY_3 },
-    ],
-    bridge
+    {
+      slots: [
+        { tenderKey: TENDER_KEY_2 },
+        { tenderKey: TENDER_KEY_1, activationEpoch: 3 },
+        { tenderKey: TENDER_KEY_2, activationEpoch: 3 },
+        { tenderKey: TENDER_KEY_3 },
+      ],
+      epoch: 1,
+    },
+    chainInfo
   );
 
   expect(Object.keys(chainInfo.validators).length).toBe(3);
