@@ -58,6 +58,7 @@ async function run() {
       balances: {}, // stores account balances like this { [colorIndex]: { address1: 0, ... } }
       unspent: {}, // stores unspent outputs (deposits, transfers)
       processedDeposit: 0,
+      epoch: 0,
       slots: [],
     },
     networkId: config.network,
@@ -116,7 +117,7 @@ async function run() {
         db,
       });
       if (!cliArgs.no_validators_updates && state.slots.length > 0) {
-        await updateValidators(chainInfo, state.slots, bridge);
+        await updateValidators(state, chainInfo);
       }
       logParsec('Height:', chainInfo.height);
     } catch (err) {

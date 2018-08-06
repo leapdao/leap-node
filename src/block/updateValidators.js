@@ -9,13 +9,11 @@ const { getAddress, hexToBase64 } = require('../utils');
 /*
  * Removes validators except those having a slot
  */
-module.exports = async (chainInfo, slots, bridge) => {
-  const lastCompleteEpoch = await bridge.methods.lastCompleteEpoch().call();
-  const validatorPubKeys = slots
+module.exports = async (state, chainInfo) => {
+  const validatorPubKeys = state.slots
     .filter(s => s) // filter undefined slots
     .filter(
-      s =>
-        s.activationEpoch ? s.activationEpoch - lastCompleteEpoch > 2 : true
+      s => (s.activationEpoch ? s.activationEpoch - state.epoch > 2 : true)
     )
     .map(s => s.tenderKey.replace('0x', ''))
     .map(hexToBase64);

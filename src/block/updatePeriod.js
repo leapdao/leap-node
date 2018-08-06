@@ -13,7 +13,7 @@ const { logPeriod } = require('../debug');
 
 module.exports = async (state, chainInfo, options) => {
   try {
-    const { node, bridge } = options;
+    const { node } = options;
     if (chainInfo.height % 32 === 0) {
       logPeriod('updatePeriod');
       node.previousPeriod = node.currentPeriod;
@@ -23,14 +23,11 @@ module.exports = async (state, chainInfo, options) => {
     }
     if (chainInfo.height % 32 === 16) {
       // check if there is a validator slot that is "waiting for me"
-      const lastCompleteEpoch = await bridge.methods.lastCompleteEpoch().call();
       const myAuctionedSlots = getAuctionedByAddr(
         state.slots,
         node.account.address
       )
-        .filter(
-          ({ activationEpoch }) => activationEpoch - lastCompleteEpoch >= 2
-        )
+        .filter(({ activationEpoch }) => activationEpoch - state.epoch >= 2)
         .map(({ id }) => id);
       if (myAuctionedSlots.length > 0) {
         logPeriod('found some slots for activation', myAuctionedSlots);
