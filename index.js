@@ -25,6 +25,7 @@ const accumulateTx = require('./src/tx/accumulateTx');
 const addBlock = require('./src/block/addBlock');
 const updatePeriod = require('./src/block/updatePeriod');
 const updateValidators = require('./src/block/updateValidators');
+const updateEpoch = require('./src/block/updateEpoch');
 
 const checkBridge = require('./src/period/checkBridge');
 
@@ -59,6 +60,8 @@ async function run() {
       unspent: {}, // stores unspent outputs (deposits, transfers)
       processedDeposit: 0,
       epoch: 0,
+      lastEpochHeight: 0,
+      epochLength: null,
       slots: [],
     },
     networkId: config.network,
@@ -119,6 +122,8 @@ async function run() {
       if (!cliArgs.no_validators_updates && state.slots.length > 0) {
         await updateValidators(state, chainInfo);
       }
+
+      updateEpoch(state, chainInfo);
       logParsec('Height:', chainInfo.height);
     } catch (err) {
       logParsec('ERRBL', err);
