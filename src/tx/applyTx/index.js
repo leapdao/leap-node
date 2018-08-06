@@ -8,6 +8,7 @@
 const { Type } = require('parsec-lib');
 const checkConsolidate = require('./checkConsolidate');
 const checkDeposit = require('./checkDeposit');
+const checkEpoch = require('./checkEpoch');
 const checkExit = require('./checkExit');
 const checkTransfer = require('./checkTransfer');
 const checkValidatorJoin = require('./checkValidatorJoin');
@@ -17,6 +18,7 @@ const { checkOutpoints, removeInputs, addOutputs } = require('./utils');
 const checks = {
   [Type.CONSOLIDATE]: checkConsolidate,
   [Type.DEPOSIT]: checkDeposit,
+  [Type.EPOCH]: checkEpoch,
   [Type.EXIT]: checkExit,
   [Type.TRANSFER]: checkTransfer,
   [Type.VALIDATOR_JOIN]: checkValidatorJoin,
