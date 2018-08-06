@@ -26,9 +26,9 @@ module.exports = async (txServerPort, web3, bridge) => {
     await sendTx(txServerPort, tx.hex());
   };
 
-  const handleEpoch = async event => {
-    const { epoch } = event.returnValues;
-    const tx = Tx.epoch(Number(epoch));
+  const handleEpochLength = async event => {
+    const { epochLength } = event.returnValues;
+    const tx = Tx.epochLength(Number(epochLength));
     await sendTx(txServerPort, tx.hex());
   };
 
@@ -68,8 +68,8 @@ module.exports = async (txServerPort, web3, bridge) => {
         case 'NewDeposit':
           await handleDeposit(event);
           break;
-        case 'Epoch':
-          await handleEpoch(event);
+        case 'EpochLength':
+          await handleEpochLength(event);
           break;
         case 'ExitStarted':
           await handleExit(event);

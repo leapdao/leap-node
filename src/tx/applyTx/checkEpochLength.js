@@ -8,13 +8,9 @@
 const { Type } = require('parsec-lib');
 
 module.exports = (state, tx) => {
-  if (tx.type !== Type.EPOCH) {
-    throw new Error('Epoch tx expected');
+  if (tx.type !== Type.EPOCH_LENGTH) {
+    throw new Error('epochLength tx expected');
   }
 
-  if (tx.options.epoch - state.epoch !== 1) {
-    throw new Error('Epoch should be increment by 1');
-  }
-
-  state.epoch = Number(tx.options.epoch);
+  state.epochLength = Number(tx.options.epochLength);
 };

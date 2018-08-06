@@ -284,6 +284,18 @@ module.exports = [
     inputs: [
       {
         indexed: false,
+        name: 'epochLength',
+        type: 'uint256',
+      },
+    ],
+    name: 'EpochLength',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
         name: 'blockNumber',
         type: 'uint256',
       },
