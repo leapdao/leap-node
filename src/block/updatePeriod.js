@@ -13,7 +13,7 @@ const { logPeriod } = require('../debug');
 
 module.exports = async (state, chainInfo, options) => {
   try {
-    const { node } = options;
+    const { node, bridge } = options;
     if (chainInfo.height % 32 === 0) {
       logPeriod('updatePeriod');
       node.previousPeriod = node.currentPeriod;
@@ -22,12 +22,16 @@ module.exports = async (state, chainInfo, options) => {
       submitPeriod(node.previousPeriod, state.slots, chainInfo.height, options);
     }
     if (chainInfo.height % 32 === 16) {
-      // ToDo: should try to activate in the right epoch
       // check if there is a validator slot that is "waiting for me"
+      const lastCompleteEpoch = await bridge.methods.lastCompleteEpoch().call();
       const myAuctionedSlots = getAuctionedByAddr(
         state.slots,
         node.account.address
-      ).map(({ id }) => id);
+      )
+        .filter(
+          ({ activationEpoch }) => activationEpoch - lastCompleteEpoch >= 2
+        )
+        .map(({ id }) => id);
       if (myAuctionedSlots.length > 0) {
         logPeriod('found some slots for activation', myAuctionedSlots);
         myAuctionedSlots.forEach(id => {
