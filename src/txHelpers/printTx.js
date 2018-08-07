@@ -9,6 +9,9 @@ module.exports = (state, tx) => {
     case Type.DEPOSIT: {
       return `deposit: ${printOutput(tx.outputs[0], '+')}`;
     }
+    case Type.EPOCH_LENGTH: {
+      return `epochLength: ${tx.options.epochLength}`;
+    }
     case Type.EXIT: {
       return `exit`;
     }

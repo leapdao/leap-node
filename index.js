@@ -109,25 +109,26 @@ async function run() {
   });
 
   app.useBlock(async (state, chainInfo) => {
-    try {
-      await updatePeriod(state, chainInfo, {
-        bridge,
-        web3,
-        node,
-      });
-      await addBlock(state, chainInfo, {
-        node,
-        db,
-      });
-      if (!cliArgs.no_validators_updates && state.slots.length > 0) {
-        await updateValidators(state, chainInfo);
-      }
-
-      updateEpoch(state, chainInfo);
-      logParsec('Height:', chainInfo.height);
-    } catch (err) {
-      logParsec('ERRBL', err);
+    await updatePeriod(state, chainInfo, {
+      bridge,
+      web3,
+      node,
+    });
+    await addBlock(state, chainInfo, {
+      node,
+      db,
+    });
+    if (!cliArgs.no_validators_updates && state.slots.length > 0) {
+      await updateValidators(state, chainInfo);
     }
+
+    updateEpoch(state, chainInfo);
+    logParsec(
+      'Height: %d, epoch: %d, epochLenght: %d',
+      chainInfo.height,
+      state.epoch,
+      state.epochLength
+    );
   });
 
   app.useBlock((state, { height }) => {
