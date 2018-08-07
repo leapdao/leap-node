@@ -59,10 +59,13 @@ async function run() {
       balances: {}, // stores account balances like this { [colorIndex]: { address1: 0, ... } }
       unspent: {}, // stores unspent outputs (deposits, transfers)
       processedDeposit: 0,
-      epoch: 0,
-      lastEpochHeight: 0,
-      epochLength: null,
       slots: [],
+      epoch: {
+        epoch: 0,
+        lastEpochHeight: 0,
+        epochLength: null,
+        epochLengthIndex: -1,
+      },
     },
     networkId: config.network,
     genesis: config.genesis,
@@ -126,8 +129,8 @@ async function run() {
     logParsec(
       'Height: %d, epoch: %d, epochLength: %d',
       chainInfo.height,
-      state.epoch,
-      state.epochLength
+      state.epoch.epoch,
+      state.epoch.epochLength
     );
   });
 
