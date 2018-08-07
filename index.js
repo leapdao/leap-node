@@ -124,7 +124,7 @@ async function run() {
 
     updateEpoch(state, chainInfo);
     logParsec(
-      'Height: %d, epoch: %d, epochLenght: %d',
+      'Height: %d, epoch: %d, epochLength: %d',
       chainInfo.height,
       state.epoch,
       state.epochLength
