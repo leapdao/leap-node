@@ -7,6 +7,7 @@
 
 const { Period, Outpoint } = require('parsec-lib');
 const ContractEventsSubscription = require('./eventsRelay/ContractEventsSubscription');
+const { handleEvents } = require('./utils');
 
 module.exports = class Node {
   constructor(db, web3, bridge, config) {
@@ -35,43 +36,28 @@ module.exports = class Node {
       this.bridge
     );
 
-    const handleDeposit = ({
-      returnValues: { depositId, depositor, color, amount },
-    }) => {
-      this.deposits[depositId] = {
-        depositor,
-        color,
-        amount,
-      };
-    };
-
-    const handleExit = ({
-      returnValues: { txHash, outIndex, color, exitor, amount },
-    }) => {
-      const outpoint = new Outpoint(txHash, outIndex);
-      this.exits[outpoint.getUtxoId()] = {
-        txHash,
-        outIndex,
-        exitor,
-        color,
-        amount,
-      };
-    };
-    eventsSubscription.on('events', events => {
-      events.forEach(event => {
-        switch (event.event) {
-          case 'NewDeposit': {
-            handleDeposit(event);
-            break;
-          }
-          case 'ExitStarted': {
-            handleExit(event);
-            break;
-          }
-          default:
-        }
-      });
-    });
+    eventsSubscription.on(
+      'events',
+      handleEvents({
+        NewDeposit: ({ returnValues: event }) => {
+          this.deposits[event.depositId] = {
+            depositor: event.depositor,
+            color: event.color,
+            amount: event.amount,
+          };
+        },
+        ExitStarted: ({ returnValues: event }) => {
+          const outpoint = new Outpoint(event.txHash, event.outIndex);
+          this.exits[outpoint.getUtxoId()] = {
+            txHash: event.txHash,
+            outIndex: event.outIndex,
+            exitor: event.exitor,
+            color: event.color,
+            amount: event.amount,
+          };
+        },
+      })
+    );
     await eventsSubscription.init();
   }
 };
