@@ -9,6 +9,7 @@ const constants = require('./constants');
 
 Object.assign(exports, constants);
 
+exports.handleEvents = require('./handleEvents');
 exports.getCurrentSlotId = require('./getCurrentSlotId');
 exports.readSlots = require('./readSlots');
 exports.sendTransaction = require('./sendTransaction');
