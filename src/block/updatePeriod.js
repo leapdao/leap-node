@@ -27,7 +27,9 @@ module.exports = async (state, chainInfo, options) => {
         state.slots,
         node.account.address
       )
-        .filter(({ activationEpoch }) => activationEpoch - state.epoch >= 2)
+        .filter(
+          ({ activationEpoch }) => activationEpoch - state.epoch.epoch >= 2
+        )
         .map(({ id }) => id);
       if (myAuctionedSlots.length > 0) {
         logPeriod('found some slots for activation', myAuctionedSlots);

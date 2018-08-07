@@ -18,8 +18,11 @@ const getInitialState = () => ({
   unspent: {},
   processedDeposit: 11,
   slots: [],
-  epochLength: null,
-  lastEpochHeight: 0,
+  epoch: {
+    epoch: 0,
+    epochLength: null,
+    epochLengthIndex: -1,
+  },
 });
 
 const makeDepositMock = (depositor, amount, color) => {
@@ -571,8 +574,32 @@ describe('epochLength', () => {
     const state = getInitialState();
     const epochLength = Tx.epochLength(4);
 
-    applyTx(state, epochLength);
+    applyTx(state, epochLength, {
+      epochLengths: [4],
+    });
 
-    expect(state.epochLength).toBe(4);
+    expect(state.epoch.epochLength).toBe(4);
+  });
+
+  test('tx without corresponding event', () => {
+    const state = getInitialState();
+    const epochLength = Tx.epochLength(4);
+
+    expect(() => {
+      applyTx(state, epochLength, {
+        epochLengths: [],
+      });
+    }).toThrow('Unknown epochLength change');
+  });
+
+  test('epoch length mismatch', () => {
+    const state = getInitialState();
+    const epochLength = Tx.epochLength(4);
+
+    expect(() => {
+      applyTx(state, epochLength, {
+        epochLengths: [5],
+      });
+    }).toThrow('Wrong epoch length');
   });
 });

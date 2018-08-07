@@ -7,10 +7,22 @@
 
 const { Type } = require('parsec-lib');
 
-module.exports = (state, tx) => {
+module.exports = (state, tx, node) => {
   if (tx.type !== Type.EPOCH_LENGTH) {
     throw new Error('epochLength tx expected');
   }
 
-  state.epochLength = Number(tx.options.epochLength);
+  if (state.epoch.epochLengthIndex + 1 !== node.epochLengths.length - 1) {
+    throw new Error('Unknown epochLength change');
+  }
+
+  if (
+    node.epochLengths[state.epoch.epochLengthIndex + 1] !==
+    tx.options.epochLength
+  ) {
+    throw new Error('Wrong epoch length');
+  }
+
+  state.epoch.epochLengthIndex += 1;
+  state.epoch.epochLength = tx.options.epochLength;
 };

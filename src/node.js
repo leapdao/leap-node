@@ -22,6 +22,7 @@ module.exports = class Node {
     this.previousPeriod = null;
     this.deposits = {};
     this.exits = {};
+    this.epochLengths = [];
     this.account = web3.eth.accounts.privateKeyToAccount(config.privKey);
   }
 
@@ -55,6 +56,9 @@ module.exports = class Node {
             color: event.color,
             amount: event.amount,
           };
+        },
+        EpochLength: ({ returnValues: event }) => {
+          this.epochLengths.push(Number(event.epochLength));
         },
       })
     );
