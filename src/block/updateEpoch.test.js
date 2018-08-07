@@ -26,7 +26,7 @@ test('epoch update', () => {
   expect(state.lastEpochHeight).toBe(256);
 });
 
-test('epoch update (chaned epochLength)', () => {
+test('epoch update (changed epochLength)', () => {
   const state = {
     epochLength: 5,
     lastEpochHeight: 128, // epochLength was 4
@@ -36,4 +36,15 @@ test('epoch update (chaned epochLength)', () => {
   updateEpoch(state, { height: 290 });
   expect(state.epoch).toBe(2);
   expect(state.lastEpochHeight).toBe(288);
+});
+
+test('epoch update (empty epochLength)', () => {
+  const state = {
+    epochLength: 0,
+    lastEpochHeight: 0,
+    epoch: 0,
+  };
+
+  updateEpoch(state, { height: 20 });
+  expect(state.epoch).toBe(0);
 });
