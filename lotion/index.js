@@ -3,6 +3,7 @@
 const getPort = require('get-port');
 const fs = require('fs-extra');
 const level = require('level');
+const axios = require('axios');
 const { join } = require('path');
 const ABCIServer = require('./lib/abci-app.js');
 const TxServer = require('./lib/tx-server.js');
@@ -237,6 +238,13 @@ function Lotion(opts = {}) {
       txHTTPServer.close();
     },
     lotionPath: () => lotionPath,
+    status: async () => {
+      const { tendermintPort } = await getPorts(undefined, opts.tendermintPort);
+      const tendermintRpcUrl = `http://localhost:${tendermintPort}`;
+      return axios
+        .get(`${tendermintRpcUrl}/status`)
+        .then(rsp => rsp.data.result);
+    },
   };
 
   return appMethods;

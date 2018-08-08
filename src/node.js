@@ -14,7 +14,6 @@ module.exports = class Node {
     this.db = db;
     this.web3 = web3;
     this.bridge = bridge;
-    this.replay = true;
     this.blockHeight = 0;
     this.currentState = null;
     this.networkId = config.networkId;

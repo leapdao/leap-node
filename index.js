@@ -150,12 +150,10 @@ async function run() {
   });
 
   app.listen(cliArgs.port).then(async params => {
-    node.replay = false;
-
     await eventsRelay(params.txServerPort, web3, bridge);
     await printStartupInfo(params, node, bridge);
 
-    const api = await jsonrpc(node, params.txServerPort, db, bridge);
+    const api = await jsonrpc(node, params.txServerPort, db, bridge, app);
     api
       .listenHttp({ port: cliArgs.rpcport, host: cliArgs.rpcaddr })
       .then(addr => {
