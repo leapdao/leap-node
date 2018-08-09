@@ -25,7 +25,7 @@ api.use(jsonParser());
 /*
 * Starts JSON RPC server
 */
-module.exports = async (node, lotionPort, db, bridge) => {
+module.exports = async (node, lotionPort, db, bridge, app) => {
   const getNetwork = async () => node.networkId;
 
   const getBalance = async (address, tag = 'latest') => {
@@ -79,6 +79,19 @@ module.exports = async (node, lotionPort, db, bridge) => {
     }
 
     return `0x${color.toString(16)}`;
+  };
+
+  const getNodeStatus = async () => {
+    const status = await app.status();
+    if (status.sync_info.catching_up) {
+      return 'catching-up';
+    }
+
+    if (node.checkCallsCount > 0) {
+      return 'waiting-for-period';
+    }
+
+    return 'ok';
   };
 
   const sendRawTransaction = async rawTx => {
@@ -207,6 +220,7 @@ module.exports = async (node, lotionPort, db, bridge) => {
     parsec_unspent: getUnspent,
     parsec_getColor: getColor,
     parsec_getColors: getColors,
+    parsec_status: getNodeStatus,
   };
 
   const apiMethodsWithCallback = Object.keys(nodeApi).reduce((set, key) => {
