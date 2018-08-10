@@ -119,7 +119,7 @@ module.exports = async (node, lotionPort, db, bridge, app) => {
       blockNumber: `0x${height.toString(16)}`,
       transactionIndex: txPos,
       // assuming first output is transfer, second one is change
-      value: tx.outputs && tx.outputs.length ? tx.outputs[0].value : null,
+      value: tx.outputs && tx.outputs.length ? tx.outputs[0].value : 0,
       to: tx.outputs && tx.outputs.length ? tx.outputs[0].address : null,
       gas: '0x0',
       gasPrice: '0x0',
