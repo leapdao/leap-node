@@ -12,47 +12,41 @@ const { getAuctionedByAddr } = require('../utils');
 const { logPeriod } = require('../debug');
 
 module.exports = async (state, chainInfo, bridgeState) => {
-  try {
-    if (chainInfo.height % 32 === 0) {
-      logPeriod('updatePeriod');
-      bridgeState.previousPeriod = bridgeState.currentPeriod;
-      bridgeState.currentPeriod = new Period(
-        bridgeState.previousPeriod.merkleRoot()
-      );
-      bridgeState.checkCallsCount = 0;
-      submitPeriod(
-        bridgeState.previousPeriod,
-        state.slots,
-        chainInfo.height,
-        bridgeState
-      );
-    }
-    if (chainInfo.height % 32 === 16) {
-      // check if there is a validator slot that is "waiting for me"
-      const myAuctionedSlots = getAuctionedByAddr(
-        state.slots,
-        bridgeState.account.address
-      )
-        .filter(
-          ({ activationEpoch }) => activationEpoch - state.epoch.epoch >= 2
-        )
-        .map(({ id }) => id);
-      if (myAuctionedSlots.length > 0) {
-        logPeriod('found some slots for activation', myAuctionedSlots);
-        myAuctionedSlots.forEach(id => {
-          const tx = activateSlot(id, bridgeState);
-          tx.catch(err => {
-            logPeriod('activation error', err.message);
-          });
-          if (typeof tx.on === 'function') {
-            tx.on('transactionHash', txHash => {
-              logPeriod('activate', id, txHash);
-            });
-          }
+  if (chainInfo.height % 32 === 0) {
+    logPeriod('updatePeriod');
+    bridgeState.previousPeriod = bridgeState.currentPeriod;
+    bridgeState.currentPeriod = new Period(
+      bridgeState.previousPeriod.merkleRoot()
+    );
+    bridgeState.checkCallsCount = 0;
+    submitPeriod(
+      bridgeState.previousPeriod,
+      state.slots,
+      chainInfo.height,
+      bridgeState
+    );
+  }
+  if (chainInfo.height % 32 === 16) {
+    // check if there is a validator slot that is "waiting for me"
+    const myAuctionedSlots = getAuctionedByAddr(
+      state.slots,
+      bridgeState.account.address
+    )
+      .filter(({ activationEpoch }) => activationEpoch - state.epoch.epoch >= 2)
+      .map(({ id }) => id);
+    if (myAuctionedSlots.length > 0) {
+      logPeriod('found some slots for activation', myAuctionedSlots);
+      myAuctionedSlots.forEach(id => {
+        const tx = activateSlot(id, bridgeState);
+        tx.catch(err => {
+          logPeriod('activation error', err.message);
         });
-      }
+        if (typeof tx.on === 'function') {
+          tx.on('transactionHash', txHash => {
+            logPeriod('activate', id, txHash);
+          });
+        }
+      });
     }
-  } catch (err) {
-    console.error(err);
   }
 };
