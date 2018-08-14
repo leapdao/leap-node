@@ -9,6 +9,11 @@ const options = [
     help: 'Print this help',
   },
   {
+    names: ['version'],
+    type: 'bool',
+    help: 'Print version',
+  },
+  {
     names: ['no-validators-updates'],
     type: 'bool',
     default: false,
@@ -71,6 +76,11 @@ const cliArgs = parser.parse(process.argv);
 if (cliArgs.help) {
   console.log('Usage:');
   console.log(parser.help({ includeEnv: true }).trimRight());
+  process.exit(0);
+}
+
+if (cliArgs.version) {
+  console.log(`v${require('../package.json').version}`); // eslint-disable-line
   process.exit(0);
 }
 

@@ -26,6 +26,7 @@ title: How to use
 - `wsport` — port for websocket RPC server (default: 8546)
 - `p2pPort` — port for p2p connection (default: random)
 - `config` — path to config file
+- `version` — print version of the node
 
 ### Config file options
 
