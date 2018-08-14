@@ -8,8 +8,8 @@ title: JSON RPC API
 
 **Transport**
 
-* HTTP: Listens on port `8545`
-* WebSockets: Listens on port `8546`
+* HTTP: Listens on port `9545`
+* WebSockets: Listens on port `9546`
 
 **Types in the JSONRPC**
 

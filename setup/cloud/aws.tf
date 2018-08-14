@@ -23,7 +23,7 @@ resource "aws_instance" "parsec_node" {
       user     = "ubuntu"
     }
   }
-  
+
   provisioner "remote-exec" {
     inline = [
       "sudo /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=1024",
@@ -121,16 +121,16 @@ resource "aws_security_group" "parsec_tendermint" {
   }
 
   ingress {
-    from_port   = 8545
-    to_port     = 8545
+    from_port   = 9545
+    to_port     = 9545
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
     description = "JSON RPC over HTTP"
   }
 
   ingress {
-    from_port   = 8546
-    to_port     = 8546
+    from_port   = 9546
+    to_port     = 9546
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
     description = "JSON RPC over WebSockets"

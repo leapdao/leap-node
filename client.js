@@ -16,7 +16,7 @@ const unspentForAddress = require('./src/utils/unspentForAddress');
 const sendTx = require('./src/txHelpers/sendTx');
 
 const web3 = new Web3('https://rinkeby.infura.io');
-const parsecWeb3 = new Web3('http://localhost:8545');
+const parsecWeb3 = new Web3('http://localhost:9545');
 
 const privKey =
   '0xad8e31c8862f5f86459e7cca97ac9302c5e1817077902540779eef66e21f394a';

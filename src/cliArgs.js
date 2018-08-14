@@ -34,7 +34,7 @@ const options = [
   {
     names: ['rpcport'],
     type: 'number',
-    default: 8545,
+    default: 9545,
     help: 'Port for http RPC server',
   },
   {
@@ -46,7 +46,7 @@ const options = [
   {
     names: ['wsport'],
     type: 'number',
-    default: 8546,
+    default: 9546,
     help: 'Port for websocket RPC server',
   },
   {
