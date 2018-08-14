@@ -2,11 +2,12 @@ site_name: PARSEC Labs
 theme: readthedocs
 
 pages:
-  - Home: index.md
-  - How to use: how-to-use.md
-  - Becomin validator: becoming-validator.md
+  - 'Home': index.md
+  - 'How to use': how-to-use.md
+  - 'Becomin validator': becoming-validator.md
   - 'JSON RPC':
-    - Overview: json-rpc/overview.md
+    - 'Overview': json-rpc/overview.md
+    - 'HTTPS support': json-rpc/https.md
     - 'web3.eth': json-rpc/web3.eth.md
     - 'web3.net': json-rpc/web3.net.md
     - 'web3.parsec': json-rpc/web3.parsec.md
