@@ -12,14 +12,14 @@ const printTx = require('../txHelpers/printTx');
 
 const { logTx } = require('../debug');
 
-module.exports = bridgeState => (state, { encoded }) => {
+module.exports = bridgeState => (state, { encoded }, _, isCheck) => {
   const tx = Tx.fromRaw(encoded);
   const printedTx = printTx(state, tx);
 
   applyTx(state, tx, bridgeState);
   accumulateTx(state, tx);
 
-  if (printedTx) {
+  if (printedTx && !isCheck) {
     logTx(printedTx);
   }
 };
