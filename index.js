@@ -15,6 +15,7 @@ const { Tx } = require('parsec-lib');
 
 const cliArgs = require('./src/cliArgs');
 const cleanupLotion = require('./src/cleanupLotion');
+const readConfig = require('./src/readConfig');
 const Db = require('./src/api/db');
 const jsonrpc = require('./src/api/jsonrpc');
 
@@ -42,12 +43,7 @@ const writeFile = promisify(fs.writeFile);
 const exists = promisify(fs.exists);
 
 async function run() {
-  const config = JSON.parse(await readFile(cliArgs.config));
-
-  if (!config.bridgeAddr) {
-    console.error('bridgeAddr is required');
-    process.exit(0);
-  }
+  const config = await readConfig(cliArgs.config);
 
   const web3 = new Web3();
   web3.setProvider(new web3.providers.HttpProvider(config.rootNetwork));
