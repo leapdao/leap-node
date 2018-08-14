@@ -1,7 +1,0 @@
-{
-  "bridgeAddr": "0x099303c83fda47570b255a8fcebf5f8dd86e015e",
-  "rootNetwork": "https://rinkeby.infura.io",
-  "genesis": {"app_hash":"5b88a10e99ae3d215bbbf4e316b9074885d1a857da91a18a9cbe1c3faf822a8d","chain_id":"test-chain-l8mul9","genesis_time":"2018-07-08T11:31:42.509487925Z","validators":[{"name":"","power":10,"pub_key":{"type":"AC26791624DE60","value":"+Stl7q7wASVbrGLjGuho3eeyPB4ZV9wxXIenkC0GFGk="}}]},
-  "network": "016fbd33717ad6d8b8337e06518adc9d30772aecc277257ada6a7bda394d70eb",
-  "peers": ["3bcad3a396eda2132ab70180986caa1f4a405638@34.254.247.1:46691"]
-}

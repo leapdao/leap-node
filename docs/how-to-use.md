@@ -37,7 +37,7 @@ title: How to use
 
 ### Config presets
 
-Dev config file: <a href="https://raw.githubusercontent.com/parsec-labs/parsec-node/master/presets/parsec-rainbow.json" download>parsec-rainbow.json</a>
+Dev config file: <a href="https://raw.githubusercontent.com/parsec-labs/parsec-node/master/presets/parsec-testnet-alpha.json" download>parsec-testnet-alpha.json</a>
 
 Testnet config file: N/A
 
