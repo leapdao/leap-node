@@ -5,15 +5,24 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
+const Web3 = require('web3');
 const { Period, Outpoint } = require('parsec-lib');
+const bridgeABI = require('./bridgeABI');
 const ContractEventsSubscription = require('./eventsRelay/ContractEventsSubscription');
 const { handleEvents } = require('./utils');
 
-module.exports = class Node {
-  constructor(db, web3, bridge, config) {
+module.exports = class BridgeState {
+  constructor(db, config) {
+    this.web3 = new Web3();
+    this.web3.setProvider(
+      new this.web3.providers.HttpProvider(config.rootNetwork)
+    );
+    this.contract = new this.web3.eth.Contract(bridgeABI, config.bridgeAddr);
+    this.account = config.privKey
+      ? this.web3.eth.accounts.privateKeyToAccount(config.privKey)
+      : this.web3.eth.accounts.create();
+
     this.db = db;
-    this.web3 = web3;
-    this.bridge = bridge;
     this.blockHeight = 0;
     this.currentState = null;
     this.networkId = config.networkId;
@@ -22,7 +31,6 @@ module.exports = class Node {
     this.deposits = {};
     this.exits = {};
     this.epochLengths = [];
-    this.account = web3.eth.accounts.privateKeyToAccount(config.privKey);
   }
 
   async init() {
@@ -33,7 +41,7 @@ module.exports = class Node {
   async watchContractEvents() {
     const eventsSubscription = new ContractEventsSubscription(
       this.web3,
-      this.bridge
+      this.contract
     );
 
     eventsSubscription.on(

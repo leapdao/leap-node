@@ -8,10 +8,9 @@
 const submitPeriod = require('../txHelpers/submitPeriod');
 const { logPeriod } = require('../debug');
 
-module.exports = async (rsp, chainInfo, _, options) => {
+module.exports = bridgeState => async (rsp, chainInfo) => {
   try {
     const height = chainInfo.height - 32;
-    const { node } = options;
     if (height === 0) {
       // genesis height doesn't need check
       rsp.status = 1;
@@ -20,10 +19,10 @@ module.exports = async (rsp, chainInfo, _, options) => {
 
     logPeriod('checkBridge');
     const contractPeriod = await submitPeriod(
-      node.previousPeriod,
-      node.currentState.slots,
-      height + node.checkCallsCount,
-      options
+      bridgeState.previousPeriod,
+      bridgeState.currentState.slots,
+      height + bridgeState.checkCallsCount,
+      bridgeState
     );
 
     if (contractPeriod.timestamp === '0') {
@@ -32,7 +31,7 @@ module.exports = async (rsp, chainInfo, _, options) => {
       rsp.status = 1;
     }
 
-    node.checkCallsCount += 1;
+    bridgeState.checkCallsCount += 1;
   } catch (err) {
     console.error(err);
   }

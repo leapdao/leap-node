@@ -25,8 +25,8 @@ api.use(jsonParser());
 /*
 * Starts JSON RPC server
 */
-module.exports = async (node, lotionPort, db, bridge, app) => {
-  const getNetwork = async () => node.networkId;
+module.exports = async (bridgeState, lotionPort, db, app) => {
+  const getNetwork = async () => bridgeState.networkId;
 
   const getBalance = async (address, tag = 'latest') => {
     if (tag !== 'latest') {
@@ -37,26 +37,26 @@ module.exports = async (node, lotionPort, db, bridge, app) => {
       };
       /* eslint-enable no-throw-literal */
     }
-    const balances = node.currentState.balances['0'] || {};
+    const balances = bridgeState.currentState.balances['0'] || {};
     const balance = balances[address] || 0;
     return `0x${balance.toString(16)}`;
   };
 
   const getBlockNumber = async () => {
-    return `0x${node.blockHeight.toString(16)}`;
+    return `0x${bridgeState.blockHeight.toString(16)}`;
   };
 
   const getUnspent = async address => {
-    const { unspent } = node.currentState;
+    const { unspent } = bridgeState.currentState;
     return unspentForAddress(unspent, address);
   };
 
   let tokens = [];
   const getColors = async () => {
-    const tokenCount = await bridge.methods.tokenCount().call();
+    const tokenCount = await bridgeState.contract.methods.tokenCount().call();
     if (tokenCount !== tokens.length) {
       const tokenData = range(0, tokenCount - 1).map(i =>
-        bridge.methods.tokens(i).call()
+        bridgeState.contract.methods.tokens(i).call()
       );
 
       tokens = (await Promise.all(tokenData)).map(o => o.addr.toLowerCase());
@@ -87,7 +87,7 @@ module.exports = async (node, lotionPort, db, bridge, app) => {
       return 'catching-up';
     }
 
-    if (node.checkCallsCount > 0) {
+    if (bridgeState.checkCallsCount > 0) {
       return 'waiting-for-period';
     }
 
@@ -160,7 +160,7 @@ module.exports = async (node, lotionPort, db, bridge, app) => {
   const getBlockByNumber = async (heightOrTag, showFullTxs = false) => {
     let height = heightOrTag;
     if (heightOrTag === 'latest') {
-      height = node.blockHeight;
+      height = bridgeState.blockHeight;
     } else if (typeof height === 'string' && height.indexOf('0x') === 0) {
       height = parseInt(height, 16);
     }
@@ -183,7 +183,7 @@ module.exports = async (node, lotionPort, db, bridge, app) => {
       // balanceOf
       const color = String(parseInt(await getColor(txObj.to), 16));
       const address = `0x${txObj.data.substring(txObj.data.length - 40)}`;
-      const balances = node.currentState.balances[color] || {};
+      const balances = bridgeState.currentState.balances[color] || {};
       const balance = balances[address] || 0;
       return `0x${balance.toString(16)}`;
     }

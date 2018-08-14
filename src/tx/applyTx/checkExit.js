@@ -7,7 +7,7 @@
 
 const { Type } = require('parsec-lib');
 
-module.exports = (state, tx, node) => {
+module.exports = (state, tx, bridgeState) => {
   if (tx.type !== Type.EXIT) {
     throw new Error('Exit tx expected');
   }
@@ -18,7 +18,7 @@ module.exports = (state, tx, node) => {
 
   const [{ prevout }] = tx.inputs;
   const unspent = state.unspent[prevout.hex()];
-  const exit = node.exits[prevout.getUtxoId()];
+  const exit = bridgeState.exits[prevout.getUtxoId()];
   if (
     !exit ||
     exit.exitor !== unspent.address ||

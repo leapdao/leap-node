@@ -8,7 +8,7 @@
 const { Type } = require('parsec-lib');
 const { addrCmp } = require('../../utils');
 
-module.exports = (state, tx, node) => {
+module.exports = (state, tx, bridgeState) => {
   if (tx.type !== Type.DEPOSIT) {
     throw new Error('Deposit tx expected');
   }
@@ -23,7 +23,7 @@ module.exports = (state, tx, node) => {
       }`
     );
   }
-  const deposit = node.deposits[tx.options.depositId];
+  const deposit = bridgeState.deposits[tx.options.depositId];
   if (
     !deposit ||
     Number(deposit.amount) !== tx.outputs[0].value ||

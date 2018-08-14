@@ -10,8 +10,6 @@
 const fs = require('fs');
 const path = require('path');
 const { promisify } = require('util');
-const Web3 = require('web3');
-const { Tx } = require('parsec-lib');
 
 const cliArgs = require('./src/cliArgs');
 const cleanupLotion = require('./src/cleanupLotion');
@@ -19,24 +17,16 @@ const readConfig = require('./src/readConfig');
 const Db = require('./src/api/db');
 const jsonrpc = require('./src/api/jsonrpc');
 
-const bridgeABI = require('./src/bridgeABI');
-const applyTx = require('./src/tx/applyTx');
-const accumulateTx = require('./src/tx/accumulateTx');
-
-const addBlock = require('./src/block/addBlock');
-const updatePeriod = require('./src/block/updatePeriod');
-const updateValidators = require('./src/block/updateValidators');
-const updateEpoch = require('./src/block/updateEpoch');
-
-const checkBridge = require('./src/period/checkBridge');
+const txHandler = require('./src/tx');
+const blockHandler = require('./src/block');
+const periodHandler = require('./src/period');
 
 const eventsRelay = require('./src/eventsRelay');
 const { printStartupInfo } = require('./src/utils');
-const printTx = require('./src/txHelpers/printTx');
-const Node = require('./src/node');
+const BridgeState = require('./src/bridgeState');
 const lotion = require('./lotion');
 
-const { logParsec, logTendermint, logTx } = require('./src/debug');
+const { logParsec, logTendermint } = require('./src/debug');
 
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
@@ -44,10 +34,6 @@ const exists = promisify(fs.exists);
 
 async function run() {
   const config = await readConfig(cliArgs.config);
-
-  const web3 = new Web3();
-  web3.setProvider(new web3.providers.HttpProvider(config.rootNetwork));
-  const bridge = new web3.eth.Contract(bridgeABI, config.bridgeAddr);
 
   const app = lotion({
     initialState: {
@@ -81,75 +67,31 @@ async function run() {
     await cleanupLotion(app);
   }
 
+  const db = Db(app);
+
   const privFilename = path.join(path.dirname(cliArgs.config), '.priv');
   if (await exists(privFilename)) {
     config.privKey = await readFile(privFilename);
-  } else {
-    const { privateKey } = web3.eth.accounts.create();
-    config.privKey = privateKey;
-    await writeFile(privFilename, privateKey);
   }
 
-  const db = Db(app);
+  const bridgeState = new BridgeState(db, config);
+  await bridgeState.init();
 
-  const node = new Node(db, web3, bridge, config);
-  await node.init();
+  await writeFile(privFilename, bridgeState.account.privateKey);
 
-  app.useTx((state, { encoded }) => {
-    const tx = Tx.fromRaw(encoded);
-    const printedTx = printTx(state, tx);
-
-    applyTx(state, tx, node, bridge);
-    accumulateTx(state, tx);
-
-    if (printedTx) {
-      logTx(printedTx);
-    }
-  });
-
-  app.useBlock(async (state, chainInfo) => {
-    await updatePeriod(state, chainInfo, {
-      bridge,
-      web3,
-      node,
-    });
-    await addBlock(state, chainInfo, {
-      node,
-      db,
-    });
-    if (!cliArgs.no_validators_updates && state.slots.length > 0) {
-      await updateValidators(state, chainInfo);
-    }
-
-    updateEpoch(state, chainInfo);
-    logParsec(
-      'Height: %d, epoch: %d, epochLength: %d',
-      chainInfo.height,
-      state.epoch.epoch,
-      state.epoch.epochLength
-    );
-  });
-
-  app.useBlock((state, { height }) => {
-    // state is merk here. TODO: assign object copy or something immutable
-    node.currentState = state;
-    node.blockHeight = height;
-  });
-
-  app.usePeriod(async (rsp, chainInfo, height) => {
-    await checkBridge(rsp, chainInfo, height, {
-      node,
-      web3,
-      bridge,
-      privKey: config.privKey,
-    });
-  });
+  app.useTx(txHandler(bridgeState));
+  app.useBlock(blockHandler(bridgeState, db, cliArgs.no_validators_updates));
+  app.usePeriod(periodHandler(bridgeState));
 
   app.listen(cliArgs.port).then(async params => {
-    await eventsRelay(params.txServerPort, web3, bridge);
-    await printStartupInfo(params, node, bridge);
+    await eventsRelay(
+      params.txServerPort,
+      bridgeState.web3,
+      bridgeState.contract
+    );
+    await printStartupInfo(params, bridgeState);
 
-    const api = await jsonrpc(node, params.txServerPort, db, bridge, app);
+    const api = await jsonrpc(bridgeState, params.txServerPort, db, app);
     api
       .listenHttp({ port: cliArgs.rpcport, host: cliArgs.rpcaddr })
       .then(addr => {

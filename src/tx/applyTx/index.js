@@ -25,14 +25,14 @@ const checks = {
   [Type.VALIDATOR_LOGOUT]: checkValidatorLogout,
 };
 
-module.exports = (state, tx, node) => {
+module.exports = (state, tx, bridgeState) => {
   if (!checks[tx.type]) {
     throw new Error('Unsupported tx type');
   }
 
   checkOutpoints(state, tx);
 
-  checks[tx.type](state, tx, node);
+  checks[tx.type](state, tx, bridgeState);
 
   removeInputs(state, tx);
   addOutputs(state, tx);

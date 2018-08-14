@@ -42,12 +42,12 @@ test('addBlock', () => {
   ).signAll(PRIV_1);
 
   const state = { mempool: [tx1.toJSON(), tx2.toJSON(), tx3.toJSON()] };
-  const node = {
+  const bridgeState = {
     currentPeriod: new Period(),
     account: { address: ADDR_1 },
   };
-  addBlock(state, { height: 1 }, { node });
-  const { blockList } = node.currentPeriod;
+  addBlock(state, { height: 1 }, { bridgeState });
+  const { blockList } = bridgeState.currentPeriod;
   expect(blockList.length).toBe(1);
   const { txList } = blockList[0];
   expect(txList.length).toBe(3);

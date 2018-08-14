@@ -17,8 +17,8 @@ const { logParsec } = require('../debug');
 
 const readFile = promisify(fs.readFile);
 
-module.exports = async (params, node, bridge) => {
-  logParsec(`Last block synced: ${node.lastBlockSynced}`);
+module.exports = async (params, bridgeState) => {
+  logParsec(`Last block synced: ${bridgeState.lastBlockSynced}`);
 
   const validatorKeyPath = path.join(
     params.lotionPath,
@@ -31,8 +31,8 @@ module.exports = async (params, node, bridge) => {
     validatorKey.pub_key.value,
     'base64'
   ).toString('hex');
-  const slots = await readSlots(bridge);
-  const mySlots = getSlotsByAddr(slots, node.account.address);
+  const slots = await readSlots(bridgeState.contract);
+  const mySlots = getSlotsByAddr(slots, bridgeState.account.address);
 
   mySlots.forEach(slot => {
     if (
@@ -52,11 +52,13 @@ module.exports = async (params, node, bridge) => {
     );
     console.log(
       `  Open ${colors.bold(
-        `http://stake-dev.parseclabs.org/#${bridge.options.address}`
+        `http://stake-dev.parseclabs.org/#${
+          bridgeState.contract.options.address
+        }`
       )} and buy a slot`
     );
     console.log(
-      `  ${colors.bold('Validator address:')}\t${node.account.address}`
+      `  ${colors.bold('Validator address:')}\t${bridgeState.account.address}`
     );
     console.log(`  ${colors.bold('Validator ID:')}\t\t${validatorID}`);
     console.log('\n');
