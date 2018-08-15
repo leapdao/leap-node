@@ -45,7 +45,7 @@ module.exports = async (txServerPort, web3, bridge) => {
     },
     ValidatorJoin: handleJoin,
     ValidatorUpdate: handleJoin,
-    validatorLogout: async event => {
+    ValidatorLogout: async event => {
       const tx = Tx.validatorLogout(
         event.returnValues.slotId,
         event.returnValues.tenderAddr,
