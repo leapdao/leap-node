@@ -1,9 +1,8 @@
 /* eslint-disable no-await-in-loop */
 
 const createABCIServer = require('abci');
-const merk = require('merk');
 const decodeTx = require('./tx-encoding.js').decode;
-const { clone } = require('jsondiffpatch');
+const jsondiffpatch = require('jsondiffpatch');
 const getRoot = require('./get-root.js');
 const { stringify } = require('deterministic-json');
 
@@ -14,20 +13,41 @@ async function runTx(
   chainInfo,
   allowMutation = false
 ) {
-  const newChainInfo = clone(chainInfo);
+  let stateMutated = false;
+  // TODO: mutate store then use merk.rollback instead of cloning state
+  const newChainInfo = jsondiffpatch.clone(chainInfo);
+  const newState = jsondiffpatch.clone(store);
+  const proxy = {
+    get: (target, name) => {
+      if (typeof target[name] === 'object' && target[name] !== null) {
+        return new Proxy(target[name], proxy);
+      }
+      return target[name];
+    },
+    set: (target, name, newValue) => {
+      const oldValue = target[name];
+      target[name] = newValue;
+      if (newValue !== oldValue) {
+        stateMutated = true;
+      }
+      return true;
+    },
+  };
+  const hookedState = new Proxy(newState, proxy);
+  const hookedChainInfo = new Proxy(chainInfo, proxy);
+  // run middleware stack
   try {
-    // run middleware stack
     for (const txHandler of txMiddleware) {
-      await txHandler(store, tx, newChainInfo, allowMutation);
+      await txHandler(hookedState, tx, hookedChainInfo, allowMutation);
     }
   } catch (e) {
     return [false, e.toString()];
   }
-  const stateMutated = Object.keys(merk.mutations(store).before).length > 0;
   if (allowMutation) {
-    await merk.commit(store);
+    Object.assign(chainInfo, newChainInfo);
+    Object.assign(store, newState);
   } else {
-    merk.rollback(store);
+    // merk.rollback(store)
   }
   return [
     stateMutated,
@@ -112,7 +132,6 @@ module.exports = function configureABCIServer({
     blockMiddleware.forEach(blockHandler => {
       blockHandler(store, chainInfo);
     });
-    await merk.commit(store);
     const appHash = await getRoot(store);
     return { data: appHash };
   };
