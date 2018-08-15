@@ -69,6 +69,10 @@ Some usefule commands:
 - check the logs: `ssh ubuntu@<ec2 host> journalctl -u parsec`
 - start/stop/restart/status: `ssh ubuntu@<ec2 host> sudo service parsec start/stop/restart/status`
 
+## Dive in development
+
+https://github.com/parsec-labs/parsec-contracts/wiki/Setting-up-local-development-environment
+
 ## Staking UI
 
 Dev: http://stake-dev.parseclabs.org/
