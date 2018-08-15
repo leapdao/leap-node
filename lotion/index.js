@@ -162,6 +162,7 @@ function Lotion(opts = {}) {
           await initializer(appState);
         }
         Object.assign(store, appState);
+        await merk.commit(store);
         const initialAppHash = (await getRoot(store)).toString('hex');
         abciServer = ABCIServer({
           txMiddleware,
