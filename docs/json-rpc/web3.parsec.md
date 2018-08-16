@@ -26,7 +26,7 @@ params: ["0x407d73d8a49eeb85d32cf465507dd71d507100c1"]
 
 Request
 ```bash
-curl --data '{"method":"parsec_unspent","params":["0x407d73d8a49eeb85d32cf465507dd71d507100c1"],"id":1,"jsonrpc":"2.0"}' -H "Content-Type: application/json" -X POST localhost:9545
+curl --data '{"method":"parsec_unspent","params":["0x407d73d8a49eeb85d32cf465507dd71d507100c1"],"id":1,"jsonrpc":"2.0"}' -H "Content-Type: application/json" -X POST localhost:8645
 ```
 
 Response

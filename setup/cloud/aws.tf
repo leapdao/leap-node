@@ -121,16 +121,16 @@ resource "aws_security_group" "parsec_tendermint" {
   }
 
   ingress {
-    from_port   = 9545
-    to_port     = 9545
+    from_port   = 8645
+    to_port     = 8645
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
     description = "JSON RPC over HTTP"
   }
 
   ingress {
-    from_port   = 9546
-    to_port     = 9546
+    from_port   = 8646
+    to_port     = 8646
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
     description = "JSON RPC over WebSockets"

@@ -233,14 +233,14 @@ module.exports = async (bridgeState, lotionPort, db, app) => {
   return {
     listenHttp: async ({ host, port }) => {
       return new Promise(resolve => {
-        const server = api.listen(port || 9545, host || 'localhost', () => {
+        const server = api.listen(port || 8645, host || 'localhost', () => {
           resolve(server.address());
         });
       });
     },
     listenWs: ({ host, port }) => {
       const wsServer = new WsJsonRpcServer({
-        port: port || 9546,
+        port: port || 8646,
         host: host || 'localhost',
       });
 

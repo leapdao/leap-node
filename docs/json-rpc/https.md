@@ -24,10 +24,10 @@ server {
     proxy_set_header X-Forwarded-Proto $scheme;
 
     # Fix the “It appears that your reverse proxy set up is broken" error.
-    proxy_pass http://localhost:9545;
+    proxy_pass http://localhost:8645;
     proxy_read_timeout 90;
 
-    proxy_redirect http://localhost:9545 https://example.com;
+    proxy_redirect http://localhost:8645 https://example.com;
   }
 }
 
@@ -43,10 +43,10 @@ server {
     proxy_set_header X-Forwarded-Proto $scheme;
 
     # Fix the “It appears that your reverse proxy set up is broken" error.
-    proxy_pass http://localhost:9545;
+    proxy_pass http://localhost:8645;
     proxy_read_timeout 90;
 
-    proxy_redirect http://localhost:9545 https://example.com;
+    proxy_redirect http://localhost:8645 https://example.com;
   }
 }
 ```
