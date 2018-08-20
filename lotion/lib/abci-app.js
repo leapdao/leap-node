@@ -38,7 +38,7 @@ async function runTx(
   // run middleware stack
   try {
     for (const txHandler of txMiddleware) {
-      await txHandler(hookedState, tx, hookedChainInfo, allowMutation);
+      await txHandler(hookedState, tx, hookedChainInfo, !allowMutation);
     }
   } catch (e) {
     return [false, e.toString()];
