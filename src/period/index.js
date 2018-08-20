@@ -26,9 +26,9 @@ module.exports = bridgeState => async (rsp, chainInfo) => {
 
   if (contractPeriod.timestamp === '0') {
     rsp.status = 0;
+    bridgeState.checkCallsCount += 1;
   } else {
     rsp.status = 1;
+    bridgeState.checkCallsCount = 0;
   }
-
-  bridgeState.checkCallsCount += 1;
 };
