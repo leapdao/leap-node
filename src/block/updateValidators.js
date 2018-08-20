@@ -4,7 +4,10 @@
  * This source code is licensed under the Mozilla Public License Version 2.0
  * found in the LICENSE file in the root directory of this source tree.
  */
-const { getAddress, hexToBase64 } = require('../utils');
+const { getAddress, hexToBase64, base64ToHex } = require('../utils');
+const { logValidators } = require('../debug');
+
+const power = v => (typeof v === 'number' ? v : v.power);
 
 /*
  * Removes validators except those having a slot
@@ -18,6 +21,7 @@ module.exports = async (state, chainInfo) => {
     )
     .map(s => s.tenderKey.replace('0x', ''))
     .map(hexToBase64);
+  // logValidators(state.slots, validatorPubKeys, chainInfo.validators);
   const validatorAddrs = validatorPubKeys.map(key => getAddress(key));
 
   // Change existing validators
@@ -25,10 +29,12 @@ module.exports = async (state, chainInfo) => {
     const idx = validatorAddrs.findIndex(
       a => a.toLowerCase() === addr.toLowerCase()
     );
-    if (idx === -1 && chainInfo.validators[addr].power !== 0) {
+    if (idx === -1 && power(chainInfo.validators[addr]) !== 0) {
       chainInfo.validators[addr] = 0;
-    } else if (idx !== -1 && chainInfo.validators[addr].power === 0) {
+      logValidators(`Remove 0x${base64ToHex(addr)}`);
+    } else if (idx !== -1 && power(chainInfo.validators[addr]) === 0) {
       chainInfo.validators[addr] = 10;
+      logValidators(`Add 0x${base64ToHex(addr)}`);
     }
   });
 
@@ -43,6 +49,7 @@ module.exports = async (state, chainInfo) => {
         },
         power: 10,
       };
+      logValidators(`Add 0x${base64ToHex(addr)}`);
     }
   });
 };

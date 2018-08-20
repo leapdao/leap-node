@@ -19,6 +19,7 @@ exports.getAuctionedByAddr = require('./getAuctionedByAddr');
 exports.unspentForAddress = require('./unspentForAddress');
 exports.getAddress = require('./getAddress');
 exports.hexToBase64 = require('./hexToBase64');
+exports.base64ToHex = require('./base64ToHex');
 exports.range = require('./range');
 exports.printStartupInfo = require('./printStartupInfo');
 
