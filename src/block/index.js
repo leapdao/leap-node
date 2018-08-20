@@ -9,6 +9,7 @@ module.exports = (bridgeState, db, noValidatorsUpdates) => async (
   state,
   chainInfo
 ) => {
+  bridgeState.checkCallsCount = 0;
   await updatePeriod(state, chainInfo, bridgeState);
   await addBlock(state, chainInfo, {
     bridgeState,

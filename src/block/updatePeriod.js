@@ -18,7 +18,6 @@ module.exports = async (state, chainInfo, bridgeState) => {
     bridgeState.currentPeriod = new Period(
       bridgeState.previousPeriod.merkleRoot()
     );
-    bridgeState.checkCallsCount = 0;
     submitPeriod(
       bridgeState.previousPeriod,
       state.slots,

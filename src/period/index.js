@@ -29,6 +29,5 @@ module.exports = bridgeState => async (rsp, chainInfo) => {
     bridgeState.checkCallsCount += 1;
   } else {
     rsp.status = 1;
-    bridgeState.checkCallsCount = 0;
   }
 };
