@@ -8,7 +8,7 @@ Restart=on-failure
 User=ubuntu
 Group=ubuntu
 PermissionsStartOnly=true
-ExecStart=/usr/local/bin/parsec --p2pPort=46691 --preset=testnet-alpha
+ExecStart=/usr/local/bin/parsec --p2pPort=46691 --network=testnet-alpha
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGTERM
 

@@ -3,7 +3,7 @@ title: Connect to testnet
 ---
 
 1. Install `parsec-node` package: `npm install parsec-node -g`
-2. Run with preset `parsec --preset=tesnet-alpha`
+2. Run with `testnet-alpha` network: `parsec --network=tesnet-alpha`
 3. (Optional) become a validator
 
 ## How to become a validator

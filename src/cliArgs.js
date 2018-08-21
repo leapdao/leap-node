@@ -63,7 +63,7 @@ const options = [
     help: 'Path to config file',
   },
   {
-    names: ['preset'],
+    names: ['network'],
     type: 'string',
     help: 'Config preset',
   },
@@ -89,12 +89,12 @@ if (cliArgs.version) {
   process.exit(0);
 }
 
-if (cliArgs.preset) {
+if (cliArgs.network) {
   const configPath = path.join(
     __dirname,
     '..',
     'presets',
-    `parsec-${cliArgs.preset}.json`
+    `parsec-${cliArgs.network}.json`
   );
 
   if (fs.existsSync(configPath)) {
@@ -103,7 +103,7 @@ if (cliArgs.preset) {
 }
 
 if (!cliArgs.config) {
-  console.log('Config/preset option is required. See --help');
+  console.log('Config/network option is required. See --help');
   process.exit(0);
 }
 
