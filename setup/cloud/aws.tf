@@ -140,6 +140,14 @@ resource "aws_security_group" "parsec_tendermint" {
   }
 
   ingress {
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "lotion"
+  }
+
+  ingress {
     from_port   = 8645
     to_port     = 8645
     protocol    = "tcp"
