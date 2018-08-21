@@ -4,7 +4,7 @@ theme: readthedocs
 pages:
   - 'Home': index.md
   - 'How to use': how-to-use.md
-  - 'Becomin validator': becoming-validator.md
+  - 'Connect to testnet': connect.md
   - 'JSON RPC':
     - 'Overview': json-rpc/overview.md
     - 'HTTPS support': json-rpc/https.md
