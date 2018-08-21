@@ -8,7 +8,7 @@ Restart=on-failure
 User=ubuntu
 Group=ubuntu
 PermissionsStartOnly=true
-ExecStart=/usr/local/bin/parsec --p2pPort=46691 --config=/home/ubuntu/parsec-rainbow.json
+ExecStart=/usr/local/bin/parsec --p2pPort=46691 --preset=testnet-alpha
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGTERM
 

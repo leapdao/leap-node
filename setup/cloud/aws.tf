@@ -38,7 +38,6 @@ resource "aws_instance" "parsec_node" {
       "sudo apt-get install -y nodejs",
       "sudo apt-get -y install yarn",
       "sudo yarn global add parsec-node",
-      "curl https://raw.githubusercontent.com/parsec-labs/parsec-node/master/presets/parsec-rainbow.json -o parsec-rainbow.json",
       "sudo mv /home/ubuntu/parsec.service /etc/systemd/system/",
       "sudo service parsec start"
     ]
