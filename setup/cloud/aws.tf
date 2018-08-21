@@ -1,11 +1,37 @@
-variable "SSH_KEY_FILE" {
-  description = "SSH public key file to be used on the nodes"
+variable "region" {
+  description = "AWS region to create node in"
+  type = "string"
+  default = "eu-west-1"
+}
+
+variable "network" {
+  description = "Network name to run node on"
+  default = "parsec-testnet-alpha"
   type = "string"
 }
 
-provider "aws" {
-  region = "eu-west-1"
+variable "ssh_public_file" {
+  description = "SSH public key file to be used to connect to the node"
+  type = "string"
 }
+
+variable "ssh_private_file" {
+  description = "SSH private key file to be used to connect to the node"
+  type = "string"
+}
+
+data "template_file" "parsec_systemd" {
+  template = "${file("${path.module}/parsec.systemd.service")}"
+
+  vars {
+    network = "${var.network}"
+  }
+}
+
+provider "aws" {
+  region = "${var.region}"
+}
+
 
 resource "aws_instance" "parsec_node" {
   ami                    = "ami-58d7e821"
@@ -14,49 +40,43 @@ resource "aws_instance" "parsec_node" {
   vpc_security_group_ids = ["${aws_security_group.parsec_tendermint.id}", "${aws_security_group.parsec_ssh.id}"]
   key_name               = "${aws_key_pair.parsec_auth.id}"
 
-  provisioner "file" {
-    source      = "setup/cloud/parsec.systemd.service"
-    destination = "/home/ubuntu/parsec.service"
+  connection {
+    user        = "ubuntu"
+    private_key = "${file(var.ssh_private_file)}"
+    timeout     = "600s"
+  }
 
-    connection {
-      type     = "ssh"
-      user     = "ubuntu"
-    }
+  provisioner "file" {
+    content     = "${data.template_file.parsec_systemd.rendered}"
+    destination = "/tmp/parsec.service"
+  }
+
+  provisioner "file" {
+    source      = "setup/cloud/bootstrap.sh"
+    destination = "/tmp/bootstrap.sh"
+  }
+
+  provisioner "file" {
+    source      = "presets/parsec-${var.network}.json"
+    destination = "/home/ubuntu/parsec-${var.network}.json"
   }
 
   provisioner "remote-exec" {
     inline = [
-      "sudo /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count=1024",
-      "sudo /sbin/mkswap /var/swap.1",
-      "sudo chmod 600 /var/swap.1",
-      "sudo /sbin/swapon /var/swap.1",
-      "curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -",
-      "echo 'deb https://dl.yarnpkg.com/debian/ stable main' | sudo tee /etc/apt/sources.list.d/yarn.list",
-      "sudo apt-get update",
-      "sudo apt-get -y install build-essential",
-      "curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -",
-      "sudo apt-get install -y nodejs",
-      "sudo apt-get -y install yarn",
-      "sudo yarn global add parsec-node",
-      "sudo mv /home/ubuntu/parsec.service /etc/systemd/system/",
-      "sudo service parsec start"
+      "chmod +x /tmp/bootstrap.sh",
+      "sudo /tmp/bootstrap.sh",
     ]
-
-    connection {
-      type     = "ssh"
-      user     = "ubuntu"
-    }
   }
 
   tags {
     Group = "parsec_node"
-    Name = "PARSEC node"
+    Name = "parsec node - ${var.network}"
   }
 }
 
 resource "aws_key_pair" "parsec_auth" {
   key_name   = "parsec_auth"
-  public_key = "${file(var.SSH_KEY_FILE)}"
+  public_key = "${file(var.ssh_public_file)}"
 }
 
 resource "aws_eip_association" "eip_assoc" {
@@ -148,10 +168,20 @@ resource "aws_security_group" "parsec_tendermint" {
   }
 }
 
+// The list of cluster instance IDs
+output "instance" {
+  value = ["${aws_instance.parsec_node.id}"]
+}
+
+// The list of cluster instance public IPs
+output "public_ip" {
+  value = ["${aws_eip.parsec_eip.public_ip}"]
+}
+
 terraform {
   backend "s3" {
     bucket = "parsec-node-state"
-    key    = "rainbow"
+    key    = "testnet"
     region = "eu-west-1"
   }
 }

@@ -58,14 +58,15 @@ Mainnet config file: N/A
 
 ## Run in the cloud
 
-You can use [Terraform](https://www.terraform.io/) to spin up an Amazon EC2 instance with the node:
+You can use [Terraform](https://www.terraform.io/) to spin up an Amazon EC2 instance with the node. You will need an SSH keypair to access the EC2 instance. Generate a new keypair or use an existing one.
+
 ```
-terraform apply -var SSH_KEY_FILE="<your public key for SSH access>" setup/cloud
+terraform init setup/cloud
+terraform apply -var ssh_public_file="~/.ssh/parsec-testnet.pub" -var ssh_private_file="~/.ssh/parsec-testnet" -var network="testnet-alpha" setup/cloud
 ```
 
-So far it starts Dev Rainbow network only.
 
-Some usefule commands:
+Some useful commands once it is up and running:
 - check the logs: `ssh ubuntu@<ec2 host> journalctl -u parsec`
 - start/stop/restart/status: `ssh ubuntu@<ec2 host> sudo service parsec start/stop/restart/status`
 
