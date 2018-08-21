@@ -9,7 +9,7 @@ User=ubuntu
 Group=ubuntu
 PermissionsStartOnly=true
 Environment="DEBUG=parsec,parsec:tx,parsec:period"
-ExecStart=/usr/local/bin/parsec --p2pPort=46691 --config=/home/ubuntu/parsec-${network}.json
+ExecStart=/usr/local/bin/parsec --p2pPort=46691 --rpcaddr=0.0.0.0 --wsaddr=0.0.0.0 --config=/home/ubuntu/parsec-${network}.json
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGTERM
 
