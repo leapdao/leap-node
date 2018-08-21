@@ -1,5 +1,7 @@
 /* eslint-disable no-console */
 
+const fs = require('fs');
+const path = require('path');
 const dashdash = require('dashdash');
 
 const options = [
@@ -58,9 +60,12 @@ const options = [
   {
     names: ['config'],
     type: 'string',
-    default: './config.json',
     help: 'Path to config file',
-    required: true,
+  },
+  {
+    names: ['preset'],
+    type: 'string',
+    help: 'Config preset',
   },
   {
     names: ['fresh'],
@@ -81,6 +86,24 @@ if (cliArgs.help) {
 
 if (cliArgs.version) {
   console.log(`v${require('../package.json').version}`); // eslint-disable-line
+  process.exit(0);
+}
+
+if (cliArgs.preset) {
+  const configPath = path.join(
+    __dirname,
+    '..',
+    'presets',
+    `parsec-${cliArgs.preset}.json`
+  );
+
+  if (fs.existsSync(configPath)) {
+    cliArgs.config = configPath;
+  }
+}
+
+if (!cliArgs.config) {
+  console.log('Config/preset option is required. See --help');
   process.exit(0);
 }
 
