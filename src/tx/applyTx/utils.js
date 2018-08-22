@@ -35,29 +35,6 @@ const checkInsAndOuts = (tx, state, unspentFilter) => {
   }
 };
 
-const removeInputs = (state, tx) => {
-  tx.inputs.forEach(input => {
-    const outpointId = input.prevout.hex();
-    const { address, value, color } = state.unspent[outpointId];
-    state.balances[color][address] -= value;
-    delete state.unspent[outpointId];
-  });
-};
-
-const addOutputs = (state, tx) => {
-  tx.outputs.forEach((out, outPos) => {
-    const outpoint = new Outpoint(tx.hash(), outPos);
-    if (state.unspent[outpoint.hex()] !== undefined) {
-      throw new Error('Attempt to create existing output');
-    }
-    state.balances[out.color] = state.balances[out.color] || {};
-    state.balances[out.color][out.address] =
-      state.balances[out.color][out.address] || 0;
-    state.balances[out.color][out.address] += out.value;
-    state.unspent[outpoint.hex()] = out.toJSON();
-  });
-};
-
 const checkOutpoints = (state, tx) => {
   tx.inputs.forEach(input => {
     const outpointId = input.prevout.hex();
@@ -67,7 +44,42 @@ const checkOutpoints = (state, tx) => {
   });
 };
 
+const addOutputs = ({ balances, unspent }, tx) => {
+  tx.outputs.forEach((out, outPos) => {
+    const outpoint = new Outpoint(tx.hash(), outPos);
+    if (unspent[outpoint.hex()] !== undefined) {
+      throw new Error('Attempt to create existing output');
+    }
+    balances[out.color] = balances[out.color] || {};
+    const cBalances = balances[out.color];
+    if (isNFT(out.color)) {
+      cBalances[out.address] = cBalances[out.address] || [];
+      cBalances[out.address].push(out.value);
+    } else {
+      cBalances[out.address] = cBalances[out.address] || 0;
+      cBalances[out.address] += out.value;
+    }
+
+    unspent[outpoint.hex()] = out.toJSON();
+  });
+};
+
+const removeInputs = (state, tx) => {
+  tx.inputs.forEach(input => {
+    const outpointId = input.prevout.hex();
+    const { address, value, color } = state.unspent[outpointId];
+
+    if (isNFT(color)) {
+      const index = state.balances[color][address].indexOf(value);
+      state.balances[color][address].splice(index, 1);
+    } else {
+      state.balances[color][address] -= value;
+    }
+    delete state.unspent[outpointId];
+  });
+};
+
 exports.checkInsAndOuts = checkInsAndOuts;
-exports.removeInputs = removeInputs;
-exports.addOutputs = addOutputs;
 exports.checkOutpoints = checkOutpoints;
+exports.addOutputs = addOutputs;
+exports.removeInputs = removeInputs;
