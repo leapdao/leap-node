@@ -8,7 +8,7 @@
 const { Outpoint } = require('parsec-lib');
 const isEqual = require('lodash/isEqual');
 
-const isNFT = color => color > 2 ** 15;
+const { isNFT } = require('../../utils');
 
 const groupValuesByColor = (values, { color, value }) =>
   Object.assign({}, values, {
