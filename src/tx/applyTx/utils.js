@@ -44,17 +44,20 @@ const checkOutpoints = (state, tx) => {
   });
 };
 
-const addOutputs = ({ balances, unspent }, tx) => {
+const addOutputs = ({ balances, owners, unspent }, tx) => {
   tx.outputs.forEach((out, outPos) => {
     const outpoint = new Outpoint(tx.hash(), outPos);
     if (unspent[outpoint.hex()] !== undefined) {
       throw new Error('Attempt to create existing output');
     }
     balances[out.color] = balances[out.color] || {};
+    owners[out.color] = owners[out.color] || {};
     const cBalances = balances[out.color];
+    const cOwners = owners[out.color];
     if (isNFT(out.color)) {
       cBalances[out.address] = cBalances[out.address] || [];
       cBalances[out.address].push(out.value);
+      cOwners[out.value] = out.address;
     } else {
       cBalances[out.address] = cBalances[out.address] || 0;
       cBalances[out.address] += out.value;
@@ -64,18 +67,19 @@ const addOutputs = ({ balances, unspent }, tx) => {
   });
 };
 
-const removeInputs = (state, tx) => {
+const removeInputs = ({ unspent, balances, owners }, tx) => {
   tx.inputs.forEach(input => {
     const outpointId = input.prevout.hex();
-    const { address, value, color } = state.unspent[outpointId];
+    const { address, value, color } = unspent[outpointId];
 
     if (isNFT(color)) {
-      const index = state.balances[color][address].indexOf(value);
-      state.balances[color][address].splice(index, 1);
+      const index = balances[color][address].indexOf(value);
+      balances[color][address].splice(index, 1);
+      delete owners[color][value];
     } else {
-      state.balances[color][address] -= value;
+      balances[color][address] -= value;
     }
-    delete state.unspent[outpointId];
+    delete unspent[outpointId];
   });
 };
 

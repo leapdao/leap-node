@@ -39,6 +39,7 @@ async function run() {
     initialState: {
       mempool: [],
       balances: {}, // stores account balances like this { [colorIndex]: { address1: 0, ... } }
+      owners: {}, // index for NFT ownerOf call
       unspent: {}, // stores unspent outputs (deposits, transfers)
       processedDeposit: 0,
       slots: [],

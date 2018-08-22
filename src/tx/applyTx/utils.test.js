@@ -42,6 +42,7 @@ describe('applyTx utils', () => {
     const outpoint = new Outpoint(deposit.hash(), 0);
     const state = {
       balances: {},
+      owners: {},
       unspent: {},
     };
 
@@ -55,6 +56,7 @@ describe('applyTx utils', () => {
     const outpoint = new Outpoint(deposit.hash(), 0);
     const state = {
       balances: {},
+      owners: {},
       unspent: {},
     };
 

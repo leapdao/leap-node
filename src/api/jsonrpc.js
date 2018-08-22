@@ -180,7 +180,7 @@ module.exports = async (bridgeState, lotionPort, db, app) => {
 
     const method = txObj.data.substring(0, 10);
     if (method === '0x70a08231') {
-      // balanceOf
+      // ERC20 balanceOf
       const color = String(parseInt(await getColor(txObj.to), 16));
       const address = `0x${txObj.data.substring(txObj.data.length - 40)}`;
       const balances = bridgeState.currentState.balances[color] || {};
