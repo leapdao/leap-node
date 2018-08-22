@@ -79,6 +79,7 @@ const removeInputs = (state, tx) => {
   });
 };
 
+exports.isNFT = isNFT;
 exports.checkInsAndOuts = checkInsAndOuts;
 exports.checkOutpoints = checkOutpoints;
 exports.addOutputs = addOutputs;
