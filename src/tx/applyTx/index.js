@@ -5,24 +5,19 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
+/* eslint-disable global-require */
+
 const { Type } = require('parsec-lib');
-const checkConsolidate = require('./checkConsolidate');
-const checkDeposit = require('./checkDeposit');
-const checkEpochLength = require('./checkEpochLength');
-const checkExit = require('./checkExit');
-const checkTransfer = require('./checkTransfer');
-const checkValidatorJoin = require('./checkValidatorJoin');
-const checkValidatorLogout = require('./checkValidatorLogout');
 const { checkOutpoints, removeInputs, addOutputs } = require('./utils');
 
 const checks = {
-  [Type.CONSOLIDATE]: checkConsolidate,
-  [Type.DEPOSIT]: checkDeposit,
-  [Type.EPOCH_LENGTH]: checkEpochLength,
-  [Type.EXIT]: checkExit,
-  [Type.TRANSFER]: checkTransfer,
-  [Type.VALIDATOR_JOIN]: checkValidatorJoin,
-  [Type.VALIDATOR_LOGOUT]: checkValidatorLogout,
+  [Type.CONSOLIDATE]: require('./checkConsolidate'),
+  [Type.DEPOSIT]: require('./checkDeposit'),
+  [Type.EPOCH_LENGTH]: require('./checkEpochLength'),
+  [Type.EXIT]: require('./checkExit'),
+  [Type.TRANSFER]: require('./checkTransfer'),
+  [Type.VALIDATOR_JOIN]: require('./checkValidatorJoin'),
+  [Type.VALIDATOR_LOGOUT]: require('./checkValidatorLogout'),
 };
 
 module.exports = (state, tx, bridgeState) => {

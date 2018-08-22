@@ -22,6 +22,11 @@ module.exports = (state, tx) => {
   if (!state.slots[tx.options.slotId]) {
     throw new Error(`Slot ${tx.options.slotId} is empty`);
   }
+
+  if (state.slots[tx.options.slotId].tenderKey !== tx.options.tenderKey) {
+    throw new Error('Wrong tendermint address');
+  }
+
   state.slots[tx.options.slotId].activationEpoch = tx.options.activationEpoch;
   state.slots[tx.options.slotId].eventsCount = tx.options.eventsCount;
   state.slots[tx.options.slotId].newSigner = tx.options.newSigner;
