@@ -6,10 +6,15 @@
  */
 
 const { Outpoint } = require('parsec-lib');
+const isEqual = require('lodash/isEqual');
+
+const isNFT = color => color > 2 ** 15;
 
 const groupValuesByColor = (values, { color, value }) =>
   Object.assign({}, values, {
-    [color]: (values[color] || 0) + value,
+    [color]: isNFT(color)
+      ? (values[color] || new Set()).add(value)
+      : (values[color] || 0) + value,
   });
 
 const checkInsAndOuts = (tx, state, unspentFilter) => {
@@ -24,7 +29,7 @@ const checkInsAndOuts = (tx, state, unspentFilter) => {
   const outsValues = tx.outputs.reduce(groupValuesByColor, {});
   const colors = Object.keys(insValues);
   for (const color of colors) {
-    if (insValues[color] !== outsValues[color]) {
+    if (!isEqual(insValues[color], outsValues[color])) {
       throw new Error('Ins and outs values are mismatch');
     }
   }
