@@ -30,7 +30,7 @@ const checkInsAndOuts = (tx, state, unspentFilter) => {
   const colors = Object.keys(insValues);
   for (const color of colors) {
     if (!isEqual(insValues[color], outsValues[color])) {
-      throw new Error('Ins and outs values are mismatch');
+      throw new Error(`Ins and outs values are mismatch for color ${color}`);
     }
   }
 };
@@ -83,7 +83,6 @@ const removeInputs = ({ unspent, balances, owners }, tx) => {
   });
 };
 
-exports.isNFT = isNFT;
 exports.checkInsAndOuts = checkInsAndOuts;
 exports.checkOutpoints = checkOutpoints;
 exports.addOutputs = addOutputs;

@@ -10,26 +10,6 @@ const ADDR_3 = '0x418eaa171b93ed13589377cdbe6abf05840543af';
 const PRIV_3 =
   '0x9ae3ed3d1659a33902644da4ce645cfac1de84bc0889909db83692c8374fc44e';
 
-// const getInitialState = () => ({
-//   balances: {},
-//   unspent: {},
-//   processedDeposit: 11,
-//   slots: [],
-// });
-
-// const makeDepositMock = (depositor, amount, color) => {
-//   return {
-//     deposits: new Proxy(
-//       {},
-//       {
-//         get: () => ({ depositor, amount, color }),
-//       }
-//     ),
-//   };
-// };
-
-// const defaultDepositMock = makeDepositMock(ADDR_1, '500', 0);
-
 describe('checkTransfer', () => {
   test('valid tx', () => {
     const deposit = Tx.deposit(12, 500, ADDR_1, 0);
@@ -163,7 +143,7 @@ describe('checkTransfer', () => {
     try {
       checkTransfer(state, transfer);
     } catch (e) {
-      expect(e.message).toBe('Ins and outs values are mismatch');
+      expect(e.message).toBe('Ins and outs values are mismatch for color 0');
     }
   });
 });
