@@ -51,6 +51,28 @@ describe('applyTx utils', () => {
       );
     });
 
+    test('ERC721 (big value)', () => {
+      const color = 2 ** 15 + 1;
+      const value =
+        '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+      const deposit = Tx.deposit(12, value, ADDR_1, color);
+      const outpoint = new Outpoint(deposit.hash(), 0);
+      const state = {
+        unspent: {
+          [outpoint.hex()]: deposit.outputs[0].toJSON(),
+        },
+      };
+      const transfer = Tx.transfer(
+        [new Input(outpoint)],
+        [new Output(value, ADDR_1, color)]
+      ).signAll(PRIV_1);
+      checkInsAndOuts(
+        transfer,
+        state,
+        ({ address }, i) => address === transfer.inputs[i].signer
+      );
+    });
+
     test('ERC20 + ERC721', () => {
       const colorERC721 = 2 ** 15 + 1;
       const colorERC20 = 0;
@@ -187,9 +209,13 @@ describe('applyTx utils', () => {
 
     test('ERC721', () => {
       const color = 2 ** 15 + 1;
-      const deposit1 = Tx.deposit(12, 500, ADDR_1, color);
+      const value1 =
+        '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+      const value2 =
+        '0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffa';
+      const deposit1 = Tx.deposit(12, value1, ADDR_1, color);
       const outpoint1 = new Outpoint(deposit1.hash(), 0);
-      const deposit2 = Tx.deposit(12, 400, ADDR_1, color);
+      const deposit2 = Tx.deposit(12, value2, ADDR_1, color);
       const outpoint2 = new Outpoint(deposit2.hash(), 0);
       const state = {
         balances: {},
@@ -199,10 +225,10 @@ describe('applyTx utils', () => {
 
       addOutputs(state, deposit1);
       expect(state.unspent[outpoint1.hex()]).toBeDefined();
-      expect(state.balances[color][ADDR_1]).toEqual([500]);
+      expect(state.balances[color][ADDR_1]).toEqual([value1]);
       addOutputs(state, deposit2);
       expect(state.unspent[outpoint2.hex()]).toBeDefined();
-      expect(state.balances[color][ADDR_1]).toEqual([500, 400]);
+      expect(state.balances[color][ADDR_1]).toEqual([value1, value2]);
     });
   });
 
@@ -229,9 +255,13 @@ describe('applyTx utils', () => {
 
     test('ERC721', () => {
       const color = 2 ** 15 + 1;
-      const deposit1 = Tx.deposit(12, 500, ADDR_1, color);
+      const value1 =
+        '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+      const value2 =
+        '0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffa';
+      const deposit1 = Tx.deposit(12, value1, ADDR_1, color);
+      const deposit2 = Tx.deposit(12, value2, ADDR_1, color);
       const outpoint1 = new Outpoint(deposit1.hash(), 0);
-      const deposit2 = Tx.deposit(12, 400, ADDR_1, color);
       const outpoint2 = new Outpoint(deposit2.hash(), 0);
       const state = {
         balances: {},
@@ -241,22 +271,22 @@ describe('applyTx utils', () => {
 
       addOutputs(state, deposit1);
       expect(state.unspent[outpoint1.hex()]).toBeDefined();
-      expect(state.balances[color][ADDR_1]).toEqual([500]);
+      expect(state.balances[color][ADDR_1]).toEqual([value1]);
       addOutputs(state, deposit2);
       expect(state.unspent[outpoint2.hex()]).toBeDefined();
-      expect(state.balances[color][ADDR_1]).toEqual([500, 400]);
+      expect(state.balances[color][ADDR_1]).toEqual([value1, value2]);
 
       const transfer1 = Tx.transfer(
         [new Input(outpoint1)],
-        [new Output(500, ADDR_1, color)]
+        [new Output(value1, ADDR_1, color)]
       );
       removeInputs(state, transfer1);
       expect(state.unspent[outpoint1.hex()]).toBeUndefined();
-      expect(state.balances[color][ADDR_1]).toEqual([400]);
+      expect(state.balances[color][ADDR_1]).toEqual([value2]);
 
       const transfer2 = Tx.transfer(
         [new Input(outpoint2)],
-        [new Output(400, ADDR_1, color)]
+        [new Output(value2, ADDR_1, color)]
       );
       removeInputs(state, transfer2);
       expect(state.unspent[outpoint2.hex()]).toBeUndefined();
