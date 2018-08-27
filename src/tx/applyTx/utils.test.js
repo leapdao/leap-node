@@ -9,6 +9,7 @@ const {
 const ADDR_1 = '0x4436373705394267350db2c06613990d34621d69';
 const PRIV_1 =
   '0xad8e31c8862f5f86459e7cca97ac9302c5e1817077902540779eef66e21f394a';
+const ADDR_2 = '0xc5a72c0bf9f59ed5a1d2ac9f29bd80c55279d2d3';
 
 describe('applyTx utils', () => {
   describe('checkInsAndOuts', () => {
@@ -213,10 +214,14 @@ describe('applyTx utils', () => {
         '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
       const value2 =
         '0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffa';
+      const value3 =
+        '0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe';
       const deposit1 = Tx.deposit(12, value1, ADDR_1, color);
-      const outpoint1 = new Outpoint(deposit1.hash(), 0);
       const deposit2 = Tx.deposit(12, value2, ADDR_1, color);
+      const deposit3 = Tx.deposit(12, value3, ADDR_2, color);
+      const outpoint1 = new Outpoint(deposit1.hash(), 0);
       const outpoint2 = new Outpoint(deposit2.hash(), 0);
+      const outpoint3 = new Outpoint(deposit3.hash(), 0);
       const state = {
         balances: {},
         owners: {},
@@ -226,9 +231,15 @@ describe('applyTx utils', () => {
       addOutputs(state, deposit1);
       expect(state.unspent[outpoint1.hex()]).toBeDefined();
       expect(state.balances[color][ADDR_1]).toEqual([value1]);
+      expect(state.owners[color][value1]).toBe(ADDR_1);
       addOutputs(state, deposit2);
       expect(state.unspent[outpoint2.hex()]).toBeDefined();
       expect(state.balances[color][ADDR_1]).toEqual([value1, value2]);
+      expect(state.owners[color][value2]).toBe(ADDR_1);
+      addOutputs(state, deposit3);
+      expect(state.unspent[outpoint3.hex()]).toBeDefined();
+      expect(state.balances[color][ADDR_2]).toEqual([value3]);
+      expect(state.owners[color][value3]).toBe(ADDR_2);
     });
   });
 
@@ -259,10 +270,14 @@ describe('applyTx utils', () => {
         '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
       const value2 =
         '0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffa';
+      const value3 =
+        '0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe';
       const deposit1 = Tx.deposit(12, value1, ADDR_1, color);
       const deposit2 = Tx.deposit(12, value2, ADDR_1, color);
+      const deposit3 = Tx.deposit(12, value3, ADDR_2, color);
       const outpoint1 = new Outpoint(deposit1.hash(), 0);
       const outpoint2 = new Outpoint(deposit2.hash(), 0);
+      const outpoint3 = new Outpoint(deposit3.hash(), 0);
       const state = {
         balances: {},
         owners: {},
@@ -272,9 +287,15 @@ describe('applyTx utils', () => {
       addOutputs(state, deposit1);
       expect(state.unspent[outpoint1.hex()]).toBeDefined();
       expect(state.balances[color][ADDR_1]).toEqual([value1]);
+      expect(state.owners[color][value1]).toBe(ADDR_1);
       addOutputs(state, deposit2);
       expect(state.unspent[outpoint2.hex()]).toBeDefined();
       expect(state.balances[color][ADDR_1]).toEqual([value1, value2]);
+      expect(state.owners[color][value2]).toBe(ADDR_1);
+      addOutputs(state, deposit3);
+      expect(state.unspent[outpoint3.hex()]).toBeDefined();
+      expect(state.balances[color][ADDR_2]).toEqual([value3]);
+      expect(state.owners[color][value3]).toBe(ADDR_2);
 
       const transfer1 = Tx.transfer(
         [new Input(outpoint1)],
@@ -283,6 +304,7 @@ describe('applyTx utils', () => {
       removeInputs(state, transfer1);
       expect(state.unspent[outpoint1.hex()]).toBeUndefined();
       expect(state.balances[color][ADDR_1]).toEqual([value2]);
+      expect(state.owners[color][value1]).toBeUndefined();
 
       const transfer2 = Tx.transfer(
         [new Input(outpoint2)],
@@ -291,6 +313,16 @@ describe('applyTx utils', () => {
       removeInputs(state, transfer2);
       expect(state.unspent[outpoint2.hex()]).toBeUndefined();
       expect(state.balances[color][ADDR_1]).toEqual([]);
+      expect(state.owners[color][value2]).toBeUndefined();
+
+      const transfer3 = Tx.transfer(
+        [new Input(outpoint3)],
+        [new Output(value3, ADDR_2, color)]
+      );
+      removeInputs(state, transfer3);
+      expect(state.unspent[outpoint3.hex()]).toBeUndefined();
+      expect(state.balances[color][ADDR_2]).toEqual([]);
+      expect(state.owners[color][value3]).toBeUndefined();
     });
   });
 });
