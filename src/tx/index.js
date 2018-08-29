@@ -9,29 +9,33 @@ const { Tx, Type } = require('parsec-lib');
 const applyTx = require('./applyTx');
 const accumulateTx = require('./accumulateTx');
 const printTx = require('../txHelpers/printTx');
-const runComputation = require('../txHelpers/runComputation');
+const runComputation = require('../computation/runComputation');
 
 const { logTx, logError } = require('../debug');
 
-module.exports = bridgeState => async (state, { encoded }, _, isCheck) => {
-  const tx = Tx.fromRaw(encoded);
+const runTx = (state, tx, bridgeState, isCheck) => {
   const printedTx = printTx(state, tx);
 
   try {
     applyTx(state, tx, bridgeState);
     accumulateTx(state, tx);
 
-    if (tx.type === Type.COMP_REQ) {
-      const compResponse = await runComputation(state, tx);
-      applyTx(state, compResponse, bridgeState);
-      accumulateTx(state, compResponse);
+    if (printedTx && !isCheck) {
+      logTx(printedTx);
     }
   } catch (err) {
     logError(err.message);
     throw err;
   }
+};
 
-  if (printedTx && !isCheck) {
-    logTx(printedTx);
+module.exports = bridgeState => async (state, { encoded }, _, isCheck) => {
+  const tx = Tx.fromRaw(encoded);
+
+  runTx(state, tx, bridgeState, isCheck);
+
+  if (tx.type === Type.COMP_REQ) {
+    const compResponse = await runComputation(state, tx);
+    runTx(state, compResponse, bridgeState, isCheck);
   }
 };
