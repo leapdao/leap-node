@@ -22,79 +22,77 @@ const getInitialState = () => ({
 const defaultDepositMock = makeDepositMock(ADDR_1, '500', 0);
 
 describe('checkDeposit', () => {
-  test('successful tx', () => {
+  test('valid tx', () => {
     const state = getInitialState();
     const tx = Tx.deposit(1, 500, ADDR_1, 0);
     checkDeposit(state, tx, defaultDepositMock);
     expect(state.processedDeposit).toBe(1);
   });
 
-  test('successful tx (non-default color)', () => {
+  test('valid tx (non-default color)', () => {
     const state = getInitialState();
     const tx = Tx.deposit(1, 500, ADDR_1, 1);
     checkDeposit(state, tx, makeDepositMock(ADDR_1, '500', '1'));
     expect(state.processedDeposit).toBe(1);
   });
 
+  test('valid tx (nft)', () => {
+    const state = getInitialState();
+    const color = 2 ** 15 + 1;
+    const value = '293875120984651807345';
+    const tx = Tx.deposit(1, value, ADDR_1, color);
+    checkDeposit(state, tx, makeDepositMock(ADDR_1, value, String(color)));
+    expect(state.processedDeposit).toBe(1);
+  });
+
   test('non-existent', () => {
     const state = getInitialState();
     const tx = Tx.deposit(1, 500, ADDR_1, 0);
-    try {
+
+    expect(() => {
       checkDeposit(state, tx, { deposits: {} });
-    } catch (e) {
-      expect(e.message).toBe('Trying to submit incorrect deposit');
-    }
+    }).toThrow('Trying to submit incorrect deposit');
   });
 
   test('skipping depositId', () => {
     const state = getInitialState();
     const tx = Tx.deposit(2, 500, ADDR_1, 0);
-    try {
+    expect(() => {
       checkDeposit(state, tx, defaultDepositMock);
-    } catch (e) {
-      expect(e.message).toBe('Deposit ID skipping ahead. want 1, found 2');
-    }
+    }).toThrow('Deposit ID skipping ahead. want 1, found 2');
   });
 
   test('wrong owner', () => {
     const state = getInitialState();
     const tx = Tx.deposit(1, 500, ADDR_1, 0);
-    try {
+    expect(() => {
       checkDeposit(state, tx, makeDepositMock(ADDR_2, '500', 0));
-    } catch (e) {
-      expect(e.message).toBe('Trying to submit incorrect deposit');
-    }
+    }).toThrow('Trying to submit incorrect deposit');
   });
 
   test('wrong value', () => {
     const state = getInitialState();
     const tx = Tx.deposit(1, 500, ADDR_1, 0);
-    try {
+    expect(() => {
       checkDeposit(state, tx, makeDepositMock(ADDR_1, '600', 0));
-    } catch (e) {
-      expect(e.message).toBe('Trying to submit incorrect deposit');
-    }
+    }).toThrow('Trying to submit incorrect deposit');
   });
 
   test('wrong color', () => {
     const state = getInitialState();
     const tx = Tx.deposit(1, 500, ADDR_1, 0);
-    try {
+    expect(() => {
       checkDeposit(state, tx, makeDepositMock(ADDR_1, '600', 1));
-    } catch (e) {
-      expect(e.message).toBe('Trying to submit incorrect deposit');
-    }
+    }).toThrow('Trying to submit incorrect deposit');
   });
 
   test('prevent double deposit', () => {
     const state = getInitialState();
     const tx = Tx.deposit(1, 500, ADDR_1, 0);
     checkDeposit(state, tx, defaultDepositMock);
-    try {
+    expect(() => {
       checkDeposit(state, tx, defaultDepositMock);
-    } catch (e) {
-      expect(e.message).toBe('Deposit ID already used.');
-    }
+    }).toThrow('Deposit ID already used.');
   });
 
   test('prevent double deposit (spent)', () => {
@@ -111,10 +109,8 @@ describe('checkDeposit', () => {
     const state = getInitialState();
     const tx = Tx.deposit(1, 500, ADDR_1, 0);
     checkDeposit(state, tx, defaultDepositMock);
-    try {
+    expect(() => {
       checkDeposit(state, tx, defaultDepositMock);
-    } catch (e) {
-      expect(e.message).toBe('Deposit ID already used.');
-    }
+    }).toThrow('Deposit ID already used.');
   });
 });

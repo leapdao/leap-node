@@ -24,14 +24,12 @@ module.exports = (state, tx, bridgeState) => {
     );
   }
   const deposit = bridgeState.deposits[tx.options.depositId];
-  const color = Number(deposit.color);
-  const isNFT = Output.isNFT(color);
   if (
     !deposit ||
-    (isNFT
+    (Output.isNFT(Number(deposit.color))
       ? deposit.amount !== tx.outputs[0].value
       : Number(deposit.amount) !== tx.outputs[0].value) ||
-    color !== tx.outputs[0].color ||
+    Number(deposit.color) !== tx.outputs[0].color ||
     !addrCmp(deposit.depositor, tx.outputs[0].address)
   ) {
     throw new Error('Trying to submit incorrect deposit');
