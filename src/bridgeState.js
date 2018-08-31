@@ -9,7 +9,7 @@ const Web3 = require('web3');
 const { Period, Outpoint } = require('parsec-lib');
 const bridgeABI = require('./bridgeABI');
 const ContractEventsSubscription = require('./eventsRelay/ContractEventsSubscription');
-const { handleEvents } = require('./utils');
+const { handleEvents, getGenesisBlock } = require('./utils');
 
 module.exports = class BridgeState {
   constructor(db, config) {
@@ -39,9 +39,11 @@ module.exports = class BridgeState {
   }
 
   async watchContractEvents() {
+    const genesisBlock = await getGenesisBlock(this.web3, this.contract);
     const eventsSubscription = new ContractEventsSubscription(
       this.web3,
-      this.contract
+      this.contract,
+      genesisBlock
     );
 
     eventsSubscription.on(
@@ -69,6 +71,6 @@ module.exports = class BridgeState {
         },
       })
     );
-    await eventsSubscription.init();
+    eventsSubscription.init();
   }
 };

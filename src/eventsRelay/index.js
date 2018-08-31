@@ -11,7 +11,7 @@ const { Tx, Input, Outpoint } = require('parsec-lib');
 
 const ContractEventsSubscription = require('./ContractEventsSubscription');
 const sendTx = require('../txHelpers/sendTx');
-const { handleEvents } = require('../utils');
+const { handleEvents, getGenesisBlock } = require('../utils');
 
 module.exports = async (txServerPort, web3, bridge) => {
   const handleJoin = async event => {
@@ -57,7 +57,12 @@ module.exports = async (txServerPort, web3, bridge) => {
     },
   });
 
-  const eventSubscription = new ContractEventsSubscription(web3, bridge);
+  const genesisBlock = await getGenesisBlock(web3, bridge);
+  const eventSubscription = new ContractEventsSubscription(
+    web3,
+    bridge,
+    genesisBlock
+  );
   const events = await eventSubscription.init();
   await handler(events);
   eventSubscription.on('events', handler);
