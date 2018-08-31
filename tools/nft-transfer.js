@@ -10,7 +10,7 @@
 const axios = require('axios');
 const { Output, Tx, Input, Outpoint } = require('parsec-lib');
 
-const sendTx = require('./src/txHelpers/sendTx');
+const sendTx = require('../src/txHelpers/sendTx');
 
 const privKey =
   '0xad8e31c8862f5f86459e7cca97ac9302c5e1817077902540779eef66e21f394a';
