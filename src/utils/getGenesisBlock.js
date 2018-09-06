@@ -1,6 +1,6 @@
 const { GENESIS } = require('./constants');
 
-const BLOCK_GUESS_GAP = 10000;
+const BLOCK_GUESS_GAP = 50000;
 
 const getBlockAverageTime = async web3 => {
   const span = 500;

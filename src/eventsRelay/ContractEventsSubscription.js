@@ -17,8 +17,9 @@ module.exports = class ContractEventsSubscription extends EventEmitter {
   }
 
   async init() {
+    const initialEvetns = await this.fetchEvents();
     setInterval(() => this.fetchEvents(), 5 * 1000);
-    return this.fetchEvents();
+    return initialEvetns;
   }
 
   async fetchEvents() {
