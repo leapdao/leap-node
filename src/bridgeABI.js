@@ -116,6 +116,20 @@ module.exports = [
   {
     constant: true,
     inputs: [],
+    name: 'nftTokenCount',
+    outputs: [
+      {
+        name: '',
+        type: 'uint16',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
     name: 'averageGasPrice',
     outputs: [
       {
@@ -130,7 +144,7 @@ module.exports = [
   {
     constant: true,
     inputs: [],
-    name: 'tokenCount',
+    name: 'erc20TokenCount',
     outputs: [
       {
         name: '',
@@ -491,6 +505,37 @@ module.exports = [
     type: 'event',
   },
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        name: 'tokenAddr',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        name: 'color',
+        type: 'uint16',
+      },
+    ],
+    name: 'NewToken',
+    type: 'event',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'tokenCount',
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     constant: false,
     inputs: [
       {
@@ -595,10 +640,6 @@ module.exports = [
       {
         name: '_tenderAddr',
         type: 'bytes32',
-      },
-      {
-        name: '_owner',
-        type: 'address',
       },
     ],
     name: 'bet',
@@ -706,29 +747,11 @@ module.exports = [
     constant: false,
     inputs: [
       {
-        name: '_slotId',
-        type: 'uint256',
-      },
-      {
-        name: '_value',
-        type: 'uint256',
-      },
-    ],
-    name: 'slash',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
         name: '_owner',
         type: 'address',
       },
       {
-        name: '_amount',
+        name: '_amountOrTokenId',
         type: 'uint256',
       },
       {

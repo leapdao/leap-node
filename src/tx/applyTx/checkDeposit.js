@@ -5,7 +5,7 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-const { Type } = require('parsec-lib');
+const { Type, Output } = require('parsec-lib');
 const { addrCmp } = require('../../utils');
 
 module.exports = (state, tx, bridgeState) => {
@@ -26,7 +26,9 @@ module.exports = (state, tx, bridgeState) => {
   const deposit = bridgeState.deposits[tx.options.depositId];
   if (
     !deposit ||
-    Number(deposit.amount) !== tx.outputs[0].value ||
+    (Output.isNFT(Number(deposit.color))
+      ? deposit.amount !== tx.outputs[0].value
+      : Number(deposit.amount) !== tx.outputs[0].value) ||
     Number(deposit.color) !== tx.outputs[0].color ||
     !addrCmp(deposit.depositor, tx.outputs[0].address)
   ) {

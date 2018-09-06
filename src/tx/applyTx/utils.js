@@ -6,10 +6,15 @@
  */
 
 const { Outpoint } = require('parsec-lib');
+const isEqual = require('lodash/isEqual');
+
+const { isNFT } = require('../../utils');
 
 const groupValuesByColor = (values, { color, value }) =>
   Object.assign({}, values, {
-    [color]: (values[color] || 0) + value,
+    [color]: isNFT(color)
+      ? (values[color] || new Set()).add(value)
+      : (values[color] || 0) + value,
   });
 
 const checkInsAndOuts = (tx, state, unspentFilter) => {
@@ -24,33 +29,10 @@ const checkInsAndOuts = (tx, state, unspentFilter) => {
   const outsValues = tx.outputs.reduce(groupValuesByColor, {});
   const colors = Object.keys(insValues);
   for (const color of colors) {
-    if (insValues[color] !== outsValues[color]) {
-      throw new Error('Ins and outs values are mismatch');
+    if (!isEqual(insValues[color], outsValues[color])) {
+      throw new Error(`Ins and outs values are mismatch for color ${color}`);
     }
   }
-};
-
-const removeInputs = (state, tx) => {
-  tx.inputs.forEach(input => {
-    const outpointId = input.prevout.hex();
-    const { address, value, color } = state.unspent[outpointId];
-    state.balances[color][address] -= value;
-    delete state.unspent[outpointId];
-  });
-};
-
-const addOutputs = (state, tx) => {
-  tx.outputs.forEach((out, outPos) => {
-    const outpoint = new Outpoint(tx.hash(), outPos);
-    if (state.unspent[outpoint.hex()] !== undefined) {
-      throw new Error('Attempt to create existing output');
-    }
-    state.balances[out.color] = state.balances[out.color] || {};
-    state.balances[out.color][out.address] =
-      state.balances[out.color][out.address] || 0;
-    state.balances[out.color][out.address] += out.value;
-    state.unspent[outpoint.hex()] = out.toJSON();
-  });
 };
 
 const checkOutpoints = (state, tx) => {
@@ -62,7 +44,46 @@ const checkOutpoints = (state, tx) => {
   });
 };
 
+const addOutputs = ({ balances, owners, unspent }, tx) => {
+  tx.outputs.forEach((out, outPos) => {
+    const outpoint = new Outpoint(tx.hash(), outPos);
+    if (unspent[outpoint.hex()] !== undefined) {
+      throw new Error('Attempt to create existing output');
+    }
+    balances[out.color] = balances[out.color] || {};
+    owners[out.color] = owners[out.color] || {};
+    const cBalances = balances[out.color];
+    const cOwners = owners[out.color];
+    if (isNFT(out.color)) {
+      cBalances[out.address] = cBalances[out.address] || [];
+      cBalances[out.address].push(out.value);
+      cOwners[out.value] = out.address;
+    } else {
+      cBalances[out.address] = cBalances[out.address] || 0;
+      cBalances[out.address] += out.value;
+    }
+
+    unspent[outpoint.hex()] = out.toJSON();
+  });
+};
+
+const removeInputs = ({ unspent, balances, owners }, tx) => {
+  tx.inputs.forEach(input => {
+    const outpointId = input.prevout.hex();
+    const { address, value, color } = unspent[outpointId];
+
+    if (isNFT(color)) {
+      const index = balances[color][address].indexOf(value);
+      balances[color][address].splice(index, 1);
+      delete owners[color][value];
+    } else {
+      balances[color][address] -= value;
+    }
+    delete unspent[outpointId];
+  });
+};
+
 exports.checkInsAndOuts = checkInsAndOuts;
-exports.removeInputs = removeInputs;
-exports.addOutputs = addOutputs;
 exports.checkOutpoints = checkOutpoints;
+exports.addOutputs = addOutputs;
+exports.removeInputs = removeInputs;

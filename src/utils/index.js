@@ -30,3 +30,4 @@ exports.seq = mapFn => async arr => {
   }
 };
 exports.delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+exports.isNFT = color => color > 2 ** 15;

@@ -7,7 +7,7 @@
 
 /* eslint-disable no-await-in-loop, default-case */
 
-const { Tx, Input, Outpoint } = require('parsec-lib');
+const { Tx, Input, Outpoint, Output } = require('parsec-lib');
 
 const ContractEventsSubscription = require('./ContractEventsSubscription');
 const sendTx = require('../txHelpers/sendTx');
@@ -25,11 +25,15 @@ module.exports = async (txServerPort, web3, bridge) => {
       const deposit = await bridge.methods
         .deposits(event.returnValues.depositId)
         .call();
+      const color = Number(deposit.color);
+      const value = Output.isNFT(color)
+        ? deposit.amount
+        : Number(deposit.amount);
       const tx = Tx.deposit(
         event.returnValues.depositId,
-        Number(deposit.amount),
+        value,
         deposit.owner,
-        Number(deposit.color)
+        color
       );
       await sendTx(txServerPort, tx.hex());
     },

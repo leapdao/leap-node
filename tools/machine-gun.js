@@ -11,9 +11,9 @@ const Web3 = require('web3');
 const axios = require('axios');
 const { helpers, Output, Tx, Outpoint } = require('parsec-lib');
 
-const makeTransfer = require('./src/txHelpers/makeTransfer');
-const unspentForAddress = require('./src/utils/unspentForAddress');
-const sendTx = require('./src/txHelpers/sendTx');
+const makeTransfer = require('../src/txHelpers/makeTransfer');
+const unspentForAddress = require('../src/utils/unspentForAddress');
+const sendTx = require('../src/txHelpers/sendTx');
 
 const web3 = new Web3('https://rinkeby.infura.io');
 const parsecWeb3 = new Web3('http://localhost:8645');
