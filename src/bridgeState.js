@@ -71,6 +71,6 @@ module.exports = class BridgeState {
         },
       })
     );
-    eventsSubscription.init();
+    await eventsSubscription.init();
   }
 };
