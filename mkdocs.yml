@@ -11,3 +11,5 @@ pages:
     - 'web3.eth': json-rpc/web3.eth.md
     - 'web3.net': json-rpc/web3.net.md
     - 'web3.parsec': json-rpc/web3.parsec.md
+  - 'Advanced':
+    - 'Data structures': data-structures.md
