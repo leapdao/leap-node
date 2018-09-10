@@ -9,6 +9,8 @@ const { Tx, Block, Util } = require('parsec-lib');
 const sendTx = require('../txHelpers/sendTx');
 const { unspentForAddress, range, isNFT } = require('../utils');
 
+const NFT_COLOR_BASE = 32769; // 2^15 + 1
+
 // JSON RPC 2.0 invalid params error code
 const INVALID_PARAMS = -32602;
 
@@ -51,25 +53,49 @@ module.exports = async (bridgeState, lotionPort, db, app) => {
     return unspentForAddress(unspent, address);
   };
 
-  let tokens = [];
-  const getColors = async () => {
-    const tokenCount = await bridgeState.contract.methods.tokenCount().call();
-    if (tokenCount !== tokens.length) {
-      const tokenData = range(0, tokenCount - 1).map(i =>
+  const getTokensRange = (from, to) => {
+    return Promise.all(
+      range(from, to - 1).map(i =>
         bridgeState.contract.methods.tokens(i).call()
-      );
+      )
+    ).then(tokens => tokens.map(o => o.addr.toLowerCase()));
+  };
 
-      tokens = (await Promise.all(tokenData)).map(o => o.addr.toLowerCase());
+  let erc20Tokens = [];
+  let nftTokens = [];
+  const getColors = async (nft = false) => {
+    if (nft) {
+      const tokenCount = Number(
+        await bridgeState.contract.methods.nftTokenCount().call()
+      );
+      if (tokenCount !== nftTokens.length) {
+        nftTokens = await getTokensRange(
+          NFT_COLOR_BASE,
+          NFT_COLOR_BASE + tokenCount
+        );
+      }
+    } else {
+      const tokenCount = Number(
+        await bridgeState.contract.methods.erc20TokenCount().call()
+      );
+      console.log('fetchTokens', typeof tokenCount, typeof erc20Tokens.length);
+      if (tokenCount !== erc20Tokens.length) {
+        erc20Tokens = await getTokensRange(0, tokenCount);
+        console.log('fetchTokens', erc20Tokens);
+      }
     }
 
-    return tokens;
+    return nft ? nftTokens : erc20Tokens;
   };
 
   const getColor = async address => {
-    const colors = await getColors();
+    const erc20Colors = await getColors();
+    const nftColors = await getColors(true);
 
-    const color = colors.indexOf(address);
-    if (color === -1) {
+    const erc20Color = erc20Colors.indexOf(address);
+    const nftColor = nftColors.indexOf(address);
+
+    if (erc20Color === -1 && nftColor === -1) {
       /* eslint-disable no-throw-literal */
       throw {
         code: INVALID_PARAMS,
@@ -78,6 +104,7 @@ module.exports = async (bridgeState, lotionPort, db, app) => {
       /* eslint-enable no-throw-literal */
     }
 
+    const color = erc20Color === -1 ? NFT_COLOR_BASE + nftColor : erc20Color;
     return `0x${color.toString(16)}`;
   };
 
