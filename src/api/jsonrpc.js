@@ -78,10 +78,8 @@ module.exports = async (bridgeState, lotionPort, db, app) => {
       const tokenCount = Number(
         await bridgeState.contract.methods.erc20TokenCount().call()
       );
-      console.log('fetchTokens', typeof tokenCount, typeof erc20Tokens.length);
       if (tokenCount !== erc20Tokens.length) {
         erc20Tokens = await getTokensRange(0, tokenCount);
-        console.log('fetchTokens', erc20Tokens);
       }
     }
 
@@ -210,7 +208,7 @@ module.exports = async (bridgeState, lotionPort, db, app) => {
       // balanceOf(address)
       case '0x70a08231': {
         const color = parseInt(await getColor(txObj.to), 16);
-        const address = `0x${txObj.data.substring(10, 50)}`;
+        const address = `0x${txObj.data.substring(txObj.data.length - 40)}`;
         const balances = bridgeState.currentState.balances[color] || {};
         if (isNFT(color)) {
           const nfts = balances[address] || [];
