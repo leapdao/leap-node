@@ -17,3 +17,11 @@ title: Connect to testnet
 1. Go to [stake-dev.parseclabs.org/#0x9c5330342db6b48e1bd8b1089829d9d1ac09b519](https://stake-dev.parseclabs.org/#0x9c5330342db6b48e1bd8b1089829d9d1ac09b519)
 2. Put your token contract address
 3. Execute transaction
+
+## Useful links
+
+[Block explorer](https://stake-dev.parseclabs.org/0x9c5330342db6b48e1bd8b1089829d9d1ac09b519/explorer)
+
+[Deposit tokens](https://stake-dev.parseclabs.org/0x9c5330342db6b48e1bd8b1089829d9d1ac09b519/deposit)
+
+[Health check page](https://health.parseclabs.org/)
