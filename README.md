@@ -50,7 +50,7 @@ Example: `DEBUG=tendermint,parsec:tx parsec`
 
 ### Config presets
 
-Dev config file: <a href="https://raw.githubusercontent.com/parsec-labs/parsec-node/master/presets/parsec-testnet-alpha.json" download>parsec-testnet-alpha.json</a>
+Dev config file: <a href="https://raw.githubusercontent.com/parsec-labs/parsec-node/master/presets/parsec-testnet-beta.json" download>parsec-testnet-beta.json</a>
 
 Testnet config file: N/A
 
@@ -62,7 +62,7 @@ You can use [Terraform](https://www.terraform.io/) to spin up an Amazon EC2 inst
 
 ```
 terraform init setup/cloud
-terraform apply -var ssh_public_file="~/.ssh/parsec-testnet.pub" -var ssh_private_file="~/.ssh/parsec-testnet" -var network="testnet-alpha" setup/cloud
+terraform apply -var ssh_public_file="~/.ssh/parsec-testnet.pub" -var ssh_private_file="~/.ssh/parsec-testnet" -var network="testnet-beta" setup/cloud
 ```
 
 
