@@ -6,7 +6,7 @@ variable "region" {
 
 variable "network" {
   description = "Network name to run node on"
-  default = "parsec-testnet-alpha"
+  default = "parsec-testnet-beta"
   type = "string"
 }
 

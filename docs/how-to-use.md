@@ -38,7 +38,7 @@ title: How to use
 
 ### Config presets
 
-Dev config file: <a href="https://raw.githubusercontent.com/parsec-labs/parsec-node/master/presets/parsec-testnet-alpha.json" download>parsec-testnet-alpha.json</a>
+Dev config file: <a href="https://raw.githubusercontent.com/parsec-labs/parsec-node/master/presets/parsec-testnet-beta.json" download>parsec-testnet-beta.json</a>
 
 Testnet config file: N/A
 
