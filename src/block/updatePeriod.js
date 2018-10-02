@@ -14,15 +14,15 @@ const { logPeriod } = require('../debug');
 module.exports = async (state, chainInfo, bridgeState) => {
   if (chainInfo.height % 32 === 0) {
     logPeriod('updatePeriod');
-    bridgeState.previousPeriod = bridgeState.currentPeriod;
-    bridgeState.currentPeriod = new Period(
-      bridgeState.previousPeriod.merkleRoot()
-    );
-    submitPeriod(
-      bridgeState.previousPeriod,
+    await submitPeriod(
+      bridgeState.currentPeriod,
       state.slots,
       chainInfo.height,
       bridgeState
+    );
+    bridgeState.previousPeriod = bridgeState.currentPeriod;
+    bridgeState.currentPeriod = new Period(
+      bridgeState.previousPeriod.merkleRoot()
     );
   }
   if (chainInfo.height % 32 === 16) {

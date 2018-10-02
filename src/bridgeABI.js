@@ -243,7 +243,7 @@ module.exports = [
     outputs: [
       {
         name: 'amount',
-        type: 'uint64',
+        type: 'uint256',
       },
       {
         name: 'color',
@@ -682,33 +682,6 @@ module.exports = [
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        name: '_txData',
-        type: 'bytes32[]',
-      },
-    ],
-    name: 'readInvalidDepositProof',
-    outputs: [
-      {
-        name: 'depositId',
-        type: 'uint32',
-      },
-      {
-        name: 'value',
-        type: 'uint64',
-      },
-      {
-        name: 'signer',
-        type: 'address',
-      },
-    ],
-    payable: false,
-    stateMutability: 'pure',
     type: 'function',
   },
   {

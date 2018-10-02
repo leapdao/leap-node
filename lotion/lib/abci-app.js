@@ -129,9 +129,9 @@ module.exports = function configureABCIServer({
 
   abciApp.commit = async () => {
     chainInfo.height += 1;
-    blockMiddleware.forEach(blockHandler => {
-      blockHandler(store, chainInfo);
-    });
+    for (const blockHandler of blockMiddleware) {
+      await blockHandler(store, chainInfo);
+    }
     const appHash = await getRoot(store);
     return { data: appHash };
   };

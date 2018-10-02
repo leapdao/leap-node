@@ -19,7 +19,7 @@ module.exports = async (period, slots, height, bridgeState) => {
     .call();
 
   // period not found
-  logPeriod('submittedPeriod', submittedPeriod);
+  logPeriod('submittedPeriod', period.merkleRoot(), submittedPeriod);
   if (submittedPeriod.timestamp === '0') {
     const mySlots = getSlotsByAddr(slots, bridgeState.account.address);
     const currentSlotId = getCurrentSlotId(slots, height);
