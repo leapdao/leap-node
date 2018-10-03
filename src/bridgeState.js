@@ -13,6 +13,7 @@ const { handleEvents, getGenesisBlock } = require('./utils');
 
 module.exports = class BridgeState {
   constructor(db, config) {
+    this.config = config;
     this.web3 = new Web3();
     this.web3.setProvider(
       new this.web3.providers.HttpProvider(config.rootNetwork)

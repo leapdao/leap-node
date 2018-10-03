@@ -255,6 +255,24 @@ module.exports = async (bridgeState, lotionPort, db, app) => {
     /* eslint-enable */
   };
 
+  const getConfig = async () => {
+    const config = {
+      bridgeAddr: bridgeState.config.bridgeAddr,
+      rootNetwork: bridgeState.config.rootNetwork,
+      network: bridgeState.config.network,
+    };
+
+    if (bridgeState.config.genesis) {
+      config.genesis = bridgeState.config.genesis;
+    }
+
+    if (bridgeState.config.peers) {
+      config.peers = bridgeState.config.peers;
+    }
+
+    return config;
+  };
+
   const withCallback = method => {
     return function handler(args, cb) {
       method(...args)
@@ -281,6 +299,7 @@ module.exports = async (bridgeState, lotionPort, db, app) => {
     parsec_getColor: getColor,
     parsec_getColors: getColors,
     parsec_status: getNodeStatus,
+    parsec_getConfig: getConfig,
   };
 
   const apiMethodsWithCallback = Object.keys(nodeApi).reduce((set, key) => {
