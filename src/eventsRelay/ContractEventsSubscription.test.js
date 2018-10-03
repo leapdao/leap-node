@@ -58,7 +58,7 @@ test('init', async () => {
   );
 
   const events = await sub.init();
-  expect(events).toBe(contractEvents);
+  expect(events).toEqual(contractEvents);
 });
 
 test('emitter', async () => {
@@ -75,7 +75,7 @@ test('emitter', async () => {
   let emitted = false;
   sub.on('events', events => {
     emitted = true;
-    expect(events).toBe(contractEvents);
+    expect(events).toEqual(contractEvents);
   });
 
   await sub.init();
