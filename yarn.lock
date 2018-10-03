@@ -875,6 +875,14 @@ babel-plugin-transform-strict-mode@^6.24.1:
     babel-runtime "^6.22.0"
     babel-types "^6.24.1"
 
+babel-polyfill@^6.26.0:
+  version "6.26.0"
+  resolved "https://registry.yarnpkg.com/babel-polyfill/-/babel-polyfill-6.26.0.tgz#379937abc67d7895970adc621f284cd966cf2153"
+  dependencies:
+    babel-runtime "^6.26.0"
+    core-js "^2.5.0"
+    regenerator-runtime "^0.10.5"
+
 babel-preset-env@^1.6.1:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/babel-preset-env/-/babel-preset-env-1.7.0.tgz#dea79fa4ebeb883cd35dab07e260c1c9c04df77a"
@@ -5264,10 +5272,11 @@ parse5@4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/parse5/-/parse5-4.0.0.tgz#6d78656e3da8d78b4ec0b906f7c08ef1dfe3f608"
 
-parsec-lib@0.16.5:
-  version "0.16.5"
-  resolved "https://registry.yarnpkg.com/parsec-lib/-/parsec-lib-0.16.5.tgz#7e58d18de60516d6f6e89f256789f2bf604bd2ed"
+parsec-lib@0.16.8:
+  version "0.16.8"
+  resolved "https://registry.yarnpkg.com/parsec-lib/-/parsec-lib-0.16.8.tgz#b9825a6ccf1512586100a2d4b221aa74367dc028"
   dependencies:
+    babel-polyfill "^6.26.0"
     bn.js "^4.11.8"
     ethereumjs-util "^4.5.0"
     fast-equals "^1.5.0"
@@ -5734,6 +5743,10 @@ realpath-native@^1.0.0:
 regenerate@^1.2.1:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/regenerate/-/regenerate-1.4.0.tgz#4a856ec4b56e4077c557589cae85e7a4c8869a11"
+
+regenerator-runtime@^0.10.5:
+  version "0.10.5"
+  resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.10.5.tgz#336c3efc1220adcedda2c9fab67b5a7955a33658"
 
 regenerator-runtime@^0.11.0:
   version "0.11.1"

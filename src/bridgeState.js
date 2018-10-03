@@ -58,10 +58,10 @@ module.exports = class BridgeState {
           };
         },
         ExitStarted: ({ returnValues: event }) => {
-          const outpoint = new Outpoint(event.txHash, event.outIndex);
+          const outpoint = new Outpoint(event.txHash, Number(event.outIndex));
           this.exits[outpoint.getUtxoId()] = {
             txHash: event.txHash,
-            outIndex: event.outIndex,
+            outIndex: Number(event.outIndex),
             exitor: event.exitor,
             color: event.color,
             amount: event.amount,

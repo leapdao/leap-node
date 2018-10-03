@@ -14,7 +14,7 @@ module.exports = (state, tx) => {
         return `epochLength: ${tx.options.epochLength}`;
       }
       case Type.EXIT: {
-        return `exit`;
+        return `exit: ${tx.inputs[0].getUtxoId()}`;
       }
       case Type.TRANSFER: {
         const inputStrings = tx.inputs

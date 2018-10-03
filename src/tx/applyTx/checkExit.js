@@ -5,7 +5,8 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-const { Type } = require('parsec-lib');
+const { Type, Output } = require('parsec-lib');
+const { addrCmp } = require('../../utils');
 
 module.exports = (state, tx, bridgeState) => {
   if (tx.type !== Type.EXIT) {
@@ -21,8 +22,10 @@ module.exports = (state, tx, bridgeState) => {
   const exit = bridgeState.exits[prevout.getUtxoId()];
   if (
     !exit ||
-    exit.exitor !== unspent.address ||
-    Number(exit.amount) !== unspent.value ||
+    !addrCmp(exit.exitor, unspent.address) ||
+    (Output.isNFT(Number(exit.color))
+      ? exit.amount !== unspent.value
+      : Number(exit.amount) !== unspent.value) ||
     Number(exit.color) !== unspent.color
   ) {
     throw new Error('Trying to submit incorrect exit');
