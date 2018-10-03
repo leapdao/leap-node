@@ -6,6 +6,7 @@
  */
 
 const { Type, Output } = require('parsec-lib');
+const { addrCmp } = require('../../utils');
 
 module.exports = (state, tx, bridgeState) => {
   if (tx.type !== Type.EXIT) {
@@ -21,7 +22,7 @@ module.exports = (state, tx, bridgeState) => {
   const exit = bridgeState.exits[prevout.getUtxoId()];
   if (
     !exit ||
-    exit.exitor !== unspent.address ||
+    !addrCmp(exit.exitor, unspent.address) ||
     (Output.isNFT(Number(exit.color))
       ? exit.amount !== unspent.value
       : Number(exit.amount) !== unspent.value) ||
