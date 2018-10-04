@@ -34,7 +34,7 @@ const getState = async () => {
 };
 
 async function run() {
-  for (let i = 0; i < 100; i += 1) {
+  for (let i = 0; i < 10; i += 1) {
     console.log('------');
     console.log((await getState()).balances);
     console.log('------');
