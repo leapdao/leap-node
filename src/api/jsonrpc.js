@@ -4,7 +4,7 @@ const jayson = require('jayson');
 const jsonParser = require('body-parser').json;
 const WsJsonRpcServer = require('rpc-websockets').Server;
 
-const { Tx, Block, Util } = require('parsec-lib');
+const { Tx, Type, Block, Util } = require('parsec-lib');
 
 const sendTx = require('../txHelpers/sendTx');
 const { unspentForAddress, range, isNFT } = require('../utils');
@@ -126,29 +126,54 @@ module.exports = async (bridgeState, lotionPort, db, app) => {
     return tx.hash();
   };
 
+  const txValue = (tx, prevTx) => {
+    // assuming first output is transfer, second one is change
+    if (tx.outputs && tx.outputs.length > 0) {
+      return {
+        value: tx.outputs[0].value,
+        color: tx.outputs[0].color,
+      };
+    }
+
+    if (tx.type === Type.EXIT && prevTx) {
+      const output = prevTx.outputs[tx.inputs[0].prevout.index];
+      return {
+        value: output.value,
+        color: output.color,
+      };
+    }
+
+    return { value: 0, color: 0 };
+  };
+
   const txResponse = async (tx, blockHash, height, txPos) => {
+    let prevTx = null;
     let from = '';
     if (tx.inputs && tx.inputs.length > 0 && tx.inputs[0].prevout) {
       const prevTxHash = tx.inputs[0].prevout.hash;
       const outputIndex = tx.inputs[0].prevout.index;
       const txDoc = await db.getTransaction(Util.toHexString(prevTxHash));
       if (txDoc) {
-        from = Tx.fromJSON(txDoc.txData).outputs[outputIndex].address;
+        prevTx = Tx.fromJSON(txDoc.txData);
+        from = prevTx.outputs[outputIndex].address;
       }
     }
-    return {
+    const { value, color } = txValue(tx, prevTx);
+    const response = {
+      value,
+      color,
       hash: tx.hash(),
       from,
       raw: tx.hex(),
       blockHash,
       blockNumber: `0x${height.toString(16)}`,
       transactionIndex: txPos,
-      // assuming first output is transfer, second one is change
-      value: tx.outputs && tx.outputs.length ? tx.outputs[0].value : 0,
       to: tx.outputs && tx.outputs.length ? tx.outputs[0].address : null,
       gas: '0x0',
       gasPrice: '0x0',
     };
+
+    return response;
   };
 
   const getTransactionByHash = async hash => {
