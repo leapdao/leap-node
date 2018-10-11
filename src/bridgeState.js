@@ -6,10 +6,11 @@
  */
 
 const Web3 = require('web3');
-const { Period, Outpoint } = require('parsec-lib');
+const { Period, Block, Outpoint } = require('parsec-lib');
 const bridgeABI = require('./bridgeABI');
 const ContractEventsSubscription = require('./eventsRelay/ContractEventsSubscription');
 const { handleEvents, getGenesisBlock } = require('./utils');
+const { GENESIS } = require('./utils/constants');
 
 module.exports = class BridgeState {
   constructor(db, config) {
@@ -27,7 +28,7 @@ module.exports = class BridgeState {
     this.blockHeight = 0;
     this.currentState = null;
     this.networkId = config.networkId;
-    this.currentPeriod = new Period();
+    this.currentPeriod = new Period(GENESIS);
     this.previousPeriod = null;
     this.deposits = {};
     this.exits = {};
@@ -37,6 +38,7 @@ module.exports = class BridgeState {
   async init() {
     this.lastBlockSynced = await this.db.getLastBlockSynced();
     await this.watchContractEvents();
+    await this.initBlocks();
   }
 
   async watchContractEvents() {
@@ -73,5 +75,15 @@ module.exports = class BridgeState {
       })
     );
     await eventsSubscription.init();
+  }
+
+  async initBlocks() {
+    const blockOptions = {
+      timestamp: Math.round(Date.now() / 1000),
+    };
+    const blocks = [new Block(0, blockOptions), new Block(1, blockOptions)];
+
+    blocks.forEach(b => this.currentPeriod.addBlock(b));
+    await Promise.all(blocks.map(b => this.db.storeBlock(b)));
   }
 };
