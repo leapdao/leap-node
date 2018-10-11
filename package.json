@@ -1,6 +1,6 @@
 {
   "name": "parsec-node",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "main": "index.js",
   "author": "Alex Lunyov <isuntc@gmail.com>",
   "license": "MPL-2.0",
