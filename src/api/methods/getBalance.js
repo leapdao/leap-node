@@ -5,7 +5,7 @@ module.exports = async (bridgeState, address, tag = 'latest') => {
     /* eslint-disable no-throw-literal */
     throw {
       code: INVALID_PARAMS,
-      message: 'Only balance for latest block is supported.',
+      message: 'Only balance for latest block is supported',
     };
     /* eslint-enable no-throw-literal */
   }
