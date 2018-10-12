@@ -7,16 +7,16 @@
 
 module.exports = function unspentForAddress(unspent, address, color) {
   return Object.keys(unspent)
+    .filter(
+      k =>
+        unspent[k] &&
+        unspent[k].address.toLowerCase() === address.toLowerCase() &&
+        (color !== undefined ? unspent[k].color === color : true)
+    )
     .map(k => ({
       outpoint: k,
       output: unspent[k],
     }))
-    .filter(
-      u =>
-        u.output &&
-        u.output.address.toLowerCase() === address.toLowerCase() &&
-        (color !== undefined ? u.output.color === color : true)
-    )
     .sort((a, b) => {
       return a.output.value - b.output.value;
     });
