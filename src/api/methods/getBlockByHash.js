@@ -6,16 +6,18 @@ module.exports = async (db, hash, showFullTxs = false) => {
   const blockDoc = await db.getBlock(hash);
   if (!blockDoc) return null;
 
-  const { blockData, height } = blockDoc;
+  const { blockData } = blockDoc;
   const block = Block.fromJSON(blockData);
   const txs = !showFullTxs
     ? block.txHashList
     : await Promise.all(
-        block.txList.map((tx, pos) => txResponse(db, tx, hash, height, pos))
+        block.txList.map((tx, pos) =>
+          txResponse(db, tx, block.hash(), block.height, pos)
+        )
       );
   return {
-    number: `0x${height.toString(16)}`,
-    hash,
+    number: `0x${block.height.toString(16)}`,
+    hash: block.hash(),
     parentHash: block.parent,
     size: `0x${block.hex().length.toString(16)}`,
     timestamp: `0x${block.timestamp.toString(16)}`,
