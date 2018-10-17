@@ -2,6 +2,8 @@ const { Output } = require('parsec-lib');
 const getColor = require('./getColor');
 const { INVALID_PARAMS } = require('./constants');
 
+const formatUint256 = n => `0x${n.toString(16).padStart(64, '0')}`;
+
 module.exports = async (bridgeState, txObj, tag) => {
   if (tag !== 'latest') {
     /* eslint-disable no-throw-literal */
@@ -22,11 +24,11 @@ module.exports = async (bridgeState, txObj, tag) => {
       const balances = bridgeState.currentState.balances[color] || {};
       if (Output.isNFT(color)) {
         const nfts = balances[address] || [];
-        return `0x${nfts.length.toString(16)}`;
+        return formatUint256(nfts.length);
       }
 
       const balance = balances[address] || 0;
-      return `0x${balance.toString(16)}`;
+      return formatUint256(balance);
     }
 
     // tokenOfOwnerByIndex(address,uint256)
