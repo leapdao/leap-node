@@ -1,8 +1,9 @@
 const { Output } = require('parsec-lib');
+const BN = require('bn.js');
 const getColor = require('./getColor');
 const { INVALID_PARAMS } = require('./constants');
 
-const formatUint256 = n => `0x${n.toString(16).padStart(64, '0')}`;
+const formatUint256 = n => `0x${new BN(n, 10).toString(16).padStart(64, '0')}`;
 
 module.exports = async (bridgeState, txObj, tag) => {
   if (tag !== 'latest') {
@@ -47,7 +48,7 @@ module.exports = async (bridgeState, txObj, tag) => {
           };
           /* eslint-enable */
         }
-        return nfts[index];
+        return formatUint256(nfts[index]);
       }
 
       /* eslint-disable no-throw-literal */

@@ -35,7 +35,7 @@ describe('executeCall', () => {
         currentState: {
           balances: {
             [NFT_COLOR_BASE]: {
-              [A1]: ['000000000'],
+              [A1]: ['1'],
             },
           },
         },
@@ -43,7 +43,9 @@ describe('executeCall', () => {
       tx,
       'latest'
     );
-    expect(response).toBe('000000000');
+    expect(response).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000001'
+    );
   });
 
   test('tokenOfOwnerByIndex: index overflow', async () => {
@@ -118,7 +120,9 @@ describe('executeCall', () => {
       tx,
       'latest'
     );
-    expect(response).toBe('0x64');
+    expect(response).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000064'
+    );
   });
 
   test('balanceOf: empty erc20color', async () => {
@@ -137,7 +141,9 @@ describe('executeCall', () => {
       tx,
       'latest'
     );
-    expect(response).toBe('0x0');
+    expect(response).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000000'
+    );
   });
 
   test('balanceOf: erc721color', async () => {
@@ -160,7 +166,9 @@ describe('executeCall', () => {
       tx,
       'latest'
     );
-    expect(response).toBe('0x1');
+    expect(response).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000001'
+    );
   });
 
   test('balanceOf: empty erc721color', async () => {
@@ -179,6 +187,8 @@ describe('executeCall', () => {
       tx,
       'latest'
     );
-    expect(response).toBe('0x0');
+    expect(response).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000000'
+    );
   });
 });
