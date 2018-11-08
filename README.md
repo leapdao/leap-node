@@ -1,4 +1,4 @@
-# PARSEC Labs validation node
+# Leap DAO validation node
 
 https://parseclabs.readthedocs.io/en/latest/
 
@@ -10,23 +10,23 @@ https://parseclabs.readthedocs.io/en/latest/
 
 ## Install
 
-`npm install parsec-node -g` or `yarn global add parsec-node`
+`npm install leap-node -g` or `yarn global add leap-node`
 
 ## Run locally
 
-`parsec [ARGS] --config=path-to-config.json`
+`leap-node [ARGS] --config=path-to-config.json`
 
 ### Debug
 
 To enable logs use `DEBUG` env variable (see: https://www.npmjs.com/package/debug). Debug namepaces:
 
 - `tendermint`
-- `parsec`
-- `parsec:period`
-- `parsec:tx`
+- `leap-node`
+- `leap-node:period`
+- `leap-node:tx`
 - `abci` (built-in from js-abci)
 
-Example: `DEBUG=tendermint,parsec:tx parsec`
+Example: `DEBUG=tendermint,leap-node:tx leap-node`
 
 ### Available cli arguments
 
@@ -42,7 +42,7 @@ Example: `DEBUG=tendermint,parsec:tx parsec`
 
 ### Config file options
 
-- `bridgeAddr` — parsec bridge contract address
+- `bridgeAddr` — leap bridge contract address
 - `rootNetwork` — ethereum provider url
 - `genesis` — genesis string
 - `network` — network id
@@ -50,7 +50,7 @@ Example: `DEBUG=tendermint,parsec:tx parsec`
 
 ### Config presets
 
-Dev config file: <a href="https://raw.githubusercontent.com/parsec-labs/parsec-node/master/presets/parsec-testnet-beta.json" download>parsec-testnet-beta.json</a>
+Dev config file: `leap-node --network=testnet-beta`
 
 Testnet config file: N/A
 
@@ -62,13 +62,13 @@ You can use [Terraform](https://www.terraform.io/) to spin up an Amazon EC2 inst
 
 ```
 terraform init setup/cloud
-terraform apply -var ssh_public_file="~/.ssh/parsec-testnet.pub" -var ssh_private_file="~/.ssh/parsec-testnet" -var network="testnet-beta" setup/cloud
+terraform apply -var ssh_public_file="~/.ssh/leap-testnet.pub" -var ssh_private_file="~/.ssh/leap-testnet" -var network="testnet-beta" setup/cloud
 ```
 
 
 Some useful commands once it is up and running:
-- check the logs: `ssh ubuntu@<ec2 host> journalctl -u parsec`
-- start/stop/restart/status: `ssh ubuntu@<ec2 host> sudo service parsec start/stop/restart/status`
+- check the logs: `ssh ubuntu@<ec2 host> journalctl -u leap-node`
+- start/stop/restart/status: `ssh ubuntu@<ec2 host> sudo service leap-node start/stop/restart/status`
 
 ## Dive in development
 

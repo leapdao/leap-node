@@ -1,4 +1,4 @@
-const { logParsec } = require('../debug');
+const { logNode } = require('../debug');
 
 const addBlock = require('./addBlock');
 const updatePeriod = require('./updatePeriod');
@@ -20,7 +20,7 @@ module.exports = (bridgeState, db, noValidatorsUpdates) => async (
   }
 
   updateEpoch(state, chainInfo);
-  logParsec(
+  logNode(
     'Height: %d, epoch: %d, epochLength: %d',
     chainInfo.height,
     state.epoch.epoch,

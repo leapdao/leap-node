@@ -6,7 +6,7 @@ variable "region" {
 
 variable "network" {
   description = "Network name to run node on"
-  default = "parsec-testnet-beta"
+  default = "testnet-beta"
   type = "string"
 }
 
@@ -20,8 +20,8 @@ variable "ssh_private_file" {
   type = "string"
 }
 
-data "template_file" "parsec_systemd" {
-  template = "${file("${path.module}/parsec.systemd.service")}"
+data "template_file" "leap_systemd" {
+  template = "${file("${path.module}/leap.systemd.service")}"
 
   vars {
     network = "${var.network}"
@@ -33,12 +33,12 @@ provider "aws" {
 }
 
 
-resource "aws_instance" "parsec_node" {
+resource "aws_instance" "leap_node" {
   ami                    = "ami-58d7e821"
   availability_zone      = "eu-west-1c"
   instance_type          = "t2.micro"
-  vpc_security_group_ids = ["${aws_security_group.parsec_tendermint.id}", "${aws_security_group.parsec_ssh.id}"]
-  key_name               = "${aws_key_pair.parsec_auth.id}"
+  vpc_security_group_ids = ["${aws_security_group.leap_tendermint.id}", "${aws_security_group.leap_ssh.id}"]
+  key_name               = "${aws_key_pair.leap_auth.id}"
 
   connection {
     user        = "ubuntu"
@@ -47,8 +47,8 @@ resource "aws_instance" "parsec_node" {
   }
 
   provisioner "file" {
-    content     = "${data.template_file.parsec_systemd.rendered}"
-    destination = "/tmp/parsec.service"
+    content     = "${data.template_file.leap_systemd.rendered}"
+    destination = "/tmp/leap.service"
   }
 
   provisioner "file" {
@@ -57,8 +57,8 @@ resource "aws_instance" "parsec_node" {
   }
 
   provisioner "file" {
-    source      = "presets/parsec-${var.network}.json"
-    destination = "/home/ubuntu/parsec-${var.network}.json"
+    source      = "presets/leap-${var.network}.json"
+    destination = "/home/ubuntu/leap-${var.network}.json"
   }
 
   provisioner "remote-exec" {
@@ -69,32 +69,32 @@ resource "aws_instance" "parsec_node" {
   }
 
   tags {
-    Group = "parsec_node"
-    Name = "parsec node - ${var.network}"
+    Group = "leap_node"
+    Name = "leap node - ${var.network}"
   }
 }
 
-resource "aws_key_pair" "parsec_auth" {
-  key_name   = "parsec_auth"
+resource "aws_key_pair" "leap_auth" {
+  key_name   = "leap_auth"
   public_key = "${file(var.ssh_public_file)}"
 }
 
 resource "aws_eip_association" "eip_assoc" {
-  instance_id   = "${aws_instance.parsec_node.id}"
-  allocation_id = "${aws_eip.parsec_eip.id}"
+  instance_id   = "${aws_instance.leap_node.id}"
+  allocation_id = "${aws_eip.leap_eip.id}"
 }
 
-resource "aws_eip" "parsec_eip" {
+resource "aws_eip" "leap_eip" {
   vpc = true
 
   tags {
-    Group = "parsec_node"
-    Name = "PARSEC node IP"
+    Group = "leap_node"
+    Name = "Leap node IP"
   }
 }
 
-resource "aws_security_group" "parsec_ssh" {
-  name        = "parsec_ssh"
+resource "aws_security_group" "leap_ssh" {
+  name        = "leap_ssh"
   description = "Allows SSH connection to node instance"
 
   ingress {
@@ -106,13 +106,13 @@ resource "aws_security_group" "parsec_ssh" {
   }
 
   tags {
-    Group = "parsec_node"
-    Name = "PARSEC node SSH"
+    Group = "leap_node"
+    Name = "Leap node SSH"
   }
 }
 
-resource "aws_security_group" "parsec_tendermint" {
-  name        = "parsec_tendermint"
+resource "aws_security_group" "leap_tendermint" {
+  name        = "leap_tendermint"
   description = "Allows tendermint and JSON RPC connections"
 
   ingress {
@@ -171,24 +171,24 @@ resource "aws_security_group" "parsec_tendermint" {
   }
 
   tags {
-    Group = "parsec_node"
-    Name = "PARSEC node security group"
+    Group = "leap_node"
+    Name = "Leap node security group"
   }
 }
 
 // The list of cluster instance IDs
 output "instance" {
-  value = ["${aws_instance.parsec_node.id}"]
+  value = ["${aws_instance.leap_node.id}"]
 }
 
 // The list of cluster instance public IPs
 output "public_ip" {
-  value = ["${aws_eip.parsec_eip.public_ip}"]
+  value = ["${aws_eip.leap_eip.public_ip}"]
 }
 
 terraform {
   backend "s3" {
-    bucket = "parsec-node-state"
+    bucket = "leap-node-state"
     key    = "testnet"
     region = "eu-west-1"
   }

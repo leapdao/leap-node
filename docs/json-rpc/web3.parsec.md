@@ -1,8 +1,8 @@
 ---
-title: "web3.parsec"
+title: "Leap web3 extension"
 ---
 
-# parsec_unspent
+# plasma_unspent
 
 Returns the list of UTXOs for a given address.
 
@@ -26,7 +26,7 @@ params: ["0x407d73d8a49eeb85d32cf465507dd71d507100c1"]
 
 Request
 ```bash
-curl --data '{"method":"parsec_unspent","params":["0x407d73d8a49eeb85d32cf465507dd71d507100c1"],"id":1,"jsonrpc":"2.0"}' -H "Content-Type: application/json" -X POST localhost:8645
+curl --data '{"method":"plasma_unspent","params":["0x407d73d8a49eeb85d32cf465507dd71d507100c1"],"id":1,"jsonrpc":"2.0"}' -H "Content-Type: application/json" -X POST localhost:8645
 ```
 
 Response

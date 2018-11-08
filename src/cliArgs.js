@@ -94,7 +94,7 @@ if (cliArgs.network) {
     __dirname,
     '..',
     'presets',
-    `parsec-${cliArgs.network}.json`
+    `leap-${cliArgs.network}.json`
   );
 
   if (fs.existsSync(configPath)) {

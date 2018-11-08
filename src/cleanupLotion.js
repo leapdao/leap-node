@@ -29,7 +29,7 @@ module.exports = async app => {
 
     await rimraf(path.join(lotionPath, 'data'));
     await rimraf(path.join(lotionPath, 'merk'));
-    await rimraf(path.join(lotionPath, 'parsec.db'));
+    await rimraf(path.join(lotionPath, 'leap.db'));
     await rimraf(path.join(configPath, 'addrbook.json'));
     await rimraf(path.join(configPath, 'config.toml'));
     await rimraf(path.join(configPath, 'genesis.json'));

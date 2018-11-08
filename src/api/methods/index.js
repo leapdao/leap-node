@@ -26,11 +26,11 @@ module.exports = (bridgeState, db, app, lotionPort) => {
       db
     ),
     eth_call: require('./executeCall').bind(null, bridgeState),
-    parsec_unspent: require('./getUnspent').bind(null, bridgeState),
-    parsec_getColor: require('./getColor').bind(null, bridgeState),
-    parsec_getColors: require('./getColors').bind(null, bridgeState),
-    parsec_status: require('./getNodeStatus').bind(null, bridgeState, app),
-    parsec_getConfig: require('./getConfig').bind(null, bridgeState),
+    plasma_unspent: require('./getUnspent').bind(null, bridgeState),
+    plasma_getColor: require('./getColor').bind(null, bridgeState),
+    plasma_getColors: require('./getColors').bind(null, bridgeState),
+    plasma_status: require('./getNodeStatus').bind(null, bridgeState, app),
+    plasma_getConfig: require('./getConfig').bind(null, bridgeState),
   };
 
   const methodsWithCallback = Object.keys(nodeApi).reduce((set, key) => {

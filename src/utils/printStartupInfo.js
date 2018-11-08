@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2018-present, Parsec Labs (parseclabs.org)
+ * Copyright (c) 2018-present, Leap DAO (leapdao.org)
  *
  * This source code is licensed under the Mozilla Public License Version 2.0
  * found in the LICENSE file in the root directory of this source tree.
@@ -13,12 +13,12 @@ const { promisify } = require('util');
 const colors = require('colors');
 const getSlotsByAddr = require('./getSlotsByAddr');
 const readSlots = require('./readSlots');
-const { logParsec } = require('../debug');
+const { logNode } = require('../debug');
 
 const readFile = promisify(fs.readFile);
 
 module.exports = async (params, bridgeState) => {
-  logParsec(`Last block synced: ${bridgeState.lastBlockSynced}`);
+  logNode(`Last block synced: ${bridgeState.lastBlockSynced}`);
 
   const validatorKeyPath = path.join(
     params.lotionPath,

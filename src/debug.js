@@ -1,6 +1,6 @@
-exports.logParsec = require('debug')('parsec');
+exports.logNode = require('debug')('leap-node');
 exports.logTendermint = require('debug')('tendermint');
-exports.logPeriod = require('debug')('parsec:period');
-exports.logTx = require('debug')('parsec:tx');
-exports.logError = require('debug')('parsec:error');
-exports.logValidators = require('debug')('parsec:validators');
+exports.logPeriod = require('debug')('leap-node:period');
+exports.logTx = require('debug')('leap-node:tx');
+exports.logError = require('debug')('leap-node:error');
+exports.logValidators = require('debug')('leap-node:validators');

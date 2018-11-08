@@ -1,5 +1,5 @@
 {
-  "name": "parsec-node",
+  "name": "leap-node",
   "version": "2.2.2",
   "main": "index.js",
   "author": "Alex Lunyov <isuntc@gmail.com>",
@@ -12,7 +12,7 @@
     "machine-gun": "node tools/machine-gun.js"
   },
   "bin": {
-    "parsec": "./bin.js"
+    "leap-node": "./bin.js"
   },
   "lint-staged": {
     "*.js": [

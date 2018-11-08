@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2018-present, Parsec Labs (parseclabs.org)
+ * Copyright (c) 2018-present, Leap DAO (leapdao.org)
  *
  * This source code is licensed under the Mozilla Public License Version 2.0
  * found in the LICENSE file in the root directory of this source tree.
@@ -16,7 +16,7 @@ const unspentForAddress = require('../src/utils/unspentForAddress');
 const sendTx = require('../src/txHelpers/sendTx');
 
 const web3 = new Web3('https://rinkeby.infura.io');
-const parsecWeb3 = new Web3('http://localhost:8645');
+const plasmaWeb3 = new Web3('http://localhost:8645');
 
 const privKey =
   '0xad8e31c8862f5f86459e7cca97ac9302c5e1817077902540779eef66e21f394a';
@@ -40,13 +40,13 @@ async function run() {
     console.log('------');
 
     console.log(`From account: ${account.address}`);
-    console.log(`Balance: ${await parsecWeb3.eth.getBalance(account.address)}`);
+    console.log(`Balance: ${await plasmaWeb3.eth.getBalance(account.address)}`);
 
-    let latestBlockData = await parsecWeb3.eth.getBlock('latest');
+    let latestBlockData = await plasmaWeb3.eth.getBlock('latest');
     console.log(`Latest block: ${JSON.stringify(latestBlockData, null, 2)}`);
 
     console.log(latestBlockData.number);
-    latestBlockData = await parsecWeb3.eth.getBlock(latestBlockData.number);
+    latestBlockData = await plasmaWeb3.eth.getBlock(latestBlockData.number);
     console.log(
       `Latest block by number: ${JSON.stringify(latestBlockData, null, 2)}`
     );
@@ -61,8 +61,8 @@ async function run() {
     await sendTx(PORT, transfer1.hex());
     console.log('Transfer:', transfer1.hex());
     console.log(transfer1.hash());
-    const txData = await parsecWeb3.eth.getTransaction(transfer1.hash());
-    const blockData = await parsecWeb3.eth.getBlock(txData.blockHash);
+    const txData = await plasmaWeb3.eth.getTransaction(transfer1.hash());
+    const blockData = await plasmaWeb3.eth.getBlock(txData.blockHash);
     console.log(`getTransaction: ${JSON.stringify(txData, null, 2)}`);
     console.log(`Block data: ${JSON.stringify(blockData, null, 2)}`);
     console.log('------');
@@ -85,7 +85,7 @@ async function run() {
 
     const consolidateAddress = async address => {
       console.log(await getState());
-      const balance = await parsecWeb3.eth.getBalance(address);
+      const balance = await plasmaWeb3.eth.getBalance(address);
       const unspent = unspentForAddress(
         (await getState()).unspent,
         address,
@@ -108,7 +108,7 @@ async function run() {
 
     await consolidateAddress(ADDR_3);
 
-    latestBlockData = await parsecWeb3.eth.getBlock('latest');
+    latestBlockData = await plasmaWeb3.eth.getBlock('latest');
     console.log(latestBlockData.number);
   }
 }

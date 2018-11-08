@@ -1,7 +1,7 @@
 {
   "bridgeAddr": "0x2ac21a06346f075cfa4c59779f85830356ea64f3",
   "rootNetwork": "https://rinkeby.infura.io",
-  "network": "parsec-testnet-beta",
+  "network": "leap-testnet-beta",
   "genesis": {"app_hash":"2436cd126aca5c6ef46b17a041de5b935396224ce9fc2b9cc1f1a60bf52e317e","chain_id":"beta","consensus_params":{"block_gossip_params":{"block_part_size_bytes":"65536"},"block_size_params":{"max_bytes":"22020096","max_gas":"-1","max_txs":"10000"},"evidence_params":{"max_age":"100000"},"tx_size_params":{"max_bytes":"10240","max_gas":"-1"}},"genesis_time":"2018-07-16T10:08:17.520479952Z","validators":[{"name":"","power":"10","pub_key":{"type":"tendermint/PubKeyEd25519","value":"dkDWnZ7bIVksvfTMSZVupT5ZZW/C2LvRrj9Ce/Z9R/o="}}]},
   "peers": [
     "b661fa5f8b1ef4207ac2ecb99bb6e126fd1252eb@testnet-1.parseclabs.org:46691",

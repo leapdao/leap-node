@@ -10,11 +10,11 @@ title: How to use
 
 ## Install
 
-`npm install parsec-node -g` or `yarn global add parsec-node`
+`npm install leap-node -g` or `yarn global add leap-node`
 
 ## Run
 
-`parsec [ARGS] --config=path-to-config.json`
+`leap-node [ARGS] --config=path-to-config.json`
 
 ### Available cli arguments
 
@@ -30,7 +30,7 @@ title: How to use
 
 ### Config file options
 
-- `bridgeAddr` — parsec bridge contract address
+- `bridgeAddr` — leap bridge contract address
 - `rootNetwork` — ethereum provider url
 - `genesis` — genesis string
 - `network` — network id
@@ -38,7 +38,7 @@ title: How to use
 
 ### Config presets
 
-Dev config file: <a href="https://raw.githubusercontent.com/parsec-labs/parsec-node/master/presets/parsec-testnet-beta.json" download>parsec-testnet-beta.json</a>
+Dev config file: `leap-node --network=testnet-beta`
 
 Testnet config file: N/A
 

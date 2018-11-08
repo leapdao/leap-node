@@ -16,11 +16,11 @@ curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 sudo apt-get install -y nodejs
 sudo apt-get -y install yarn
 
-# Install PARSEC node
-sudo yarn global add parsec-node
+# Install Leap node
+sudo yarn global add leap-node
 
 # Setup system.d config
-sudo mv /tmp/parsec.service /etc/systemd/system/
+sudo mv /tmp/leap.service /etc/systemd/system/
 
 # Start the node
-sudo service parsec start
+sudo service leap start

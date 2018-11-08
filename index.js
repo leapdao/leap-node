@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2018-present, Parsec Labs (parseclabs.org)
+ * Copyright (c) 2018-present, Leap DAO (leapdao.org)
  *
  * This source code is licensed under the Mozilla Public License Version 2.0
  * found in the LICENSE file in the root directory of this source tree.
@@ -26,7 +26,7 @@ const { printStartupInfo } = require('./src/utils');
 const BridgeState = require('./src/bridgeState');
 const lotion = require('./lotion');
 
-const { logParsec, logTendermint } = require('./src/debug');
+const { logNode, logTendermint } = require('./src/debug');
 
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
@@ -96,13 +96,13 @@ async function run() {
     api
       .listenHttp({ port: cliArgs.rpcport, host: cliArgs.rpcaddr })
       .then(addr => {
-        logParsec(
+        logNode(
           `Http JSON RPC server is listening at ${addr.address}:${addr.port}`
         );
       });
 
     api.listenWs({ port: cliArgs.wsport, host: cliArgs.wsaddr }).then(addr => {
-      logParsec(
+      logNode(
         `Ws JSON RPC server is listening at ${addr.address}:${addr.port}`
       );
     });

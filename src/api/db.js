@@ -2,7 +2,7 @@ const path = require('path');
 const level = require('level');
 
 module.exports = app => {
-  const levelDb = level(path.join(app.lotionPath(), 'parsec.db'));
+  const levelDb = level(path.join(app.lotionPath(), 'leap.db'));
 
   /*
   * Returns last synced block number from the db. If there is no such a number, returns 0

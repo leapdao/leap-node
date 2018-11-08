@@ -1,5 +1,5 @@
 [Unit]
-Description=PARSEC node
+Description=Leap node
 Requires=network-online.target
 After=network-online.target
 
@@ -8,8 +8,8 @@ Restart=on-failure
 User=ubuntu
 Group=ubuntu
 PermissionsStartOnly=true
-Environment="DEBUG=parsec,parsec:tx,parsec:period"
-ExecStart=/usr/local/bin/parsec --p2pPort=46691 --rpcaddr=0.0.0.0 --wsaddr=0.0.0.0 --config=/home/ubuntu/parsec-${network}.json
+Environment="DEBUG=leap-node,leap-node:tx,leap-node:period"
+ExecStart=/usr/local/bin/leap-node --p2pPort=46691 --rpcaddr=0.0.0.0 --wsaddr=0.0.0.0 --config=/home/ubuntu/leap-${network}.json
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGTERM
 
