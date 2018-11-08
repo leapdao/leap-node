@@ -6,7 +6,7 @@
  */
 
 const Web3 = require('web3');
-const { Period, Block, Outpoint } = require('parsec-lib');
+const { Period, Block, Outpoint } = require('leap-core');
 const bridgeABI = require('./bridgeABI');
 const ContractEventsSubscription = require('./eventsRelay/ContractEventsSubscription');
 const { handleEvents, getGenesisBlock } = require('./utils');

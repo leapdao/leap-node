@@ -1,4 +1,4 @@
-const { Tx, Input, Outpoint, Output } = require('parsec-lib');
+const { Tx, Input, Outpoint, Output } = require('leap-core');
 const accumulateTx = require('./accumulateTx');
 
 const ADDR_1 = '0x4436373705394267350db2c06613990d34621d69';

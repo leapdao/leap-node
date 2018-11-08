@@ -5,7 +5,7 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-const { Block, Tx } = require('parsec-lib');
+const { Block, Tx } = require('leap-core');
 
 module.exports = async (state, chainInfo, { bridgeState, db }) => {
   const b = new Block(chainInfo.height, {

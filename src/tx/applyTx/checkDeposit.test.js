@@ -1,4 +1,4 @@
-const { Tx } = require('parsec-lib');
+const { Tx } = require('leap-core');
 const checkDeposit = require('./checkDeposit');
 
 const ADDR_1 = '0x4436373705394267350db2c06613990d34621d69';

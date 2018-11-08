@@ -1,4 +1,4 @@
-const { Block, Tx } = require('parsec-lib');
+const { Block, Tx } = require('leap-core');
 const getBlockByHash = require('./getBlockByHash');
 const txResponse = require('./txResponse');
 

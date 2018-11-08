@@ -5,7 +5,7 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-const { Type } = require('parsec-lib');
+const { Type } = require('leap-core');
 
 module.exports = (state, tx) => {
   if (tx.type !== Type.VALIDATOR_JOIN) {

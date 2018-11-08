@@ -5,7 +5,7 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-const { Tx } = require('parsec-lib');
+const { Tx } = require('leap-core');
 const applyTx = require('./applyTx');
 const accumulateTx = require('./accumulateTx');
 const printTx = require('../txHelpers/printTx');

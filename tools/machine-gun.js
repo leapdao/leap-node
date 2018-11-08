@@ -9,7 +9,7 @@
 
 const Web3 = require('web3');
 const axios = require('axios');
-const { helpers, Output, Tx, Outpoint } = require('parsec-lib');
+const { helpers, Output, Tx, Outpoint } = require('leap-core');
 
 const makeTransfer = require('../src/txHelpers/makeTransfer');
 const unspentForAddress = require('../src/utils/unspentForAddress');

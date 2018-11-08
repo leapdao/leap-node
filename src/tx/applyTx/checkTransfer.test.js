@@ -1,4 +1,4 @@
-const { Tx, Input, Outpoint, Output } = require('parsec-lib');
+const { Tx, Input, Outpoint, Output } = require('leap-core');
 
 const checkTransfer = require('./checkTransfer');
 

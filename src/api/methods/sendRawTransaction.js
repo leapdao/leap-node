@@ -1,4 +1,4 @@
-const { Tx } = require('parsec-lib');
+const { Tx } = require('leap-core');
 const sendTx = require('../../txHelpers/sendTx');
 
 module.exports = async (lotionPort, rawTx) => {

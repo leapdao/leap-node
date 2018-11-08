@@ -5,7 +5,7 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-const { Period } = require('parsec-lib');
+const { Period } = require('leap-core');
 const submitPeriod = require('../txHelpers/submitPeriod');
 const activateSlot = require('../txHelpers/activateSlot');
 const { getAuctionedByAddr } = require('../utils');

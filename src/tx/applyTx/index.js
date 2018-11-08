@@ -7,7 +7,7 @@
 
 /* eslint-disable global-require */
 
-const { Type } = require('parsec-lib');
+const { Type } = require('leap-core');
 const { checkOutpoints, removeInputs, addOutputs } = require('./utils');
 
 const checks = {

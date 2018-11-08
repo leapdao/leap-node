@@ -1,4 +1,4 @@
-const { Tx, Type, Util } = require('parsec-lib');
+const { Tx, Type, Util } = require('leap-core');
 
 const txValue = (tx, prevTx) => {
   // assuming first output is transfer, second one is change

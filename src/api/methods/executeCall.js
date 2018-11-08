@@ -1,4 +1,4 @@
-const { Output } = require('parsec-lib');
+const { Output } = require('leap-core');
 const BN = require('bn.js');
 const getColor = require('./getColor');
 const { INVALID_PARAMS } = require('./constants');

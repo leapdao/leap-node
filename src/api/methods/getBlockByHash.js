@@ -1,4 +1,4 @@
-const { Block } = require('parsec-lib');
+const { Block } = require('leap-core');
 const txResponse = require('./txResponse');
 
 module.exports = async (db, hash, showFullTxs = false) => {

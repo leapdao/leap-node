@@ -1,4 +1,4 @@
-const { Type } = require('parsec-lib');
+const { Type } = require('leap-core');
 const { range } = require('../utils');
 
 const printOutput = (output, sign) =>

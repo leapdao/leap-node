@@ -5,7 +5,7 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-const { Outpoint } = require('parsec-lib');
+const { Outpoint } = require('leap-core');
 const isEqual = require('lodash/isEqual');
 
 const { isNFT } = require('../../utils');

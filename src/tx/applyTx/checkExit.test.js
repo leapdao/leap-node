@@ -1,4 +1,4 @@
-const { Tx, Input, Outpoint } = require('parsec-lib');
+const { Tx, Input, Outpoint } = require('leap-core');
 const checkExit = require('./checkExit');
 
 const ADDR_1 = '0x4436373705394267350db2c06613990d34621d69';

@@ -8,7 +8,7 @@
 /* eslint-disable no-await-in-loop, no-console, no-loop-func */
 
 const axios = require('axios');
-const { Output, Tx, Input, Outpoint } = require('parsec-lib');
+const { Output, Tx, Input, Outpoint } = require('leap-core');
 
 const sendTx = require('../src/txHelpers/sendTx');
 

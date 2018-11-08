@@ -7,7 +7,7 @@
 
 /* eslint-disable no-await-in-loop, default-case */
 
-const { Tx, Input, Outpoint, Output } = require('parsec-lib');
+const { Tx, Input, Outpoint, Output } = require('leap-core');
 
 const ContractEventsSubscription = require('./ContractEventsSubscription');
 const sendTx = require('../txHelpers/sendTx');

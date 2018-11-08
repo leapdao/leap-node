@@ -5,7 +5,7 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-const { Type, Output } = require('parsec-lib');
+const { Type, Output } = require('leap-core');
 const { addrCmp } = require('../../utils');
 
 module.exports = (state, tx, bridgeState) => {

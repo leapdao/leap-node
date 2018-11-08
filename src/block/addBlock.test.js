@@ -1,4 +1,4 @@
-const { Tx, Period, Input, Outpoint, Output } = require('parsec-lib');
+const { Tx, Period, Input, Outpoint, Output } = require('leap-core');
 const addBlock = require('./addBlock');
 
 const PRIV_1 =
