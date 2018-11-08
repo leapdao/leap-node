@@ -10,6 +10,6 @@ pages:
     - 'HTTPS support': json-rpc/https.md
     - 'web3.eth': json-rpc/web3.eth.md
     - 'web3.net': json-rpc/web3.net.md
-    - 'Leap web3 extension': json-rpc/web3.leap.md
+    - 'Leap web3 extension': json-rpc/web3.plasma.md
   - 'Advanced':
     - 'Data structures': data-structures.md

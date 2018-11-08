@@ -35,4 +35,4 @@ Aside from `DATA` and `QUANTITIES`, there are also normative JSON types, which w
 
 - [net](web3.net)
 - [eth](web3.eth)
-- [leap](web3.leap)
+- [plasma](web3.plasma)
