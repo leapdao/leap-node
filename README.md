@@ -1,6 +1,6 @@
 # Leap DAO validation node
 
-https://parseclabs.readthedocs.io/en/latest/
+https://leapdao.readthedocs.io/
 
 ## Prerequisite
 
