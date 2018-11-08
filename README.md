@@ -76,7 +76,7 @@ https://github.com/parsec-labs/parsec-contracts/wiki/Setting-up-local-developmen
 
 ## Staking UI
 
-Dev: http://stake-dev.parseclabs.org/
+Dev: https://bridge-dev.leapdao.org/
 
 Testnet: N/A
 
