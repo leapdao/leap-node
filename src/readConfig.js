@@ -8,12 +8,29 @@
 /* eslint-disable no-console */
 
 const fs = require('fs');
+const { helpers } = require('leap-core');
+const Web3 = require('web3');
 const { promisify } = require('util');
+const { logNode } = require('./debug');
 
 const readFile = promisify(fs.readFile);
 
+const fetchNodeConfig = nodeUrl => {
+  logNode(`Fetching config from: ${nodeUrl}`);
+  const web3 = helpers.extendWeb3(new Web3(nodeUrl));
+  return web3.getConfig();
+};
+
+const readConfigFile = async configPath => {
+  return JSON.parse(await readFile(configPath));
+};
+
+const urlRegex = /^https{0,1}:\/\//;
+
 module.exports = async configPath => {
-  const config = JSON.parse(await readFile(configPath));
+  const config = urlRegex.test(configPath)
+    ? await fetchNodeConfig(configPath)
+    : await readConfigFile(configPath);
 
   if (!config.bridgeAddr) {
     console.error('bridgeAddr is required');

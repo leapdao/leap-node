@@ -70,7 +70,7 @@ async function run() {
 
   const db = Db(app);
 
-  const privFilename = path.join(path.dirname(cliArgs.config), '.priv');
+  const privFilename = path.join(app.lotionPath(), '.priv');
   if (await exists(privFilename)) {
     config.privKey = await readFile(privFilename);
   }
