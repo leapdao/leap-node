@@ -3,7 +3,7 @@ title: Connect to testnet
 ---
 
 1. Install `leap-node` package: `npm install leap-node -g`
-2. Run with `testnet-beta` network: `leap-node --network=testnet-beta`
+2. Connect to testnet: `leap-node --config=https://testnet-1.leapdao.org`
 3. (Optional) become a validator
 
 ## How to become a validator
@@ -14,7 +14,7 @@ title: Connect to testnet
 
 ## How to register your token
 
-1. Go to [bridge-dev.leapdao.org](https://bridge-dev.leapdao.org)
+1. Go to [bridge-dev.leapdao.org/registerToken](https://bridge-dev.leapdao.org/registerToken)
 2. Put your token contract address
 3. Execute transaction
 

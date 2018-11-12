@@ -37,7 +37,7 @@ Example: `DEBUG=tendermint,leap-node:tx leap-node`
 - `wsaddr` — host for websocket RPC server (default: localhost)
 - `wsport` — port for websocket RPC server (default: 8646)
 - `p2pPort` — port for p2p connection (default: random)
-- `config` — path to config file
+- `config` — path to config file or node's JSON RPC url (eg https://testnet-2.leapdao.org)
 - `version` — print version of the node
 
 ### Config file options
