@@ -179,5 +179,5 @@ module.exports = async (state, tx) => {
       );
     }
   }
-  return 1;
+  return Promise.resolve();
 };

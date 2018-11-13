@@ -20,14 +20,14 @@ const checks = {
   [Type.VALIDATOR_LOGOUT]: require('./checkValidatorLogout'),
 };
 
-module.exports = (state, tx, bridgeState) => {
+module.exports = async (state, tx, bridgeState) => {
   if (!checks[tx.type]) {
     throw new Error('Unsupported tx type');
   }
 
   checkOutpoints(state, tx);
 
-  checks[tx.type](state, tx, bridgeState);
+  await checks[tx.type](state, tx, bridgeState);
 
   removeInputs(state, tx);
   addOutputs(state, tx);
