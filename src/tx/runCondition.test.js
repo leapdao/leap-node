@@ -4,7 +4,7 @@
  * This source code is licensed under the Mozilla Public License Version 2.0
  * found in the LICENSE file in the root directory of this source tree.
  */
-const { Tx, Input, Outpoint, Output } = require('parsec-lib');
+const { Tx, Input, Outpoint, Output } = require('leap-core');
 const utils = require('ethereumjs-util');
 const runCondition = require('./runCondition');
 
