@@ -29,7 +29,7 @@ const PRIV =
   '0x94890218f2b0d04296f30aeafd13655eba4c5bbf1770273276fee52cbe3f2cb4';
 
 describe('checkSpendCond', () => {
-  test('valid tx', () => {
+  test('valid tx', async () => {
     // a depsoit to the above script tas been done
     const scriptHash = utils.ripemd160(conditionScript);
     const deposit = Tx.deposit(
@@ -84,6 +84,6 @@ describe('checkSpendCond', () => {
         )}${amountBuf.toString('hex')}` // outputs
     );
 
-    checkSpendCond(state, condition);
+    await checkSpendCond(state, condition);
   });
 });
