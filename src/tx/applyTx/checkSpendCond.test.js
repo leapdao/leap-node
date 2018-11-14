@@ -2,6 +2,31 @@ const { Tx, Input, Outpoint, Output } = require('leap-core');
 const utils = require('ethereumjs-util');
 const checkSpendCond = require('./checkSpendCond');
 
+const erc20Tokens = [
+  '0x0000000000000000000000000000000000000000',
+  '0x1111111111111111111111111111111111111111',
+];
+const tokens = {};
+erc20Tokens.forEach((addr, i) => {
+  tokens[i] = addr;
+});
+
+const contract = {
+  methods: {
+    erc20TokenCount: () => ({
+      call: async () => erc20Tokens.length,
+    }),
+    nftTokenCount: () => ({
+      call: async () => 0,
+    }),
+    tokens: i => ({
+      call: async () => {
+        return { addr: tokens[i] };
+      },
+    }),
+  },
+};
+
 // a script exists that can only be spent by spenderAddr defined in script
 //
 // pragma solidity ^0.4.24;
@@ -84,6 +109,9 @@ describe('checkSpendCond', () => {
         )}${amountBuf.toString('hex')}` // outputs
     );
 
-    await checkSpendCond(state, condition);
+    await checkSpendCond(state, condition, {
+      contract,
+      tokens: { erc20: [], erc721: [] },
+    });
   });
 });
