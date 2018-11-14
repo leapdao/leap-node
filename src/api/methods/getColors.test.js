@@ -39,16 +39,44 @@ exports.exitHandlerContract = exitHandlerContract;
 
 describe('getColors', () => {
   test('ERC20 colors', async () => {
-    const colors = await getColors({ exitHandlerContract }, false);
+    const colors = await getColors(
+      { exitHandlerContract, tokens: { erc20: [], erc721: [] } },
+      false
+    );
     expect(colors.length).toBe(2);
     expect(colors[0]).toBe(erc20Tokens[0].toLowerCase());
     expect(colors[1]).toBe(erc20Tokens[1].toLowerCase());
   });
 
+  test('ERC20 colors cache', async () => {
+    const tokensCache = { erc20: [], erc721: [] };
+    const colors = await getColors({ contract, tokens: tokensCache }, false);
+    expect(tokensCache.erc20.map(c => c.toLowerCase())).toEqual(
+      erc20Tokens.map(c => c.toLowerCase())
+    );
+    expect(tokensCache.erc20.map(c => c.toLowerCase())).toEqual(
+      colors.map(c => c.toLowerCase())
+    );
+  });
+
   test('ERC721 colors', async () => {
-    const colors = await getColors({ exitHandlerContract }, true);
+    const colors = await getColors(
+      { exitHandlerContract, tokens: { erc20: [], erc721: [] } },
+      true
+    );
     expect(colors.length).toBe(2);
     expect(colors[0]).toBe(erc721Tokens[0].toLowerCase());
     expect(colors[1]).toBe(erc721Tokens[1].toLowerCase());
+  });
+
+  test('ERC721 colors cache', async () => {
+    const tokensCache = { erc20: [], erc721: [] };
+    const colors = await getColors({ contract, tokens: tokensCache }, true);
+    expect(tokensCache.erc721.map(c => c.toLowerCase())).toEqual(
+      erc721Tokens.map(c => c.toLowerCase())
+    );
+    expect(tokensCache.erc721.map(c => c.toLowerCase())).toEqual(
+      colors.map(c => c.toLowerCase())
+    );
   });
 });

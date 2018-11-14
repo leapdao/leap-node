@@ -1,15 +1,19 @@
 const { INVALID_PARAMS, NFT_COLOR_BASE } = require('./constants');
 const getColors = require('./getColors');
+const { addrCmp } = require('../../utils');
+
+const colorIndex = (colors, address) =>
+  colors.findIndex(c => addrCmp(c, address));
 
 module.exports = async (bridgeState, address) => {
   const erc20Colors = await getColors(bridgeState, false);
-  const erc20Color = erc20Colors.indexOf(address.toLowerCase());
+  const erc20Color = colorIndex(erc20Colors, address);
   if (erc20Color > -1) {
     return `0x${erc20Color.toString(16)}`;
   }
 
   const nftColors = await getColors(bridgeState, true);
-  const nftColor = nftColors.indexOf(address.toLowerCase());
+  const nftColor = colorIndex(nftColors, address);
   if (nftColor > -1) {
     return `0x${(NFT_COLOR_BASE + nftColor).toString(16)}`;
   }
