@@ -81,7 +81,6 @@ describe('checkSpendCond', () => {
       '2222222222222222222222222222222222222222',
       'hex'
     );
-    const amount = 4993673500; // rest is spent on gas
     const condition = Tx.spendCond(
       [
         new Input({
@@ -90,14 +89,14 @@ describe('checkSpendCond', () => {
           script: conditionScript,
         }),
       ],
-      [new Output(amount, `0x${receiver.toString('hex')}`, 1)]
+      [new Output(4993673500, `0x${receiver.toString('hex')}`, 1)]
     );
 
     const sig = condition.getConditionSig(PRIV);
 
     // msgData that satisfies the spending condition
     const vBuf = utils.setLengthLeft(utils.toBuffer(sig.v), 32);
-    const amountBuf = utils.setLengthLeft(utils.toBuffer(amount), 32);
+    const amountBuf = utils.setLengthLeft(utils.toBuffer(4993673500), 32);
     condition.inputs[0].setMsgData(
       '0x31b3c80e' + // function called
       `${sig.r.toString('hex')}${sig.s.toString('hex')}${vBuf.toString(

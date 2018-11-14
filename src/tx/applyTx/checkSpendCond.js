@@ -5,14 +5,14 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-const { Type } = require('leap-core');
+const { Type, Output } = require('leap-core');
 const { checkInsAndOuts } = require('./utils');
 const Account = require('ethereumjs-account');
 const Transaction = require('ethereumjs-tx');
 const Trie = require('merkle-patricia-tree');
 const VM = require('ethereumjs-vm');
 const utils = require('ethereumjs-util');
-
+const isEqual = require('lodash/isEqual');
 const getColors = require('../../api/methods/getColors');
 const { NFT_COLOR_BASE } = require('../../api/methods/constants');
 
@@ -87,6 +87,7 @@ module.exports = async (state, tx, bridgeState) => {
     throw new Error('Spending Condition tx expected');
   }
 
+  // check that script hashes to address
   checkInsAndOuts(
     tx,
     state,
@@ -153,10 +154,9 @@ module.exports = async (state, tx, bridgeState) => {
     await setAccount(conditionAccount, stateTrie, tx.sigHash());
   });
 
+  const logOuts = [];
   // running conditions with msgData
   for (let i = 0; i < tx.inputs.length; i += 1) {
-    console.log(`---- running condition ${i} -------`); // eslint-disable-line no-console
-
     // eslint-disable-next-line no-await-in-loop
     results = await runTx(vm, {
       nonce: nonceCounter,
@@ -166,16 +166,19 @@ module.exports = async (state, tx, bridgeState) => {
       data: tx.inputs[i].msgData,
     });
     nonceCounter += 1;
-    console.log('gas used: ', results.gasUsed.toString()); // eslint-disable-line no-console
 
     let spent = results.gasUsed.toNumber() * tx.inputs[i].gasPrice;
     const out = inputMap[tx.inputs[i].prevout.getUtxoId()];
+    // itterate through all transfer events and sum them up per color
     results.vm.logs.forEach(log => {
       if (log[0].equals(colorMap[out.color])) {
-        spent += utils.bufferToInt(log[2]);
+        const transferAmount = utils.bufferToInt(log[2]);
+        spent += transferAmount;
+        const toAddr = `0x${log[1][2].slice(12, 32).toString('hex')}`;
+        logOuts.push(new Output(transferAmount, toAddr, out.color));
       }
     });
-    if (out.value > spent) {
+    if (out.value !== spent) {
       return Promise.reject(
         new Error(
           `balance missmatch for ${out.address}. inputs: ${
@@ -184,6 +187,16 @@ module.exports = async (state, tx, bridgeState) => {
         )
       );
     }
+  }
+  // TODO: compact logOuts
+  if (!isEqual(tx.outputs, logOuts)) {
+    return Promise.reject(
+      new Error(
+        `outputs do not match computation results. \n outputs ${
+          tx.outputs
+        } \n calculated: ${logOuts}`
+      )
+    );
   }
   return Promise.resolve();
 };
