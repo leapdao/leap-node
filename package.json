@@ -99,6 +99,8 @@
       "src/bridgeState.js",
       "src/utils/printStartupInfo.js",
       "src/utils/sendTransaction.js",
+      "src/utils/getGenesisBlock.js",
+      "src/utils/index.js",
       "src/txHelpers/activateSlot.js",
       "src/txHelpers/makeTransfer.js",
       "src/txHelpers/printTx.js",
