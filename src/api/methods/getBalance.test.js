@@ -34,4 +34,16 @@ describe('getBalance', () => {
     }
     expect(error).toBe('Only balance for latest block is supported');
   });
+
+  test('empty state', async () => {
+    const balance = await getBalance(
+      {
+        currentState: {
+          balances: {},
+        },
+      },
+      ADDR
+    );
+    expect(balance).toBe('0x0');
+  });
 });

@@ -5,14 +5,13 @@ const { INVALID_PARAMS } = require('./constants');
 
 const formatUint256 = n => `0x${new BN(n, 10).toString(16).padStart(64, '0')}`;
 
+/* eslint-disable no-throw-literal */
 module.exports = async (bridgeState, txObj, tag) => {
   if (tag !== 'latest') {
-    /* eslint-disable no-throw-literal */
     throw {
       code: INVALID_PARAMS,
       message: 'Only call for latest block is supported',
     };
-    /* eslint-enable no-throw-literal */
   }
 
   const method = txObj.data.substring(0, 10);
@@ -41,29 +40,24 @@ module.exports = async (bridgeState, txObj, tag) => {
         const balances = bridgeState.currentState.balances[color] || {};
         const nfts = balances[address] || [];
         if (!nfts[index]) {
-          /* eslint-disable no-throw-literal */
           throw {
             code: INVALID_PARAMS,
             message: 'Index overflow',
           };
-          /* eslint-enable */
         }
         return formatUint256(nfts[index]);
       }
 
-      /* eslint-disable no-throw-literal */
       throw {
         code: INVALID_PARAMS,
         message: 'Only for NFT',
       };
-      /* eslint-enable */
     }
     default:
+      throw {
+        code: INVALID_PARAMS,
+        message: `Method call ${method} is not supported`,
+      };
   }
-  /* eslint-disable no-throw-literal */
-  throw {
-    code: INVALID_PARAMS,
-    message: `Method call ${method} is not supported`,
-  };
-  /* eslint-enable */
 };
+/* eslint-enable */

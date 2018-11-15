@@ -6,6 +6,7 @@ const A1 = '0xB8205608d54cb81f44F263bE086027D8610F3C94';
 const signatures = {
   tokenOfOwnerByIndex: '0x2f745c59000000000000000000000000',
   balanceOf: '0x70a08231000000000000000000000000',
+  unsupported: '0x00000000000000000000000000000000', // represents any unsupported method
 };
 
 describe('executeCall', () => {
@@ -190,5 +191,19 @@ describe('executeCall', () => {
     expect(response).toBe(
       '0x0000000000000000000000000000000000000000000000000000000000000000'
     );
+  });
+
+  test('Unsupported method', async () => {
+    const tx = {
+      data: `${signatures.unsupported}`,
+      to: erc20Tokens[0],
+    };
+    let error;
+    try {
+      await executeCall(null, tx, 'latest');
+    } catch (err) {
+      error = err.message;
+    }
+    expect(error).toBe('Method call 0x00000000 is not supported');
   });
 });
