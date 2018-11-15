@@ -32,11 +32,12 @@ module.exports = class ContractEventsSubscription extends EventEmitter {
     this.fromBlock = fromBlock;
     this.web3 = web3;
     this.contract = contract;
+    this.fetchEvents = this.fetchEvents.bind(this);
   }
 
   async init() {
     const initialEvetns = await this.fetchEvents();
-    setInterval(() => this.fetchEvents(), 5 * 1000);
+    setInterval(this.fetchEvents, 5 * 1000);
     return initialEvetns;
   }
 
