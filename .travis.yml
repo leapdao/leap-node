@@ -3,4 +3,4 @@ cache: yarn
 node_js:
   - 'node'
   - '8.11'
-script: yarn lint && yarn test
+script: yarn lint && yarn test --detectOpenHandles
