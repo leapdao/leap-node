@@ -241,6 +241,20 @@ describe('applyTx utils', () => {
       expect(state.balances[color][ADDR_2]).toEqual([value3]);
       expect(state.owners[color][value3]).toBe(ADDR_2);
     });
+
+    test('Existing outpoint', () => {
+      const deposit = Tx.deposit(12, 500, ADDR_1, 0);
+      const state = {
+        balances: {},
+        owners: {},
+        unspent: {},
+      };
+
+      addOutputs(state, deposit);
+      expect(() => addOutputs(state, deposit)).toThrow(
+        'Attempt to create existing output'
+      );
+    });
   });
 
   describe('removeInputs', () => {

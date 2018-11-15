@@ -13,6 +13,13 @@ const getInitialState = () => ({
 });
 
 describe('checkValidatorJoin', () => {
+  test('wrong type', () => {
+    const tx = Tx.deposit(0, 0, ADDR_1);
+    expect(() => checkValidatorJoin({}, tx)).toThrow(
+      'validatorJoin tx expected'
+    );
+  });
+
   test('successful tx (empty slot)', () => {
     const state = getInitialState();
 

@@ -15,6 +15,11 @@ const makeExitMock = (exitor, amount, color) => {
 };
 
 describe('checkExit', () => {
+  test('wrong type', () => {
+    const tx = Tx.transfer([], []);
+    expect(() => checkExit({}, tx)).toThrow('Exit tx expected');
+  });
+
   test('successful tx', () => {
     const deposit = Tx.deposit(12, 500, ADDR_1, 0);
     const outpoint = new Outpoint(deposit.hash(), 0);
@@ -26,6 +31,22 @@ describe('checkExit', () => {
 
     const exit = Tx.exit(new Input(outpoint));
     checkExit(state, exit, makeExitMock(ADDR_1, '500', 0));
+  });
+
+  test('not 1 input', () => {
+    const deposit = Tx.deposit(12, 500, ADDR_1, 0);
+    const outpoint = new Outpoint(deposit.hash(), 0);
+    const state = {
+      unspent: {
+        [outpoint.hex()]: deposit.outputs[0].toJSON(),
+      },
+    };
+
+    const exit = Tx.exit(new Input(outpoint));
+    exit.inputs.push(new Input(outpoint));
+    expect(() =>
+      checkExit(state, exit, makeExitMock(ADDR_1, '500', 0))
+    ).toThrow('Exit tx should have one input');
   });
 
   test('non-existent', () => {
@@ -42,7 +63,7 @@ describe('checkExit', () => {
     }).toThrow('Trying to submit incorrect exit');
   });
 
-  test('wrong amount', () => {
+  test('wrong amount: erc20', () => {
     const deposit = Tx.deposit(12, 500, ADDR_1, 0);
     const outpoint = new Outpoint(deposit.hash(), 0);
     const state = {
@@ -53,6 +74,21 @@ describe('checkExit', () => {
     const exit = Tx.exit(new Input(outpoint));
     expect(() => {
       checkExit(state, exit, makeExitMock(ADDR_1, '600', 0));
+    }).toThrow('Trying to submit incorrect exit');
+  });
+
+  test('wrong amount: erc721', () => {
+    const color = 32769 + 1;
+    const deposit = Tx.deposit(12, '500', ADDR_1, color);
+    const outpoint = new Outpoint(deposit.hash(), 0);
+    const state = {
+      unspent: {
+        [outpoint.hex()]: deposit.outputs[0].toJSON(),
+      },
+    };
+    const exit = Tx.exit(new Input(outpoint));
+    expect(() => {
+      checkExit(state, exit, makeExitMock(ADDR_1, '600', color));
     }).toThrow('Trying to submit incorrect exit');
   });
 

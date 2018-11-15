@@ -9,7 +9,7 @@ const range = require('./range');
 module.exports = async bridge => {
   const epochLength = await bridge.methods.epochLength().call();
   const slots = await Promise.all(
-    range(0, epochLength).map(slotId => bridge.methods.slots(slotId).call())
+    range(0, epochLength - 1).map(slotId => bridge.methods.slots(slotId).call())
   );
 
   return slots.map(

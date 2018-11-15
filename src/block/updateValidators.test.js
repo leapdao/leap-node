@@ -98,6 +98,24 @@ test('Advanced removing of a validator (with activationEpoch)', async () => {
   expect(chainInfo.validators[getAddress(TENDER_KEY_2)].power).toBe(10);
 });
 
+test('Re-enabling validator', async () => {
+  const chainInfo = {
+    validators: {
+      [getAddress(TENDER_KEY_1)]: 0,
+    },
+  };
+  await updateValidators(
+    {
+      slots: [{ tenderKey: TENDER_KEY_1 }],
+      epoch: 1,
+    },
+    chainInfo
+  );
+
+  expect(Object.keys(chainInfo.validators).length).toBe(1);
+  expect(chainInfo.validators[getAddress(TENDER_KEY_1)]).toBe(10);
+});
+
 test('Validator with several slots', async () => {
   const chainInfo = {
     validators: {

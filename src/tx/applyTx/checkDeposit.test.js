@@ -22,6 +22,11 @@ const getInitialState = () => ({
 const defaultDepositMock = makeDepositMock(ADDR_1, '500', 0);
 
 describe('checkDeposit', () => {
+  test('wrong type', () => {
+    const tx = Tx.transfer([], []);
+    expect(() => checkDeposit({}, tx)).toThrow('Deposit tx expected');
+  });
+
   test('valid tx', () => {
     const state = getInitialState();
     const tx = Tx.deposit(1, 500, ADDR_1, 0);

@@ -10,7 +10,7 @@ const getTokensRange = (bridgeState, from, to) => {
   ).then(tokens => tokens.map(o => o.addr.toLowerCase()));
 };
 
-const getColors = async (bridgeState, nft = false) => {
+const getColors = async (bridgeState, nft) => {
   if (nft) {
     const tokenCount = Number(
       await bridgeState.contract.methods.nftTokenCount().call()
