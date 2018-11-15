@@ -11,6 +11,11 @@ const PRIV_3 =
   '0x9ae3ed3d1659a33902644da4ce645cfac1de84bc0889909db83692c8374fc44e';
 
 describe('checkTransfer', () => {
+  test('wrong type', () => {
+    const tx = Tx.deposit(0, 0, ADDR_1);
+    expect(() => checkTransfer({}, tx)).toThrow('Transfer tx expected');
+  });
+
   test('valid tx', () => {
     const deposit = Tx.deposit(12, 500, ADDR_1, 0);
     const state = {

@@ -11,6 +11,11 @@ const getInitialState = () => ({
 });
 
 describe('checkEpochLength', () => {
+  test('wrong type', () => {
+    const tx = Tx.transfer([], []);
+    expect(() => checkEpochLength({}, tx)).toThrow('epochLength tx expected');
+  });
+
   test('successful tx', () => {
     const state = getInitialState();
     const epochLength = Tx.epochLength(4);

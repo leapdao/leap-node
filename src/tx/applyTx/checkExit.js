@@ -13,7 +13,7 @@ module.exports = (state, tx, bridgeState) => {
     throw new Error('Exit tx expected');
   }
 
-  if (!tx.inputs.length === 1) {
+  if (tx.inputs.length !== 1) {
     throw new Error('Exit tx should have one input');
   }
 
