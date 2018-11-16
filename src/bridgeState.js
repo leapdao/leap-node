@@ -11,6 +11,7 @@ const bridgeABI = require('./bridgeABI');
 const ContractEventsSubscription = require('./eventsRelay/ContractEventsSubscription');
 const { handleEvents, getGenesisBlock } = require('./utils');
 const { GENESIS } = require('./utils/constants');
+const { logNode } = require('./debug');
 
 module.exports = class BridgeState {
   constructor(db, config) {
@@ -36,9 +37,11 @@ module.exports = class BridgeState {
   }
 
   async init() {
+    logNode('Syncing bridge events...');
     this.lastBlockSynced = await this.db.getLastBlockSynced();
     await this.watchContractEvents();
     await this.initBlocks();
+    logNode('Synced');
   }
 
   async watchContractEvents() {

@@ -66,6 +66,7 @@ async function run() {
 
   if (cliArgs.fresh) {
     await cleanupLotion(app);
+    process.exit(0);
   }
 
   const db = Db(app);
