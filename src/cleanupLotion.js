@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 const { promisify } = require('util');
 const fs = require('fs');
 const path = require('path');
@@ -9,6 +11,7 @@ const writeFile = promisify(fs.writeFile);
 const exists = promisify(fs.exists);
 
 module.exports = async app => {
+  console.log('Cleaning up...');
   const lotionPath = app.lotionPath();
   if (await exists(lotionPath)) {
     const configPath = path.join(lotionPath, 'config');
@@ -34,4 +37,5 @@ module.exports = async app => {
     await rimraf(path.join(configPath, 'config.toml'));
     await rimraf(path.join(configPath, 'genesis.json'));
   }
+  console.log('Done ✅');
 };
