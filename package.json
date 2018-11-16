@@ -1,6 +1,6 @@
 {
   "name": "leap-node",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "main": "index.js",
   "author": "Alex Lunyov <isuntc@gmail.com>",
   "license": "MPL-2.0",
@@ -89,7 +89,9 @@
   "jest": {
     "testEnvironment": "node",
     "collectCoverage": true,
-    "collectCoverageFrom": ["src/**/*.js"],
+    "collectCoverageFrom": [
+      "src/**/*.js"
+    ],
     "coveragePathIgnorePatterns": [
       "src/bridgeABI.js",
       "src/cleanupLotion.js",
