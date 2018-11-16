@@ -8,7 +8,7 @@
 const { Type } = require('leap-core');
 const { checkInsAndOuts } = require('./utils');
 
-module.exports = (state, tx) => {
+module.exports = (state, tx, bridgeState) => {
   if (tx.type !== Type.TRANSFER) {
     throw new Error('Transfer tx expected');
   }
@@ -16,6 +16,7 @@ module.exports = (state, tx) => {
   checkInsAndOuts(
     tx,
     state,
+    bridgeState,
     ({ address }, i) => address === tx.inputs[i].signer
   );
 };

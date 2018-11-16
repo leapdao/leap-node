@@ -8,7 +8,7 @@
 const { Type } = require('leap-core');
 const { checkInsAndOuts } = require('./utils');
 
-module.exports = (state, tx) => {
+module.exports = (state, tx, bridgeState) => {
   if (tx.type !== Type.CONSOLIDATE) {
     throw new Error('Consolidate tx expected');
   }
@@ -24,6 +24,7 @@ module.exports = (state, tx) => {
   checkInsAndOuts(
     tx,
     state,
+    bridgeState,
     ({ address }) => address === tx.outputs[0].address
   );
 };

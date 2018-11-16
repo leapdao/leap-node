@@ -28,6 +28,7 @@ describe('applyTx utils', () => {
       checkInsAndOuts(
         transfer,
         state,
+        {},
         ({ address }, i) => address === transfer.inputs[i].signer
       );
     });
@@ -48,6 +49,7 @@ describe('applyTx utils', () => {
       checkInsAndOuts(
         transfer,
         state,
+        {},
         ({ address }, i) => address === transfer.inputs[i].signer
       );
     });
@@ -70,6 +72,7 @@ describe('applyTx utils', () => {
       checkInsAndOuts(
         transfer,
         state,
+        {},
         ({ address }, i) => address === transfer.inputs[i].signer
       );
     });
@@ -97,6 +100,7 @@ describe('applyTx utils', () => {
       checkInsAndOuts(
         transfer,
         state,
+        {},
         ({ address }, i) => address === transfer.inputs[i].signer
       );
     });
@@ -118,13 +122,14 @@ describe('applyTx utils', () => {
         [new Input(outpointERC721), new Input(outpointERC20)],
         [
           new Output(500, ADDR_1, colorERC721),
-          new Output(400, ADDR_1, colorERC20),
+          new Output(600, ADDR_1, colorERC20),
         ]
       ).signAll(PRIV_1);
       expect(() => {
         checkInsAndOuts(
           transfer,
           state,
+          {},
           ({ address }, i) => address === transfer.inputs[i].signer
         );
       }).toThrow(`Ins and outs values are mismatch for color ${colorERC20}`);
@@ -154,9 +159,77 @@ describe('applyTx utils', () => {
         checkInsAndOuts(
           transfer,
           state,
+          {},
           ({ address }, i) => address === transfer.inputs[i].signer
         );
       }).toThrow(`Ins and outs values are mismatch for color ${colorERC721}`);
+    });
+
+    test('With gasPrice', () => {
+      const colorERC20 = 0;
+      const depositERC20 = Tx.deposit(12, 500, ADDR_1, colorERC20);
+      const outpointERC20 = new Outpoint(depositERC20.hash(), 0);
+      const state = {
+        unspent: {
+          [outpointERC20.hex()]: depositERC20.outputs[0].toJSON(),
+        },
+      };
+      const transfer = Tx.transfer(
+        [new Input(outpointERC20)],
+        [new Output(300, ADDR_1, colorERC20)]
+      ).signAll(PRIV_1);
+      checkInsAndOuts(
+        transfer,
+        state,
+        { gasPrice: 0.02 },
+        ({ address }, i) => address === transfer.inputs[i].signer
+      );
+    });
+
+    test('Overpriced', () => {
+      const colorERC20 = 0;
+      const depositERC20 = Tx.deposit(12, 500, ADDR_1, colorERC20);
+      const outpointERC20 = new Outpoint(depositERC20.hash(), 0);
+      const state = {
+        unspent: {
+          [outpointERC20.hex()]: depositERC20.outputs[0].toJSON(),
+        },
+      };
+      const transfer = Tx.transfer(
+        [new Input(outpointERC20)],
+        [new Output(300, ADDR_1, colorERC20)]
+      ).signAll(PRIV_1);
+      expect(() => {
+        checkInsAndOuts(
+          transfer,
+          state,
+          { gasPrice: 0.01 },
+          ({ address }, i) => address === transfer.inputs[i].signer
+        );
+      }).toThrow(`Tx overpriced`);
+    });
+
+    test('Overpriced', () => {
+      const colorERC20 = 0;
+      const depositERC20 = Tx.deposit(12, 500, ADDR_1, colorERC20);
+      const outpointERC20 = new Outpoint(depositERC20.hash(), 0);
+      const state = {
+        unspent: {
+          [outpointERC20.hex()]: depositERC20.outputs[0].toJSON(),
+        },
+      };
+      const transfer = Tx.transfer(
+        [new Input(outpointERC20)],
+        [new Output(300, ADDR_1, colorERC20)]
+      ).signAll(PRIV_1);
+      expect(() => {
+        checkInsAndOuts(
+          transfer,
+          state,
+          { gasPrice: 0.03 },
+          ({ address }, i) => address === transfer.inputs[i].signer
+        );
+      }).toThrow(`Tx underpriced`);
     });
   });
 
