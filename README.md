@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/leapdao/leap-node/branch/master/graph/badge.svg)](https://codecov.io/gh/leapdao/leap-node)
+
 # Leap DAO validation node
 
 https://leapdao.readthedocs.io/
