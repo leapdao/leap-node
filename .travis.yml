@@ -2,4 +2,8 @@ language: node_js
 cache: yarn
 node_js:
   - '8.11'
-script: yarn lint && yarn test
+before_script: yarn global add codecov
+script:
+  - yarn lint
+  - yarn test
+  - codecov
