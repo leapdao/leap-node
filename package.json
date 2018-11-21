@@ -113,7 +113,8 @@
       "src/api/methods/getBlockByNumber.js",
       "src/eventsRelay/index.js",
       "src/tx/applyTx/index.js",
-      "src/tx/index.js"
+      "src/tx/index.js",
+      "src/block/index.js"
     ],
     "coverageThreshold": {
       "global": {
