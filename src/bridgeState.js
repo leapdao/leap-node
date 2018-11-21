@@ -39,20 +39,19 @@ module.exports = class BridgeState {
   async init() {
     logNode('Syncing bridge events...');
     this.lastBlockSynced = await this.db.getLastBlockSynced();
+    const genesisBlock = await getGenesisBlock(this.web3, this.contract);
+    this.eventsSubscription = new ContractEventsSubscription(
+      this.web3,
+      this.contract,
+      genesisBlock
+    );
     await this.watchContractEvents();
     await this.initBlocks();
     logNode('Synced');
   }
 
   async watchContractEvents() {
-    const genesisBlock = await getGenesisBlock(this.web3, this.contract);
-    const eventsSubscription = new ContractEventsSubscription(
-      this.web3,
-      this.contract,
-      genesisBlock
-    );
-
-    eventsSubscription.on(
+    this.eventsSubscription.on(
       'events',
       handleEvents({
         NewDeposit: ({ returnValues: event }) => {
@@ -77,7 +76,7 @@ module.exports = class BridgeState {
         },
       })
     );
-    await eventsSubscription.init();
+    await this.eventsSubscription.init();
   }
 
   async initBlocks() {

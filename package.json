@@ -98,29 +98,27 @@
       "src/cliArgs.js",
       "src/debug.js",
       "src/readConfig.js",
-      "src/bridgeState.js",
       "src/utils/printStartupInfo.js",
       "src/utils/sendTransaction.js",
       "src/utils/getGenesisBlock.js",
       "src/utils/index.js",
-      "src/txHelpers/activateSlot.js",
       "src/txHelpers/makeTransfer.js",
       "src/txHelpers/printTx.js",
       "src/txHelpers/sendTx.js",
       "src/api/jsonrpc.js",
       "src/api/db.js",
       "src/api/methods/index.js",
-      "src/api/methods/getBlockByNumber.js",
       "src/eventsRelay/index.js",
       "src/tx/applyTx/index.js",
-      "src/tx/index.js"
+      "src/tx/index.js",
+      "src/block/index.js"
     ],
     "coverageThreshold": {
       "global": {
-        "branches": 75,
-        "functions": 72,
-        "lines": 84,
-        "statements": 82
+        "branches": 90,
+        "functions": 90,
+        "lines": 90,
+        "statements": 90
       }
     }
   }
