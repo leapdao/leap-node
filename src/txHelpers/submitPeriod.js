@@ -13,6 +13,12 @@ const {
 } = require('../utils');
 const { logPeriod } = require('../debug');
 
+/* istanbul ignore next line */
+const logError = height => err => {
+  /* istanbul ignore next line */
+  logPeriod('submitPeriod error: %s (height: %d)', err.message, height);
+};
+
 module.exports = async (period, slots, height, bridgeState) => {
   const submittedPeriod = await bridgeState.contract.methods
     .periods(period.merkleRoot())
@@ -36,9 +42,7 @@ module.exports = async (period, slots, height, bridgeState) => {
         ),
         bridgeState.contract.options.address,
         bridgeState.account
-      ).catch(err => {
-        logPeriod('submitPeriod error: %s (height: %d)', err.message, height);
-      });
+      ).catch(logError(height));
 
       tx.then(receipt => {
         logPeriod('submitPeriod tx', receipt);
