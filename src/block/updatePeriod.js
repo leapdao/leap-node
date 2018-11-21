@@ -37,10 +37,13 @@ module.exports = async (state, chainInfo, bridgeState) => {
       logPeriod('found some slots for activation', myAuctionedSlots);
       myAuctionedSlots.forEach(id => {
         const tx = activateSlot(id, bridgeState);
+        /* istanbul ignore next */
         tx.catch(err => {
           logPeriod('activation error', err.message);
         });
+        /* istanbul ignore next */
         if (typeof tx.on === 'function') {
+          /* istanbul ignore next */
           tx.on('transactionHash', txHash => {
             logPeriod('activate', id, txHash);
           });

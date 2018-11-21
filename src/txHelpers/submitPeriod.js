@@ -13,9 +13,8 @@ const {
 } = require('../utils');
 const { logPeriod } = require('../debug');
 
-/* istanbul ignore next line */
+/* istanbul ignore next */
 const logError = height => err => {
-  /* istanbul ignore next line */
   logPeriod('submitPeriod error: %s (height: %d)', err.message, height);
 };
 
