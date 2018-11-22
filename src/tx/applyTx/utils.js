@@ -30,15 +30,19 @@ const checkInsAndOuts = (tx, state, bridgeState, unspentFilter) => {
     ...Object.keys(insValues),
     ...Object.keys(outsValues),
   ]).map(Number);
-  const gasPrice = bridgeState.gasPrice || 0;
+  const minGasPrice = bridgeState.minGasPrice || 0;
   const gas = Math.max(0, tx.outputs.length * 20000 - tx.inputs.length * 10000);
-
   for (const color of colors) {
-    if (color === 0 && gas > 0 && gasPrice > 0 && tx.type === Type.TRANSFER) {
-      const inputValue = insValues[color] || 0;
-      const outputValue = outsValues[color] || 0;
+    if (
+      color === 0 &&
+      gas > 0 &&
+      minGasPrice > 0 &&
+      tx.type === Type.TRANSFER
+    ) {
+      const inputValue = insValues[color];
+      const outputValue = outsValues[color];
       const txGasPrice = (inputValue - outputValue) / gas;
-      if (txGasPrice < gasPrice) {
+      if (txGasPrice < minGasPrice) {
         throw new Error(`Tx underpriced`);
       }
     } else if (!isEqual(insValues[color], outsValues[color])) {
