@@ -186,7 +186,7 @@ describe('applyTx utils', () => {
       );
     });
 
-    test('Overpriced', () => {
+    test('Do not fail overpriced tx', () => {
       const colorERC20 = 0;
       const depositERC20 = Tx.deposit(12, 500, ADDR_1, colorERC20);
       const outpointERC20 = new Outpoint(depositERC20.hash(), 0);
@@ -199,17 +199,15 @@ describe('applyTx utils', () => {
         [new Input(outpointERC20)],
         [new Output(300, ADDR_1, colorERC20)]
       ).signAll(PRIV_1);
-      expect(() => {
-        checkInsAndOuts(
-          transfer,
-          state,
-          { gasPrice: 0.01 },
-          ({ address }, i) => address === transfer.inputs[i].signer
-        );
-      }).toThrow(`Tx overpriced`);
+      checkInsAndOuts(
+        transfer,
+        state,
+        { gasPrice: 0.01 },
+        ({ address }, i) => address === transfer.inputs[i].signer
+      );
     });
 
-    test('Overpriced', () => {
+    test('Underpriced', () => {
       const colorERC20 = 0;
       const depositERC20 = Tx.deposit(12, 500, ADDR_1, colorERC20);
       const outpointERC20 = new Outpoint(depositERC20.hash(), 0);

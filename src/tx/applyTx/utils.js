@@ -38,9 +38,7 @@ const checkInsAndOuts = (tx, state, bridgeState, unspentFilter) => {
       const inputValue = insValues[color] || 0;
       const outputValue = outsValues[color] || 0;
       const txGasPrice = (inputValue - outputValue) / gas;
-      if (txGasPrice > gasPrice) {
-        throw new Error(`Tx overpriced`); // is this a really reason to decline tx?
-      } else if (txGasPrice < gasPrice) {
+      if (txGasPrice < gasPrice) {
         throw new Error(`Tx underpriced`);
       }
     } else if (!isEqual(insValues[color], outsValues[color])) {
