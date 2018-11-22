@@ -13,7 +13,7 @@ const PRIV_3 =
 describe('checkTransfer', () => {
   test('wrong type', () => {
     const tx = Tx.deposit(0, 0, ADDR_1);
-    expect(() => checkTransfer({}, tx)).toThrow('Transfer tx expected');
+    expect(() => checkTransfer({}, tx, {})).toThrow('Transfer tx expected');
   });
 
   test('valid tx', () => {
@@ -29,7 +29,7 @@ describe('checkTransfer', () => {
       [new Output(500, ADDR_2, 0)]
     ).signAll(PRIV_1);
 
-    checkTransfer(state, transfer);
+    checkTransfer(state, transfer, {});
   });
 
   test('valid tx with multiple colors', () => {
@@ -49,7 +49,7 @@ describe('checkTransfer', () => {
       ],
       [new Output(500, ADDR_2, 0), new Output(500, ADDR_2, 1)]
     ).signAll(PRIV_1);
-    checkTransfer(state, transfer);
+    checkTransfer(state, transfer, {});
   });
 
   test('wrong color', () => {
@@ -65,7 +65,7 @@ describe('checkTransfer', () => {
       [new Output(500, ADDR_2, 1)]
     ).signAll(PRIV_1);
     expect(() => {
-      checkTransfer(state, transfer);
+      checkTransfer(state, transfer, {});
     }).toThrow('Ins and outs values are mismatch');
   });
 
@@ -82,7 +82,7 @@ describe('checkTransfer', () => {
       [new Output(500, ADDR_1, 0)]
     ).signAll(PRIV_1);
     try {
-      checkTransfer(state, transfer);
+      checkTransfer(state, transfer, {});
     } catch (e) {
       expect(e.message).toBe('Wrong inputs');
     }
@@ -105,7 +105,7 @@ describe('checkTransfer', () => {
       [new Input(new Outpoint(transfer.hash(), 1))],
       [new Output(100, ADDR_1, 0), new Output(100, ADDR_3, 0)]
     ).sign([PRIV_3]);
-    checkTransfer(state, transfer2);
+    checkTransfer(state, transfer2, {});
   });
 
   test('several inputs', () => {
@@ -125,7 +125,7 @@ describe('checkTransfer', () => {
       ],
       [new Output(1000, ADDR_2, 0)]
     ).sign([PRIV_1, PRIV_1]);
-    checkTransfer(state, transfer);
+    checkTransfer(state, transfer, {});
   });
 
   test('inputs/outputs mismatch', () => {
@@ -146,7 +146,7 @@ describe('checkTransfer', () => {
       [new Output(1200, ADDR_2, 0)]
     ).sign([PRIV_1, PRIV_1]);
     try {
-      checkTransfer(state, transfer);
+      checkTransfer(state, transfer, {});
     } catch (e) {
       expect(e.message).toBe('Ins and outs values are mismatch for color 0');
     }

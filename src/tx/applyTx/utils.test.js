@@ -28,6 +28,7 @@ describe('applyTx utils', () => {
       checkInsAndOuts(
         transfer,
         state,
+        {},
         ({ address }, i) => address === transfer.inputs[i].signer
       );
     });
@@ -48,6 +49,7 @@ describe('applyTx utils', () => {
       checkInsAndOuts(
         transfer,
         state,
+        {},
         ({ address }, i) => address === transfer.inputs[i].signer
       );
     });
@@ -70,6 +72,7 @@ describe('applyTx utils', () => {
       checkInsAndOuts(
         transfer,
         state,
+        {},
         ({ address }, i) => address === transfer.inputs[i].signer
       );
     });
@@ -97,6 +100,7 @@ describe('applyTx utils', () => {
       checkInsAndOuts(
         transfer,
         state,
+        {},
         ({ address }, i) => address === transfer.inputs[i].signer
       );
     });
@@ -118,13 +122,14 @@ describe('applyTx utils', () => {
         [new Input(outpointERC721), new Input(outpointERC20)],
         [
           new Output(500, ADDR_1, colorERC721),
-          new Output(400, ADDR_1, colorERC20),
+          new Output(600, ADDR_1, colorERC20),
         ]
       ).signAll(PRIV_1);
       expect(() => {
         checkInsAndOuts(
           transfer,
           state,
+          {},
           ({ address }, i) => address === transfer.inputs[i].signer
         );
       }).toThrow(`Ins and outs values are mismatch for color ${colorERC20}`);
@@ -132,8 +137,7 @@ describe('applyTx utils', () => {
 
     test('Ins and outs mismatch ERC721', () => {
       const colorERC721 = 2 ** 15 + 1;
-      const colorERC20 = 0;
-      const depositERC20 = Tx.deposit(12, 500, ADDR_1, colorERC20);
+      const depositERC20 = Tx.deposit(12, 500, ADDR_1, 0);
       const outpointERC20 = new Outpoint(depositERC20.hash(), 0);
       const depositERC721 = Tx.deposit(12, 500, ADDR_1, colorERC721);
       const outpointERC721 = new Outpoint(depositERC721.hash(), 0);
@@ -147,16 +151,82 @@ describe('applyTx utils', () => {
         [new Input(outpointERC721), new Input(outpointERC20)],
         [
           new Output(400, ADDR_1, colorERC721),
-          new Output(500, ADDR_1, colorERC20),
+          new Output(500, ADDR_1, 0),
+          new Output(500, ADDR_1, 3),
         ]
       ).signAll(PRIV_1);
       expect(() => {
         checkInsAndOuts(
           transfer,
           state,
+          {},
           ({ address }, i) => address === transfer.inputs[i].signer
         );
       }).toThrow(`Ins and outs values are mismatch for color ${colorERC721}`);
+    });
+
+    test('With minGasPrice', () => {
+      const colorERC20 = 0;
+      const depositERC20 = Tx.deposit(12, 50000, ADDR_1, colorERC20);
+      const outpointERC20 = new Outpoint(depositERC20.hash(), 0);
+      const state = {
+        unspent: {
+          [outpointERC20.hex()]: depositERC20.outputs[0].toJSON(),
+        },
+      };
+      const transfer = Tx.transfer(
+        [new Input(outpointERC20)],
+        [new Output(30000, ADDR_1, colorERC20)]
+      ).signAll(PRIV_1);
+      checkInsAndOuts(
+        transfer,
+        state,
+        { minGasPrice: 2 },
+        ({ address }, i) => address === transfer.inputs[i].signer
+      );
+    });
+
+    test('Do not fail overpriced tx', () => {
+      const deposit1 = Tx.deposit(12, 50000, ADDR_1, 0);
+      const outpoint1 = new Outpoint(deposit1.hash(), 0);
+      const state = {
+        unspent: {
+          [outpoint1.hex()]: deposit1.outputs[0].toJSON(),
+        },
+      };
+      const transfer = Tx.transfer(
+        [new Input(outpoint1)],
+        [new Output(30000, ADDR_1, 0)]
+      ).signAll(PRIV_1);
+      checkInsAndOuts(
+        transfer,
+        state,
+        { minGasPrice: 1 },
+        ({ address }, i) => address === transfer.inputs[i].signer
+      );
+    });
+
+    test('Underpriced', () => {
+      const colorERC20 = 0;
+      const depositERC20 = Tx.deposit(12, 50000, ADDR_1, colorERC20);
+      const outpointERC20 = new Outpoint(depositERC20.hash(), 0);
+      const state = {
+        unspent: {
+          [outpointERC20.hex()]: depositERC20.outputs[0].toJSON(),
+        },
+      };
+      const transfer = Tx.transfer(
+        [new Input(outpointERC20)],
+        [new Output(30000, ADDR_1, colorERC20)]
+      ).signAll(PRIV_1);
+      expect(() => {
+        checkInsAndOuts(
+          transfer,
+          state,
+          { minGasPrice: 3 },
+          ({ address }, i) => address === transfer.inputs[i].signer
+        );
+      }).toThrow(`Tx underpriced`);
     });
   });
 

@@ -8,7 +8,7 @@
     "start": "node index.js",
     "test": "./node_modules/.bin/jest --maxWorkers=4 --detectOpenHandles",
     "lint": "./node_modules/.bin/eslint src",
-    "test:watch": "./node_modules/.bin/jest --watch",
+    "test:watch": "./node_modules/.bin/jest --watch --coverage=false",
     "precommit": "./node_modules/.bin/lint-staged",
     "machine-gun": "node tools/machine-gun.js"
   },

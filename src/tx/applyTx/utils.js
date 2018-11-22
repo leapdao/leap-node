@@ -5,19 +5,18 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-const { Outpoint } = require('leap-core');
+const { Outpoint, Output, Type } = require('leap-core');
 const isEqual = require('lodash/isEqual');
-
-const { isNFT } = require('../../utils');
+const uniq = require('lodash/uniq');
 
 const groupValuesByColor = (values, { color, value }) =>
   Object.assign({}, values, {
-    [color]: isNFT(color)
+    [color]: Output.isNFT(color)
       ? (values[color] || new Set()).add(value)
       : (values[color] || 0) + value,
   });
 
-const checkInsAndOuts = (tx, state, unspentFilter) => {
+const checkInsAndOuts = (tx, state, bridgeState, unspentFilter) => {
   const inputTransactions = tx.inputs
     .map(input => state.unspent[input.prevout.hex()])
     .filter(unspentFilter);
@@ -27,9 +26,26 @@ const checkInsAndOuts = (tx, state, unspentFilter) => {
 
   const insValues = inputTransactions.reduce(groupValuesByColor, {});
   const outsValues = tx.outputs.reduce(groupValuesByColor, {});
-  const colors = Object.keys(insValues);
+  const colors = uniq([
+    ...Object.keys(insValues),
+    ...Object.keys(outsValues),
+  ]).map(Number);
+  const minGasPrice = bridgeState.minGasPrice || 0;
+  const gas = Math.max(0, tx.outputs.length * 20000 - tx.inputs.length * 10000);
   for (const color of colors) {
-    if (!isEqual(insValues[color], outsValues[color])) {
+    if (
+      color === 0 &&
+      gas > 0 &&
+      minGasPrice > 0 &&
+      tx.type === Type.TRANSFER
+    ) {
+      const inputValue = insValues[color];
+      const outputValue = outsValues[color];
+      const txGasPrice = (inputValue - outputValue) / gas;
+      if (txGasPrice < minGasPrice) {
+        throw new Error(`Tx underpriced`);
+      }
+    } else if (!isEqual(insValues[color], outsValues[color])) {
       throw new Error(`Ins and outs values are mismatch for color ${color}`);
     }
   }
@@ -54,7 +70,7 @@ const addOutputs = ({ balances, owners, unspent }, tx) => {
     owners[out.color] = owners[out.color] || {};
     const cBalances = balances[out.color];
     const cOwners = owners[out.color];
-    if (isNFT(out.color)) {
+    if (Output.isNFT(out.color)) {
       cBalances[out.address] = cBalances[out.address] || [];
       cBalances[out.address].push(out.value);
       cOwners[out.value] = out.address;
@@ -72,7 +88,7 @@ const removeInputs = ({ unspent, balances, owners }, tx) => {
     const outpointId = input.prevout.hex();
     const { address, value, color } = unspent[outpointId];
 
-    if (isNFT(color)) {
+    if (Output.isNFT(color)) {
       const index = balances[color][address].indexOf(value);
       balances[color][address].splice(index, 1);
       delete owners[color][value];

@@ -25,7 +25,7 @@ describe('checkConsolidate', () => {
       ],
       new Output(1000, ADDR_1, 0)
     );
-    checkConsolidate(state, consolidate);
+    checkConsolidate(state, consolidate, {});
   });
 
   test('with 1 input', () => {
