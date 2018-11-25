@@ -48,7 +48,7 @@ resource "aws_instance" "leap_node" {
 
   provisioner "file" {
     content     = "${data.template_file.leap_systemd.rendered}"
-    destination = "/tmp/leap.service"
+    destination = "/tmp/leap-node.service"
   }
 
   provisioner "file" {

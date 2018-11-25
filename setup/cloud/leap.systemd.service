@@ -8,8 +8,8 @@ Restart=on-failure
 User=ubuntu
 Group=ubuntu
 PermissionsStartOnly=true
-Environment="DEBUG=leap-node,leap-node:tx,leap-node:period"
-ExecStart=/usr/local/bin/leap-node --p2pPort=46691 --rpcaddr=0.0.0.0 --wsaddr=0.0.0.0 --config=/home/ubuntu/leap-${network}.json
+Environment="DEBUG=tendermint,leap-node*"
+ExecStart=/usr/local/bin/leap-node --p2pPort=46691 --rpcaddr=0.0.0.0 --rpcport=8545 --wsaddr=0.0.0.0 --wsport=8546 --config=/home/ubuntu/leap-${network}.json
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGTERM
 

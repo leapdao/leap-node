@@ -20,7 +20,7 @@ sudo apt-get -y install yarn
 sudo yarn global add leap-node
 
 # Setup system.d config
-sudo mv /tmp/leap.service /etc/systemd/system/
+sudo mv /tmp/leap-node.service /etc/systemd/system/
 
 # Start the node
-sudo service leap start
+sudo service leap-node start
