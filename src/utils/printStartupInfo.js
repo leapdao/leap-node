@@ -63,4 +63,10 @@ module.exports = async (params, bridgeState) => {
     console.log(`  ${colors.bold('Validator ID:')}\t\t${validatorID}`);
     console.log('\n');
   }
+
+  logNode(
+    `Network: ${bridgeState.config.network}, Network ID: ${
+      bridgeState.networkId
+    }`
+  );
 };
