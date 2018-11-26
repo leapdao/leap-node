@@ -3,5 +3,6 @@
   "rootNetwork": "https://rinkeby.infura.io",
   "genesis": null,
   "network": "",
+  "networkId": 1341,
   "peers": []
 }

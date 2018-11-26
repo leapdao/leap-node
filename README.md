@@ -47,7 +47,8 @@ Example: `DEBUG=tendermint,leap-node:tx leap-node`
 - `bridgeAddr` — leap bridge contract address
 - `rootNetwork` — ethereum provider url
 - `genesis` — genesis string
-- `network` — network id
+- `network` — network name
+- `networkId` - network ID. Possible values: `1340` - Leap mainnet, `1341` - Leap testnet.
 - `peers` — array of peers
 
 ### Config presets

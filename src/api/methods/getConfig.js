@@ -3,6 +3,7 @@ module.exports = async bridgeState => {
     bridgeAddr: bridgeState.config.bridgeAddr,
     rootNetwork: bridgeState.config.rootNetwork,
     network: bridgeState.config.network,
+    networkId: bridgeState.config.networkId,
   };
 
   if (bridgeState.config.genesis) {

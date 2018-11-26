@@ -50,7 +50,7 @@ async function run() {
         epochLengthIndex: -1,
       },
     },
-    networkId: config.network,
+    networkId: `${config.network}-${config.networkId}`,
     genesis: config.genesis,
     abciPort: 26658,
     peers: config.peers,
