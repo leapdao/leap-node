@@ -11,30 +11,35 @@ const fs = require('fs');
 const path = require('path');
 const { promisify } = require('util');
 
-exports.readPrivKey = async (app, config, cliArgs) => {
+const privKeyPath = async (app, cliArgs) => {
   const exists = promisify(fs.exists);
-  const readFile = promisify(fs.readFile);
 
   if (cliArgs.privateKey && (await exists(cliArgs.privateKey))) {
-    config.privKey = await readFile(cliArgs.privateKey);
-    return;
+    return cliArgs.privateKey;
   }
 
-  const privFilename = path.join(app.lotionPath(), '.priv');
-  if (await exists(privFilename)) {
-    config.privKey = await readFile(privFilename);
+  return path.join(app.lotionPath(), '.priv');
+};
+
+exports.readPrivKey = async (app, cliArgs) => {
+  const exists = promisify(fs.exists);
+  const readFile = promisify(fs.readFile);
+  const filePath = privKeyPath(app, cliArgs);
+
+  if (await exists(filePath)) {
+    return readFile(filePath, 'utf-8');
   }
+
+  return undefined;
 };
 
 exports.writePrivKey = async (app, cliArgs, privateKey) => {
   const exists = promisify(fs.exists);
   const writeFile = promisify(fs.writeFile);
+  const filePath = privKeyPath(app, cliArgs);
 
   const privFilename = path.join(app.lotionPath(), '.priv');
-  if (
-    (!cliArgs.privateKey || !(await exists(cliArgs.privateKey))) &&
-    !(await exists(privFilename))
-  ) {
+  if (!(await exists(filePath))) {
     await writeFile(privFilename, privateKey);
   }
 };

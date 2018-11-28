@@ -7,49 +7,49 @@ describe('privKey utils', () => {
   describe('readPrivKey', () => {
     test('from privateKey cli arg', async () => {
       fs.exists.mockImplementationOnce((_, cb) => cb(null, true));
-      fs.readFile.mockImplementationOnce((_, cb) => cb(null, '0x000'));
+      fs.exists.mockImplementationOnce((_, cb) => cb(null, true));
+      fs.readFile.mockImplementationOnce((_1, _2, cb) => cb(null, '0x000'));
 
-      const config = {};
-      await readPrivKey({}, config, {
-        privateKey: 'path/to/.priv',
-      });
-      expect(config.privKey).toBe('0x000');
+      const privKey = await readPrivKey(
+        {},
+        {
+          privateKey: 'path/to/.priv',
+        }
+      );
+      expect(privKey).toBe('0x000');
     });
 
     test('from lotion path', async () => {
       fs.exists.mockImplementationOnce((_, cb) => cb(null, true));
-      fs.readFile.mockImplementationOnce((_, cb) => cb(null, '0x000'));
+      fs.readFile.mockImplementationOnce((_1, _2, cb) => cb(null, '0x000'));
 
-      const config = {};
-      await readPrivKey(
+      const privKey = await readPrivKey(
         {
           lotionPath: () => '~/.lotion/networks/net',
         },
-        config,
         {}
       );
-      expect(config.privKey).toBe('0x000');
+      expect(privKey).toBe('0x000');
     });
 
     test('not exists', async () => {
       fs.exists.mockImplementationOnce((_, cb) => cb(null, false));
       fs.exists.mockImplementationOnce((_, cb) => cb(null, false));
 
-      const config = {};
-      await readPrivKey(
+      const privKey = await readPrivKey(
         {
           lotionPath: () => '~/.lotion/networks/net',
         },
-        config,
         { privateKey: 'path/to/.priv' }
       );
-      expect(config.privKey).toBe(undefined);
+      expect(privKey).toBe(undefined);
     });
   });
 
   describe('writePrivKey', () => {
     fs.writeFile.mockImplementation((_1, _2, cb) => cb(null, ''));
     test('not write if from cliArg', async () => {
+      fs.exists.mockImplementationOnce((_, cb) => cb(null, true));
       fs.exists.mockImplementationOnce((_, cb) => cb(null, true));
       await writePrivKey(
         {

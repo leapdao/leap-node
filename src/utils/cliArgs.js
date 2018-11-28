@@ -113,4 +113,9 @@ if (!cliArgs.config) {
   process.exit(0);
 }
 
+if (cliArgs.privateKey && !fs.existsSync(cliArgs.privateKey)) {
+  console.log(`${cliArgs.privateKey} does not exist`);
+  process.exit(0);
+}
+
 module.exports = cliArgs;

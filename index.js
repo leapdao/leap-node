@@ -74,12 +74,10 @@ async function run() {
 
   const db = Db(app);
 
-  await readPrivKey(app, config, cliArgs);
-
-  const bridgeState = new BridgeState(db, config);
-  await bridgeState.init();
-
+  const privKey = await readPrivKey(app, cliArgs);
+  const bridgeState = new BridgeState(db, privKey, config);
   await writePrivKey(app, cliArgs, bridgeState.account.privateKey);
+  await bridgeState.init();
 
   app.useTx(txHandler(bridgeState));
   app.useBlock(blockHandler(bridgeState, db, cliArgs.no_validators_updates));
