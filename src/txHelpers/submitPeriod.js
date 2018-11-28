@@ -11,7 +11,7 @@ const {
   getCurrentSlotId,
   GENESIS,
 } = require('../utils');
-const { logPeriod } = require('../debug');
+const { logPeriod } = require('../utils/debug');
 
 /* istanbul ignore next */
 const logError = height => err => {

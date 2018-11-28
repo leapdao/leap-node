@@ -11,7 +11,7 @@ const bridgeABI = require('./bridgeABI');
 const ContractEventsSubscription = require('./eventsRelay/ContractEventsSubscription');
 const { handleEvents, getGenesisBlock } = require('./utils');
 const { GENESIS } = require('./utils/constants');
-const { logNode } = require('./debug');
+const { logNode } = require('./utils/debug');
 
 module.exports = class BridgeState {
   constructor(db, config) {

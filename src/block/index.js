@@ -1,4 +1,4 @@
-const { logNode } = require('../debug');
+const { logNode } = require('../utils/debug');
 
 const addBlock = require('./addBlock');
 const updatePeriod = require('./updatePeriod');

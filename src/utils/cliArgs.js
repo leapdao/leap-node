@@ -60,7 +60,13 @@ const options = [
   {
     names: ['config'],
     type: 'string',
-    help: 'Path to config file',
+    help: "Path to config file or other's node JSON RPC url",
+  },
+  {
+    names: ['privateKey'],
+    type: 'string',
+    help:
+      "Path to file with ethereum private key. Will be used for validators' transaction",
   },
   {
     names: ['network'],

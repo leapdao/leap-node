@@ -99,9 +99,9 @@
     ],
     "coveragePathIgnorePatterns": [
       "src/bridgeABI.js",
-      "src/cleanupLotion.js",
-      "src/cliArgs.js",
-      "src/debug.js",
+      "src/utils/cleanupLotion.js",
+      "src/utisl/cliArgs.js",
+      "src/utils/debug.js",
       "src/utils/printStartupInfo.js",
       "src/utils/sendTransaction.js",
       "src/utils/getGenesisBlock.js",
