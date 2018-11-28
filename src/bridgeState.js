@@ -11,18 +11,18 @@ const bridgeABI = require('./bridgeABI');
 const ContractEventsSubscription = require('./eventsRelay/ContractEventsSubscription');
 const { handleEvents, getGenesisBlock } = require('./utils');
 const { GENESIS } = require('./utils/constants');
-const { logNode } = require('./debug');
+const { logNode } = require('./utils/debug');
 
 module.exports = class BridgeState {
-  constructor(db, config) {
+  constructor(db, privKey, config) {
     this.config = config;
     this.web3 = new Web3();
     this.web3.setProvider(
       new this.web3.providers.HttpProvider(config.rootNetwork)
     );
     this.contract = new this.web3.eth.Contract(bridgeABI, config.bridgeAddr);
-    this.account = config.privKey
-      ? this.web3.eth.accounts.privateKeyToAccount(config.privKey)
+    this.account = privKey
+      ? this.web3.eth.accounts.privateKeyToAccount(privKey)
       : this.web3.eth.accounts.create();
 
     this.db = db;

@@ -6,7 +6,7 @@
  */
 
 const submitPeriod = require('../txHelpers/submitPeriod');
-const { logPeriod } = require('../debug');
+const { logPeriod } = require('../utils/debug');
 
 module.exports = bridgeState => async (rsp, chainInfo) => {
   const height = chainInfo.height - 32;

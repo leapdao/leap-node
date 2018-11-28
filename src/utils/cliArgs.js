@@ -60,7 +60,13 @@ const options = [
   {
     names: ['config'],
     type: 'string',
-    help: 'Path to config file',
+    help: "Path to config file or other's node JSON RPC url",
+  },
+  {
+    names: ['privateKey'],
+    type: 'string',
+    help:
+      "Path to file with ethereum private key. Will be used for validators' transaction",
   },
   {
     names: ['network'],
@@ -104,6 +110,11 @@ if (cliArgs.network) {
 
 if (!cliArgs.config) {
   console.log('Config/network option is required. See --help');
+  process.exit(0);
+}
+
+if (cliArgs.privateKey && !fs.existsSync(cliArgs.privateKey)) {
+  console.log(`${cliArgs.privateKey} does not exist`);
   process.exit(0);
 }
 

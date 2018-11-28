@@ -7,13 +7,10 @@
 
 /* eslint-disable no-console */
 
-const fs = require('fs');
-const path = require('path');
-const { promisify } = require('util');
-
-const cliArgs = require('./src/cliArgs');
-const cleanupLotion = require('./src/cleanupLotion');
-const readConfig = require('./src/readConfig');
+const cliArgs = require('./src/utils/cliArgs');
+const cleanupLotion = require('./src/utils/cleanupLotion');
+const readConfig = require('./src/utils/readConfig');
+const { readPrivKey, writePrivKey } = require('./src/utils/privKey');
 const Db = require('./src/api/db');
 const jsonrpc = require('./src/api/jsonrpc');
 
@@ -26,11 +23,7 @@ const { printStartupInfo } = require('./src/utils');
 const BridgeState = require('./src/bridgeState');
 const lotion = require('./lotion');
 
-const { logNode, logTendermint } = require('./src/debug');
-
-const readFile = promisify(fs.readFile);
-const writeFile = promisify(fs.writeFile);
-const exists = promisify(fs.exists);
+const { logNode, logTendermint } = require('./src/utils/debug');
 
 async function run() {
   const config = await (async () => {
@@ -81,15 +74,10 @@ async function run() {
 
   const db = Db(app);
 
-  const privFilename = path.join(app.lotionPath(), '.priv');
-  if (await exists(privFilename)) {
-    config.privKey = await readFile(privFilename);
-  }
-
-  const bridgeState = new BridgeState(db, config);
+  const privKey = await readPrivKey(app, cliArgs);
+  const bridgeState = new BridgeState(db, privKey, config);
+  await writePrivKey(app, cliArgs, bridgeState.account.privateKey);
   await bridgeState.init();
-
-  await writeFile(privFilename, bridgeState.account.privateKey);
 
   app.useTx(txHandler(bridgeState));
   app.useBlock(blockHandler(bridgeState, db, cliArgs.no_validators_updates));
