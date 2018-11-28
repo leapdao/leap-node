@@ -237,6 +237,7 @@ function Lotion(opts = {}) {
       tendermint.close();
       txHTTPServer.close();
     },
+    info: () => appInfo,
     lotionPath: () => lotionPath,
     status: async () => {
       const { tendermintPort } = await getPorts(undefined, opts.tendermintPort);
