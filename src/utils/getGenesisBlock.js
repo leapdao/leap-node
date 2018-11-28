@@ -3,8 +3,11 @@ const { GENESIS } = require('./constants');
 const BLOCK_GUESS_GAP = 10000;
 
 const getBlockAverageTime = async web3 => {
-  const span = 40000;
+  let span = 40000;
   const blockNumber = await web3.eth.getBlockNumber();
+  if (blockNumber < 40000) {
+    span = blockNumber;
+  }
   const b1 = await web3.eth.getBlock(blockNumber);
   const b2 = await web3.eth.getBlock(blockNumber - span);
 

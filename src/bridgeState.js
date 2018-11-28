@@ -7,11 +7,14 @@
 
 const Web3 = require('web3');
 const { Period, Block, Outpoint } = require('leap-core');
-const bridgeABI = require('./bridgeABI');
 const ContractEventsSubscription = require('./eventsRelay/ContractEventsSubscription');
-const { handleEvents, getGenesisBlock } = require('./utils');
+const { handleEvents } = require('./utils');
 const { GENESIS } = require('./utils/constants');
 const { logNode } = require('./debug');
+
+const bridgeABI = require('./abis/bridgeAbi');
+const exitABI = require('./abis/exitHandler');
+const operatorABI = require('./abis/operator');
 
 module.exports = class BridgeState {
   constructor(db, config) {
@@ -20,7 +23,18 @@ module.exports = class BridgeState {
     this.web3.setProvider(
       new this.web3.providers.HttpProvider(config.rootNetwork)
     );
-    this.contract = new this.web3.eth.Contract(bridgeABI, config.bridgeAddr);
+    this.bridgeContract = new this.web3.eth.Contract(
+      bridgeABI,
+      config.bridgeAddr
+    );
+    this.operatorContract = new this.web3.eth.Contract(
+      operatorABI,
+      config.operatorAddr
+    );
+    this.exitHandlerContract = new this.web3.eth.Contract(
+      exitABI,
+      config.exitHandlerAddr
+    );
     this.account = config.privKey
       ? this.web3.eth.accounts.privateKeyToAccount(config.privKey)
       : this.web3.eth.accounts.create();
@@ -37,12 +51,19 @@ module.exports = class BridgeState {
   }
 
   async init() {
-    logNode('Syncing bridge events...');
+    logNode('Syncing events...');
     this.lastBlockSynced = await this.db.getLastBlockSynced();
-    const genesisBlock = await getGenesisBlock(this.web3, this.contract);
+    const genesisBlock = await this.bridgeContract.methods
+      .genesisBlockNumber()
+      .call();
+    const contracts = [
+      this.bridgeContract,
+      this.exitHandlerContract,
+      this.operatorContract,
+    ];
     this.eventsSubscription = new ContractEventsSubscription(
       this.web3,
-      this.contract,
+      contracts,
       genesisBlock
     );
     await this.watchContractEvents();

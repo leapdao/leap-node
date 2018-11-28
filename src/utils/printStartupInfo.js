@@ -31,7 +31,7 @@ module.exports = async (params, bridgeState) => {
     validatorKey.pub_key.value,
     'base64'
   ).toString('hex');
-  const slots = await readSlots(bridgeState.contract);
+  const slots = await readSlots(bridgeState.operatorContract);
   const mySlots = getSlotsByAddr(slots, bridgeState.account.address);
 
   mySlots.forEach(slot => {
@@ -52,7 +52,9 @@ module.exports = async (params, bridgeState) => {
     );
     console.log(
       `  Open ${colors.bold(
-        `https://bridge-dev.leapdao.org/${bridgeState.contract.options.address}`
+        `https://bridge-dev.leapdao.org/${
+          bridgeState.bridgeContract.options.address
+        }`
       )} and buy a slot`
     );
     console.log(

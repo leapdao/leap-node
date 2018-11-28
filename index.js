@@ -99,7 +99,9 @@ async function run() {
     await eventsRelay(
       params.txServerPort,
       bridgeState.web3,
-      bridgeState.contract
+      bridgeState.bridgeContract,
+      bridgeState.exitHandlerContract,
+      bridgeState.operatorContract
     );
     await printStartupInfo(params, bridgeState);
 

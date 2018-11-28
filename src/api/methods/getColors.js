@@ -6,14 +6,16 @@ let nftTokens = [];
 
 const getTokensRange = (bridgeState, from, to) => {
   return Promise.all(
-    range(from, to - 1).map(i => bridgeState.contract.methods.tokens(i).call())
+    range(from, to - 1).map(i =>
+      bridgeState.exitHandlerContract.methods.tokens(i).call()
+    )
   ).then(tokens => tokens.map(o => o.addr.toLowerCase()));
 };
 
 const getColors = async (bridgeState, nft) => {
   if (nft) {
     const tokenCount = Number(
-      await bridgeState.contract.methods.nftTokenCount().call()
+      await bridgeState.exitHandlerContract.methods.nftTokenCount().call()
     );
     if (tokenCount !== nftTokens.length) {
       nftTokens = await getTokensRange(
@@ -24,7 +26,7 @@ const getColors = async (bridgeState, nft) => {
     }
   } else {
     const tokenCount = Number(
-      await bridgeState.contract.methods.erc20TokenCount().call()
+      await bridgeState.exitHandlerContract.methods.erc20TokenCount().call()
     );
     if (tokenCount !== erc20Tokens.length) {
       erc20Tokens = await getTokensRange(bridgeState, 0, tokenCount);

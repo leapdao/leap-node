@@ -10,8 +10,8 @@ const { sendTransaction } = require('../utils');
 module.exports = (slotId, bridgeState) => {
   return sendTransaction(
     bridgeState.web3,
-    bridgeState.contract.methods.activate(slotId),
-    bridgeState.contract.options.address,
+    bridgeState.operatorContract.methods.activate(slotId),
+    bridgeState.operatorContract.options.address,
     bridgeState.account
   );
 };
