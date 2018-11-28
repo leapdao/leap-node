@@ -11,11 +11,10 @@ const fs = require('fs');
 const path = require('path');
 const { promisify } = require('util');
 
-const readFile = promisify(fs.readFile);
-const writeFile = promisify(fs.writeFile);
-const exists = promisify(fs.exists);
-
 exports.readPrivKey = async (app, config, cliArgs) => {
+  const exists = promisify(fs.exists);
+  const readFile = promisify(fs.readFile);
+
   if (cliArgs.privateKey && (await exists(cliArgs.privateKey))) {
     config.privKey = await readFile(cliArgs.privateKey);
     return;
@@ -28,6 +27,9 @@ exports.readPrivKey = async (app, config, cliArgs) => {
 };
 
 exports.writePrivKey = async (app, cliArgs, privateKey) => {
+  const exists = promisify(fs.exists);
+  const writeFile = promisify(fs.writeFile);
+
   const privFilename = path.join(app.lotionPath(), '.priv');
   if (
     (!cliArgs.privateKey || !(await exists(cliArgs.privateKey))) &&
