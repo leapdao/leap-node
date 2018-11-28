@@ -27,6 +27,7 @@ const fetchNodeConfig = async nodeUrl => {
     delete config.p2pPort;
     delete config.nodeId;
   }
+  logNode(`Fetched config from: ${nodeUrl}`, config);
   return config;
 };
 

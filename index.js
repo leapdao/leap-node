@@ -33,7 +33,7 @@ const writeFile = promisify(fs.writeFile);
 const exists = promisify(fs.exists);
 
 async function run() {
-  const config = (async () => {
+  const config = await (async () => {
     let result;
     try {
       result = readConfig(cliArgs.config);
