@@ -1,6 +1,6 @@
 {
   "name": "leap-node",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "main": "index.js",
   "author": "Alex Lunyov <isuntc@gmail.com>",
   "license": "MPL-2.0",
@@ -94,7 +94,9 @@
     "collectCoverageFrom": [
       "src/**/*.js"
     ],
-    "setupFiles": ["<rootDir>/jestSetup.js"],
+    "setupFiles": [
+      "<rootDir>/jestSetup.js"
+    ],
     "coveragePathIgnorePatterns": [
       "src/bridgeABI.js",
       "src/cleanupLotion.js",
