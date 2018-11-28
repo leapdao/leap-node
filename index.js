@@ -33,7 +33,17 @@ const writeFile = promisify(fs.writeFile);
 const exists = promisify(fs.exists);
 
 async function run() {
-  const config = await readConfig(cliArgs.config);
+  const config = (async () => {
+    let result;
+    try {
+      result = readConfig(cliArgs.config);
+    } catch (err) {
+      console.error(err.message);
+      process.exit(0);
+    }
+
+    return result;
+  })();
 
   const app = lotion({
     initialState: {

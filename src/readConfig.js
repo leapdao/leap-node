@@ -8,6 +8,7 @@
 /* eslint-disable no-console */
 
 const fs = require('fs');
+const url = require('url');
 const { helpers } = require('leap-core');
 const Web3 = require('web3');
 const { promisify } = require('util');
@@ -15,10 +16,18 @@ const { logNode } = require('./debug');
 
 const readFile = promisify(fs.readFile);
 
-const fetchNodeConfig = nodeUrl => {
+const fetchNodeConfig = async nodeUrl => {
   logNode(`Fetching config from: ${nodeUrl}`);
   const web3 = helpers.extendWeb3(new Web3(nodeUrl));
-  return web3.getConfig();
+  const config = await web3.getConfig();
+  if (config.p2pPort && config.nodeId) {
+    const { hostname } = url.parse(nodeUrl);
+    config.peers = config.peers || [];
+    config.peers.push(`${config.nodeId}@${hostname}:${config.p2pPort}`);
+    delete config.p2pPort;
+    delete config.nodeId;
+  }
+  return config;
 };
 
 const readConfigFile = async configPath => {
@@ -33,8 +42,7 @@ module.exports = async configPath => {
     : await readConfigFile(configPath);
 
   if (!config.bridgeAddr) {
-    console.error('bridgeAddr is required');
-    process.exit(0);
+    throw new Error('bridgeAddr is required');
   }
 
   return config;
