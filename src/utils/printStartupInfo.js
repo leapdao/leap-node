@@ -52,9 +52,7 @@ module.exports = async (params, bridgeState) => {
     );
     console.log(
       `  Open ${colors.bold(
-        `https://bridge-dev.leapdao.org/#${
-          bridgeState.contract.options.address
-        }`
+        `https://bridge-dev.leapdao.org/${bridgeState.contract.options.address}`
       )} and buy a slot`
     );
     console.log(
