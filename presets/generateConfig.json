@@ -1,1 +1,1 @@
-{"bridgeAddr":"0x4d8f3b9d31486bedc57241e4c80ec72bbcdda9f8","operatorAddr":"0x7ba4a38a2636b30f11d6b166cd8f958e8b2e81d9","exitHandlerAddr":"0xc7312899918c4933fd30ab850e21c343749ca629","rootNetwork":"http://localhost:7545","network":"ganache","networkId":644399691,"peers":[]}
+{"bridgeAddr":"0xdaf81c57a228909bd951e0af495a4074dd1e15d8","operatorAddr":"0x6eead7043e19dbe82594e3aa507148bbe4d52be4","exitHandlerAddr":"0x544c2fa32ec0c9b4be3526db4220499d58e61783","rootNetwork":"http://localhost:7545","network":"ganache","networkId":445129242,"peers":[]}

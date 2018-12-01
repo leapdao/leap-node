@@ -35,19 +35,26 @@ ContractEventsSubscription.__setEventBatches([
 ]);
 /* eslint-enable */
 
-const createInstance = (web3, contract, db, config) => {
+const createInstance = (web3, bridgeContract, db, config) => {
   const bridgeState = new BridgeState(db, config);
   bridgeState.web3 = web3;
-  bridgeState.contract = contract;
+  bridgeState.bridgeContract = bridgeContract;
 
   return bridgeState;
 };
 
 describe('BridgeState', () => {
   test('Initialisation', async () => {
+    const bridgeContract = {
+      methods: {
+        genesisBlockNumber: () => ({
+          call: async () => 5,
+        }),
+      },
+    };
     const state = createInstance(
       {},
-      {},
+      bridgeContract,
       {
         async getLastBlockSynced() {
           return 0;
@@ -63,9 +70,16 @@ describe('BridgeState', () => {
   });
 
   test('Initialisation: import privateKey', async () => {
+    const bridgeContract = {
+      methods: {
+        genesisBlockNumber: () => ({
+          call: async () => 5,
+        }),
+      },
+    };
     const state = createInstance(
       {},
-      {},
+      bridgeContract,
       {
         async getLastBlockSynced() {
           return 0;
@@ -87,9 +101,16 @@ describe('BridgeState', () => {
   });
 
   test('Handle events', async () => {
+    const bridgeContract = {
+      methods: {
+        genesisBlockNumber: () => ({
+          call: async () => 5,
+        }),
+      },
+    };
     const state = createInstance(
       {},
-      {},
+      bridgeContract,
       {
         async getLastBlockSynced() {
           return 0;

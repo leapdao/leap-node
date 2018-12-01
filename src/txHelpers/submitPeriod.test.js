@@ -6,7 +6,7 @@ const ADDR = '0x4436373705394267350db2c06613990d34621d69';
 
 describe('submitPeriod', async () => {
   test('submitted period', async () => {
-    const contract = {
+    const bridgeContract = {
       methods: {
         periods: () => ({
           async call() {
@@ -26,7 +26,7 @@ describe('submitPeriod', async () => {
       },
       [],
       0,
-      { contract }
+      { bridgeContract }
     );
     expect(period).toEqual({
       timestamp: '100',
@@ -35,7 +35,7 @@ describe('submitPeriod', async () => {
 
   test('not submitted, no own slot', async () => {
     let submitCalled = false;
-    const contract = {
+    const bridgeContract = {
       options: {
         address: ADDR,
       },
@@ -47,6 +47,13 @@ describe('submitPeriod', async () => {
             };
           },
         }),
+      },
+    };
+    const operatorContract = {
+      options: {
+        address: ADDR,
+      },
+      methods: {
         submitPeriod: () => {
           submitCalled = true;
           return {};
@@ -63,7 +70,8 @@ describe('submitPeriod', async () => {
       [],
       0,
       {
-        contract,
+        bridgeContract,
+        operatorContract,
         account: {
           address: ADDR,
         },
@@ -77,7 +85,7 @@ describe('submitPeriod', async () => {
 
   test('not submitted, own slot', async () => {
     let submitCalled = false;
-    const contract = {
+    const bridgeContract = {
       options: {
         address: ADDR,
       },
@@ -89,6 +97,13 @@ describe('submitPeriod', async () => {
             };
           },
         }),
+      },
+    };
+    const operatorContract = {
+      options: {
+        address: ADDR,
+      },
+      methods: {
         submitPeriod: () => {
           submitCalled = true;
           return {};
@@ -105,7 +120,8 @@ describe('submitPeriod', async () => {
       [{ signerAddr: ADDR, id: 0 }],
       0,
       {
-        contract,
+        operatorContract,
+        bridgeContract,
         account: {
           address: ADDR,
         },
