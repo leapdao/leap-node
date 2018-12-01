@@ -9,7 +9,7 @@ const { Period } = require('leap-core');
 const submitPeriod = require('../txHelpers/submitPeriod');
 const activateSlot = require('../txHelpers/activateSlot');
 const { getAuctionedByAddr } = require('../utils');
-const { logPeriod } = require('../debug');
+const { logPeriod } = require('../utils/debug');
 
 module.exports = async (state, chainInfo, bridgeState) => {
   if (chainInfo.height % 32 === 0) {

@@ -10,19 +10,20 @@ const { Period, Block, Outpoint } = require('leap-core');
 const ContractEventsSubscription = require('./eventsRelay/ContractEventsSubscription');
 const { handleEvents } = require('./utils');
 const { GENESIS } = require('./utils/constants');
-const { logNode } = require('./debug');
+const { logNode } = require('./utils/debug');
 
 const bridgeABI = require('./abis/bridgeAbi');
 const exitABI = require('./abis/exitHandler');
 const operatorABI = require('./abis/operator');
 
 module.exports = class BridgeState {
-  constructor(db, config) {
+  constructor(db, privKey, config) {
     this.config = config;
     this.web3 = new Web3();
     this.web3.setProvider(
       new this.web3.providers.HttpProvider(config.rootNetwork)
     );
+
     this.bridgeContract = new this.web3.eth.Contract(
       bridgeABI,
       config.bridgeAddr
@@ -35,8 +36,9 @@ module.exports = class BridgeState {
       exitABI,
       config.exitHandlerAddr
     );
-    this.account = config.privKey
-      ? this.web3.eth.accounts.privateKeyToAccount(config.privKey)
+
+    this.account = privKey
+      ? this.web3.eth.accounts.privateKeyToAccount(privKey)
       : this.web3.eth.accounts.create();
 
     this.db = db;

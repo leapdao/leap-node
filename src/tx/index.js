@@ -10,7 +10,7 @@ const applyTx = require('./applyTx');
 const accumulateTx = require('./accumulateTx');
 const printTx = require('../txHelpers/printTx');
 
-const { logTx, logError } = require('../debug');
+const { logTx, logError } = require('../utils/debug');
 
 module.exports = bridgeState => (state, { encoded }, _, isCheck) => {
   const tx = Tx.fromRaw(encoded);

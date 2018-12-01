@@ -5,7 +5,7 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 const { getAddress, hexToBase64, base64ToHex } = require('../utils');
-const { logValidators } = require('../debug');
+const { logValidators } = require('../utils/debug');
 
 const power = v => (typeof v === 'number' ? v : v.power);
 

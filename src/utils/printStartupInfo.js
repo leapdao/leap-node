@@ -13,7 +13,7 @@ const { promisify } = require('util');
 const colors = require('colors');
 const getSlotsByAddr = require('./getSlotsByAddr');
 const readSlots = require('./readSlots');
-const { logNode } = require('../debug');
+const { logNode } = require('../utils/debug');
 
 const readFile = promisify(fs.readFile);
 
