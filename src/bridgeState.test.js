@@ -2,7 +2,6 @@ const { Outpoint } = require('leap-core');
 const BridgeState = require('./bridgeState');
 
 jest.mock('./eventsRelay/ContractEventsSubscription');
-jest.mock('./utils/getGenesisBlock');
 
 const ContractEventsSubscription = require('./eventsRelay/ContractEventsSubscription');
 

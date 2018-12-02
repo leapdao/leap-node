@@ -22,7 +22,6 @@ exports.hexToBase64 = require('./hexToBase64');
 exports.base64ToHex = require('./base64ToHex');
 exports.range = require('./range');
 exports.printStartupInfo = require('./printStartupInfo');
-exports.getGenesisBlock = require('./getGenesisBlock');
 
 exports.seq = mapFn => async arr => {
   for (const item of arr) {
