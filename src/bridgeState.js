@@ -7,7 +7,7 @@
 
 const Web3 = require('web3');
 const { Period, Block, Outpoint } = require('leap-core');
-const ContractEventsSubscription = require('./eventsRelay/ContractEventsSubscription');
+const ContractsEventsSubscription = require('./eventsRelay/ContractsEventsSubscription');
 const { handleEvents } = require('./utils');
 const { GENESIS } = require('./utils/constants');
 const { logNode } = require('./utils/debug');
@@ -63,7 +63,7 @@ module.exports = class BridgeState {
       this.exitHandlerContract,
       this.operatorContract,
     ];
-    this.eventsSubscription = new ContractEventsSubscription(
+    this.eventsSubscription = new ContractsEventsSubscription(
       this.web3,
       contracts,
       genesisBlock

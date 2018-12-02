@@ -26,7 +26,7 @@ async function getPastEvents(contract, fromBlock, toBlock) {
   return events.reduce((result, ev) => result.concat(ev), []);
 }
 
-module.exports = class ContractEventsSubscription extends EventEmitter {
+module.exports = class ContractsEventsSubscription extends EventEmitter {
   constructor(web3, contracts, fromBlock = null) {
     super();
     this.fromBlock = fromBlock;

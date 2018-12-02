@@ -9,7 +9,7 @@
 
 const { Tx, Input, Outpoint, Output } = require('leap-core');
 
-const ContractEventsSubscription = require('./ContractEventsSubscription');
+const ContractsEventsSubscription = require('./ContractsEventsSubscription');
 const sendTx = require('../txHelpers/sendTx');
 const { handleEvents } = require('../utils');
 
@@ -64,7 +64,7 @@ module.exports = async (txServerPort, bridgeState) => {
   const genesisBlock = await bridgeState.bridgeContract.methods
     .genesisBlockNumber()
     .call();
-  const eventSubscription = new ContractEventsSubscription(
+  const eventSubscription = new ContractsEventsSubscription(
     bridgeState.web3,
     [
       bridgeState.bridgeContract,

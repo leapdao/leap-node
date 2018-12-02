@@ -1,12 +1,12 @@
 const { Outpoint } = require('leap-core');
 const BridgeState = require('./bridgeState');
 
-jest.mock('./eventsRelay/ContractEventsSubscription');
+jest.mock('./eventsRelay/ContractsEventsSubscription');
 
-const ContractEventsSubscription = require('./eventsRelay/ContractEventsSubscription');
+const ContractsEventsSubscription = require('./eventsRelay/ContractsEventsSubscription');
 
 /* eslint-disable */
-ContractEventsSubscription.__setEventBatches([
+ContractsEventsSubscription.__setEventBatches([
   [{ event: 'EpochLength', returnValues: { epochLength: 4 } }],
   [
     {
