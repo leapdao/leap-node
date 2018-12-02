@@ -153,6 +153,15 @@ module.exports = [
   },
   {
     constant: true,
+    inputs: [],
+    name: 'bridge',
+    outputs: [{ name: '', type: 'address' }],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
     inputs: [{ name: '', type: 'address' }],
     name: 'tokenColors',
     outputs: [{ name: '', type: 'bool' }],
