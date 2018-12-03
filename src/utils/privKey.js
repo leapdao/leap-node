@@ -24,9 +24,9 @@ const privKeyPath = async (app, cliArgs) => {
 exports.readPrivKey = async (app, cliArgs) => {
   const exists = promisify(fs.exists);
   const readFile = promisify(fs.readFile);
-  const filePath = privKeyPath(app, cliArgs);
+  const filePath = await privKeyPath(app, cliArgs);
 
-  if (await exists(filePath)) {
+  if (filePath && (await exists(filePath))) {
     return readFile(filePath, 'utf-8');
   }
 
@@ -36,10 +36,10 @@ exports.readPrivKey = async (app, cliArgs) => {
 exports.writePrivKey = async (app, cliArgs, privateKey) => {
   const exists = promisify(fs.exists);
   const writeFile = promisify(fs.writeFile);
-  const filePath = privKeyPath(app, cliArgs);
+  const filePath = await privKeyPath(app, cliArgs);
 
   const privFilename = path.join(app.lotionPath(), '.priv');
-  if (!(await exists(filePath))) {
+  if (!filePath || !(await exists(filePath))) {
     await writeFile(privFilename, privateKey);
   }
 };
