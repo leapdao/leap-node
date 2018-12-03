@@ -1,3 +1,8 @@
+const fs = require('fs');
+const { promisify } = require('util');
+
+const readFile = promisify(fs.readFile);
+
 module.exports = async (bridgeState, app) => {
   const config = {
     bridgeAddr: bridgeState.config.bridgeAddr,
@@ -8,9 +13,8 @@ module.exports = async (bridgeState, app) => {
     networkId: bridgeState.config.networkId,
   };
 
-  if (bridgeState.config.genesis) {
-    config.genesis = bridgeState.config.genesis;
-  }
+  const genesis = JSON.parse(await readFile(app.info().genesisPath));
+  config.genesis = genesis;
 
   if (bridgeState.config.peers) {
     config.peers = bridgeState.config.peers;
