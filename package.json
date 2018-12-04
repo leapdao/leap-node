@@ -67,7 +67,7 @@
     "rimraf": "^2.6.2",
     "rpc-websockets": "^4.1.2",
     "tendermint": "^3.1.9",
-    "tendermint-node": "leapdao/tendermint-node#9b0074b2beb1a048e26a222e78f9cb2cbc528275",
+    "tendermint-node": "leapdao/tendermint-node#0b586e7453e8d4e799b74c6fdb995ff787369241",
     "varstruct": "^6.1.1",
     "web3": "^1.0.0-beta.34"
   },
