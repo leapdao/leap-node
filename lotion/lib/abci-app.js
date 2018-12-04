@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 
-const createABCIServer = require('abci');
+const createABCIServer = require('js-abci');
 const decodeTx = require('./tx-encoding.js').decode;
 const jsondiffpatch = require('jsondiffpatch');
 const getRoot = require('./get-root.js');

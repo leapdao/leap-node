@@ -41,7 +41,6 @@
     "plasma"
   ],
   "dependencies": {
-    "abci": "github:leapdao/js-abci#385079c3fe6d66afd58deb3eee345a9f66428a2a",
     "axios": "^0.18.0",
     "bn.js": "^4.11.8",
     "body-parser": "^1.18.3",
@@ -57,7 +56,7 @@
     "get-port": "^3.1.0",
     "jayson": "^2.0.6",
     "jpfs": "0.0.3",
-    "js-abci": "^0.1.1",
+    "js-abci": "leapdao/js-abci#e8c81c21cf4d058da0b7e3bb825fef261a6bd078",
     "jsondiffpatch": "^0.2.5",
     "leap-core": "^0.19.0",
     "level": "^4.0.0",
