@@ -189,15 +189,6 @@ abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
 
-"abci@github:leapdao/js-abci#385079c3fe6d66afd58deb3eee345a9f66428a2a":
-  version "4.0.2"
-  resolved "https://codeload.github.com/leapdao/js-abci/tar.gz/385079c3fe6d66afd58deb3eee345a9f66428a2a"
-  dependencies:
-    bl "^1.2.2"
-    debug "^3.1.0"
-    protobufjs "^6.8.8"
-    protocol-buffers-encodings "^1.1.0"
-
 abstract-leveldown@^5.0.0, abstract-leveldown@~5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/abstract-leveldown/-/abstract-leveldown-5.0.0.tgz#f7128e1f86ccabf7d2893077ce5d06d798e386c6"
@@ -4038,9 +4029,9 @@ jpfs@0.0.3:
     concat-stream "^1.6.2"
     peer-channel "^0.1.1"
 
-js-abci@leapdao/js-abci#e8c81c21cf4d058da0b7e3bb825fef261a6bd078:
+js-abci@leapdao/js-abci#34538e252811610b23340a9f5314be4d0a44a501:
   version "4.0.2"
-  resolved "https://codeload.github.com/leapdao/js-abci/tar.gz/e8c81c21cf4d058da0b7e3bb825fef261a6bd078"
+  resolved "https://codeload.github.com/leapdao/js-abci/tar.gz/34538e252811610b23340a9f5314be4d0a44a501"
   dependencies:
     bl "^1.2.2"
     debug "^3.1.0"
@@ -6579,9 +6570,9 @@ tar@^4:
     safe-buffer "^5.1.2"
     yallist "^3.0.2"
 
-tendermint-node@leapdao/tendermint-node#2675d13f572f893f11ee2d2a588f1e33011c5531:
+tendermint-node@leapdao/tendermint-node#9b0074b2beb1a048e26a222e78f9cb2cbc528275:
   version "3.4.3"
-  resolved "https://codeload.github.com/leapdao/tendermint-node/tar.gz/2675d13f572f893f11ee2d2a588f1e33011c5531"
+  resolved "https://codeload.github.com/leapdao/tendermint-node/tar.gz/9b0074b2beb1a048e26a222e78f9cb2cbc528275"
   dependencies:
     axios "^0.18.0"
     cross-spawn "^6.0.5"
