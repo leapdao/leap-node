@@ -5,6 +5,17 @@ jest.mock('./eventsRelay/ContractsEventsSubscription');
 
 const ContractsEventsSubscription = require('./eventsRelay/ContractsEventsSubscription');
 
+class Contract {
+  constructor(abi, address) {
+    this.options = { address };
+    this.methods = {
+      genesisBlockNumber: () => ({
+        call: async () => 5,
+      }),
+    };
+  }
+}
+
 /* eslint-disable */
 ContractsEventsSubscription.__setEventBatches([
   [{ event: 'EpochLength', returnValues: { epochLength: 4 } }],
@@ -34,28 +45,30 @@ ContractsEventsSubscription.__setEventBatches([
 ]);
 /* eslint-enable */
 
-const createInstance = (web3, bridgeContract, db, config) => {
+const createInstance = (web3, exitHandlerContract, db, config) => {
   const bridgeState = new BridgeState(db, config.privKey, config);
   bridgeState.web3 = web3;
-  bridgeState.bridgeContract = bridgeContract;
+  bridgeState.exitHandlerContract = exitHandlerContract;
   bridgeState.operatorContract = {};
-  bridgeState.exitHandlerContract = {};
+  bridgeState.bridgeContract = {
+    methods: {
+      genesisBlockNumber: () => ({
+        call: async () => 5,
+      }),
+    },
+  };
 
   return bridgeState;
 };
 
 describe('BridgeState', () => {
   test('Initialisation', async () => {
-    const bridgeContract = {
-      methods: {
-        genesisBlockNumber: () => ({
-          call: async () => 5,
-        }),
-      },
+    const exitHandlerContract = {
+      methods: {},
     };
     const state = createInstance(
       {},
-      bridgeContract,
+      exitHandlerContract,
       {
         async getLastBlockSynced() {
           return 0;
@@ -71,16 +84,12 @@ describe('BridgeState', () => {
   });
 
   test('Initialisation: import privateKey', async () => {
-    const bridgeContract = {
-      methods: {
-        genesisBlockNumber: () => ({
-          call: async () => 5,
-        }),
-      },
+    const exitHandlerContract = {
+      methods: {},
     };
     const state = createInstance(
       {},
-      bridgeContract,
+      exitHandlerContract,
       {
         async getLastBlockSynced() {
           return 0;
@@ -102,16 +111,12 @@ describe('BridgeState', () => {
   });
 
   test('Handle events', async () => {
-    const bridgeContract = {
-      methods: {
-        genesisBlockNumber: () => ({
-          call: async () => 5,
-        }),
-      },
+    const exitHandlerContract = {
+      methods: {},
     };
     const state = createInstance(
       {},
-      bridgeContract,
+      exitHandlerContract,
       {
         async getLastBlockSynced() {
           return 0;
@@ -154,5 +159,74 @@ describe('BridgeState', () => {
         amount: '100',
       },
     });
+  });
+
+  test('Create bridgeContract instance', async () => {
+    const exitHandlerContract = {
+      methods: {
+        bridge: () => ({
+          call: async () => '0x00',
+        }),
+      },
+    };
+    const state = createInstance(
+      {
+        eth: {
+          Contract,
+        },
+      },
+      exitHandlerContract,
+      {
+        async getLastBlockSynced() {
+          return 0;
+        },
+        async storeBlock() {
+          return null;
+        },
+      },
+      {
+        privKey:
+          '0x9b63fe8147edb8d251a6a66fd18c0ed73873da9fff3f08ea202e1c0a8ead7311',
+      }
+    );
+    state.bridgeContract = undefined;
+    await state.init();
+    expect(state.bridgeContract.options.address).toBe('0x00');
+  });
+
+  test('Create operatorContract instance', async () => {
+    const exitHandlerContract = {
+      methods: {
+        bridge: () => ({
+          call: async () => '0x00',
+        }),
+      },
+    };
+    const state = createInstance(
+      {
+        eth: {
+          Contract,
+        },
+      },
+      exitHandlerContract,
+      {
+        async getLastBlockSynced() {
+          return 0;
+        },
+        async storeBlock() {
+          return null;
+        },
+      },
+      {
+        privKey:
+          '0x9b63fe8147edb8d251a6a66fd18c0ed73873da9fff3f08ea202e1c0a8ead7311',
+      }
+    );
+    state.operatorContract = undefined;
+    state.bridgeContract.methods.operator = () => ({
+      call: async () => '0x01',
+    });
+    await state.init();
+    expect(state.operatorContract.options.address).toBe('0x01');
   });
 });
