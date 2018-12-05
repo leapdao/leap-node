@@ -24,6 +24,10 @@ module.exports = class BridgeState {
       new this.web3.providers.HttpProvider(config.rootNetwork)
     );
 
+    this.exitHandlerContract = new this.web3.eth.Contract(
+      exitABI,
+      config.exitHandlerAddr
+    );
     this.bridgeContract = new this.web3.eth.Contract(
       bridgeABI,
       config.bridgeAddr
@@ -31,10 +35,6 @@ module.exports = class BridgeState {
     this.operatorContract = new this.web3.eth.Contract(
       operatorABI,
       config.operatorAddr
-    );
-    this.exitHandlerContract = new this.web3.eth.Contract(
-      exitABI,
-      config.exitHandlerAddr
     );
 
     this.account = privKey

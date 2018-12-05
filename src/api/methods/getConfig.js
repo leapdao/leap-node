@@ -1,19 +1,21 @@
 const fs = require('fs');
 const { promisify } = require('util');
 
-const readFile = promisify(fs.readFile);
-
 module.exports = async (bridgeState, app) => {
+  const readFile = promisify(fs.readFile);
+
   const config = {
+    exitHandlerAddr: bridgeState.config.exitHandlerAddr,
     bridgeAddr: bridgeState.config.bridgeAddr,
     operatorAddr: bridgeState.config.operatorAddr,
-    exitHandlerAddr: bridgeState.config.exitHandlerAddr,
     rootNetwork: bridgeState.config.rootNetwork,
     network: bridgeState.config.network,
     networkId: bridgeState.config.networkId,
   };
 
-  const genesis = JSON.parse(await readFile(app.info().genesisPath));
+  const genesis =
+    bridgeState.config.genesis ||
+    JSON.parse(await readFile(app.info().genesisPath));
   config.genesis = genesis;
 
   if (bridgeState.config.peers) {
