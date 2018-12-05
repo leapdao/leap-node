@@ -19,7 +19,7 @@ const logError = height => err => {
 };
 
 module.exports = async (period, slots, height, bridgeState) => {
-  const submittedPeriod = await bridgeState.contract.methods
+  const submittedPeriod = await bridgeState.bridgeContract.methods
     .periods(period.merkleRoot())
     .call();
 
@@ -34,12 +34,12 @@ module.exports = async (period, slots, height, bridgeState) => {
       logPeriod('submitPeriod. Slot %d', currentSlot.id);
       const tx = sendTransaction(
         bridgeState.web3,
-        bridgeState.contract.methods.submitPeriod(
+        bridgeState.operatorContract.methods.submitPeriod(
           currentSlot.id,
           period.prevHash || GENESIS,
           period.merkleRoot()
         ),
-        bridgeState.contract.options.address,
+        bridgeState.operatorContract.options.address,
         bridgeState.account
       ).catch(logError(height));
 

@@ -55,7 +55,7 @@ describe('updatePeriod', () => {
       account: {
         address: ADDR,
       },
-      contract: {
+      operatorContract: {
         options: {
           address: ADDR,
         },
@@ -93,7 +93,7 @@ describe('updatePeriod', () => {
       account: {
         address: ADDR,
       },
-      contract: {
+      operatorContract: {
         options: {
           address: ADDR,
         },

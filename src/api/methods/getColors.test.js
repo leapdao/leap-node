@@ -17,7 +17,7 @@ erc721Tokens.forEach((addr, i) => {
   tokens[NFT_COLOR_BASE + i] = addr;
 });
 
-const contract = {
+const exitHandlerContract = {
   methods: {
     erc20TokenCount: () => ({
       call: async () => erc20Tokens.length,
@@ -35,18 +35,18 @@ const contract = {
 
 exports.erc20Tokens = erc20Tokens;
 exports.erc721Tokens = erc721Tokens;
-exports.contract = contract;
+exports.exitHandlerContract = exitHandlerContract;
 
 describe('getColors', () => {
   test('ERC20 colors', async () => {
-    const colors = await getColors({ contract }, false);
+    const colors = await getColors({ exitHandlerContract }, false);
     expect(colors.length).toBe(2);
     expect(colors[0]).toBe(erc20Tokens[0].toLowerCase());
     expect(colors[1]).toBe(erc20Tokens[1].toLowerCase());
   });
 
   test('ERC721 colors', async () => {
-    const colors = await getColors({ contract }, true);
+    const colors = await getColors({ exitHandlerContract }, true);
     expect(colors.length).toBe(2);
     expect(colors[0]).toBe(erc721Tokens[0].toLowerCase());
     expect(colors[1]).toBe(erc721Tokens[1].toLowerCase());

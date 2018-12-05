@@ -7,11 +7,14 @@
 
 const Web3 = require('web3');
 const { Period, Block, Outpoint } = require('leap-core');
-const bridgeABI = require('./bridgeABI');
-const ContractEventsSubscription = require('./eventsRelay/ContractEventsSubscription');
-const { handleEvents, getGenesisBlock } = require('./utils');
+const ContractsEventsSubscription = require('./eventsRelay/ContractsEventsSubscription');
+const { handleEvents } = require('./utils');
 const { GENESIS } = require('./utils/constants');
 const { logNode } = require('./utils/debug');
+
+const bridgeABI = require('./abis/bridgeAbi');
+const exitABI = require('./abis/exitHandler');
+const operatorABI = require('./abis/operator');
 
 module.exports = class BridgeState {
   constructor(db, privKey, config) {
@@ -20,7 +23,12 @@ module.exports = class BridgeState {
     this.web3.setProvider(
       new this.web3.providers.HttpProvider(config.rootNetwork)
     );
-    this.contract = new this.web3.eth.Contract(bridgeABI, config.bridgeAddr);
+
+    this.exitHandlerContract = new this.web3.eth.Contract(
+      exitABI,
+      config.exitHandlerAddr
+    );
+
     this.account = privKey
       ? this.web3.eth.accounts.privateKeyToAccount(privKey)
       : this.web3.eth.accounts.create();
@@ -37,12 +45,32 @@ module.exports = class BridgeState {
   }
 
   async init() {
-    logNode('Syncing bridge events...');
+    if (!this.bridgeContract) {
+      const bridgeAddr = await this.exitHandlerContract.methods.bridge().call();
+      this.bridgeContract = new this.web3.eth.Contract(bridgeABI, bridgeAddr);
+    }
+
+    if (!this.operatorContract) {
+      const operatorAddr = await this.bridgeContract.methods.operator().call();
+      this.operatorContract = new this.web3.eth.Contract(
+        operatorABI,
+        operatorAddr
+      );
+    }
+
+    logNode('Syncing events...');
     this.lastBlockSynced = await this.db.getLastBlockSynced();
-    const genesisBlock = await getGenesisBlock(this.web3, this.contract);
-    this.eventsSubscription = new ContractEventsSubscription(
+    const genesisBlock = await this.bridgeContract.methods
+      .genesisBlockNumber()
+      .call();
+    const contracts = [
+      this.bridgeContract,
+      this.exitHandlerContract,
+      this.operatorContract,
+    ];
+    this.eventsSubscription = new ContractsEventsSubscription(
       this.web3,
-      this.contract,
+      contracts,
       genesisBlock
     );
     await this.watchContractEvents();

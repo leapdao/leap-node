@@ -26,12 +26,12 @@ async function getPastEvents(contract, fromBlock, toBlock) {
   return events.reduce((result, ev) => result.concat(ev), []);
 }
 
-module.exports = class ContractEventsSubscription extends EventEmitter {
-  constructor(web3, contract, fromBlock = null) {
+module.exports = class ContractsEventsSubscription extends EventEmitter {
+  constructor(web3, contracts, fromBlock = null) {
     super();
     this.fromBlock = fromBlock;
     this.web3 = web3;
-    this.contract = contract;
+    this.contracts = contracts;
     this.fetchEvents = this.fetchEvents.bind(this);
   }
 
@@ -48,11 +48,12 @@ module.exports = class ContractEventsSubscription extends EventEmitter {
       return null;
     }
 
-    const events = await getPastEvents(
-      this.contract,
-      this.fromBlock || 0,
-      blockNumber
+    const eventsList = await Promise.all(
+      this.contracts.map(contract => {
+        return getPastEvents(contract, this.fromBlock || 0, blockNumber);
+      })
     );
+    const events = eventsList.reduce((acc, evnts) => acc.concat(evnts), []);
 
     this.emit('events', events);
 

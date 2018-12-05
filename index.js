@@ -84,11 +84,7 @@ async function run() {
   app.usePeriod(periodHandler(bridgeState));
 
   app.listen(cliArgs.port).then(async params => {
-    await eventsRelay(
-      params.txServerPort,
-      bridgeState.web3,
-      bridgeState.contract
-    );
+    await eventsRelay(params.txServerPort, bridgeState);
     await printStartupInfo(params, bridgeState);
 
     const api = await jsonrpc(bridgeState, params.txServerPort, db, app);

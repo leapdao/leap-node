@@ -2,7 +2,7 @@ const EventEmitter = require('events');
 
 let eventsBatches = [];
 
-class ContractEventsSubscriptionMock extends EventEmitter {
+class ContractsEventsSubscriptionMock extends EventEmitter {
   constructor() {
     super();
     this.fetchEvents = this.fetchEvents.bind(this);
@@ -25,8 +25,8 @@ class ContractEventsSubscriptionMock extends EventEmitter {
 }
 
 /* eslint-disable */
-ContractEventsSubscriptionMock.__setEventBatches = batches => {
+ContractsEventsSubscriptionMock.__setEventBatches = batches => {
   eventsBatches = batches;
 };
 
-module.exports = ContractEventsSubscriptionMock;
+module.exports = ContractsEventsSubscriptionMock;

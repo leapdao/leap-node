@@ -1,4 +1,4 @@
-const ContractEventsSubscription = require('./ContractEventsSubscription');
+const ContractsEventsSubscription = require('./ContractsEventsSubscription');
 
 const mockWeb3 = blockNumber => ({
   eth: {
@@ -8,15 +8,17 @@ const mockWeb3 = blockNumber => ({
   },
 });
 
-const mockContract = getPastEvents => ({
-  getPastEvents,
-});
+const mockContracts = getPastEvents => [
+  {
+    getPastEvents,
+  },
+];
 
 test('events fetching', async () => {
   let fetched = false;
-  const sub = new ContractEventsSubscription(
+  const sub = new ContractsEventsSubscription(
     mockWeb3(10),
-    mockContract((event, options) => {
+    mockContracts((event, options) => {
       expect(event).toBe('allEvents');
       expect(options.fromBlock).toBe(0);
       expect(options.toBlock).toBe(10);
@@ -33,9 +35,9 @@ test('events fetching', async () => {
 
 test('events fetching from same block', async () => {
   let fetched = false;
-  const sub = new ContractEventsSubscription(
+  const sub = new ContractsEventsSubscription(
     mockWeb3(10),
-    mockContract(() => {
+    mockContracts(() => {
       fetched = true;
     }),
     10
@@ -52,9 +54,9 @@ test('init', async () => {
     { event: 'NewDeposit' },
     { event: 'NewExit' },
   ];
-  const sub = new ContractEventsSubscription(
+  const sub = new ContractsEventsSubscription(
     mockWeb3(10),
-    mockContract(() => contractEvents)
+    mockContracts(() => contractEvents)
   );
 
   const events = await sub.init();
@@ -67,9 +69,9 @@ test('emitter', async () => {
     { event: 'NewDeposit' },
     { event: 'NewExit' },
   ];
-  const sub = new ContractEventsSubscription(
+  const sub = new ContractsEventsSubscription(
     mockWeb3(10),
-    mockContract(() => contractEvents)
+    mockContracts(() => contractEvents)
   );
 
   let emitted = false;
