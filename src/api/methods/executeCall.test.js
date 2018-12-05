@@ -1,5 +1,9 @@
 const executeCall = require('./executeCall');
-const { erc20Tokens, erc721Tokens, contract } = require('./getColors.test');
+const {
+  erc20Tokens,
+  erc721Tokens,
+  exitHandlerContract,
+} = require('./getColors.test');
 const { NFT_COLOR_BASE } = require('./constants');
 
 const A1 = '0xB8205608d54cb81f44F263bE086027D8610F3C94';
@@ -32,7 +36,7 @@ describe('executeCall', () => {
 
     const response = await executeCall(
       {
-        contract,
+        exitHandlerContract,
         currentState: {
           balances: {
             [NFT_COLOR_BASE]: {
@@ -63,7 +67,7 @@ describe('executeCall', () => {
     try {
       await executeCall(
         {
-          contract,
+          exitHandlerContract,
           currentState: {
             balances: {},
           },
@@ -87,7 +91,7 @@ describe('executeCall', () => {
     try {
       await executeCall(
         {
-          contract,
+          exitHandlerContract,
           currentState: {
             balances: {},
           },
@@ -109,7 +113,7 @@ describe('executeCall', () => {
 
     const response = await executeCall(
       {
-        contract,
+        exitHandlerContract,
         currentState: {
           balances: {
             0: {
@@ -134,7 +138,7 @@ describe('executeCall', () => {
 
     const response = await executeCall(
       {
-        contract,
+        exitHandlerContract,
         currentState: {
           balances: {},
         },
@@ -155,7 +159,7 @@ describe('executeCall', () => {
 
     const response = await executeCall(
       {
-        contract,
+        exitHandlerContract,
         currentState: {
           balances: {
             [NFT_COLOR_BASE]: {
@@ -180,7 +184,7 @@ describe('executeCall', () => {
 
     const response = await executeCall(
       {
-        contract,
+        exitHandlerContract,
         currentState: {
           balances: {},
         },

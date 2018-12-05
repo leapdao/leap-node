@@ -168,8 +168,8 @@
   resolved "https://registry.yarnpkg.com/@types/underscore/-/underscore-1.8.9.tgz#fef41f800cd23db1b4f262ddefe49cd952d82323"
 
 "@types/web3@^1.0.12":
-  version "1.0.13"
-  resolved "https://registry.yarnpkg.com/@types/web3/-/web3-1.0.13.tgz#f65e695fb0ab942a0b932c76b5a530efebc39994"
+  version "1.0.14"
+  resolved "https://registry.yarnpkg.com/@types/web3/-/web3-1.0.14.tgz#709b700b3eecf7fe9fb09771c4bf484add89912a"
   dependencies:
     "@types/bn.js" "*"
     "@types/underscore" "*"
@@ -1589,8 +1589,8 @@ copy-descriptor@^0.1.0:
   resolved "https://registry.yarnpkg.com/copy-descriptor/-/copy-descriptor-0.1.1.tgz#676f6eb3c39997c2ee1ac3a924fd6124748f578d"
 
 core-js@^2.4.0, core-js@^2.5.0:
-  version "2.5.7"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.7.tgz#f972608ff0cead68b841a16a932d0b183791814e"
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.6.0.tgz#1e30793e9ee5782b307e37ffa22da0eacddd84d4"
 
 core-util-is@1.0.2, core-util-is@~1.0.0:
   version "1.0.2"
@@ -1946,8 +1946,8 @@ discovery-server@^1.1.0:
     utp-native "^1.6.0"
 
 dns-discovery@^6.0.1:
-  version "6.2.2"
-  resolved "https://registry.yarnpkg.com/dns-discovery/-/dns-discovery-6.2.2.tgz#fb0b2cee35ed4e794d184c6d1be9693064f42886"
+  version "6.2.3"
+  resolved "https://registry.yarnpkg.com/dns-discovery/-/dns-discovery-6.2.3.tgz#47d8bc0f639ed1f3c09897a133a96bc4106fda15"
   dependencies:
     circular-append-file "^1.0.1"
     debug "^2.6.9"
@@ -4263,8 +4263,8 @@ lcid@^1.0.0:
     invert-kv "^1.0.0"
 
 leap-core@^0.19.0:
-  version "0.19.2"
-  resolved "https://registry.yarnpkg.com/leap-core/-/leap-core-0.19.2.tgz#b656f2cafa2fc43c6757d122848933b578e3e2a4"
+  version "0.19.4"
+  resolved "https://registry.yarnpkg.com/leap-core/-/leap-core-0.19.4.tgz#284efa0d9b654a28831e08eedffaee2ba8db1e06"
   dependencies:
     "@types/web3" "^1.0.12"
     babel-polyfill "^6.26.0"
@@ -4835,8 +4835,8 @@ node-cmake@2.3.2:
     yargs "^7.0.2"
 
 node-gyp-build@^3.0.0:
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/node-gyp-build/-/node-gyp-build-3.5.0.tgz#92f7c6517d1f90e2795a1cd49a59c6487b4f1cdb"
+  version "3.5.1"
+  resolved "https://registry.yarnpkg.com/node-gyp-build/-/node-gyp-build-3.5.1.tgz#15abc0b483f1f031e48a9e2eb3976baa1d0c17f8"
 
 node-int64@^0.4.0:
   version "0.4.0"
@@ -5689,7 +5689,7 @@ regexpp@^1.0.1:
 
 regexpu-core@^2.0.0:
   version "2.0.0"
-  resolved "https://registry.yarnpkg.com/regexpu-core/-/regexpu-core-2.0.0.tgz#49d038837b8dcf8bfa5b9a42139938e6ea2ae240"
+  resolved "http://registry.npmjs.org/regexpu-core/-/regexpu-core-2.0.0.tgz#49d038837b8dcf8bfa5b9a42139938e6ea2ae240"
   dependencies:
     regenerate "^1.2.1"
     regjsgen "^0.2.0"

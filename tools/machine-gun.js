@@ -15,11 +15,11 @@ const makeTransfer = require('../src/txHelpers/makeTransfer');
 const unspentForAddress = require('../src/utils/unspentForAddress');
 const sendTx = require('../src/txHelpers/sendTx');
 
-const web3 = new Web3('https://rinkeby.infura.io');
+const web3 = new Web3('http://localhost:7545');
 const plasmaWeb3 = new Web3('http://localhost:8645');
 
 const privKey =
-  '0xad8e31c8862f5f86459e7cca97ac9302c5e1817077902540779eef66e21f394a';
+  '0xbd54b17c48ac1fc91d5ef2ef02e9911337f8758e93c801b619e5d178094486cc';
 const account = web3.eth.accounts.privateKeyToAccount(privKey);
 
 const ADDR_2 = '0x8AB21C65041778DFc7eC7995F9cDef3d5221a5ad';
@@ -34,7 +34,7 @@ const getState = async () => {
 };
 
 async function run() {
-  for (let i = 0; i < 10; i += 1) {
+  for (let i = 0; i < 32; i += 1) {
     console.log('------');
     console.log((await getState()).balances);
     console.log('------');

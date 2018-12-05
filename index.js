@@ -55,10 +55,11 @@ async function run() {
     },
     networkId: `${config.network}-${config.networkId}`,
     genesis: config.genesis,
-    abciPort: 26658,
+    devMode: cliArgs.devMode,
+    abciPort: cliArgs.abciPort,
     peers: config.peers,
     p2pPort: cliArgs.p2pPort,
-    tendermintPort: 26659,
+    tendermintPort: cliArgs.tendermintPort,
     createEmptyBlocks: false,
     logTendermint: log => {
       logTendermint(
@@ -84,11 +85,7 @@ async function run() {
   app.usePeriod(periodHandler(bridgeState));
 
   app.listen(cliArgs.port).then(async params => {
-    await eventsRelay(
-      params.txServerPort,
-      bridgeState.web3,
-      bridgeState.contract
-    );
+    await eventsRelay(params.txServerPort, bridgeState);
     await printStartupInfo(params, bridgeState);
 
     const api = await jsonrpc(bridgeState, params.txServerPort, db, app);

@@ -9,11 +9,11 @@
 
 const { Tx, Input, Outpoint, Output } = require('leap-core');
 
-const ContractEventsSubscription = require('./ContractEventsSubscription');
+const ContractsEventsSubscription = require('./ContractsEventsSubscription');
 const sendTx = require('../txHelpers/sendTx');
-const { handleEvents, getGenesisBlock } = require('../utils');
+const { handleEvents } = require('../utils');
 
-module.exports = async (txServerPort, web3, bridge) => {
+module.exports = async (txServerPort, bridgeState) => {
   const handleJoin = async event => {
     const { slotId, tenderAddr, eventCounter, signerAddr } = event.returnValues;
     const tx = Tx.validatorJoin(slotId, tenderAddr, eventCounter, signerAddr);
@@ -22,7 +22,7 @@ module.exports = async (txServerPort, web3, bridge) => {
 
   const handler = handleEvents({
     NewDeposit: async event => {
-      const deposit = await bridge.methods
+      const deposit = await bridgeState.exitHandlerContract.methods
         .deposits(event.returnValues.depositId)
         .call();
       const color = Number(deposit.color);
@@ -61,10 +61,16 @@ module.exports = async (txServerPort, web3, bridge) => {
     },
   });
 
-  const genesisBlock = await getGenesisBlock(web3, bridge);
-  const eventSubscription = new ContractEventsSubscription(
-    web3,
-    bridge,
+  const genesisBlock = await bridgeState.bridgeContract.methods
+    .genesisBlockNumber()
+    .call();
+  const eventSubscription = new ContractsEventsSubscription(
+    bridgeState.web3,
+    [
+      bridgeState.bridgeContract,
+      bridgeState.exitHandlerContract,
+      bridgeState.operatorContract,
+    ],
     genesisBlock
   );
   const events = await eventSubscription.init();

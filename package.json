@@ -1,6 +1,6 @@
 {
   "name": "leap-node",
-  "version": "2.5.3",
+  "version": "2.6.1",
   "main": "index.js",
   "author": "Alex Lunyov <isuntc@gmail.com>",
   "license": "MPL-2.0",
@@ -104,7 +104,6 @@
       "src/utils/debug.js",
       "src/utils/printStartupInfo.js",
       "src/utils/sendTransaction.js",
-      "src/utils/getGenesisBlock.js",
       "src/utils/index.js",
       "src/txHelpers/makeTransfer.js",
       "src/txHelpers/printTx.js",

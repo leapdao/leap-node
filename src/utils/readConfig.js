@@ -42,8 +42,8 @@ module.exports = async configPath => {
     ? await fetchNodeConfig(configPath)
     : await readConfigFile(configPath);
 
-  if (!config.bridgeAddr) {
-    throw new Error('bridgeAddr is required');
+  if (!config.exitHandlerAddr) {
+    throw new Error('exitHandlerAddr is required');
   }
 
   return config;
