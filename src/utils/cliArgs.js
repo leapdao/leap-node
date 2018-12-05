@@ -58,6 +58,24 @@ const options = [
     help: 'Port for p2p connection',
   },
   {
+    names: ['tendermintPort'],
+    type: 'number',
+    default: 26659,
+    help: 'Port for tendermint connection',
+  },
+  {
+    names: ['abciPort'],
+    type: 'number',
+    default: 26658,
+    help: 'Port for abci connection',
+  },
+  {
+    names: ['devMode'],
+    type: 'bool',
+    default: false,
+    help: 'Lotion devMode',
+  },
+  {
     names: ['config'],
     type: 'string',
     help: "Path to config file or other's node JSON RPC url",

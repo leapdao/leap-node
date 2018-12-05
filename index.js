@@ -55,10 +55,11 @@ async function run() {
     },
     networkId: `${config.network}-${config.networkId}`,
     genesis: config.genesis,
-    abciPort: 26658,
+    devMode: cliArgs.devMode,
+    abciPort: cliArgs.abciPort,
     peers: config.peers,
     p2pPort: cliArgs.p2pPort,
-    tendermintPort: 26659,
+    tendermintPort: cliArgs.tendermintPort,
     createEmptyBlocks: false,
     logTendermint: log => {
       logTendermint(

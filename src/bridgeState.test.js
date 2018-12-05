@@ -5,17 +5,6 @@ jest.mock('./eventsRelay/ContractsEventsSubscription');
 
 const ContractsEventsSubscription = require('./eventsRelay/ContractsEventsSubscription');
 
-// class Contract {
-//   constructor(abi, address) {
-//     this.options = { address };
-//     this.methods = {
-//       genesisBlockNumber: () => ({
-//         call: async () => 5,
-//       }),
-//     };
-//   }
-// }
-
 /* eslint-disable */
 ContractsEventsSubscription.__setEventBatches([
   [{ event: 'EpochLength', returnValues: { epochLength: 4 } }],
@@ -45,30 +34,26 @@ ContractsEventsSubscription.__setEventBatches([
 ]);
 /* eslint-enable */
 
-const createInstance = (web3, exitHandlerContract, db, config) => {
+const createInstance = (web3, bridgeContract, db, config) => {
   const bridgeState = new BridgeState(db, config.privKey, config);
   bridgeState.web3 = web3;
-  bridgeState.exitHandlerContract = exitHandlerContract;
-  bridgeState.operatorContract = {};
-  bridgeState.bridgeContract = {
-    methods: {
-      genesisBlockNumber: () => ({
-        call: async () => 5,
-      }),
-    },
-  };
+  bridgeState.bridgeContract = bridgeContract;
 
   return bridgeState;
 };
 
 describe('BridgeState', () => {
   test('Initialisation', async () => {
-    const exitHandlerContract = {
-      methods: {},
+    const bridgeContract = {
+      methods: {
+        genesisBlockNumber: () => ({
+          call: async () => 5,
+        }),
+      },
     };
     const state = createInstance(
       {},
-      exitHandlerContract,
+      bridgeContract,
       {
         async getLastBlockSynced() {
           return 0;
@@ -84,12 +69,16 @@ describe('BridgeState', () => {
   });
 
   test('Initialisation: import privateKey', async () => {
-    const exitHandlerContract = {
-      methods: {},
+    const bridgeContract = {
+      methods: {
+        genesisBlockNumber: () => ({
+          call: async () => 5,
+        }),
+      },
     };
     const state = createInstance(
       {},
-      exitHandlerContract,
+      bridgeContract,
       {
         async getLastBlockSynced() {
           return 0;
@@ -111,12 +100,16 @@ describe('BridgeState', () => {
   });
 
   test('Handle events', async () => {
-    const exitHandlerContract = {
-      methods: {},
+    const bridgeContract = {
+      methods: {
+        genesisBlockNumber: () => ({
+          call: async () => 5,
+        }),
+      },
     };
     const state = createInstance(
       {},
-      exitHandlerContract,
+      bridgeContract,
       {
         async getLastBlockSynced() {
           return 0;

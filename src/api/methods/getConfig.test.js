@@ -1,4 +1,5 @@
 /* eslint-disable no-prototype-builtins */
+const path = require('path');
 
 const getConfig = require('./getConfig');
 
@@ -7,6 +8,7 @@ const P2P_PORT = 41000;
 const appMock = {
   info: () => ({
     p2pPort: P2P_PORT,
+    genesisPath: path.join(__dirname, 'genesis.json'),
   }),
   status: async () => ({
     node_info: {
@@ -19,6 +21,8 @@ describe('getConfig', () => {
   test('basic config', async () => {
     const config = {
       exitHandlerAddr: '0x186fab4587006032993a9abc62ab288cc259d7e7',
+      bridgeAddr: '0x186fab4587006032993a9abc62ab288cc259d7e7',
+      operatorAddr: '0x186fab4587006032993a9abc62ab288cc259d7e7',
       rootNetwork: 'https://rinkeby.infura.io',
       network: 'testnet',
       networkId: '1341',
@@ -26,6 +30,9 @@ describe('getConfig', () => {
     const result = await getConfig({ config }, appMock);
     expect(result).toEqual({
       exitHandlerAddr: config.exitHandlerAddr,
+      bridgeAddr: config.bridgeAddr,
+      operatorAddr: config.operatorAddr,
+      genesis: {},
       rootNetwork: config.rootNetwork,
       network: config.network,
       networkId: config.networkId,
