@@ -38,6 +38,8 @@ const createInstance = (web3, bridgeContract, db, config) => {
   const bridgeState = new BridgeState(db, config.privKey, config);
   bridgeState.web3 = web3;
   bridgeState.bridgeContract = bridgeContract;
+  bridgeState.operatorContract = {};
+  bridgeState.exitHandlerContract = {};
 
   return bridgeState;
 };

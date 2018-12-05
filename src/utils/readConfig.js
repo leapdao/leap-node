@@ -14,9 +14,6 @@ const Web3 = require('web3');
 const { promisify } = require('util');
 const { logNode } = require('./debug');
 
-const exitABI = require('../abis/exitHandler');
-const bridgeABI = require('../abis/bridgeAbi');
-
 const readFile = promisify(fs.readFile);
 
 const fetchNodeConfig = async nodeUrl => {
@@ -40,33 +37,14 @@ const readConfigFile = async configPath => {
 
 const urlRegex = /^https{0,1}:\/\//;
 
-const fetchAdditionalAddresses = async config => {
-  const web3 = new Web3();
-  web3.setProvider(new web3.providers.HttpProvider(config.rootNetwork));
-  const exitHandlerContract = new web3.eth.Contract(
-    exitABI,
-    config.exitHandlerAddr
-  );
-  const bridgeAddr = await exitHandlerContract.methods.bridge().call();
-  const bridgeContract = new web3.eth.Contract(bridgeABI, bridgeAddr);
-  const operatorAddr = await bridgeContract.methods.operator().call();
-  return {
-    ...config,
-    bridgeAddr,
-    operatorAddr,
-  };
-};
-
 module.exports = async configPath => {
-  let config = urlRegex.test(configPath)
+  const config = urlRegex.test(configPath)
     ? await fetchNodeConfig(configPath)
     : await readConfigFile(configPath);
 
   if (!config.exitHandlerAddr) {
     throw new Error('exitHandlerAddr is required');
   }
-
-  config = fetchAdditionalAddresses(config);
 
   return config;
 };

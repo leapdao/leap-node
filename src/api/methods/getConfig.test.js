@@ -18,14 +18,14 @@ const appMock = {
 describe('getConfig', () => {
   test('basic config', async () => {
     const config = {
-      bridgeAddr: '0x186fab4587006032993a9abc62ab288cc259d7e7',
+      exitHandlerAddr: '0x186fab4587006032993a9abc62ab288cc259d7e7',
       rootNetwork: 'https://rinkeby.infura.io',
       network: 'testnet',
       networkId: '1341',
     };
     const result = await getConfig({ config }, appMock);
     expect(result).toEqual({
-      bridgeAddr: config.bridgeAddr,
+      exitHandlerAddr: config.exitHandlerAddr,
       rootNetwork: config.rootNetwork,
       network: config.network,
       networkId: config.networkId,
@@ -36,7 +36,7 @@ describe('getConfig', () => {
 
   test('with peers and genesis', async () => {
     const config = {
-      bridgeAddr: '0x186fab4587006032993a9abc62ab288cc259d7e7',
+      exitHandlerAddr: '0x186fab4587006032993a9abc62ab288cc259d7e7',
       rootNetwork: 'https://rinkeby.infura.io',
       network: 'testnet',
       networkId: '1341',
@@ -45,7 +45,7 @@ describe('getConfig', () => {
     };
     const result = await getConfig({ config }, appMock);
     expect(result).toEqual({
-      bridgeAddr: config.bridgeAddr,
+      exitHandlerAddr: config.exitHandlerAddr,
       rootNetwork: config.rootNetwork,
       network: config.network,
       networkId: config.networkId,
@@ -71,8 +71,6 @@ describe('getConfig', () => {
     expect(result.privKey).toBeUndefined();
     expect(result.someSensitiveStuff).toBeUndefined();
     expect(Object.keys(result)).toEqual([
-      'bridgeAddr',
-      'operatorAddr',
       'exitHandlerAddr',
       'rootNetwork',
       'network',

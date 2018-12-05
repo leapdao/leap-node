@@ -10,7 +10,7 @@ describe('readConfig', () => {
     cb(
       null,
       JSON.stringify({
-        bridgeAddr: '0x000',
+        exitHandlerAddr: '0x000',
         network: 'testnet',
       })
     );
@@ -24,19 +24,19 @@ describe('readConfig', () => {
 
     const result = await readConfig('./config.json');
     expect(result).toEqual({
-      bridgeAddr: '0x000',
+      exitHandlerAddr: '0x000',
       network: 'testnet',
     });
   });
 
   test('fetch node config', async () => {
     Web3.__setMethodMock('getConfig', {
-      bridgeAddr: '0x000',
+      exitHandlerAddr: '0x000',
       network: 'testnet',
     });
     const result = await readConfig('https://tesnet.leapdao.org');
     expect(result).toEqual({
-      bridgeAddr: '0x000',
+      exitHandlerAddr: '0x000',
       network: 'testnet',
     });
   });
@@ -51,19 +51,19 @@ describe('readConfig', () => {
     } catch (err) {
       error = err.message;
     }
-    expect(error).toBe('bridgeAddr is required');
+    expect(error).toBe('exitHandlerAddr is required');
   });
 
   test("append donor's peer", async () => {
     Web3.__setMethodMock('getConfig', {
-      bridgeAddr: '0x000',
+      exitHandlerAddr: '0x000',
       network: 'testnet',
       p2pPort: 41000,
       nodeId: 'blahblah',
     });
     const result = await readConfig('https://tesnet.leapdao.org');
     expect(result).toEqual({
-      bridgeAddr: '0x000',
+      exitHandlerAddr: '0x000',
       network: 'testnet',
       peers: ['blahblah@tesnet.leapdao.org:41000'],
     });
