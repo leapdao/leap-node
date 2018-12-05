@@ -72,6 +72,8 @@ describe('getConfig', () => {
     expect(result.someSensitiveStuff).toBeUndefined();
     expect(Object.keys(result)).toEqual([
       'exitHandlerAddr',
+      'bridgeAddr',
+      'operatorAddr',
       'rootNetwork',
       'network',
       'networkId',

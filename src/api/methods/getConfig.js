@@ -1,6 +1,8 @@
 module.exports = async (bridgeState, app) => {
   const config = {
     exitHandlerAddr: bridgeState.config.exitHandlerAddr,
+    bridgeAddr: bridgeState.config.bridgeAddr,
+    operatorAddr: bridgeState.config.operatorAddr,
     rootNetwork: bridgeState.config.rootNetwork,
     network: bridgeState.config.network,
     networkId: bridgeState.config.networkId,

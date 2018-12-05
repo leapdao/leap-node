@@ -28,6 +28,14 @@ module.exports = class BridgeState {
       exitABI,
       config.exitHandlerAddr
     );
+    this.bridgeContract = new this.web3.eth.Contract(
+      bridgeABI,
+      config.bridgeAddr
+    );
+    this.operatorContract = new this.web3.eth.Contract(
+      operatorABI,
+      config.operatorAddr
+    );
 
     this.account = privKey
       ? this.web3.eth.accounts.privateKeyToAccount(privKey)
@@ -45,19 +53,6 @@ module.exports = class BridgeState {
   }
 
   async init() {
-    if (!this.bridgeContract) {
-      const bridgeAddr = await this.exitHandlerContract.methods.bridge().call();
-      this.bridgeContract = new this.web3.eth.Contract(bridgeABI, bridgeAddr);
-    }
-
-    if (!this.operatorContract) {
-      const operatorAddr = await this.bridgeContract.methods.operator().call();
-      this.operatorContract = new this.web3.eth.Contract(
-        operatorABI,
-        operatorAddr
-      );
-    }
-
     logNode('Syncing events...');
     this.lastBlockSynced = await this.db.getLastBlockSynced();
     const genesisBlock = await this.bridgeContract.methods
