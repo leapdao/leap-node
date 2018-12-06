@@ -41,7 +41,6 @@
     "plasma"
   ],
   "dependencies": {
-    "abci": "github:parsec-labs/js-abci#a4be8a213afb3a2974b32f8434664009d1cfae1b",
     "axios": "^0.18.0",
     "bn.js": "^4.11.8",
     "body-parser": "^1.18.3",
@@ -57,6 +56,7 @@
     "get-port": "^3.1.0",
     "jayson": "^2.0.6",
     "jpfs": "0.0.3",
+    "js-abci": "leapdao/js-abci#34538e252811610b23340a9f5314be4d0a44a501",
     "jsondiffpatch": "^0.2.5",
     "leap-core": "^0.19.0",
     "level": "^4.0.0",
@@ -67,7 +67,7 @@
     "rimraf": "^2.6.2",
     "rpc-websockets": "^4.1.2",
     "tendermint": "^3.1.9",
-    "tendermint-node": "github:parsec-labs/tendermint-node#10d7d9939fab29e8f7d5fc53cfe378fbe4b252cc",
+    "tendermint-node": "leapdao/tendermint-node#0b586e7453e8d4e799b74c6fdb995ff787369241",
     "varstruct": "^6.1.1",
     "web3": "^1.0.0-beta.34"
   },

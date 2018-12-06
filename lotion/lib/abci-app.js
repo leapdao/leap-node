@@ -1,10 +1,12 @@
 /* eslint-disable no-await-in-loop */
 
-const createABCIServer = require('abci');
+const createABCIServer = require('js-abci');
 const decodeTx = require('./tx-encoding.js').decode;
 const jsondiffpatch = require('jsondiffpatch');
 const getRoot = require('./get-root.js');
 const { stringify } = require('deterministic-json');
+
+const { getAddress } = require('../../src/utils');
 
 async function runTx(
   txMiddleware,
@@ -57,16 +59,26 @@ async function runTx(
 
 function updateAndDiffValidators(validators, newValidators) {
   const diffs = [];
+  const push = validator => {
+    diffs.push({
+      pubKey: {
+        type: validator.pubKey.type,
+        data: Buffer.from(validator.pubKey.data, 'base64'),
+      },
+      power: validator.power,
+    });
+  };
+
   for (const key in newValidators) {
     if (validators[key] === undefined) {
       validators[key] = newValidators[key];
-      diffs.push(validators[key]);
+      push(validators[key]);
     } else if (
       typeof newValidators[key] === 'number' &&
       validators[key].power !== newValidators[key]
     ) {
       validators[key].power = newValidators[key];
-      diffs.push(validators[key]);
+      push(validators[key]);
     }
   }
   return diffs;
@@ -138,7 +150,7 @@ module.exports = function configureABCIServer({
 
   abciApp.initChain = async ({ validators }) => {
     validators.forEach(tmValidator => {
-      const address = tmValidator.address.toString('base64');
+      const address = getAddress(tmValidator.pubKey.data.toString('hex'));
       chainInfo.validators[address] = {
         address,
         pubKey: {
