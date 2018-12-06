@@ -5,6 +5,12 @@ const mockWeb3 = blockNumber => ({
     async getBlockNumber() {
       return blockNumber;
     },
+    async getBlock(block) {
+      return {
+        number: block,
+        timestamp: block * 100000,
+      };
+    },
   },
 });
 
