@@ -24,7 +24,7 @@ module.exports = bridgeState => (state, { encoded }, _, isCheck) => {
     throw err;
   }
 
-  if (printedTx && !isCheck) {
-    logTx(printedTx);
+  if (printedTx) {
+    logTx(`${isCheck ? 'Check: ' : ''}${printedTx}`);
   }
 };

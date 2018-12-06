@@ -6,6 +6,7 @@
  */
 
 const EventEmitter = require('events');
+const getBlockAverageTime = require('../utils/getBlockAverageTime');
 
 const BATCH_SIZE = 5000;
 async function getPastEvents(contract, fromBlock, toBlock) {
@@ -37,7 +38,11 @@ module.exports = class ContractsEventsSubscription extends EventEmitter {
 
   async init() {
     const initialEvetns = await this.fetchEvents();
-    setInterval(this.fetchEvents, 5 * 1000);
+    const eventsInterval = Math.max(
+      1,
+      (await getBlockAverageTime(this.web3)) * 0.7
+    );
+    setInterval(this.fetchEvents, eventsInterval * 1000);
     return initialEvetns;
   }
 
