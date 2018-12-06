@@ -67,9 +67,9 @@ module.exports = async (txServerPort, bridgeState) => {
   const eventSubscription = new ContractsEventsSubscription(
     bridgeState.web3,
     [
+      bridgeState.operatorContract,
       bridgeState.bridgeContract,
       bridgeState.exitHandlerContract,
-      bridgeState.operatorContract,
     ],
     genesisBlock
   );
