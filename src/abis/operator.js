@@ -198,7 +198,7 @@ module.exports = [
     inputs: [
       {
         indexed: false,
-        name: 'epoch',
+        name: 'epochLength',
         type: 'uint256',
       },
     ],

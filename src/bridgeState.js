@@ -59,9 +59,9 @@ module.exports = class BridgeState {
       .genesisBlockNumber()
       .call();
     const contracts = [
+      this.operatorContract,
       this.bridgeContract,
       this.exitHandlerContract,
-      this.operatorContract,
     ];
     this.eventsSubscription = new ContractsEventsSubscription(
       this.web3,
