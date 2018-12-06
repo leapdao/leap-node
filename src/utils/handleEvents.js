@@ -7,6 +7,10 @@ module.exports = handlers => {
 
   return async events => {
     for (const event of events) {
+      if (event.event === undefined) {
+        console.warn('Unknown event. ABI can be outdated');
+      }
+
       if (handlers[event.event]) {
         const result = handlers[event.event](event);
         if (result && typeof result.then === 'function') {
