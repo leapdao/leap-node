@@ -111,7 +111,7 @@
       "src/api/jsonrpc.js",
       "src/api/db.js",
       "src/api/methods/index.js",
-      "src/eventsRelay/index.js",
+      "src/eventsRelay.js",
       "src/tx/applyTx/index.js",
       "src/tx/index.js",
       "src/block/index.js"

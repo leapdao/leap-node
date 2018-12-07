@@ -1,9 +1,9 @@
 const { Outpoint } = require('leap-core');
 const BridgeState = require('./bridgeState');
 
-jest.mock('./eventsRelay/ContractsEventsSubscription');
+jest.mock('./utils/ContractsEventsSubscription');
 
-const ContractsEventsSubscription = require('./eventsRelay/ContractsEventsSubscription');
+const ContractsEventsSubscription = require('./utils/ContractsEventsSubscription');
 
 /* eslint-disable */
 ContractsEventsSubscription.__setEventBatches([
