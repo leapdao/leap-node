@@ -39,6 +39,53 @@ test('events fetching', async () => {
   expect(fetched).toBe(true);
 });
 
+test('events handling', async () => {
+  let handled = false;
+  const sub = new ContractsEventsSubscription(
+    mockWeb3(10),
+    mockContracts((event, options) => {
+      expect(event).toBe('allEvents');
+      expect(options.fromBlock).toBe(0);
+      expect(options.toBlock).toBe(10);
+
+      return [];
+    })
+  );
+
+  sub.handlers = [
+    async () => {
+      handled = true;
+    },
+  ];
+  await sub.handleEvents([]);
+
+  expect(handled).toBe(true);
+});
+
+test('subscribe/unsubscribe', async () => {
+  const handler1 = () => {};
+  const handler2 = () => {};
+  const sub = new ContractsEventsSubscription(
+    mockWeb3(10),
+    mockContracts((event, options) => {
+      expect(event).toBe('allEvents');
+      expect(options.fromBlock).toBe(0);
+      expect(options.toBlock).toBe(10);
+
+      return [];
+    })
+  );
+
+  const s1 = sub.subscribe(handler1);
+  expect(sub.handlers).toEqual([handler1]);
+  const s2 = sub.subscribe(handler2);
+  expect(sub.handlers).toEqual([handler1, handler2]);
+  s1();
+  expect(sub.handlers).toEqual([handler2]);
+  s2();
+  expect(sub.handlers).toEqual([]);
+});
+
 test('events fetching from same block', async () => {
   let fetched = false;
   const sub = new ContractsEventsSubscription(
@@ -81,7 +128,7 @@ test('emitter', async () => {
   );
 
   let emitted = false;
-  sub.on('events', events => {
+  sub.subscribe(events => {
     emitted = true;
     expect(events).toEqual(contractEvents);
   });

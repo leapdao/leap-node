@@ -7,7 +7,7 @@
 
 const Web3 = require('web3');
 const { Period, Block, Outpoint } = require('leap-core');
-const ContractsEventsSubscription = require('./eventsRelay/ContractsEventsSubscription');
+const ContractsEventsSubscription = require('./utils/ContractsEventsSubscription');
 const { handleEvents } = require('./utils');
 const { GENESIS } = require('./utils/constants');
 const { logNode } = require('./utils/debug');
@@ -74,8 +74,7 @@ module.exports = class BridgeState {
   }
 
   async watchContractEvents() {
-    this.eventsSubscription.on(
-      'events',
+    this.eventsSubscription.subscribe(
       handleEvents({
         NewDeposit: ({ returnValues: event }) => {
           this.deposits[event.depositId] = {

@@ -7,6 +7,7 @@ module.exports = handlers => {
 
   return async events => {
     for (const event of events) {
+      // istanbul ignore next
       if (event.event === undefined) {
         console.warn('Unknown event. ABI can be outdated');
       }
