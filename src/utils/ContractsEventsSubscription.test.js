@@ -81,7 +81,7 @@ test('emitter', async () => {
   );
 
   let emitted = false;
-  sub.on('events', events => {
+  sub.subscribe(events => {
     emitted = true;
     expect(events).toEqual(contractEvents);
   });

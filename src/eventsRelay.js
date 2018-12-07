@@ -9,9 +9,8 @@
 
 const { Tx, Input, Outpoint, Output } = require('leap-core');
 
-const ContractsEventsSubscription = require('./ContractsEventsSubscription');
-const sendTx = require('../txHelpers/sendTx');
-const { handleEvents } = require('../utils');
+const sendTx = require('./txHelpers/sendTx');
+const { handleEvents } = require('./utils');
 
 module.exports = async (txServerPort, bridgeState) => {
   const handleJoin = async event => {
@@ -61,21 +60,8 @@ module.exports = async (txServerPort, bridgeState) => {
     },
   });
 
-  const genesisBlock = await bridgeState.bridgeContract.methods
-    .genesisBlockNumber()
-    .call();
-  const eventSubscription = new ContractsEventsSubscription(
-    bridgeState.web3,
-    [
-      bridgeState.operatorContract,
-      bridgeState.bridgeContract,
-      bridgeState.exitHandlerContract,
-    ],
-    genesisBlock
-  );
-  const events = await eventSubscription.init();
-  await handler(events);
-  eventSubscription.on('events', handler);
+  await handler(bridgeState.eventsSubscription.initialEvents);
+  bridgeState.eventsSubscription.subscribe(handler);
 
-  return eventSubscription;
+  return bridgeState.eventsSubscription;
 };

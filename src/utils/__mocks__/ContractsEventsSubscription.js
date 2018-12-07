@@ -1,12 +1,14 @@
-const EventEmitter = require('events');
-
 let eventsBatches = [];
 
-class ContractsEventsSubscriptionMock extends EventEmitter {
+class ContractsEventsSubscriptionMock {
   constructor() {
-    super();
     this.fetchEvents = this.fetchEvents.bind(this);
     this.fetchCounts = 0;
+    this.handlers = [];
+  }
+
+  subscribe(handler) {
+    this.handlers.push(handler);
   }
 
   async init() {
@@ -18,7 +20,7 @@ class ContractsEventsSubscriptionMock extends EventEmitter {
     const events = eventsBatches[this.fetchCounts] || [];
     this.fetchCounts += 1;
 
-    this.emit('events', events);
+    this.handlers.forEach(handler => handler(events));
 
     return events;
   }

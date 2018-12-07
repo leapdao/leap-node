@@ -5,7 +5,6 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-const EventEmitter = require('events');
 const getBlockAverageTime = require('../utils/getBlockAverageTime');
 
 const BATCH_SIZE = 5000;
@@ -27,23 +26,42 @@ async function getPastEvents(contract, fromBlock, toBlock) {
   return events.reduce((result, ev) => result.concat(ev), []);
 }
 
-module.exports = class ContractsEventsSubscription extends EventEmitter {
+module.exports = class ContractsEventsSubscription {
   constructor(web3, contracts, fromBlock = null) {
-    super();
     this.fromBlock = fromBlock;
     this.web3 = web3;
     this.contracts = contracts;
     this.fetchEvents = this.fetchEvents.bind(this);
+    this.handlers = [];
+  }
+
+  subscribe(handler) {
+    this.handlers.push(handler);
+
+    // unsubscribe
+    return () => {
+      const index = this.handlers.indexOf(handler);
+      this.handlers.splice(index, 1);
+    };
+  }
+
+  async handleEvents(events) {
+    for (const handler of this.handlers) {
+      const result = handler(events);
+      if (result && typeof result.then === 'function') {
+        await result; // eslint-disable-line no-await-in-loop
+      }
+    }
   }
 
   async init() {
-    const initialEvetns = await this.fetchEvents();
+    this.initialEvents = await this.fetchEvents();
     const eventsInterval = Math.max(
       1,
       (await getBlockAverageTime(this.web3)) * 0.7
     );
     setInterval(this.fetchEvents, eventsInterval * 1000);
-    return initialEvetns;
+    return this.initialEvents;
   }
 
   async fetchEvents() {
@@ -60,7 +78,7 @@ module.exports = class ContractsEventsSubscription extends EventEmitter {
     );
     const events = eventsList.reduce((acc, evnts) => acc.concat(evnts), []);
 
-    this.emit('events', events);
+    this.handleEvents(events);
 
     this.fromBlock = blockNumber;
 
