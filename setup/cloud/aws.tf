@@ -6,7 +6,7 @@ variable "region" {
 
 variable "network" {
   description = "Network name to run node on"
-  default = "testnet-beta"
+  default = "testnet-new"
   type = "string"
 }
 
@@ -18,6 +18,11 @@ variable "ssh_public_file" {
 variable "ssh_private_file" {
   description = "SSH private key file to be used to connect to the node"
   type = "string"
+}
+
+variable "count" {
+  description = "Number of leap nodes to deploy"
+  default = 4
 }
 
 data "template_file" "leap_systemd" {
@@ -34,6 +39,7 @@ provider "aws" {
 
 
 resource "aws_instance" "leap_node" {
+  count			 = "${var.count}"
   ami                    = "ami-58d7e821"
   availability_zone      = "eu-west-1c"
   instance_type          = "t2.micro"
@@ -70,7 +76,7 @@ resource "aws_instance" "leap_node" {
 
   tags {
     Group = "leap_node"
-    Name = "leap node - ${var.network}"
+    Name = "${format("leap node-%01d",count.index+1)} - ${var.network}"
   }
 }
 
@@ -80,8 +86,9 @@ resource "aws_key_pair" "leap_auth" {
 }
 
 resource "aws_eip_association" "eip_assoc" {
-  instance_id   = "${aws_instance.leap_node.id}"
-  allocation_id = "${aws_eip.leap_eip.id}"
+  count		= "${var.count}"
+  instance_id   = "${element(aws_instance.leap_node.*.id, count.index)}"
+  allocation_id = "${element(aws_eip.leap_eip.*.id, count.index)}"
 }
 
 resource "aws_eip" "leap_eip" {
@@ -178,7 +185,7 @@ resource "aws_security_group" "leap_tendermint" {
 
 // The list of cluster instance IDs
 output "instance" {
-  value = ["${aws_instance.leap_node.id}"]
+  value = ["${aws_instance.leap_node.*.id}"]
 }
 
 // The list of cluster instance public IPs

@@ -1,0 +1,27 @@
+{
+    "bridgeAddr":"0xf26fcd36caea3d72b1a4b802ee25cdf4e8fe00fb",
+    "operatorAddr":"0xa59ee0aa6e15159da2bc2dba8cb24eb82468fcea",
+    "exitHandlerAddr":"0x67c43da9610ded53acd12951257a030381676a60",
+    "rootNetwork":"https://rinkeby.infura.io",
+    "network":"rinkeby",
+    "networkId":475352288,
+    "genesis": {
+        "app_hash":"ef95dbbdac64093311bf54bb1c2ef32b3b9ca1200bed4e6852fa3a10f370769e",
+        "chain_id":"test-chain-6At3dj",
+        "consensus_params":{
+            "block_gossip_params":{"block_part_size_bytes":"65536"},
+            "block_size_params":{"max_bytes":"22020096","max_gas":"-1","max_txs":"10000"},
+            "evidence_params":{"max_age":"100000"},
+            "tx_size_params":{"max_bytes":"10240","max_gas":"-1"}
+        },
+        "genesis_time":"2018-12-08T10:55:24.643031094Z",
+        "validators":[{
+            "name":"",
+            "power":"10",
+            "pub_key":{"type":"tendermint/PubKeyEd25519","value":"fLECq0Y/FdUkMR+IhTtDOc4hw/tEl17778RxpqAgw1w="}
+        }]
+    },
+    "peers":[
+        "068ff5b4fb34ff250e424c534ec6b7d930a34387@34.250.91.182:46691"
+    ]
+}
