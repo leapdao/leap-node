@@ -47,5 +47,7 @@ module.exports = async (db, tx, blockHash, height, txPos) => {
     to: tx.outputs && tx.outputs.length ? tx.outputs[0].address : null,
     gas: '0x0',
     gasPrice: '0x0',
+    nonce: 0,
+    input: '0x',
   };
 };

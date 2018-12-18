@@ -51,6 +51,8 @@ describe('txResponse', () => {
       raw: tx.hex(),
       gas: '0x0',
       gasPrice: '0x0',
+      input: '0x',
+      nonce: 0,
     });
   });
 
@@ -92,6 +94,8 @@ describe('txResponse', () => {
       raw: tx.hex(),
       gas: '0x0',
       gasPrice: '0x0',
+      input: '0x',
+      nonce: 0,
     });
   });
 
@@ -132,6 +136,8 @@ describe('txResponse', () => {
       raw: tx.hex(),
       gas: '0x0',
       gasPrice: '0x0',
+      input: '0x',
+      nonce: 0,
     });
   });
 
@@ -159,6 +165,8 @@ describe('txResponse', () => {
       raw: tx.hex(),
       gas: '0x0',
       gasPrice: '0x0',
+      input: '0x',
+      nonce: 0,
     });
   });
 });
