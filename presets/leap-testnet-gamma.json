@@ -1,23 +1,39 @@
 {
-    "bridgeAddr":"0xf26fcd36caea3d72b1a4b802ee25cdf4e8fe00fb",
-    "operatorAddr":"0xa59ee0aa6e15159da2bc2dba8cb24eb82468fcea",
-    "exitHandlerAddr":"0x67c43da9610ded53acd12951257a030381676a60",
-    "rootNetwork":"https://rinkeby.infura.io",
-    "network":"rinkeby",
-    "networkId":475352288,
-    "genesis": {
-        "app_hash":"ef95dbbdac64093311bf54bb1c2ef32b3b9ca1200bed4e6852fa3a10f370769e",
-        "chain_id":"test-chain-QuJJeN",
-        "consensus_params":{
-            "block_size":{"max_bytes":"22020096","max_gas":"-1"},
-            "evidence":{"max_age":"100000"},
-            "validator":{"pub_key_types":["ed25519"]}},
-            "genesis_time":"2018-12-12T11:15:41.102611998Z","validators":[{
-                "address":"6551286CDF7D8F8D6583CCA1025A846B93F8D282",
-                "name":"",
-                "power":"10",
-                "pub_key":{"type":"tendermint/PubKeyEd25519","value":"lY4iAXWK7I1Znfwf51I5HHt13bKjHrUCA6uykumWy6I="}
-            }]
+  "bridgeAddr": "0xc2e0777bfecb60ca1ee63965a2b29b5425181042",
+  "operatorAddr": "0xdf9d0383d2eadea2b848bacabd9c0089d4a69ca0",
+  "exitHandlerAddr": "0x99472b5c8d1d67c5e6e24d35e038f5cc57ad9dd6",
+  "rootNetwork": "https://rinkeby.infura.io",
+  "network": "rinkeby",
+  "networkId": 475352288,
+  "genesis": {
+    "app_hash": "ef95dbbdac64093311bf54bb1c2ef32b3b9ca1200bed4e6852fa3a10f370769e",
+    "chain_id": "test-chain-aPfn5H",
+    "consensus_params": {
+      "block_size": {
+        "max_bytes": "22020096",
+        "max_gas": "-1"
+      },
+      "evidence": {
+        "max_age": "100000"
+      },
+      "validator": {
+        "pub_key_types": [
+          "ed25519"
+        ]
+      }
     },
-    "peers":[]
+    "genesis_time": "2018-12-17T15:02:06.92504371Z",
+    "validators": [
+      {
+        "address": "49D595685AA9AD60A290C983957C00CC68406A61",
+        "name": "",
+        "power": "10",
+        "pub_key": {
+          "type": "tendermint/PubKeyEd25519",
+          "value": "UIfLq8Vcpiswld+AwQf8X4UxtagIvCEnwg2ogBBK8gA="
+        }
+      }
+    ]
+  },
+  "peers": []
 }
