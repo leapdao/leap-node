@@ -1,13 +1,13 @@
 {
-  "bridgeAddr": "0xc2e0777bfecb60ca1ee63965a2b29b5425181042",
-  "operatorAddr": "0xdf9d0383d2eadea2b848bacabd9c0089d4a69ca0",
-  "exitHandlerAddr": "0x99472b5c8d1d67c5e6e24d35e038f5cc57ad9dd6",
+  "bridgeAddr": "0x6e3ec9e865df7ca87707898200b25a293dd40c14",
+  "operatorAddr": "0xe4e80c696f9292f7b2541c320db14ed975d17873",
+  "exitHandlerAddr": "0x2c0f269eaa1de612ddb07674eca4f3bae48b7ce9",
   "rootNetwork": "https://rinkeby.infura.io",
   "network": "rinkeby",
-  "networkId": 475352288,
+  "networkId": 986168409,
   "genesis": {
     "app_hash": "ef95dbbdac64093311bf54bb1c2ef32b3b9ca1200bed4e6852fa3a10f370769e",
-    "chain_id": "test-chain-aPfn5H",
+    "chain_id": "test-chain-9nZoBr",
     "consensus_params": {
       "block_size": {
         "max_bytes": "22020096",
@@ -22,15 +22,15 @@
         ]
       }
     },
-    "genesis_time": "2018-12-17T15:02:06.92504371Z",
+    "genesis_time": "2018-12-19T19:50:55.326179668Z",
     "validators": [
       {
-        "address": "49D595685AA9AD60A290C983957C00CC68406A61",
+        "address": "F7CE70A1572B3EDD15A077B667544BA625DDCC87",
         "name": "",
         "power": "10",
         "pub_key": {
           "type": "tendermint/PubKeyEd25519",
-          "value": "UIfLq8Vcpiswld+AwQf8X4UxtagIvCEnwg2ogBBK8gA="
+          "value": "DWF+i+8Ng7AAjkrTAiyKGOWdQRXaSXqSc22FWjmOLqg="
         }
       }
     ]
