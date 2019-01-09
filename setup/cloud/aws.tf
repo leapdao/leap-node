@@ -39,7 +39,7 @@ provider "aws" {
 
 
 resource "aws_instance" "leap_node" {
-  count			 = "${var.count}"
+  count			             = "${var.count}"
   ami                    = "ami-58d7e821"
   availability_zone      = "eu-west-1c"
   instance_type          = "t2.micro"
@@ -92,11 +92,12 @@ resource "aws_eip_association" "eip_assoc" {
 }
 
 resource "aws_eip" "leap_eip" {
+  count		= "${var.count}"
   vpc = true
 
   tags {
     Group = "leap_node"
-    Name = "Leap node IP"
+    Name = "${format("Leap node %01d",count.index + 1)} IP"
   }
 }
 
@@ -190,7 +191,7 @@ output "instance" {
 
 // The list of cluster instance public IPs
 output "public_ip" {
-  value = ["${aws_eip.leap_eip.public_ip}"]
+  value = ["${aws_eip.leap_eip.*.public_ip}"]
 }
 
 terraform {
