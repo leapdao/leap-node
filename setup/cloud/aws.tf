@@ -5,8 +5,7 @@ variable "region" {
 }
 
 variable "network" {
-  description = "Network name to run node on"
-  default = "testnet-new"
+  description = "Network config to run node for (see presets folder)"
   type = "string"
 }
 
@@ -23,6 +22,11 @@ variable "ssh_private_file" {
 variable "count" {
   description = "Number of leap nodes to deploy"
   default = 4
+}
+
+variable "leap_node_version" {
+  description = "Version of leap-node package to install on the nodes"
+  default = "latest"
 }
 
 data "template_file" "leap_systemd" {
@@ -63,20 +67,68 @@ resource "aws_instance" "leap_node" {
   }
 
   provisioner "file" {
-    source      = "presets/leap-${var.network}.json"
-    destination = "/home/ubuntu/leap-${var.network}.json"
+    source      = "presets/${var.network}.json"
+    destination = "/home/ubuntu/${var.network}.json"
   }
 
   provisioner "remote-exec" {
     inline = [
       "chmod +x /tmp/bootstrap.sh",
-      "sudo /tmp/bootstrap.sh",
+      "sudo /tmp/bootstrap.sh ${var.leap_node_version}",
     ]
   }
 
   tags {
     Group = "leap_node"
-    Name = "${format("leap node-%01d",count.index+1)} - ${var.network}"
+    Name = "${format("node-%01d",count.index+1)} - ${var.network}"
+  }
+}
+
+resource "null_resource" "update_leap_node" {
+  count			             = "${var.count}"
+
+  triggers {
+    leap_node_version    = "${var.leap_node_version}"
+  }
+
+  connection {
+    user                 = "ubuntu"
+    private_key          = "${file(var.ssh_private_file)}"
+    timeout              = "600s"
+    host                 = "${element(aws_instance.leap_node.*.public_ip, count.index)}"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo yarn global add leap-node@${var.leap_node_version}",
+      "sudo service leap-node restart"
+    ]
+  }
+}
+
+resource "null_resource" "update_network_config" {
+  count			             = "${var.count}"
+
+  triggers {
+    network_config    = "${file("${path.module}/../../presets/${var.network}.json")}"
+  }
+
+  connection {
+    user                 = "ubuntu"
+    private_key          = "${file(var.ssh_private_file)}"
+    timeout              = "600s"
+    host                 = "${element(aws_instance.leap_node.*.public_ip, count.index)}"
+  }
+
+  provisioner "file" {
+    source      = "presets/${var.network}.json"
+    destination = "/home/ubuntu/${var.network}.json"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo service leap-node restart"
+    ]
   }
 }
 
