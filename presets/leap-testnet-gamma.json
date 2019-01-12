@@ -1,7 +1,7 @@
 {
-  "bridgeAddr": "0x7b8342412883f4b34f335d4e1391ec190eb887ca",
-  "operatorAddr": "0x9b83018de826c0343af6e682c24e7c91a421755c",
-  "exitHandlerAddr": "0x0b32eb1aaa9b0804852f4fe1b2e6100edb4533d8",
+  "bridgeAddr": "0x7D5FaD5ef1D8F9eAB64068ec075aEAA5e70ea7D6",
+  "operatorAddr": "0x79B8b362ca9A5ecc25a14297D1EafABB6d4125B8",
+  "exitHandlerAddr": "0x53f7AEBF9671caC2a3EC8a5d29F2770Bac8343Ca",
   "rootNetwork": "https://rinkeby.infura.io",
   "network": "leap-testnet-gamma",
   "networkId": 1341,
@@ -13,7 +13,7 @@
       "evidence": { "max_age": "100000" },
       "validator": { "pub_key_types": ["ed25519"] }
     },
-    "genesis_time": "2019-01-10T12:34:14.192807717Z",
+    "genesis_time": "2019-01-12T10:23:23.583448914Z",
     "validators": [
       {
         "address": "56871078D8FA74DA82852B67455827DE9ACBF0CD",
@@ -29,7 +29,6 @@
   "peers": [
     "903de4f44c6aa477dec9f3ced43d79e4aaa838cb@node1.testnet.leapdao.org:46691",
     "17eb2b2225341e7fcd2a378ae5941ac4ed4388d8@node2.testnet.leapdao.org:46691",
-    "a9d01b2f1ea5ac34b6b6aa8a82a56afeb04d4d83@node3.testnet.leapdao.org:46691",
-    "b8444aec584d37e9f41367aa7db3775be1800a6b@node4.testnet.leapdao.org:46691"
+    "a9d01b2f1ea5ac34b6b6aa8a82a56afeb04d4d83@node3.testnet.leapdao.org:46691"
   ]
 }
