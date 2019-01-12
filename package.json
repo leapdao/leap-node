@@ -98,7 +98,6 @@
       "<rootDir>/jestSetup.js"
     ],
     "coveragePathIgnorePatterns": [
-      "src/bridgeABI.js",
       "src/utils/cleanupLotion.js",
       "src/utils/cliArgs.js",
       "src/utils/debug.js",

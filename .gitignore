@@ -4,4 +4,3 @@ config.json
 yarn-error.log
 .terraform
 coverage
-tools/check-balances.js
