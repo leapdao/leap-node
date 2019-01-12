@@ -17,7 +17,8 @@ sudo apt-get install -y nodejs
 sudo apt-get -y install yarn
 
 # Install Leap node
-sudo yarn global add leap-node
+echo "Installing leap-node version: $1"
+sudo yarn global add leap-node@$1
 
 # Setup system.d config
 sudo mv /tmp/leap-node.service /etc/systemd/system/

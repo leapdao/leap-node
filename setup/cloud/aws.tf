@@ -5,8 +5,7 @@ variable "region" {
 }
 
 variable "network" {
-  description = "Network name to run node on"
-  default = "testnet-beta"
+  description = "Network config to run node for (see presets folder)"
   type = "string"
 }
 
@@ -18,6 +17,16 @@ variable "ssh_public_file" {
 variable "ssh_private_file" {
   description = "SSH private key file to be used to connect to the node"
   type = "string"
+}
+
+variable "count" {
+  description = "Number of leap nodes to deploy"
+  default = 4
+}
+
+variable "leap_node_version" {
+  description = "Version of leap-node package to install on the nodes"
+  default = "latest"
 }
 
 data "template_file" "leap_systemd" {
@@ -34,6 +43,7 @@ provider "aws" {
 
 
 resource "aws_instance" "leap_node" {
+  count			             = "${var.count}"
   ami                    = "ami-58d7e821"
   availability_zone      = "eu-west-1c"
   instance_type          = "t2.micro"
@@ -57,20 +67,68 @@ resource "aws_instance" "leap_node" {
   }
 
   provisioner "file" {
-    source      = "presets/leap-${var.network}.json"
-    destination = "/home/ubuntu/leap-${var.network}.json"
+    source      = "presets/${var.network}.json"
+    destination = "/home/ubuntu/${var.network}.json"
   }
 
   provisioner "remote-exec" {
     inline = [
       "chmod +x /tmp/bootstrap.sh",
-      "sudo /tmp/bootstrap.sh",
+      "sudo /tmp/bootstrap.sh ${var.leap_node_version}",
     ]
   }
 
   tags {
     Group = "leap_node"
-    Name = "leap node - ${var.network}"
+    Name = "${format("node-%01d",count.index+1)} - ${var.network}"
+  }
+}
+
+resource "null_resource" "update_leap_node" {
+  count			             = "${var.count}"
+
+  triggers {
+    leap_node_version    = "${var.leap_node_version}"
+  }
+
+  connection {
+    user                 = "ubuntu"
+    private_key          = "${file(var.ssh_private_file)}"
+    timeout              = "600s"
+    host                 = "${element(aws_instance.leap_node.*.public_ip, count.index)}"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo yarn global add leap-node@${var.leap_node_version}",
+      "sudo service leap-node restart"
+    ]
+  }
+}
+
+resource "null_resource" "update_network_config" {
+  count			             = "${var.count}"
+
+  triggers {
+    network_config    = "${file("${path.module}/../../presets/${var.network}.json")}"
+  }
+
+  connection {
+    user                 = "ubuntu"
+    private_key          = "${file(var.ssh_private_file)}"
+    timeout              = "600s"
+    host                 = "${element(aws_instance.leap_node.*.public_ip, count.index)}"
+  }
+
+  provisioner "file" {
+    source      = "presets/${var.network}.json"
+    destination = "/home/ubuntu/${var.network}.json"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo service leap-node restart"
+    ]
   }
 }
 
@@ -80,16 +138,18 @@ resource "aws_key_pair" "leap_auth" {
 }
 
 resource "aws_eip_association" "eip_assoc" {
-  instance_id   = "${aws_instance.leap_node.id}"
-  allocation_id = "${aws_eip.leap_eip.id}"
+  count		= "${var.count}"
+  instance_id   = "${element(aws_instance.leap_node.*.id, count.index)}"
+  allocation_id = "${element(aws_eip.leap_eip.*.id, count.index)}"
 }
 
 resource "aws_eip" "leap_eip" {
+  count		= "${var.count}"
   vpc = true
 
   tags {
     Group = "leap_node"
-    Name = "Leap node IP"
+    Name = "${format("Leap node %01d",count.index + 1)} IP"
   }
 }
 
@@ -178,12 +238,12 @@ resource "aws_security_group" "leap_tendermint" {
 
 // The list of cluster instance IDs
 output "instance" {
-  value = ["${aws_instance.leap_node.id}"]
+  value = ["${aws_instance.leap_node.*.id}"]
 }
 
 // The list of cluster instance public IPs
 output "public_ip" {
-  value = ["${aws_eip.leap_eip.public_ip}"]
+  value = ["${aws_eip.leap_eip.*.public_ip}"]
 }
 
 terraform {
