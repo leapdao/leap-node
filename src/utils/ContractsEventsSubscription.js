@@ -82,7 +82,7 @@ module.exports = class ContractsEventsSubscription {
 
     this.handleEvents(events);
 
-    this.fromBlock = blockNumber;
+    this.fromBlock = blockNumber + 1;
 
     return events;
   }
