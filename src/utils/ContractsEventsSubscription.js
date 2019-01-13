@@ -76,7 +76,9 @@ module.exports = class ContractsEventsSubscription {
         return getPastEvents(contract, this.fromBlock || 0, blockNumber);
       })
     );
-    const events = eventsList.reduce((acc, evnts) => acc.concat(evnts), []);
+    const events = eventsList
+      .reduce((acc, evnts) => acc.concat(evnts), [])
+      .sort((a, b) => a.blockNumber - b.blockNumber);
 
     this.handleEvents(events);
 
