@@ -3,7 +3,8 @@ const BN = require('bn.js');
 const getColor = require('./getColor');
 const { INVALID_PARAMS } = require('./constants');
 
-const formatUint256 = n => `0x${new BN(n, 10).toString(16).padStart(64, '0')}`;
+const formatUint256 = n =>
+  `0x${new BN(`${n}`, 10).toString(16).padStart(64, '0')}`;
 
 /* eslint-disable no-throw-literal */
 module.exports = async (bridgeState, txObj, tag) => {
