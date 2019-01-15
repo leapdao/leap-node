@@ -1,13 +1,13 @@
 {
-  "bridgeAddr": "0x7D5FaD5ef1D8F9eAB64068ec075aEAA5e70ea7D6",
-  "operatorAddr": "0x79B8b362ca9A5ecc25a14297D1EafABB6d4125B8",
-  "exitHandlerAddr": "0x53f7AEBF9671caC2a3EC8a5d29F2770Bac8343Ca",
+  "bridgeAddr": "0x9e52AbD91F8317538E248e9e679B6122eb7B2971",
+  "operatorAddr": "0xC74f4eD00F59bcb1B34C3461B23e58B6d6E2E199",
+  "exitHandlerAddr": "0x54177deD16B8fe8F9017D6c44704f6998A914e54",
   "rootNetwork": "https://rinkeby.infura.io",
   "network": "leap-testnet-gamma",
   "networkId": 1341,
   "genesis": {
     "app_hash": "ef95dbbdac64093311bf54bb1c2ef32b3b9ca1200bed4e6852fa3a10f370769e",
-    "chain_id": "leap-testnet-gamma",
+    "chain_id": "leap-testnet-gamma-14",
     "consensus_params": {
       "block_size": { "max_bytes": "22020096", "max_gas": "-1" },
       "evidence": { "max_age": "100000" },
@@ -27,8 +27,5 @@
     ]
   },
   "peers": [
-    "903de4f44c6aa477dec9f3ced43d79e4aaa838cb@node1.testnet.leapdao.org:46691",
-    "17eb2b2225341e7fcd2a378ae5941ac4ed4388d8@node2.testnet.leapdao.org:46691",
-    "a9d01b2f1ea5ac34b6b6aa8a82a56afeb04d4d83@node3.testnet.leapdao.org:46691"
   ]
 }
