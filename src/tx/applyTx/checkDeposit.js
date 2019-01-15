@@ -24,15 +24,21 @@ module.exports = (state, tx, bridgeState) => {
     );
   }
   const deposit = bridgeState.deposits[tx.options.depositId];
+  if (!deposit) {
+    throw new Error('depositId not found in bridgeState');
+  }
   if (
-    !deposit ||
     (Output.isNFT(Number(deposit.color))
       ? deposit.amount !== tx.outputs[0].value
       : Number(deposit.amount) !== tx.outputs[0].value) ||
     Number(deposit.color) !== tx.outputs[0].color ||
     !addrCmp(deposit.depositor, tx.outputs[0].address)
   ) {
-    throw new Error('Trying to submit incorrect deposit');
+    throw new Error(
+      `Trying to submit deposit with incorrect value ${deposit.amount}, ${
+        deposit.color
+      }, ${deposit.depositor}`
+    );
   }
   state.processedDeposit += 1;
 };
