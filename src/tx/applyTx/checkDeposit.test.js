@@ -56,7 +56,7 @@ describe('checkDeposit', () => {
 
     expect(() => {
       checkDeposit(state, tx, { deposits: {} });
-    }).toThrow('depositId not found in bridgeState');
+    }).toThrow('Trying to submit incorrect deposit');
   });
 
   test('skipping depositId', () => {
@@ -72,7 +72,7 @@ describe('checkDeposit', () => {
     const tx = Tx.deposit(1, 500, ADDR_1, 0);
     expect(() => {
       checkDeposit(state, tx, makeDepositMock(ADDR_2, '500', 0));
-    }).toThrow('Trying to submit deposit with incorrect value');
+    }).toThrow('Trying to submit incorrect deposit');
   });
 
   test('wrong value', () => {
@@ -80,7 +80,7 @@ describe('checkDeposit', () => {
     const tx = Tx.deposit(1, 500, ADDR_1, 0);
     expect(() => {
       checkDeposit(state, tx, makeDepositMock(ADDR_1, '600', 0));
-    }).toThrow('Trying to submit deposit with incorrect value');
+    }).toThrow('Trying to submit incorrect deposit');
   });
 
   test('wrong color', () => {
@@ -88,7 +88,7 @@ describe('checkDeposit', () => {
     const tx = Tx.deposit(1, 500, ADDR_1, 0);
     expect(() => {
       checkDeposit(state, tx, makeDepositMock(ADDR_1, '600', 1));
-    }).toThrow('Trying to submit deposit with incorrect value');
+    }).toThrow('Trying to submit incorrect deposit');
   });
 
   test('prevent double deposit', () => {
