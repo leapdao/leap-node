@@ -77,7 +77,6 @@ module.exports = class BridgeState {
     this.eventsSubscription.subscribe(
       handleEvents({
         NewDeposit: ({ returnValues: event }) => {
-          logNode(`deposit updated in bridgeState: ${event.depositId}`);
           this.deposits[event.depositId] = {
             depositor: event.depositor,
             color: event.color,
