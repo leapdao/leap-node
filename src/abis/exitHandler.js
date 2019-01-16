@@ -84,20 +84,6 @@ module.exports = [
     type: 'function',
   },
   {
-    constant: false,
-    inputs: [
-      {
-        name: '_exitDuration',
-        type: 'uint256',
-      },
-    ],
-    name: 'setExitDuration',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
     constant: true,
     inputs: [],
     name: 'erc20TokenCount',
