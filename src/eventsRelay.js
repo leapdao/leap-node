@@ -13,12 +13,13 @@ const sendTx = require('./txHelpers/sendTx');
 const { handleEvents } = require('./utils');
 
 module.exports = async (txServerPort, bridgeState) => {
+  const delay = 2000;
   const handleJoin = async event => {
     const { slotId, tenderAddr, eventCounter, signerAddr } = event.returnValues;
     const tx = Tx.validatorJoin(slotId, tenderAddr, eventCounter, signerAddr);
     setTimeout(() => {
       sendTx(txServerPort, tx.hex());
-    }, 500);
+    }, delay);
   };
 
   const handler = handleEvents({
@@ -38,21 +39,21 @@ module.exports = async (txServerPort, bridgeState) => {
       );
       setTimeout(() => {
         sendTx(txServerPort, tx.hex());
-      }, 500);
+      }, delay);
     },
     EpochLength: async event => {
       const { epochLength } = event.returnValues;
       const tx = Tx.epochLength(Number(epochLength));
       setTimeout(() => {
         sendTx(txServerPort, tx.hex());
-      }, 500);
+      }, delay);
     },
     ExitStarted: async event => {
       const { txHash, outIndex } = event.returnValues;
       const tx = Tx.exit(new Input(new Outpoint(txHash, Number(outIndex))));
       setTimeout(() => {
         sendTx(txServerPort, tx.hex());
-      }, 500);
+      }, delay);
     },
     ValidatorJoin: handleJoin,
     ValidatorUpdate: handleJoin,
@@ -66,7 +67,7 @@ module.exports = async (txServerPort, bridgeState) => {
       );
       setTimeout(() => {
         sendTx(txServerPort, tx.hex());
-      }, 500);
+      }, delay);
     },
   });
 
