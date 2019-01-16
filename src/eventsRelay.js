@@ -16,7 +16,9 @@ module.exports = async (txServerPort, bridgeState) => {
   const handleJoin = async event => {
     const { slotId, tenderAddr, eventCounter, signerAddr } = event.returnValues;
     const tx = Tx.validatorJoin(slotId, tenderAddr, eventCounter, signerAddr);
-    await sendTx(txServerPort, tx.hex());
+    setTimeout(() => {
+      sendTx(txServerPort, tx.hex());
+    }, 500);
   };
 
   const handler = handleEvents({
@@ -41,12 +43,16 @@ module.exports = async (txServerPort, bridgeState) => {
     EpochLength: async event => {
       const { epochLength } = event.returnValues;
       const tx = Tx.epochLength(Number(epochLength));
-      await sendTx(txServerPort, tx.hex());
+      setTimeout(() => {
+        sendTx(txServerPort, tx.hex());
+      }, 500);
     },
     ExitStarted: async event => {
       const { txHash, outIndex } = event.returnValues;
       const tx = Tx.exit(new Input(new Outpoint(txHash, Number(outIndex))));
-      await sendTx(txServerPort, tx.hex());
+      setTimeout(() => {
+        sendTx(txServerPort, tx.hex());
+      }, 500);
     },
     ValidatorJoin: handleJoin,
     ValidatorUpdate: handleJoin,
@@ -58,7 +64,9 @@ module.exports = async (txServerPort, bridgeState) => {
         Number(event.returnValues.epoch) + 1,
         event.returnValues.newSigner
       );
-      await sendTx(txServerPort, tx.hex());
+      setTimeout(() => {
+        sendTx(txServerPort, tx.hex());
+      }, 500);
     },
   });
 
