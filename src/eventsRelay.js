@@ -34,7 +34,9 @@ module.exports = async (txServerPort, bridgeState) => {
         deposit.owner,
         color
       );
-      await sendTx(txServerPort, tx.hex());
+      setTimeout(() => {
+        sendTx(txServerPort, tx.hex());
+      }, 500);
     },
     EpochLength: async event => {
       const { epochLength } = event.returnValues;
