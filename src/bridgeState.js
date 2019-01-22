@@ -17,7 +17,7 @@ const exitABI = require('./abis/exitHandler');
 const operatorABI = require('./abis/operator');
 
 module.exports = class BridgeState {
-  constructor(db, privKey, config) {
+  constructor(db, privKey, config, eventsDelay, relayBuffer) {
     this.config = config;
     this.web3 = new Web3();
     this.web3.setProvider(
@@ -50,6 +50,11 @@ module.exports = class BridgeState {
     this.deposits = {};
     this.exits = {};
     this.epochLengths = [];
+
+    this.onNewBlock = this.onNewBlock.bind(this);
+    this.eventsBuffer = [];
+    this.eventsDelay = eventsDelay;
+    this.relayBuffer = relayBuffer;
   }
 
   async init() {
@@ -66,39 +71,12 @@ module.exports = class BridgeState {
     this.eventsSubscription = new ContractsEventsSubscription(
       this.web3,
       contracts,
+      this.eventsBuffer,
       genesisBlock
     );
-    await this.watchContractEvents();
+    await this.eventsSubscription.init();
     await this.initBlocks();
     logNode('Synced');
-  }
-
-  async watchContractEvents() {
-    this.eventsSubscription.subscribe(
-      handleEvents({
-        NewDeposit: ({ returnValues: event }) => {
-          this.deposits[event.depositId] = {
-            depositor: event.depositor,
-            color: event.color,
-            amount: event.amount,
-          };
-        },
-        ExitStarted: ({ returnValues: event }) => {
-          const outpoint = new Outpoint(event.txHash, Number(event.outIndex));
-          this.exits[outpoint.getUtxoId()] = {
-            txHash: event.txHash,
-            outIndex: Number(event.outIndex),
-            exitor: event.exitor,
-            color: event.color,
-            amount: event.amount,
-          };
-        },
-        EpochLength: ({ returnValues: event }) => {
-          this.epochLengths.push(Number(event.epochLength));
-        },
-      })
-    );
-    await this.eventsSubscription.init();
   }
 
   async initBlocks() {
@@ -109,5 +87,53 @@ module.exports = class BridgeState {
 
     blocks.forEach(b => this.currentPeriod.addBlock(b));
     await Promise.all(blocks.map(b => this.db.storeBlock(b)));
+  }
+
+  async onNewBlock(blockNumber) {
+    if (this.eventsBuffer.length === 0) {
+      return;
+    }
+
+    const events = [];
+
+    while (this.eventsBuffer[0].blockNumber <= blockNumber - this.eventsDelay) {
+      const event = this.eventsBuffer.shift();
+
+      events.push(event);
+
+      if (this.eventsBuffer.length === 0) {
+        break;
+      }
+    }
+
+    const handler = handleEvents({
+      NewDeposit: ({ returnValues: event }) => {
+        this.deposits[event.depositId] = {
+          depositor: event.depositor,
+          color: event.color,
+          amount: event.amount,
+        };
+      },
+      ExitStarted: ({ returnValues: event }) => {
+        const outpoint = new Outpoint(event.txHash, Number(event.outIndex));
+        this.exits[outpoint.getUtxoId()] = {
+          txHash: event.txHash,
+          outIndex: Number(event.outIndex),
+          exitor: event.exitor,
+          color: event.color,
+          amount: event.amount,
+        };
+      },
+      EpochLength: ({ returnValues: event }) => {
+        this.epochLengths.push(Number(event.epochLength));
+      },
+    });
+
+    await handler(events);
+
+    // now push to second buffer
+    for (const event of events) {
+      this.relayBuffer.push(event);
+    }
   }
 };

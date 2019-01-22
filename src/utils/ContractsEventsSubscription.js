@@ -27,31 +27,13 @@ async function getPastEvents(contract, fromBlock, toBlock) {
 }
 
 module.exports = class ContractsEventsSubscription {
-  constructor(web3, contracts, fromBlock = null) {
+  constructor(web3, contracts, eventsBuffer, fromBlock = null) {
     this.fromBlock = fromBlock;
     this.web3 = web3;
     this.contracts = contracts;
     this.fetchEvents = this.fetchEvents.bind(this);
-    this.handlers = [];
-  }
 
-  subscribe(handler) {
-    this.handlers.push(handler);
-
-    // unsubscribe
-    return () => {
-      const index = this.handlers.indexOf(handler);
-      this.handlers.splice(index, 1);
-    };
-  }
-
-  async handleEvents(events) {
-    for (const handler of this.handlers) {
-      const result = handler(events);
-      if (result && typeof result.then === 'function') {
-        await result; // eslint-disable-line no-await-in-loop
-      }
-    }
+    this.eventsBuffer = eventsBuffer;
   }
 
   async init() {
@@ -78,7 +60,9 @@ module.exports = class ContractsEventsSubscription {
     );
     const events = eventsList.reduce((acc, evnts) => acc.concat(evnts), []);
 
-    this.handleEvents(events);
+    for (const event of events) {
+      this.eventsBuffer.push(event);
+    }
 
     this.fromBlock = blockNumber;
 
