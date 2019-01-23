@@ -51,7 +51,11 @@ describe('BridgeState', () => {
       },
     };
     const state = createInstance(
-      {},
+      {
+        eth: {
+          getBlockNumber: async () => 5,
+        },
+      },
       bridgeContract,
       {
         async getLastBlockSynced() {
@@ -75,7 +79,11 @@ describe('BridgeState', () => {
       },
     };
     const state = createInstance(
-      {},
+      {
+        eth: {
+          getBlockNumber: async () => 5,
+        },
+      },
       bridgeContract,
       {
         async getLastBlockSynced() {
