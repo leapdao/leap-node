@@ -95,8 +95,8 @@ async function run() {
 
   await writePrivKey(app, cliArgs, bridgeState.account.privateKey);
 
-  await blockTicker.init();
   await bridgeState.init();
+  await blockTicker.init();
 
   app.useTx(txHandler(bridgeState));
   app.useBlock(blockHandler(bridgeState, db, cliArgs.no_validators_updates));

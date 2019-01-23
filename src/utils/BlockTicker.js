@@ -19,7 +19,7 @@ module.exports = class BlockTicker {
 
   async latestBlock() {
     const blockNumber = await this.web3.eth.getBlockNumber();
-    if (blockNumber > this.lastSeenBlock) {
+    if (blockNumber >= this.lastSeenBlock) {
       this.lastSeenBlock = blockNumber;
       for (const subscriber of this.subscribers) {
         subscriber(blockNumber);

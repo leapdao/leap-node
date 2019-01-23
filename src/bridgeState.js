@@ -74,7 +74,9 @@ module.exports = class BridgeState {
       this.eventsBuffer,
       genesisBlock
     );
+    const blockNumber = await this.web3.eth.getBlockNumber();
     await this.eventsSubscription.init();
+    await this.onNewBlock(blockNumber);
     await this.initBlocks();
     logNode('Synced');
   }
