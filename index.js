@@ -78,12 +78,15 @@ async function run() {
 
   const privKey = await readPrivKey(app, cliArgs);
 
-  const eventsRelay = new EventsRelay(0, cliArgs.port);
+  const bridgeStateDelay = config.bridgeDelay ? config.bridgeDelay : 0;
+  const eventsRealyDelay = config.eventsDelay ? config.eventsDelay : 0;
+
+  const eventsRelay = new EventsRelay(eventsRealyDelay, cliArgs.port);
   const bridgeState = new BridgeState(
     db,
     privKey,
     config,
-    0,
+    bridgeStateDelay,
     eventsRelay.relayBuffer
   );
   const blockTicker = new BlockTicker(bridgeState.web3, [
