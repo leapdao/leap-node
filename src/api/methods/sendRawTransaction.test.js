@@ -8,7 +8,7 @@ jest.mock('../../txHelpers/sendTx');
 describe('sendRawTransaction', () => {
   test('success', async () => {
     const tx = Tx.deposit(0, 100, A1, 0);
-    const response = await sendRawTransaction(0, { data: tx.toRaw() });
+    const response = await sendRawTransaction(0, { data: tx.hex() });
     expect(response).toBe(tx.hash());
   });
 });
