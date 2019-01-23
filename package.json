@@ -69,7 +69,7 @@
     "tendermint": "^3.1.9",
     "tendermint-node": "leapdao/tendermint-node#0b586e7453e8d4e799b74c6fdb995ff787369241",
     "varstruct": "^6.1.1",
-    "web3": "^1.0.0-beta.34"
+    "web3": "^1.0.0-beta.37"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
