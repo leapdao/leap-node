@@ -21,7 +21,10 @@ describe('sendRawTransaction', () => {
       throw error;
     });
     const tx = Tx.deposit(0, 100, A1, 0);
-    const response = await sendRawTransaction(0, tx.hex());
-    expect(response).toBe(error);
+    try {
+      await sendRawTransaction(0, tx.hex());
+    } catch (err) {
+      expect(err).toBe(error);
+    }
   });
 });
