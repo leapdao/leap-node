@@ -7,7 +7,8 @@
 
 /* eslint-disable no-await-in-loop, default-case */
 
-const { Tx, Input, Outpoint, Output } = require('leap-core');
+const { Tx, Input, Outpoint } = require('leap-core');
+const { BigInt } = require('jsbi');
 
 const sendTx = require('./txHelpers/sendTx');
 const { handleEvents } = require('./utils');
@@ -20,7 +21,7 @@ module.exports = class EventsRelay {
     this.txServerPort = txServerPort;
     this.onNewBlock = this.onNewBlock.bind(this);
   }
-
+  s;
   async onNewBlock(blockNumber) {
     if (this.relayBuffer.length === 0) {
       return;
@@ -52,7 +53,7 @@ module.exports = class EventsRelay {
     const handler = handleEvents({
       NewDeposit: async ({ returnValues: event }) => {
         const color = Number(event.color);
-        const value = Output.isNFT(color) ? event.amount : Number(event.amount);
+        const value = BigInt(event.amount);
         const tx = Tx.deposit(event.depositId, value, event.depositor, color);
         await sendTx(this.txServerPort, tx.hex());
       },
