@@ -21,7 +21,7 @@ const periodHandler = require('./src/period');
 const { printStartupInfo } = require('./src/utils');
 const BridgeState = require('./src/bridgeState');
 const BlockTicker = require('./src/utils/BlockTicker');
-const EventsRelay = require('./src/eventsRelayClass');
+const EventsRelay = require('./src/eventsRelay');
 const lotion = require('./lotion');
 
 const { logNode, logTendermint } = require('./src/utils/debug');
