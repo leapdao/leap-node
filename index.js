@@ -18,9 +18,10 @@ const txHandler = require('./src/tx');
 const blockHandler = require('./src/block');
 const periodHandler = require('./src/period');
 
-const eventsRelay = require('./src/eventsRelay');
 const { printStartupInfo } = require('./src/utils');
 const BridgeState = require('./src/bridgeState');
+const BlockTicker = require('./src/utils/BlockTicker');
+const EventsRelay = require('./src/eventsRelay');
 const lotion = require('./lotion');
 
 const { logNode, logTendermint } = require('./src/utils/debug');
@@ -76,16 +77,33 @@ async function run() {
   const db = Db(app);
 
   const privKey = await readPrivKey(app, cliArgs);
-  const bridgeState = new BridgeState(db, privKey, config);
+
+  const bridgeStateDelay = config.bridgeDelay ? config.bridgeDelay : 0;
+  const eventsRealyDelay = config.eventsDelay ? config.eventsDelay : 0;
+
+  const eventsRelay = new EventsRelay(eventsRealyDelay, cliArgs.port);
+  const bridgeState = new BridgeState(
+    db,
+    privKey,
+    config,
+    bridgeStateDelay,
+    eventsRelay.relayBuffer
+  );
+  const blockTicker = new BlockTicker(bridgeState.web3, [
+    bridgeState.onNewBlock,
+  ]);
+
   await writePrivKey(app, cliArgs, bridgeState.account.privateKey);
+
   await bridgeState.init();
+  await blockTicker.init();
 
   app.useTx(txHandler(bridgeState));
   app.useBlock(blockHandler(bridgeState, db, cliArgs.no_validators_updates));
   app.usePeriod(periodHandler(bridgeState));
 
   app.listen(cliArgs.port).then(async params => {
-    await eventsRelay(params.txServerPort, bridgeState);
+    blockTicker.subscribe(eventsRelay.onNewBlock);
     await printStartupInfo(params, bridgeState);
 
     const api = await jsonrpc(bridgeState, params.txServerPort, db, app);
