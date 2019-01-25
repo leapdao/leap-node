@@ -5,7 +5,8 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-const { Type, Output } = require('leap-core');
+const { Type } = require('leap-core');
+const { BigInt, equal } = require('jsbi');
 const { addrCmp } = require('../../utils');
 
 module.exports = (state, tx, bridgeState) => {
@@ -23,9 +24,7 @@ module.exports = (state, tx, bridgeState) => {
   if (
     !exit ||
     !addrCmp(exit.exitor, unspent.address) ||
-    (Output.isNFT(Number(exit.color))
-      ? exit.amount !== unspent.value
-      : Number(exit.amount) !== unspent.value) ||
+    !equal(BigInt(exit.amount), BigInt(unspent.value)) ||
     Number(exit.color) !== unspent.color
   ) {
     throw new Error('Trying to submit incorrect exit');

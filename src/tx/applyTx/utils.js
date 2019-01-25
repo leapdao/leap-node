@@ -5,16 +5,25 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-const { Outpoint, Output, Type } = require('leap-core');
-const isEqual = require('lodash/isEqual');
-const uniq = require('lodash/uniq');
+const { Outpoint, Type } = require('leap-core');
+const {
+  BigInt,
+  add,
+  subtract,
+  divide,
+  lessThan,
+  greaterThan,
+} = require('jsbi');
+const { isNFT } = require('../../utils');
+const { uniq, isEqual } = require('lodash');
 
-const groupValuesByColor = (values, { color, value }) =>
-  Object.assign({}, values, {
-    [color]: Output.isNFT(color)
-      ? (values[color] || new Set()).add(value)
-      : (values[color] || 0) + value,
+const groupValuesByColor = (values, { color, value }) => {
+  return Object.assign({}, values, {
+    [color]: isNFT(color)
+      ? (values[color] || new Set()).add(BigInt(value))
+      : add(values[color] || BigInt(0), BigInt(value)),
   });
+};
 
 const checkInsAndOuts = (tx, state, bridgeState, unspentFilter) => {
   const inputTransactions = tx.inputs
@@ -30,22 +39,26 @@ const checkInsAndOuts = (tx, state, bridgeState, unspentFilter) => {
     ...Object.keys(insValues),
     ...Object.keys(outsValues),
   ]).map(Number);
-  const minGasPrice = bridgeState.minGasPrice || 0;
+  const minGasPrice = BigInt(bridgeState.minGasPrice || 0);
   const gas = Math.max(0, tx.outputs.length * 20000 - tx.inputs.length * 10000);
   for (const color of colors) {
+    const inputValue = insValues[color] || BigInt(0);
+    const outputValue = outsValues[color] || BigInt(0);
     if (
       color === 0 &&
       gas > 0 &&
-      minGasPrice > 0 &&
+      greaterThan(minGasPrice, 0) &&
       tx.type === Type.TRANSFER
     ) {
-      const inputValue = insValues[color];
-      const outputValue = outsValues[color];
-      const txGasPrice = (inputValue - outputValue) / gas;
-      if (txGasPrice < minGasPrice) {
+      const txGasPrice = divide(subtract(inputValue, outputValue), BigInt(gas));
+      if (lessThan(txGasPrice, minGasPrice)) {
         throw new Error(`Tx underpriced`);
       }
-    } else if (!isEqual(insValues[color], outsValues[color])) {
+    }
+    if (
+      (isNFT(color) && !isEqual(inputValue, outputValue)) ||
+      (!isNFT(color) && greaterThan(outputValue, inputValue))
+    ) {
       throw new Error(`Ins and outs values are mismatch for color ${color}`);
     }
   }
@@ -70,15 +83,14 @@ const addOutputs = ({ balances, owners, unspent }, tx) => {
     owners[out.color] = owners[out.color] || {};
     const cBalances = balances[out.color];
     const cOwners = owners[out.color];
-    if (Output.isNFT(out.color)) {
+    if (isNFT(out.color)) {
       cBalances[out.address] = cBalances[out.address] || [];
       cBalances[out.address].push(out.value);
       cOwners[out.value] = out.address;
     } else {
-      cBalances[out.address] = cBalances[out.address] || 0;
-      cBalances[out.address] += out.value;
+      cBalances[out.address] = cBalances[out.address] || BigInt(0);
+      cBalances[out.address] = add(cBalances[out.address], out.value);
     }
-
     unspent[outpoint.hex()] = out.toJSON();
   });
 };
@@ -88,12 +100,15 @@ const removeInputs = ({ unspent, balances, owners }, tx) => {
     const outpointId = input.prevout.hex();
     const { address, value, color } = unspent[outpointId];
 
-    if (Output.isNFT(color)) {
+    if (isNFT(color)) {
       const index = balances[color][address].indexOf(value);
       balances[color][address].splice(index, 1);
-      delete owners[color][value];
+      delete owners[color][BigInt(value).toString()];
     } else {
-      balances[color][address] -= value;
+      balances[color][address] = subtract(
+        balances[color][address],
+        BigInt(value)
+      );
     }
     delete unspent[outpointId];
   });

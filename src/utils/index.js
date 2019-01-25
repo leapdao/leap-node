@@ -22,11 +22,4 @@ exports.hexToBase64 = require('./hexToBase64');
 exports.base64ToHex = require('./base64ToHex');
 exports.range = require('./range');
 exports.printStartupInfo = require('./printStartupInfo');
-
-exports.seq = mapFn => async arr => {
-  for (const item of arr) {
-    await mapFn(item); // eslint-disable-line no-await-in-loop
-  }
-};
-exports.delay = ms => new Promise(resolve => setTimeout(resolve, ms));
-exports.isNFT = color => color > 2 ** 15;
+exports.isNFT = require('./isNFT');
