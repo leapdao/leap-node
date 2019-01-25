@@ -5,8 +5,6 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-/* eslint-disable no-await-in-loop, default-case */
-
 const { Tx, Input, Outpoint } = require('leap-core');
 const { BigInt } = require('jsbi');
 const TinyQueue = require('tinyqueue');
@@ -24,7 +22,6 @@ module.exports = class EventsRelay {
     this.txServerPort = txServerPort;
     this.onNewBlock = this.onNewBlock.bind(this);
   }
-  s;
   async onNewBlock(blockNumber) {
     if (this.relayBuffer.length === 0) {
       return;
