@@ -162,6 +162,31 @@ describe('applyTx utils', () => {
       }).toThrow(`Ins and outs values are mismatch for color ${colorERC721}`);
     });
 
+    test('should throw if overspending ERC20', () => {
+      const color = 0;
+      const depositERC20 = Tx.deposit(12, 500, ADDR_1, color);
+      const outpointERC20 = new Outpoint(depositERC20.hash(), color);
+      const state = {
+        unspent: {
+          [outpointERC20.hex()]: depositERC20.outputs[0].toJSON(),
+        },
+      };
+
+      // outputs > inputs
+      const transfer = Tx.transfer(
+        [new Input(outpointERC20)],
+        [new Output(600, ADDR_1, color)]
+      ).signAll(PRIV_1);
+      expect(() => {
+        checkInsAndOuts(
+          transfer,
+          state,
+          {},
+          ({ address }, i) => address === transfer.inputs[i].signer
+        );
+      }).toThrow(`Ins and outs values are mismatch for color ${color}`);
+    });
+
     test('With minGasPrice', () => {
       const colorERC20 = 0;
       const depositERC20 = Tx.deposit(12, 50000, ADDR_1, colorERC20);
