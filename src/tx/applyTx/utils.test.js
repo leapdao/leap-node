@@ -140,7 +140,7 @@ describe('applyTx utils', () => {
       const colorERC721 = 2 ** 15 + 1;
       const depositERC20 = Tx.deposit(12, 500, ADDR_1, 0);
       const outpointERC20 = new Outpoint(depositERC20.hash(), 0);
-      const depositERC721 = Tx.deposit(12, '500', ADDR_1, colorERC721);
+      const depositERC721 = Tx.deposit(12, 500, ADDR_1, colorERC721);
       const outpointERC721 = new Outpoint(depositERC721.hash(), 0);
       const state = {
         unspent: {
@@ -150,7 +150,7 @@ describe('applyTx utils', () => {
       };
       const transfer = Tx.transfer(
         [new Input(outpointERC721), new Input(outpointERC20)],
-        [new Output('400', ADDR_1, colorERC721), new Output(500, ADDR_1, 0)]
+        [new Output(400, ADDR_1, colorERC721), new Output(500, ADDR_1, 0)]
       ).signAll(PRIV_1);
       expect(() => {
         checkInsAndOuts(
