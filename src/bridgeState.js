@@ -6,6 +6,7 @@
  */
 
 const Web3 = require('web3');
+const TinyQueue = require('tinyqueue');
 const { Period, Block, Outpoint } = require('leap-core');
 const ContractsEventsSubscription = require('./utils/ContractsEventsSubscription');
 const { handleEvents } = require('./utils');
@@ -52,7 +53,9 @@ module.exports = class BridgeState {
     this.epochLengths = [];
 
     this.onNewBlock = this.onNewBlock.bind(this);
-    this.eventsBuffer = [];
+    this.eventsBuffer = new TinyQueue([], (a, b) => {
+      return a.blockNumber - b.blockNumber;
+    });
     this.eventsDelay = eventsDelay;
     this.relayBuffer = relayBuffer;
   }
@@ -98,8 +101,11 @@ module.exports = class BridgeState {
 
     const events = [];
 
-    while (this.eventsBuffer[0].blockNumber <= blockNumber - this.eventsDelay) {
-      const event = this.eventsBuffer.shift();
+    while (
+      this.eventsBuffer.peek().blockNumber <=
+      blockNumber - this.eventsDelay
+    ) {
+      const event = this.eventsBuffer.pop();
 
       events.push(event);
 
