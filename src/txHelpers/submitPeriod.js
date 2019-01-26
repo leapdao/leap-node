@@ -44,6 +44,7 @@ module.exports = async (period, slots, height, bridgeState) => {
       .call();
     logPeriod('submittedPeriod', period.merkleRoot(), submittedPeriod);
   } else if (submissions.length > 0) {
+    console.log('here: ', submissions[0].returnValues.periodRoot);
     prevPeriodRoot = submissions[0].returnValues.periodRoot;
   } else {
     console.log('SSSHIIIITTTTT');

@@ -290,7 +290,7 @@ module.exports = [
     inputs: [
       {
         indexed: true,
-        name: 'blockRoot',
+        name: 'blocksRoot',
         type: 'bytes32',
       },
       {
