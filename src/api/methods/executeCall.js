@@ -1,10 +1,9 @@
-const BN = require('bn.js');
 const getColor = require('./getColor');
 const { INVALID_PARAMS } = require('./constants');
 const { isNFT } = require('../../utils');
+const { BigInt } = require('jsbi');
 
-const formatUint256 = n =>
-  `0x${new BN(`${n}`, 10).toString(16).padStart(64, '0')}`;
+const formatUint256 = n => `0x${n.toString(16).padStart(64, '0')}`;
 
 /* eslint-disable no-throw-literal */
 module.exports = async (bridgeState, txObj, tag) => {
@@ -28,7 +27,7 @@ module.exports = async (bridgeState, txObj, tag) => {
         return formatUint256(nfts.length);
       }
 
-      const balance = balances[address] || 0;
+      const balance = BigInt(balances[address] || 0);
       return formatUint256(balance);
     }
 

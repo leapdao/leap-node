@@ -287,17 +287,21 @@ describe('applyTx utils', () => {
 
   describe('addOuputs', () => {
     test('ERC20', () => {
-      const deposit = Tx.deposit(12, 500, ADDR_1, 0);
-      const outpoint = new Outpoint(deposit.hash(), 0);
+      const deposit1 = Tx.deposit(12, '100000000000000000', ADDR_1, 0);
+      const outpoint = new Outpoint(deposit1.hash(), 0);
       const state = {
         balances: {},
         owners: {},
         unspent: {},
       };
 
-      addOutputs(state, deposit);
+      addOutputs(state, deposit1);
       expect(state.unspent[outpoint.hex()]).toBeDefined();
-      expect(equal(state.balances[0][ADDR_1], BigInt(500)));
+      expect(equal(state.balances[0][ADDR_1], BigInt(100000000000000000)));
+
+      const deposit2 = Tx.deposit(13, '10000000', ADDR_1, 0);
+      addOutputs(state, deposit2);
+      expect(equal(state.balances[0][ADDR_1], BigInt(100000000010000000)));
     });
 
     test('ERC721', () => {
