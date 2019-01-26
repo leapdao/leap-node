@@ -14,12 +14,16 @@ const { logPeriod } = require('../utils/debug');
 module.exports = async (state, chainInfo, bridgeState) => {
   if (chainInfo.height % 32 === 0) {
     logPeriod('updatePeriod');
-    await submitPeriod(
-      bridgeState.currentPeriod,
-      state.slots,
-      chainInfo.height,
-      bridgeState
-    );
+    try {
+      await submitPeriod(
+        bridgeState.currentPeriod,
+        state.slots,
+        chainInfo.height,
+        bridgeState
+      );
+    } catch (err) {
+      logPeriod(err);
+    }
     bridgeState.previousPeriod = bridgeState.currentPeriod;
     bridgeState.currentPeriod = new Period(
       bridgeState.previousPeriod.merkleRoot()
