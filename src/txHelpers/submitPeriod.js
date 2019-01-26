@@ -32,11 +32,10 @@ module.exports = async (period, slots, height, bridgeState) => {
       fromBlock: parentHeight - eventDistance,
     }
   );
-
   let submittedPeriod = { timestamp: '0' };
 
   // if last period not submitted, only period.prevHash would find an event
-  // if currentt period submitted already, period.merkleRoot() would also match
+  // if current period submitted already, period.merkleRoot() would also match an event
   let prevPeriodRoot;
   let currentPeriodRoot;
   for (let i = 0; i < submissions.length; i += 1) {

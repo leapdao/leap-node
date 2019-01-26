@@ -22,7 +22,7 @@ module.exports = async (state, chainInfo, bridgeState) => {
         bridgeState
       );
     } catch (err) {
-      console.log(err);
+      logPeriod(err);
     }
     bridgeState.previousPeriod = bridgeState.currentPeriod;
     bridgeState.currentPeriod = new Period(

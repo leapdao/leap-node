@@ -3,6 +3,13 @@ const submitPeriod = require('./submitPeriod');
 jest.mock('../utils/sendTransaction');
 
 const ADDR = '0x4436373705394267350db2c06613990d34621d69';
+const web3 = {
+  eth: {
+    getBlockNumber: async () => {
+      return 3324234;
+    },
+  },
+};
 
 describe('submitPeriod', async () => {
   test('submitted period', async () => {
@@ -18,6 +25,23 @@ describe('submitPeriod', async () => {
       },
     };
 
+    const operatorContract = {
+      getPastEvents: async () => {
+        return [
+          {
+            returnValues: {
+              blocksRoot: '0x',
+              periodRoot: '0x',
+            },
+          },
+        ];
+      },
+    };
+
+    const account = {
+      address: ADDR,
+    };
+
     const period = await submitPeriod(
       {
         merkleRoot() {
@@ -26,7 +50,7 @@ describe('submitPeriod', async () => {
       },
       [],
       0,
-      { bridgeContract }
+      { bridgeContract, web3, operatorContract, account }
     );
     expect(period).toEqual({
       timestamp: '100',
@@ -53,6 +77,16 @@ describe('submitPeriod', async () => {
       options: {
         address: ADDR,
       },
+      getPastEvents: async () => {
+        return [
+          {
+            returnValues: {
+              blocksRoot: '0x',
+              periodRoot: '0x',
+            },
+          },
+        ];
+      },
       methods: {
         submitPeriod: () => {
           submitCalled = true;
@@ -72,6 +106,7 @@ describe('submitPeriod', async () => {
       {
         bridgeContract,
         operatorContract,
+        web3,
         account: {
           address: ADDR,
         },
@@ -103,6 +138,16 @@ describe('submitPeriod', async () => {
       options: {
         address: ADDR,
       },
+      getPastEvents: async () => {
+        return [
+          {
+            returnValues: {
+              blocksRoot: '0x',
+              periodRoot: '0x',
+            },
+          },
+        ];
+      },
       methods: {
         submitPeriod: () => {
           submitCalled = true;
@@ -122,6 +167,7 @@ describe('submitPeriod', async () => {
       {
         operatorContract,
         bridgeContract,
+        web3,
         account: {
           address: ADDR,
         },
