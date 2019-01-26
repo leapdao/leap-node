@@ -34,11 +34,11 @@ module.exports = async (period, slots, height, bridgeState) => {
   let prevPeriodRoot;
   let currentPeriodRoot;
   for (let i = 0; i < submissions.length; i += 1) {
-    if (submissions[i].returnValues.periodRoot === period.prevHash) {
+    if (submissions[i].returnValues.blocksRoot === period.prevHash) {
       prevPeriodRoot = submissions[i].returnValues.periodRoot;
       console.log('found previous root: ', prevPeriodRoot);
     }
-    if (submissions[i].returnValues.periodRoot === period.merkleRoot()) {
+    if (submissions[i].returnValues.blocksRoot === period.merkleRoot()) {
       currentPeriodRoot = submissions[i].returnValues.periodRoot;
       console.log('found current root: ', currentPeriodRoot);
     }
