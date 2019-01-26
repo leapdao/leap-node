@@ -17,30 +17,34 @@ const { logPeriod } = require('../utils/debug');
 const logError = height => err => {
   logPeriod('submitPeriod error: %s (height: %d)', err.message, height);
 };
+const eventDistance = 4 * 120; // about 2 hours on main-net
 
 module.exports = async (period, slots, height, bridgeState) => {
-  console.log('looking for: ', period.prevHash, period.merkleRoot());
-  // query the operator events for period.merkleRoot()
+  // query the contracts for submissions
+  // to find the period roots to the merkle roots
+  const parentHeight = await bridgeState.web3.eth.getBlockNumber();
   const submissions = await bridgeState.operatorContract.getPastEvents(
     'Submission',
     {
       filter: {
         blocksRoot: [period.prevHash, period.merkleRoot()],
       },
+      fromBlock: parentHeight - eventDistance,
     }
   );
 
   let submittedPeriod = { timestamp: '0' };
+
+  // if last period not submitted, only period.prevHash would find an event
+  // if currentt period submitted already, period.merkleRoot() would also match
   let prevPeriodRoot;
   let currentPeriodRoot;
   for (let i = 0; i < submissions.length; i += 1) {
     if (submissions[i].returnValues.blocksRoot === period.prevHash) {
       prevPeriodRoot = submissions[i].returnValues.periodRoot;
-      console.log('found previous root: ', prevPeriodRoot);
     }
     if (submissions[i].returnValues.blocksRoot === period.merkleRoot()) {
       currentPeriodRoot = submissions[i].returnValues.periodRoot;
-      console.log('found current root: ', currentPeriodRoot);
     }
   }
 
