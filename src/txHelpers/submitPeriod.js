@@ -31,18 +31,23 @@ module.exports = async (period, slots, height, bridgeState) => {
   console.log('EEEEEEVVVVVEEEENTS:...');
   console.log(submissions);
 
-  // if found
-  // use periodRoot to get submittedPeriod
-  // if not found
-  // try to submit
-  // problem: how to get prevHash?
+  let submittedPeriod = {};
+  let prevPeriodRoot;
+  if (submissions.length > 1) {
+    console.log(
+      'pr: ',
+      submissions[submissions.length - 1].returnValues.periodRoot
+    );
+    submittedPeriod = await bridgeState.bridgeContract.methods
+      .periods(submissions[submissions.length - 1].returnValues.periodRoot)
+      .call();
+    logPeriod('submittedPeriod', period.merkleRoot(), submittedPeriod);
+  } else if (submissions.length > 0) {
+    prevPeriodRoot = submissions[0].returnValues.periodRoot;
+  } else {
+    console.log('SSSHIIIITTTTT');
+  }
 
-  const submittedPeriod = await bridgeState.bridgeContract.methods
-    .periods(period.merkleRoot())
-    .call();
-
-  // period not found
-  logPeriod('submittedPeriod', period.merkleRoot(), submittedPeriod);
   if (submittedPeriod.timestamp === '0') {
     const mySlots = getSlotsByAddr(slots, bridgeState.account.address);
     const currentSlotId = getCurrentSlotId(slots, height);
@@ -54,7 +59,7 @@ module.exports = async (period, slots, height, bridgeState) => {
         bridgeState.web3,
         bridgeState.operatorContract.methods.submitPeriod(
           currentSlot.id,
-          period.prevHash || GENESIS,
+          prevPeriodRoot || GENESIS,
           period.merkleRoot()
         ),
         bridgeState.operatorContract.options.address,
