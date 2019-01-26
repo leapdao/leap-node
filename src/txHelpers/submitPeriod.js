@@ -32,7 +32,7 @@ module.exports = async (period, slots, height, bridgeState) => {
   console.log('EEEEEEVVVVVEEEENTS:...');
   console.log(submissions);
 
-  let submittedPeriod = {};
+  let submittedPeriod = { timestamp: '0' };
   let prevPeriodRoot;
   if (submissions.length > 1) {
     console.log(
@@ -47,7 +47,6 @@ module.exports = async (period, slots, height, bridgeState) => {
     prevPeriodRoot = submissions[0].returnValues.periodRoot;
   } else {
     console.log('SSSHIIIITTTTT');
-    return submittedPeriod;
   }
 
   if (submittedPeriod.timestamp === '0') {
