@@ -19,6 +19,7 @@ const logError = height => err => {
 };
 
 module.exports = async (period, slots, height, bridgeState) => {
+  console.log('looking for: ', period.prevHash, period.merkleRoot());
   // query the operator events for period.merkleRoot()
   const submissions = await bridgeState.operatorContract.getPastEvents(
     'Submission',
@@ -46,6 +47,7 @@ module.exports = async (period, slots, height, bridgeState) => {
     prevPeriodRoot = submissions[0].returnValues.periodRoot;
   } else {
     console.log('SSSHIIIITTTTT');
+    return submittedPeriod;
   }
 
   if (submittedPeriod.timestamp === '0') {
