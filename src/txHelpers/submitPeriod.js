@@ -19,6 +19,24 @@ const logError = height => err => {
 };
 
 module.exports = async (period, slots, height, bridgeState) => {
+  // query the operator events for period.merkleRoot()
+  const submissions = await bridgeState.operatorContract.getPastEvents(
+    'Submission',
+    {
+      filter: {
+        blocksRoot: [period.prevHash, period.merkleRoot()],
+      },
+    }
+  );
+  console.log('EEEEEEVVVVVEEEENTS:...');
+  console.log(submissions);
+
+  // if found
+  // use periodRoot to get submittedPeriod
+  // if not found
+  // try to submit
+  // problem: how to get prevHash?
+
   const submittedPeriod = await bridgeState.bridgeContract.methods
     .periods(period.merkleRoot())
     .call();
