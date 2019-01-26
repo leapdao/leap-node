@@ -29,25 +29,26 @@ module.exports = async (period, slots, height, bridgeState) => {
       },
     }
   );
-  console.log('EEEEEEVVVVVEEEENTS:...');
-  console.log(submissions);
 
   let submittedPeriod = { timestamp: '0' };
   let prevPeriodRoot;
-  if (submissions.length > 1) {
-    console.log(
-      'pr: ',
-      submissions[submissions.length - 1].returnValues.periodRoot
-    );
+  let currentPeriodRoot;
+  for (let i = 0; i < submissions.length; i += 1) {
+    if (submissions[i].returnValues.periodRoot === period.prevHash) {
+      prevPeriodRoot = submissions[i].returnValues.periodRoot;
+      console.log('found previous root: ', prevPeriodRoot);
+    }
+    if (submissions[i].returnValues.periodRoot === period.merkleRoot()) {
+      currentPeriodRoot = submissions[i].returnValues.periodRoot;
+      console.log('found current root: ', currentPeriodRoot);
+    }
+  }
+
+  if (currentPeriodRoot) {
     submittedPeriod = await bridgeState.bridgeContract.methods
-      .periods(submissions[submissions.length - 1].returnValues.periodRoot)
+      .periods(currentPeriodRoot)
       .call();
     logPeriod('submittedPeriod', period.merkleRoot(), submittedPeriod);
-  } else if (submissions.length > 0) {
-    console.log('here: ', submissions[0].returnValues.periodRoot);
-    prevPeriodRoot = submissions[0].returnValues.periodRoot;
-  } else {
-    console.log('SSSHIIIITTTTT');
   }
 
   if (submittedPeriod.timestamp === '0') {
