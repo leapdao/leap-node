@@ -1,4 +1,5 @@
 const { INVALID_PARAMS } = require('./constants');
+const { BigInt } = require('jsbi-utils');
 
 module.exports = async (bridgeState, address, tag = 'latest') => {
   if (tag !== 'latest') {
@@ -11,5 +12,5 @@ module.exports = async (bridgeState, address, tag = 'latest') => {
   }
   const balances = bridgeState.currentState.balances['0'] || {};
   const balance = balances[address] || 0;
-  return `0x${balance.toString(16)}`;
+  return `0x${BigInt(balance).toString(16)}`;
 };
