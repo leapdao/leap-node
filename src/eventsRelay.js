@@ -6,7 +6,7 @@
  */
 
 const { Tx, Input, Outpoint } = require('leap-core');
-const { BigInt } = require('jsbi');
+const { BigInt } = require('jsbi-utils');
 const TinyQueue = require('tinyqueue');
 
 const sendTx = require('./txHelpers/sendTx');

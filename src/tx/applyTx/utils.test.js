@@ -1,5 +1,5 @@
 const { Tx, Input, Outpoint, Output } = require('leap-core');
-const { BigInt, equal } = require('jsbi');
+const { BigInt, equal } = require('jsbi-utils');
 const {
   checkOutpoints,
   checkInsAndOuts,

@@ -6,7 +6,7 @@
  */
 
 const { Type } = require('leap-core');
-const { BigInt, equal } = require('jsbi');
+const { BigInt, equal } = require('jsbi-utils');
 const { addrCmp } = require('../../utils');
 
 module.exports = (state, tx, bridgeState) => {

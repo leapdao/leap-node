@@ -13,7 +13,7 @@ const {
   divide,
   lessThan,
   greaterThan,
-} = require('jsbi');
+} = require('jsbi-utils');
 const { isNFT } = require('../../utils');
 const { uniq, isEqual } = require('lodash');
 

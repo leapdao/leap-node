@@ -56,7 +56,7 @@
     "jayson": "^2.0.6",
     "jpfs": "0.0.3",
     "js-abci": "leapdao/js-abci#34538e252811610b23340a9f5314be4d0a44a501",
-    "jsbi": "^2.0.5",
+    "jsbi-utils": "^1.0.0",
     "jsondiffpatch": "^0.2.5",
     "leap-core": "^0.21.1",
     "level": "^4.0.0",
