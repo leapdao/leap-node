@@ -46,7 +46,7 @@ describe('checkDeposit', () => {
     const tx = Tx.deposit(1, 0, ADDR_1, 1);
     expect(() => {
       checkDeposit(state, tx, makeDepositMock(ADDR_1, '0', '1'));
-    }).toThrow('0 deposits no good');
+    }).toThrow('Deposit out has value < 1');
   });
 
   test('deposit with negative size', () => {
@@ -54,7 +54,7 @@ describe('checkDeposit', () => {
     const tx = Tx.deposit(1, -1, ADDR_1, 1);
     expect(() => {
       checkDeposit(state, tx, makeDepositMock(ADDR_1, '-1', '1'));
-    }).toThrow('0 deposits no good');
+    }).toThrow('Deposit out has value < 1');
   });
 
   test('valid tx (nft)', () => {

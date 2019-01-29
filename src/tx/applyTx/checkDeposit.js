@@ -24,6 +24,9 @@ module.exports = (state, tx, bridgeState) => {
       }`
     );
   }
+  if (tx.outputs[0].value < 1) {
+    throw new Error('Deposit out has value < 1');
+  }
   const deposit = bridgeState.deposits[tx.options.depositId];
   if (
     !deposit ||
