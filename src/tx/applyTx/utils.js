@@ -18,6 +18,9 @@ const { isNFT } = require('../../utils');
 const { uniq, isEqual } = require('lodash');
 
 const groupValuesByColor = (values, { color, value }) => {
+  if (value < 1) {
+    throw new Error('One of the outs has value < 1');
+  }
   return Object.assign({}, values, {
     [color]: isNFT(color)
       ? (values[color] || new Set()).add(BigInt(value))
