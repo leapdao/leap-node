@@ -12,6 +12,8 @@ const TinyQueue = require('tinyqueue');
 const sendTx = require('./txHelpers/sendTx');
 const { handleEvents } = require('./utils');
 
+const minDelay = 2000;
+
 module.exports = class EventsRelay {
   constructor(delay, txServerPort) {
     this.relayBuffer = new TinyQueue([], (a, b) => {
@@ -50,7 +52,9 @@ module.exports = class EventsRelay {
         signerAddr,
       } = event.returnValues;
       const tx = Tx.validatorJoin(slotId, tenderAddr, eventCounter, signerAddr);
-      await sendTx(this.txServerPort, tx.hex());
+      setTimeout(() => {
+        sendTx(this.txServerPort, tx.hex());
+      }, minDelay);
     };
 
     const handler = handleEvents({
@@ -58,17 +62,23 @@ module.exports = class EventsRelay {
         const color = Number(event.color);
         const value = BigInt(event.amount);
         const tx = Tx.deposit(event.depositId, value, event.depositor, color);
-        await sendTx(this.txServerPort, tx.hex());
+        setTimeout(() => {
+          sendTx(this.txServerPort, tx.hex());
+        }, minDelay);
       },
       EpochLength: async event => {
         const { epochLength } = event.returnValues;
         const tx = Tx.epochLength(Number(epochLength));
-        await sendTx(this.txServerPort, tx.hex());
+        setTimeout(() => {
+          sendTx(this.txServerPort, tx.hex());
+        }, minDelay);
       },
       ExitStarted: async event => {
         const { txHash, outIndex } = event.returnValues;
         const tx = Tx.exit(new Input(new Outpoint(txHash, Number(outIndex))));
-        await sendTx(this.txServerPort, tx.hex());
+        setTimeout(() => {
+          sendTx(this.txServerPort, tx.hex());
+        }, minDelay);
       },
       ValidatorJoin: handleJoin,
       ValidatorUpdate: handleJoin,
@@ -80,7 +90,9 @@ module.exports = class EventsRelay {
           Number(event.returnValues.epoch) + 1,
           event.returnValues.newSigner
         );
-        await sendTx(this.txServerPort, tx.hex());
+        setTimeout(() => {
+          sendTx(this.txServerPort, tx.hex());
+        }, minDelay);
       },
     });
 
