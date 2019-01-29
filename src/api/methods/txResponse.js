@@ -36,7 +36,7 @@ module.exports = async (db, tx, blockHash, height, txPos) => {
   const { value, color } = txValue(tx, prevTx);
 
   return {
-    value: value.toString(),
+    value: `0x${value.toString(16)}`,
     color,
     hash: tx.hash(),
     from,

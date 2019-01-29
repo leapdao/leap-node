@@ -13,7 +13,7 @@ const {
   divide,
   lessThan,
   greaterThan,
-} = require('jsbi');
+} = require('jsbi-utils');
 const { isNFT } = require('../../utils');
 const { uniq, isEqual } = require('lodash');
 
@@ -88,8 +88,11 @@ const addOutputs = ({ balances, owners, unspent }, tx) => {
       cBalances[out.address].push(out.value);
       cOwners[out.value] = out.address;
     } else {
-      cBalances[out.address] = cBalances[out.address] || BigInt(0);
-      cBalances[out.address] = add(cBalances[out.address], out.value);
+      cBalances[out.address] = BigInt(cBalances[out.address] || 0);
+      cBalances[out.address] = add(
+        cBalances[out.address],
+        out.value
+      ).toString();
     }
     unspent[outpoint.hex()] = out.toJSON();
   });
@@ -106,9 +109,9 @@ const removeInputs = ({ unspent, balances, owners }, tx) => {
       delete owners[color][BigInt(value).toString()];
     } else {
       balances[color][address] = subtract(
-        balances[color][address],
+        BigInt(balances[color][address]),
         BigInt(value)
-      );
+      ).toString();
     }
     delete unspent[outpointId];
   });

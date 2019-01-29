@@ -7,7 +7,7 @@ const fakeBalance = (addr, color, balance) => ({
   currentState: {
     balances: {
       [color]: {
-        [addr]: balance,
+        [addr]: `${balance}`,
       },
     },
   },
