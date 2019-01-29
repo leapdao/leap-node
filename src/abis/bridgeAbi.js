@@ -58,9 +58,7 @@ module.exports = [
     inputs: [{ name: '', type: 'bytes32' }],
     name: 'periods',
     outputs: [
-      { name: 'parent', type: 'bytes32' },
       { name: 'height', type: 'uint32' },
-      { name: 'parentIndex', type: 'uint32' },
       { name: 'timestamp', type: 'uint32' },
     ],
     payable: false,
