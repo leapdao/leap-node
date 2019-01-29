@@ -151,4 +151,66 @@ describe('checkTransfer', () => {
       expect(e.message).toBe('Ins and outs values are mismatch for color 0');
     }
   });
+
+  /* Proof for https://github.com/leapdao/leap-node/issues/143 */
+  test('try to inflate by tx with small amount', () => {
+    const deposit = Tx.deposit(12, '10000000000000000000', ADDR_1, 0);
+    const state = {
+      unspent: {
+        [new Outpoint(deposit.hash(), 0).hex()]: deposit.outputs[0].toJSON(),
+      },
+    };
+
+    const transfer = Tx.transfer(
+      [new Input(new Outpoint(deposit.hash(), 0))],
+      [
+        new Output('10000000000000000000', ADDR_1, 0),
+        new Output('1000', ADDR_2, 0),
+      ]
+    ).signAll(PRIV_1);
+
+    expect(() => {
+      checkTransfer(state, transfer, {});
+    }).toThrow('Ins and outs values are mismatch');
+  });
+
+  test('tx with 0 value out', () => {
+    const deposit = Tx.deposit(12, '1000', ADDR_1, 0);
+    const state = {
+      unspent: {
+        [new Outpoint(deposit.hash(), 0).hex()]: deposit.outputs[0].toJSON(),
+      },
+    };
+
+    const transfer = Tx.transfer(
+      [new Input(new Outpoint(deposit.hash(), 0))],
+      [new Output('1000', ADDR_1, 0), new Output('0', ADDR_2, 0)]
+    ).signAll(PRIV_1);
+
+    console.log(transfer);
+
+    expect(() => {
+      checkTransfer(state, transfer, {});
+    }).toThrow('One of the outs has value < 1');
+  });
+
+  test('try to send tx with negative value out', () => {
+    const deposit = Tx.deposit(12, 1000, ADDR_1, 0);
+    const state = {
+      unspent: {
+        [new Outpoint(deposit.hash(), 0).hex()]: deposit.outputs[0].toJSON(),
+      },
+    };
+
+    const transfer = Tx.transfer(
+      [new Input(new Outpoint(deposit.hash(), 0))],
+      [new Output('1001', ADDR_1, 0), new Output(-1, ADDR_2, 0)]
+    ).signAll(PRIV_1);
+
+    console.log(transfer);
+
+    expect(() => {
+      checkTransfer(state, transfer, {});
+    }).toThrow('One of the outs has value < 1');
+  });
 });
