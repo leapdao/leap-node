@@ -42,7 +42,10 @@ const checkInsAndOuts = (tx, state, bridgeState, unspentFilter) => {
     ...Object.keys(insValues),
     ...Object.keys(outsValues),
   ]).map(Number);
-  const minGasPrice = BigInt(bridgeState.minGasPrice || 0);
+  const bridgeGas = bridgeState.minGasPrices;
+  const minGasPrice = BigInt(
+    bridgeGas && bridgeGas.length > 0 ? bridgeGas[bridgeGas.length - 1] : 0
+  );
   const gas = Math.max(0, tx.outputs.length * 20000 - tx.inputs.length * 10000);
   for (const color of colors) {
     const inputValue = insValues[color] || BigInt(0);

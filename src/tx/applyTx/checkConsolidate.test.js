@@ -5,7 +5,7 @@ const ADDR_1 = '0x4436373705394267350db2c06613990d34621d69';
 
 describe('checkConsolidate', () => {
   test('wrong type', () => {
-    const tx = Tx.deposit(0, 0, ADDR_1);
+    const tx = Tx.deposit(1, '123345', ADDR_1);
     expect(() => checkConsolidate({}, tx)).toThrow('Consolidate tx expected');
   });
 

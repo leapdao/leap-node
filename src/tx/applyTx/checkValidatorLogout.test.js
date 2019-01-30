@@ -9,7 +9,7 @@ const TENDER_KEY_2 = '0x0000069D9EDB21592CBDF4CC49956EA53E59656FC2D8BBD1AE3F427B
 
 describe('checkValidatorLogout', () => {
   test('wrong type', () => {
-    const tx = Tx.deposit(0, 0, ADDR_1);
+    const tx = Tx.deposit(1, '23445', ADDR_1);
     expect(() => checkValidatorLogout({}, tx)).toThrow(
       'validatorJoin tx expected'
     );

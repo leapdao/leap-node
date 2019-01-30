@@ -203,7 +203,7 @@ describe('applyTx utils', () => {
       checkInsAndOuts(
         transfer,
         state,
-        { minGasPrice: 2 },
+        { minGasPrices: ['2'] },
         ({ address }, i) => address === transfer.inputs[i].signer
       );
     });
@@ -223,7 +223,7 @@ describe('applyTx utils', () => {
       checkInsAndOuts(
         transfer,
         state,
-        { minGasPrice: 1 },
+        { minGasPrices: ['1'] },
         ({ address }, i) => address === transfer.inputs[i].signer
       );
     });
@@ -245,7 +245,7 @@ describe('applyTx utils', () => {
         checkInsAndOuts(
           transfer,
           state,
-          { minGasPrice: 3 },
+          { minGasPrices: ['3'] },
           ({ address }, i) => address === transfer.inputs[i].signer
         );
       }).toThrow(`Tx underpriced`);
