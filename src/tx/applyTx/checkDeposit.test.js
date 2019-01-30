@@ -17,6 +17,9 @@ const makeDepositMock = (depositor, amount, color) => {
 
 const getInitialState = () => ({
   processedDeposit: 0,
+  gas: {
+    minPrice: 0,
+  },
 });
 
 const defaultDepositMock = makeDepositMock(ADDR_1, '500', 0);

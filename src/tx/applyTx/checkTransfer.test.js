@@ -22,6 +22,9 @@ describe('checkTransfer', () => {
       unspent: {
         [new Outpoint(deposit.hash(), 0).hex()]: deposit.outputs[0].toJSON(),
       },
+      gas: {
+        minPrice: 0,
+      },
     };
 
     const transfer = Tx.transfer(
@@ -39,6 +42,9 @@ describe('checkTransfer', () => {
       unspent: {
         [new Outpoint(deposit1.hash(), 0).hex()]: deposit1.outputs[0].toJSON(),
         [new Outpoint(deposit2.hash(), 0).hex()]: deposit2.outputs[0].toJSON(),
+      },
+      gas: {
+        minPrice: 0,
       },
     };
 
@@ -58,6 +64,9 @@ describe('checkTransfer', () => {
       unspent: {
         [new Outpoint(deposit.hash(), 0).hex()]: deposit.outputs[0].toJSON(),
       },
+      gas: {
+        minPrice: 0,
+      },
     };
 
     const transfer = Tx.transfer(
@@ -74,6 +83,9 @@ describe('checkTransfer', () => {
     const state = {
       unspent: {
         [new Outpoint(deposit.hash(), 0).hex()]: deposit.outputs[0].toJSON(),
+      },
+      gas: {
+        minPrice: 0,
       },
     };
 
@@ -99,6 +111,9 @@ describe('checkTransfer', () => {
         [new Outpoint(transfer.hash(), 0).hex()]: transfer.outputs[0].toJSON(),
         [new Outpoint(transfer.hash(), 1).hex()]: transfer.outputs[1].toJSON(),
       },
+      gas: {
+        minPrice: 0,
+      },
     };
 
     const transfer2 = Tx.transfer(
@@ -115,6 +130,9 @@ describe('checkTransfer', () => {
       unspent: {
         [new Outpoint(deposit1.hash(), 0).hex()]: deposit1.outputs[0].toJSON(),
         [new Outpoint(deposit2.hash(), 0).hex()]: deposit2.outputs[0].toJSON(),
+      },
+      gas: {
+        minPrice: 0,
       },
     };
 
@@ -135,6 +153,9 @@ describe('checkTransfer', () => {
       unspent: {
         [new Outpoint(deposit1.hash(), 0).hex()]: deposit1.outputs[0].toJSON(),
         [new Outpoint(deposit2.hash(), 0).hex()]: deposit2.outputs[0].toJSON(),
+      },
+      gas: {
+        minPrice: 0,
       },
     };
 
@@ -158,6 +179,9 @@ describe('checkTransfer', () => {
     const state = {
       unspent: {
         [new Outpoint(deposit.hash(), 0).hex()]: deposit.outputs[0].toJSON(),
+      },
+      gas: {
+        minPrice: 0,
       },
     };
 
