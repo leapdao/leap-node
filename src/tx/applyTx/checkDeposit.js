@@ -6,8 +6,8 @@
  */
 
 const { Type } = require('leap-core');
-const { BigInt, equal } = require('jsbi-utils');
-const { addrCmp } = require('../../utils');
+const { BigInt, equal, lessThan } = require('jsbi-utils');
+const { isNFT, addrCmp } = require('../../utils');
 
 module.exports = (state, tx, bridgeState) => {
   if (tx.type !== Type.DEPOSIT) {
@@ -24,7 +24,11 @@ module.exports = (state, tx, bridgeState) => {
       }`
     );
   }
-  if (tx.outputs[0].value < 1) {
+
+  if (
+    !isNFT(tx.outputs[0].color) &&
+    lessThan(BigInt(tx.outputs[0].value), BigInt(1))
+  ) {
     throw new Error('Deposit out has value < 1');
   }
   const deposit = bridgeState.deposits[tx.options.depositId];
