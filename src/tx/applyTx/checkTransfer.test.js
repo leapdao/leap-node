@@ -187,8 +187,6 @@ describe('checkTransfer', () => {
       [new Output('1000', ADDR_1, 0), new Output('0', ADDR_2, 0)]
     ).signAll(PRIV_1);
 
-    console.log(transfer);
-
     expect(() => {
       checkTransfer(state, transfer, {});
     }).toThrow('One of the outs has value < 1');

@@ -11,6 +11,8 @@ module.exports = async (bridgeState, app) => {
     rootNetwork: bridgeState.config.rootNetwork,
     network: bridgeState.config.network,
     networkId: bridgeState.config.networkId,
+    eventsDelay: bridgeState.config.eventsDelay,
+    bridgeDelay: bridgeState.config.bridgeDelay,
   };
 
   const genesis =

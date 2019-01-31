@@ -26,6 +26,8 @@ describe('readConfig', () => {
     expect(result).toEqual({
       exitHandlerAddr: '0x000',
       network: 'testnet',
+      eventsDelay: 0,
+      bridgeDelay: 0,
     });
   });
 
@@ -38,6 +40,8 @@ describe('readConfig', () => {
     expect(result).toEqual({
       exitHandlerAddr: '0x000',
       network: 'testnet',
+      eventsDelay: 0,
+      bridgeDelay: 0,
     });
   });
 
@@ -66,6 +70,8 @@ describe('readConfig', () => {
       exitHandlerAddr: '0x000',
       network: 'testnet',
       peers: ['blahblah@tesnet.leapdao.org:41000'],
+      eventsDelay: 0,
+      bridgeDelay: 0,
     });
   });
 });
