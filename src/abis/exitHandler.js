@@ -223,6 +223,18 @@ module.exports = [
     type: 'event',
   },
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        name: 'minGasPrice',
+        type: 'uint256',
+      },
+    ],
+    name: 'MinGasPrice',
+    type: 'event',
+  },
+  {
     constant: false,
     inputs: [
       { name: '_proof', type: 'bytes32[]' },

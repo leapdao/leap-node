@@ -167,9 +167,9 @@
   version "1.8.9"
   resolved "https://registry.yarnpkg.com/@types/underscore/-/underscore-1.8.9.tgz#fef41f800cd23db1b4f262ddefe49cd952d82323"
 
-"@types/web3@^1.0.12":
-  version "1.0.14"
-  resolved "https://registry.yarnpkg.com/@types/web3/-/web3-1.0.14.tgz#709b700b3eecf7fe9fb09771c4bf484add89912a"
+"@types/web3@^1.0.18":
+  version "1.0.18"
+  resolved "https://registry.yarnpkg.com/@types/web3/-/web3-1.0.18.tgz#87a8651041d21fc37602ff02327df2c7ecf105d1"
   dependencies:
     "@types/bn.js" "*"
     "@types/underscore" "*"
@@ -4068,7 +4068,6 @@ js-yaml@^3.7.0, js-yaml@^3.9.0, js-yaml@^3.9.1:
 jsbi-utils@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/jsbi-utils/-/jsbi-utils-1.0.0.tgz#c0ce72ad42d2673a9bbc86d21cf5f3c1535af9bc"
-  integrity sha512-LuPoNHYtdmxsAxPNOxPjI4RPm+9aMNEje9rDpHoiAZDokLwfbMufP5GKdvGihiE93q2DAWs9KEmDAwMQLI8EWA==
   dependencies:
     jsbi "^2.0.5"
 
@@ -4277,12 +4276,11 @@ lcid@^1.0.0:
   dependencies:
     invert-kv "^1.0.0"
 
-leap-core@^0.22.0:
-  version "0.22.0"
-  resolved "https://registry.yarnpkg.com/leap-core/-/leap-core-0.22.0.tgz#dd1d206dd64362e4f33c24dd679a0cb5f52c5900"
-  integrity sha512-vzfXJHpbsykHZs+NPsbNfoBWTOHN+BRIo9/iiLL1bLH1TbUFAGSBBYRIWLeuGGIHFDxkLyaE23qzlSdl/4DuoA==
+leap-core@^0.23.1:
+  version "0.23.1"
+  resolved "https://registry.yarnpkg.com/leap-core/-/leap-core-0.23.1.tgz#183148283c20a5fb7ace9f692eb199eb921f0970"
   dependencies:
-    "@types/web3" "^1.0.12"
+    "@types/web3" "^1.0.18"
     babel-polyfill "^6.26.0"
     ethereumjs-util "^6.0.0"
     fast-equals "^1.5.0"

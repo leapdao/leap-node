@@ -13,6 +13,9 @@ module.exports = (state, tx) => {
       case Type.EPOCH_LENGTH: {
         return `epochLength: ${tx.options.epochLength}`;
       }
+      case Type.MIN_GAS_PRICE: {
+        return `minGasPrice: ${tx.options.minGasPrice}`;
+      }
       case Type.EXIT: {
         return `exit: ${tx.inputs[0].prevout.getUtxoId()}`;
       }

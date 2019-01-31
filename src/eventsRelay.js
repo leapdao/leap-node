@@ -73,6 +73,13 @@ module.exports = class EventsRelay {
           sendTx(this.txServerPort, tx.hex());
         }, minDelay);
       },
+      MinGasPrice: async event => {
+        const { minGasPrice } = event.returnValues;
+        const tx = Tx.minGasPrice(BigInt(minGasPrice));
+        setTimeout(() => {
+          sendTx(this.txServerPort, tx.hex());
+        }, minDelay);
+      },
       ExitStarted: async event => {
         const { txHash, outIndex } = event.returnValues;
         const tx = Tx.exit(new Input(new Outpoint(txHash, Number(outIndex))));
