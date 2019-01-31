@@ -21,6 +21,9 @@ describe('applyTx utils', () => {
         unspent: {
           [outpoint.hex()]: deposit.outputs[0].toJSON(),
         },
+        gas: {
+          minPrice: 0,
+        },
       };
       const transfer = Tx.transfer(
         [new Input(outpoint)],
@@ -41,6 +44,9 @@ describe('applyTx utils', () => {
       const state = {
         unspent: {
           [outpoint.hex()]: deposit.outputs[0].toJSON(),
+        },
+        gas: {
+          minPrice: 0,
         },
       };
       const transfer = Tx.transfer(
@@ -64,6 +70,9 @@ describe('applyTx utils', () => {
       const state = {
         unspent: {
           [outpoint.hex()]: deposit.outputs[0].toJSON(),
+        },
+        gas: {
+          minPrice: 0,
         },
       };
       const transfer = Tx.transfer(
@@ -89,6 +98,9 @@ describe('applyTx utils', () => {
         unspent: {
           [outpointERC20.hex()]: depositERC20.outputs[0].toJSON(),
           [outpointERC721.hex()]: depositERC721.outputs[0].toJSON(),
+        },
+        gas: {
+          minPrice: 0,
         },
       };
       const transfer = Tx.transfer(
@@ -117,6 +129,9 @@ describe('applyTx utils', () => {
         unspent: {
           [outpointERC20.hex()]: depositERC20.outputs[0].toJSON(),
           [outpointERC721.hex()]: depositERC721.outputs[0].toJSON(),
+        },
+        gas: {
+          minPrice: 0,
         },
       };
       const transfer = Tx.transfer(
@@ -147,6 +162,9 @@ describe('applyTx utils', () => {
           [outpointERC20.hex()]: depositERC20.outputs[0].toJSON(),
           [outpointERC721.hex()]: depositERC721.outputs[0].toJSON(),
         },
+        gas: {
+          minPrice: 0,
+        },
       };
       const transfer = Tx.transfer(
         [new Input(outpointERC721), new Input(outpointERC20)],
@@ -169,6 +187,9 @@ describe('applyTx utils', () => {
       const state = {
         unspent: {
           [outpointERC20.hex()]: depositERC20.outputs[0].toJSON(),
+        },
+        gas: {
+          minPrice: 0,
         },
       };
 
@@ -195,6 +216,9 @@ describe('applyTx utils', () => {
         unspent: {
           [outpointERC20.hex()]: depositERC20.outputs[0].toJSON(),
         },
+        gas: {
+          minPrice: 0,
+        },
       };
       const transfer = Tx.transfer(
         [new Input(outpointERC20)],
@@ -203,7 +227,7 @@ describe('applyTx utils', () => {
       checkInsAndOuts(
         transfer,
         state,
-        { minGasPrice: 2 },
+        { minGasPrices: ['2'] },
         ({ address }, i) => address === transfer.inputs[i].signer
       );
     });
@@ -215,6 +239,9 @@ describe('applyTx utils', () => {
         unspent: {
           [outpoint1.hex()]: deposit1.outputs[0].toJSON(),
         },
+        gas: {
+          minPrice: 0,
+        },
       };
       const transfer = Tx.transfer(
         [new Input(outpoint1)],
@@ -223,7 +250,7 @@ describe('applyTx utils', () => {
       checkInsAndOuts(
         transfer,
         state,
-        { minGasPrice: 1 },
+        { minGasPrices: ['1'] },
         ({ address }, i) => address === transfer.inputs[i].signer
       );
     });
@@ -236,6 +263,9 @@ describe('applyTx utils', () => {
         unspent: {
           [outpointERC20.hex()]: depositERC20.outputs[0].toJSON(),
         },
+        gas: {
+          minPrice: '3',
+        },
       };
       const transfer = Tx.transfer(
         [new Input(outpointERC20)],
@@ -245,7 +275,7 @@ describe('applyTx utils', () => {
         checkInsAndOuts(
           transfer,
           state,
-          { minGasPrice: 3 },
+          {},
           ({ address }, i) => address === transfer.inputs[i].signer
         );
       }).toThrow(`Tx underpriced`);
@@ -256,6 +286,9 @@ describe('applyTx utils', () => {
     test('non-existent outpoint', () => {
       const state = {
         unspent: {},
+        gas: {
+          minPrice: 0,
+        },
       };
       const deposit = Tx.deposit(12, 500, ADDR_1, 0);
       const transfer = Tx.transfer(

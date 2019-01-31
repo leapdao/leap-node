@@ -5,7 +5,7 @@ const ADDR_1 = '0x4436373705394267350db2c06613990d34621d69';
 
 describe('checkConsolidate', () => {
   test('wrong type', () => {
-    const tx = Tx.deposit(0, 0, ADDR_1);
+    const tx = Tx.deposit(1, '123345', ADDR_1);
     expect(() => checkConsolidate({}, tx)).toThrow('Consolidate tx expected');
   });
 
@@ -16,6 +16,9 @@ describe('checkConsolidate', () => {
       unspent: {
         [new Outpoint(deposit1.hash(), 0).hex()]: deposit1.outputs[0].toJSON(),
         [new Outpoint(deposit2.hash(), 0).hex()]: deposit2.outputs[0].toJSON(),
+      },
+      gas: {
+        minPrice: 0,
       },
     };
     const consolidate = Tx.consolidate(
@@ -33,6 +36,9 @@ describe('checkConsolidate', () => {
     const state = {
       unspent: {
         [new Outpoint(deposit.hash(), 0).hex()]: deposit.outputs[0].toJSON(),
+      },
+      gas: {
+        minPrice: 0,
       },
     };
 
@@ -54,6 +60,9 @@ describe('checkConsolidate', () => {
       unspent: {
         [new Outpoint(deposit1.hash(), 0).hex()]: deposit1.outputs[0].toJSON(),
         [new Outpoint(deposit2.hash(), 0).hex()]: deposit2.outputs[0].toJSON(),
+      },
+      gas: {
+        minPrice: 0,
       },
     };
     const consolidate = Tx.consolidate(

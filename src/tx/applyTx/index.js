@@ -14,6 +14,7 @@ const checks = {
   [Type.CONSOLIDATE]: require('./checkConsolidate'),
   [Type.DEPOSIT]: require('./checkDeposit'),
   [Type.EPOCH_LENGTH]: require('./checkEpochLength'),
+  [Type.MIN_GAS_PRICE]: require('./checkMinGasPrice'),
   [Type.EXIT]: require('./checkExit'),
   [Type.TRANSFER]: require('./checkTransfer'),
   [Type.VALIDATOR_JOIN]: require('./checkValidatorJoin'),

@@ -6,12 +6,13 @@ const ContractsEventsSubscription = require('./utils/ContractsEventsSubscription
 
 /* eslint-disable */
 ContractsEventsSubscription.__setEventBatches([
-  [{ event: 'EpochLength', returnValues: { epochLength: 4 } }],
+  [{ event: 'EpochLength', returnValues: { epochLength: '4' } }],
+  [{ event: 'MinGasPrice', returnValues: { minGasPrice: '1000000' } }],
   [
     {
       event: 'NewDeposit',
       returnValues: {
-        depositId: 0,
+        depositId: '0',
         depositor: '0xB8205608d54cb81f44F263bE086027D8610F3C94',
         color: '0',
         amount: '100',
