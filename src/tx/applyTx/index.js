@@ -11,7 +11,6 @@ const { Type } = require('leap-core');
 const { checkOutpoints, removeInputs, addOutputs } = require('./utils');
 
 const checks = {
-  [Type.CONSOLIDATE]: require('./checkConsolidate'),
   [Type.DEPOSIT]: require('./checkDeposit'),
   [Type.EPOCH_LENGTH]: require('./checkEpochLength'),
   [Type.MIN_GAS_PRICE]: require('./checkMinGasPrice'),

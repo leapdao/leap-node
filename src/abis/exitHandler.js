@@ -237,32 +237,6 @@ module.exports = [
   {
     constant: false,
     inputs: [
-      { name: '_proof', type: 'bytes32[]' },
-      { name: '_outputIndex', type: 'uint8' },
-    ],
-    name: 'startVerification',
-    outputs: [],
-    payable: true,
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      { name: '_doublespendProof', type: 'bytes32[]' },
-      { name: '_consolidateProof', type: 'bytes32[]' },
-      { name: '_inputIndex', type: 'uint8' },
-      { name: '_consolidateInputIndex', type: 'uint8' },
-    ],
-    name: 'challengeConsolidateDoublespent',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
       { name: '_bridge', type: 'address' },
       { name: '_exitDuration', type: 'uint256' },
       { name: '_exitStake', type: 'uint256' },
