@@ -109,7 +109,7 @@ if (cliArgs.help) {
 }
 
 if (cliArgs.version) {
-  console.log(`v${require('../package.json').version}`); // eslint-disable-line
+  console.log(`v${require('../../package.json').version}`); // eslint-disable-line
   process.exit(0);
 }
 
