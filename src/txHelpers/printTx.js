@@ -44,11 +44,6 @@ module.exports = (state, tx) => {
           tx.options.eventsCount
         }`;
       }
-      case Type.CONSOLIDATE: {
-        return `consolidate: ${tx.outputs[0].address}, color: ${
-          tx.outputs[0].color
-        }`;
-      }
       case Type.VALIDATOR_LOGOUT: {
         return `validatorLogout: slotId: ${
           tx.options.slotId
