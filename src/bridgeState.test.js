@@ -35,7 +35,7 @@ ContractsEventsSubscription.__setEventBatches([
 /* eslint-enable */
 
 const createInstance = (web3, bridgeContract, db, config) => {
-  const bridgeState = new BridgeState(db, config.privKey, config, 0, []);
+  const bridgeState = new BridgeState(db, config.privKey, config, []);
   bridgeState.web3 = web3;
   bridgeState.bridgeContract = bridgeContract;
 

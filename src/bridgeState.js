@@ -18,7 +18,7 @@ const exitABI = require('./abis/exitHandler');
 const operatorABI = require('./abis/operator');
 
 module.exports = class BridgeState {
-  constructor(db, privKey, config, eventsDelay, relayBuffer) {
+  constructor(db, privKey, config, relayBuffer) {
     this.config = config;
     this.web3 = new Web3();
     this.web3.setProvider(
@@ -60,7 +60,7 @@ module.exports = class BridgeState {
       }
       return a.blockNumber - b.blockNumber;
     });
-    this.eventsDelay = eventsDelay;
+    this.bridgeDelay = config.bridgeDelay;
     this.relayBuffer = relayBuffer;
   }
 
@@ -107,7 +107,7 @@ module.exports = class BridgeState {
 
     while (
       this.eventsBuffer.peek().blockNumber <=
-      blockNumber - this.eventsDelay
+      blockNumber - this.bridgeDelay
     ) {
       const event = this.eventsBuffer.pop();
 
