@@ -16,6 +16,11 @@ const { logNode } = require('./debug');
 
 const readFile = promisify(fs.readFile);
 
+const defaultConfig = {
+  eventsDelay: 0,
+  bridgeDelay: 0,
+};
+
 const fetchNodeConfig = async nodeUrl => {
   logNode(`Fetching config from: ${nodeUrl}`);
   const web3 = helpers.extendWeb3(new Web3(nodeUrl));
@@ -46,5 +51,5 @@ module.exports = async configPath => {
     throw new Error('exitHandlerAddr is required');
   }
 
-  return config;
+  return Object.assign({}, defaultConfig, config);
 };

@@ -26,6 +26,8 @@ describe('getConfig', () => {
       rootNetwork: 'https://rinkeby.infura.io',
       network: 'testnet',
       networkId: '1341',
+      eventsDelay: 6,
+      bridgeDelay: 2,
     };
     const result = await getConfig({ config }, appMock);
     expect(result).toEqual({
@@ -38,6 +40,8 @@ describe('getConfig', () => {
       networkId: config.networkId,
       p2pPort: P2P_PORT,
       nodeId: NODE_ID,
+      eventsDelay: 6,
+      bridgeDelay: 2,
     });
   });
 
@@ -49,6 +53,8 @@ describe('getConfig', () => {
       networkId: '1341',
       peers: ['peer1'],
       genesis: { validators: ['validator'] },
+      eventsDelay: 0,
+      bridgeDelay: 0,
     };
     const result = await getConfig({ config }, appMock);
     expect(result).toEqual({
@@ -60,6 +66,8 @@ describe('getConfig', () => {
       genesis: config.genesis,
       p2pPort: P2P_PORT,
       nodeId: NODE_ID,
+      eventsDelay: 0,
+      bridgeDelay: 0,
     });
   });
 
@@ -84,6 +92,8 @@ describe('getConfig', () => {
       'rootNetwork',
       'network',
       'networkId',
+      'eventsDelay',
+      'bridgeDelay',
       'genesis',
       'peers',
       'p2pPort',
