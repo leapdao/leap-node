@@ -51,9 +51,13 @@ module.exports = class BridgeState {
     this.deposits = {};
     this.exits = {};
     this.epochLengths = [];
+    this.minGasPrices = [];
 
     this.onNewBlock = this.onNewBlock.bind(this);
     this.eventsBuffer = new TinyQueue([], (a, b) => {
+      if (a.blockNumber === b.blockNumber) {
+        return a.logIndex - b.logIndex;
+      }
       return a.blockNumber - b.blockNumber;
     });
     this.bridgeDelay = config.bridgeDelay;
@@ -134,6 +138,9 @@ module.exports = class BridgeState {
       },
       EpochLength: ({ returnValues: event }) => {
         this.epochLengths.push(Number(event.epochLength));
+      },
+      MinGasPrice: ({ returnValues: event }) => {
+        this.minGasPrices.push(Number(event.minGasPrice));
       },
     });
 

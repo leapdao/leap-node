@@ -18,7 +18,7 @@ const { isNFT } = require('../../utils');
 const { uniq, isEqual } = require('lodash');
 
 const groupValuesByColor = (values, { color, value }) => {
-  if (value < 1) {
+  if (!isNFT(color) && lessThan(BigInt(value), BigInt(1))) {
     throw new Error('One of the outs has value < 1');
   }
   return Object.assign({}, values, {
@@ -42,7 +42,7 @@ const checkInsAndOuts = (tx, state, bridgeState, unspentFilter) => {
     ...Object.keys(insValues),
     ...Object.keys(outsValues),
   ]).map(Number);
-  const minGasPrice = BigInt(bridgeState.minGasPrice || 0);
+  const minGasPrice = BigInt(state.gas.minPrice);
   const gas = Math.max(0, tx.outputs.length * 20000 - tx.inputs.length * 10000);
   for (const color of colors) {
     const inputValue = insValues[color] || BigInt(0);

@@ -17,6 +17,9 @@ const minDelay = 2000;
 module.exports = class EventsRelay {
   constructor(delay, txServerPort) {
     this.relayBuffer = new TinyQueue([], (a, b) => {
+      if (a.blockNumber === b.blockNumber) {
+        return a.logIndex - b.logIndex;
+      }
       return a.blockNumber - b.blockNumber;
     });
     this.relayDelay = delay;
@@ -69,6 +72,13 @@ module.exports = class EventsRelay {
       EpochLength: async event => {
         const { epochLength } = event.returnValues;
         const tx = Tx.epochLength(Number(epochLength));
+        setTimeout(() => {
+          sendTx(this.txServerPort, tx.hex());
+        }, minDelay);
+      },
+      MinGasPrice: async event => {
+        const { minGasPrice } = event.returnValues;
+        const tx = Tx.minGasPrice(BigInt(minGasPrice));
         setTimeout(() => {
           sendTx(this.txServerPort, tx.hex());
         }, minDelay);

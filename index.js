@@ -53,6 +53,10 @@ async function run() {
         epochLength: null,
         epochLengthIndex: -1,
       },
+      gas: {
+        minPrice: 0,
+        minPriceIndex: -1,
+      },
     },
     networkId: `${config.network}-${config.networkId}`,
     genesis: config.genesis,

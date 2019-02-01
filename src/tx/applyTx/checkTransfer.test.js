@@ -12,7 +12,7 @@ const PRIV_3 =
 
 describe('checkTransfer', () => {
   test('wrong type', () => {
-    const tx = Tx.deposit(0, 0, ADDR_1);
+    const tx = Tx.deposit(1, '234345', ADDR_1);
     expect(() => checkTransfer({}, tx, {})).toThrow('Transfer tx expected');
   });
 
@@ -21,6 +21,9 @@ describe('checkTransfer', () => {
     const state = {
       unspent: {
         [new Outpoint(deposit.hash(), 0).hex()]: deposit.outputs[0].toJSON(),
+      },
+      gas: {
+        minPrice: 0,
       },
     };
 
@@ -40,6 +43,9 @@ describe('checkTransfer', () => {
         [new Outpoint(deposit1.hash(), 0).hex()]: deposit1.outputs[0].toJSON(),
         [new Outpoint(deposit2.hash(), 0).hex()]: deposit2.outputs[0].toJSON(),
       },
+      gas: {
+        minPrice: 0,
+      },
     };
 
     const transfer = Tx.transfer(
@@ -58,6 +64,9 @@ describe('checkTransfer', () => {
       unspent: {
         [new Outpoint(deposit.hash(), 0).hex()]: deposit.outputs[0].toJSON(),
       },
+      gas: {
+        minPrice: 0,
+      },
     };
 
     const transfer = Tx.transfer(
@@ -74,6 +83,9 @@ describe('checkTransfer', () => {
     const state = {
       unspent: {
         [new Outpoint(deposit.hash(), 0).hex()]: deposit.outputs[0].toJSON(),
+      },
+      gas: {
+        minPrice: 0,
       },
     };
 
@@ -99,6 +111,9 @@ describe('checkTransfer', () => {
         [new Outpoint(transfer.hash(), 0).hex()]: transfer.outputs[0].toJSON(),
         [new Outpoint(transfer.hash(), 1).hex()]: transfer.outputs[1].toJSON(),
       },
+      gas: {
+        minPrice: 0,
+      },
     };
 
     const transfer2 = Tx.transfer(
@@ -115,6 +130,9 @@ describe('checkTransfer', () => {
       unspent: {
         [new Outpoint(deposit1.hash(), 0).hex()]: deposit1.outputs[0].toJSON(),
         [new Outpoint(deposit2.hash(), 0).hex()]: deposit2.outputs[0].toJSON(),
+      },
+      gas: {
+        minPrice: 0,
       },
     };
 
@@ -135,6 +153,9 @@ describe('checkTransfer', () => {
       unspent: {
         [new Outpoint(deposit1.hash(), 0).hex()]: deposit1.outputs[0].toJSON(),
         [new Outpoint(deposit2.hash(), 0).hex()]: deposit2.outputs[0].toJSON(),
+      },
+      gas: {
+        minPrice: 0,
       },
     };
 
@@ -159,6 +180,9 @@ describe('checkTransfer', () => {
       unspent: {
         [new Outpoint(deposit.hash(), 0).hex()]: deposit.outputs[0].toJSON(),
       },
+      gas: {
+        minPrice: 0,
+      },
     };
 
     const transfer = Tx.transfer(
@@ -172,43 +196,5 @@ describe('checkTransfer', () => {
     expect(() => {
       checkTransfer(state, transfer, {});
     }).toThrow('Ins and outs values are mismatch');
-  });
-
-  test('tx with 0 value out', () => {
-    const deposit = Tx.deposit(12, '1000', ADDR_1, 0);
-    const state = {
-      unspent: {
-        [new Outpoint(deposit.hash(), 0).hex()]: deposit.outputs[0].toJSON(),
-      },
-    };
-
-    const transfer = Tx.transfer(
-      [new Input(new Outpoint(deposit.hash(), 0))],
-      [new Output('1000', ADDR_1, 0), new Output('0', ADDR_2, 0)]
-    ).signAll(PRIV_1);
-
-    expect(() => {
-      checkTransfer(state, transfer, {});
-    }).toThrow('One of the outs has value < 1');
-  });
-
-  test('try to send tx with negative value out', () => {
-    const deposit = Tx.deposit(12, 1000, ADDR_1, 0);
-    const state = {
-      unspent: {
-        [new Outpoint(deposit.hash(), 0).hex()]: deposit.outputs[0].toJSON(),
-      },
-    };
-
-    const transfer = Tx.transfer(
-      [new Input(new Outpoint(deposit.hash(), 0))],
-      [new Output('1001', ADDR_1, 0), new Output(-1, ADDR_2, 0)]
-    ).signAll(PRIV_1);
-
-    console.log(transfer);
-
-    expect(() => {
-      checkTransfer(state, transfer, {});
-    }).toThrow('One of the outs has value < 1');
   });
 });

@@ -17,6 +17,9 @@ const makeDepositMock = (depositor, amount, color) => {
 
 const getInitialState = () => ({
   processedDeposit: 0,
+  gas: {
+    minPrice: 0,
+  },
 });
 
 const defaultDepositMock = makeDepositMock(ADDR_1, '500', 0);
@@ -39,22 +42,6 @@ describe('checkDeposit', () => {
     const tx = Tx.deposit(1, 500, ADDR_1, 1);
     checkDeposit(state, tx, makeDepositMock(ADDR_1, '500', '1'));
     expect(state.processedDeposit).toBe(1);
-  });
-
-  test('deposit with size 0', () => {
-    const state = getInitialState();
-    const tx = Tx.deposit(1, 0, ADDR_1, 1);
-    expect(() => {
-      checkDeposit(state, tx, makeDepositMock(ADDR_1, '0', '1'));
-    }).toThrow('Deposit out has value < 1');
-  });
-
-  test('deposit with negative size', () => {
-    const state = getInitialState();
-    const tx = Tx.deposit(1, -1, ADDR_1, 1);
-    expect(() => {
-      checkDeposit(state, tx, makeDepositMock(ADDR_1, '-1', '1'));
-    }).toThrow('Deposit out has value < 1');
   });
 
   test('valid tx (nft)', () => {
