@@ -55,6 +55,9 @@ module.exports = class BridgeState {
 
     this.onNewBlock = this.onNewBlock.bind(this);
     this.eventsBuffer = new TinyQueue([], (a, b) => {
+      if (a.blockNumber === b.blockNumber) {
+        return a.logIndex - b.logIndex;
+      }
       return a.blockNumber - b.blockNumber;
     });
     this.eventsDelay = eventsDelay;
