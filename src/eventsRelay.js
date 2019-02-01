@@ -17,6 +17,9 @@ const minDelay = 2000;
 module.exports = class EventsRelay {
   constructor(delay, txServerPort) {
     this.relayBuffer = new TinyQueue([], (a, b) => {
+      if (a.blockNumber === b.blockNumber) {
+        return a.logIndex - b.logIndex;
+      }
       return a.blockNumber - b.blockNumber;
     });
     this.relayDelay = delay;
