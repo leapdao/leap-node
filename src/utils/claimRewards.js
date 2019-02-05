@@ -7,12 +7,13 @@ const {
   privateToAddress,
 } = require('ethereumjs-util');
 const bridgeABI = require('../abis/bridgeAbi');
+const operatorABI = require('../abis/operator');
 
 const BATCH_SIZE = 50;
 const swapAddr = process.env.SWAP_ADDR;
 const fromHeight = process.env.FROM_HEIGHT;
 const toHeight = process.env.TO_HEIGHT;
-const operatorContractAddr = process.env.OP_CONTRACT_ADDR;
+const operatorAddr = process.env.OP_CONTRACT_ADDR;
 const validatorPriv = process.env.VALIDATOR_PRIV;
 const providerUrl = process.env.PROVIDER_URL;
 const swapAbi = [
@@ -47,49 +48,6 @@ const swapAbi = [
     type: 'function',
   },
 ];
-const operatorAbi = [
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        name: 'blocksRoot',
-        type: 'bytes32',
-      },
-      {
-        indexed: true,
-        name: 'slotId',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        name: 'owner',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        name: 'periodRoot',
-        type: 'bytes32',
-      },
-    ],
-    name: 'Submission',
-    type: 'event',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'bridge',
-    outputs: [
-      {
-        name: '',
-        type: 'address',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-];
 
 async function getPastEvents(contract, fromBlock, toBlock) {
   const batchCount = Math.ceil((toBlock - fromBlock) / BATCH_SIZE);
@@ -98,15 +56,15 @@ async function getPastEvents(contract, fromBlock, toBlock) {
   for (let i = 0; i < batchCount; i += 1) {
     /* eslint-disable no-await-in-loop */
     events.push(
-      await contract.getPastEvents('allEvents', {
+      ...(await contract.getPastEvents('Submission', {
         fromBlock: i * BATCH_SIZE + fromBlock,
         toBlock: Math.min(toBlock, i * BATCH_SIZE + fromBlock + BATCH_SIZE),
-      })
+      }))
     );
     /* eslint-enable */
   }
 
-  return events.reduce((result, ev) => result.concat(ev), []);
+  return events;
 }
 
 function separateForSubmission(arr, size) {
@@ -144,13 +102,12 @@ const provider = new HDWalletProvider(validatorPriv, providerUrl);
 const claimantAddr = bufferToHex(privateToAddress(validatorPriv));
 web3.setProvider(provider);
 const swapRegistry = new web3.eth.Contract(swapAbi, swapAddr);
-const operatorContract = new web3.eth.Contract(
-  operatorAbi,
-  operatorContractAddr
-);
 
 const run = async function() {
   let slotId;
+  const operatorContract = new web3.eth.Contract(operatorABI, operatorAddr);
+  const bridgeAddr = await operatorContract.methods.bridge().call();
+  const bridge = new web3.eth.Contract(bridgeABI, bridgeAddr);
 
   // get events and filter out data
   const events = await getPastEvents(operatorContract, fromHeight, toHeight);
@@ -181,21 +138,18 @@ const run = async function() {
         rest: empty,
       };
     })
-    .reduce((accumulator, event) => {
-      let acc = accumulator;
-      if (!acc.push) {
-        acc = [[], [], [], []];
-      }
-      acc[0].push(event.consensusRoot);
-      acc[1].push(event.cas);
-      acc[2].push(event.validatorData);
-      acc[3].push(event.rest);
-      return acc;
-    });
+    .reduce(
+      (acc, event) => {
+        acc[0].push(event.consensusRoot);
+        acc[1].push(event.cas);
+        acc[2].push(event.validatorData);
+        acc[3].push(event.rest);
+        return acc;
+      },
+      [[], [], [], []]
+    );
 
   // read data from bridge
-  const bridgeAddr = await operatorContract.methods.bridge().call();
-  const bridge = new web3.eth.Contract(bridgeABI, bridgeAddr);
   const startRoot = getPeriodRoot(
     data[0][0],
     data[1][0],
@@ -210,9 +164,9 @@ const run = async function() {
     data[3][last]
   );
   let periodRsp = await bridge.methods.periods(startRoot).call();
-  console.log('start height: ', periodRsp.height);
+  console.log('start height: ', periodRsp.height); // eslint-disable-line no-console
   periodRsp = await bridge.methods.periods(endRoot).call();
-  console.log('end height: ', periodRsp.height);
+  console.log('end height: ', periodRsp.height); // eslint-disable-line no-console
 
   // claim rewards by submitting
   const slices = separateForSubmission(data, BATCH_SIZE);
@@ -224,8 +178,8 @@ const run = async function() {
     const rsp = await swapRegistry.methods // eslint-disable-line no-await-in-loop
       .claim(slotId, ...slice)
       .send({ from: claimantAddr, gas: estimate });
-    console.log('submitting: ', rsp.transactionHash);
+    console.log('submitting: ', rsp.transactionHash); // eslint-disable-line no-console
   }
-  console.log('done');
+  console.log('done'); // eslint-disable-line no-console
 };
 run();
