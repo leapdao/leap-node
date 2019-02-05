@@ -105,6 +105,7 @@
       "src/utils/debug.js",
       "src/utils/printStartupInfo.js",
       "src/utils/sendTransaction.js",
+      "src/utils/claimRewards.js",
       "src/utils/index.js",
       "src/txHelpers/makeTransfer.js",
       "src/txHelpers/printTx.js",
