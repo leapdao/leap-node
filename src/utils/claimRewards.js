@@ -170,10 +170,11 @@ const run = async function() {
 
   // claim rewards by submitting
   const slices = separateForSubmission(data, BATCH_SIZE);
-  let estimate = await swapRegistry.methods
-    .claim(slotId, ...slices[0])
-    .estimateGas({ from: claimantAddr });
-  estimate = Math.floor(estimate * 1.2);
+  const estimate = Math.round(
+    (await swapRegistry.methods
+      .claim(slotId, ...slices[0])
+      .estimateGas({ from: claimantAddr })) * 1.2
+  );
   for (const slice of slices) {
     const rsp = await swapRegistry.methods // eslint-disable-line no-await-in-loop
       .claim(slotId, ...slice)
