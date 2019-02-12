@@ -5,15 +5,23 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
+const hasAddress = (utxo, address) => {
+  if (address === undefined) return true;
+  return utxo.address.toLowerCase() === address.toLowerCase();
+};
+
+const hasColor = (utxo, color) => {
+  if (color === undefined) return true;
+  return utxo.color === color;
+};
+
 module.exports = function filterUnspent(unspent, address, color) {
   return Object.keys(unspent)
     .filter(
       k =>
         unspent[k] &&
-        (address !== undefined
-          ? unspent[k].address.toLowerCase() === address.toLowerCase()
-          : true) &&
-        (color !== undefined ? unspent[k].color === color : true)
+        hasAddress(unspent[k], address) &&
+        hasColor(unspent[k], color)
     )
     .map(k => ({
       outpoint: k,
