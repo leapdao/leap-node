@@ -54,6 +54,49 @@ describe('getUnspent', () => {
     ]);
   });
 
+  test('all unspent', async () => {
+    const tx1 = Tx.transfer(
+      [
+        new Input(
+          new Outpoint(
+            '0x7777777777777777777777777777777777777777777777777777777777777777',
+            0
+          )
+        ),
+        new Input(
+          new Outpoint(
+            '0x7777777777777777777777777777777777777777777777777777777777777777',
+            1
+          )
+        ),
+      ],
+      [new Output(100, A2, 0), new Output(200, A1, 0), new Output(300, A2, 1)]
+    ).signAll(PRIV1);
+    const state = {
+      unspent: {
+        [new Outpoint(tx1.hash(), 0).hex()]: tx1.outputs[0].toJSON(),
+        [new Outpoint(tx1.hash(), 1).hex()]: tx1.outputs[1].toJSON(),
+        [new Outpoint(tx1.hash(), 2).hex()]: tx1.outputs[2].toJSON(),
+      },
+    };
+
+    const unspent = await getUnspent({ currentState: state });
+    expect(unspent).toEqual([
+      {
+        outpoint: new Outpoint(tx1.hash(), 0).hex(),
+        output: tx1.outputs[0].toJSON(),
+      },
+      {
+        outpoint: new Outpoint(tx1.hash(), 1).hex(),
+        output: tx1.outputs[1].toJSON(),
+      },
+      {
+        outpoint: new Outpoint(tx1.hash(), 2).hex(),
+        output: tx1.outputs[2].toJSON(),
+      },
+    ]);
+  });
+
   test('unspent for exitstent addr for specific color', async () => {
     const tx1 = Tx.transfer(
       [

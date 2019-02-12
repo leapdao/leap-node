@@ -5,12 +5,14 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-module.exports = function unspentForAddress(unspent, address, color) {
+module.exports = function filterUnspent(unspent, address, color) {
   return Object.keys(unspent)
     .filter(
       k =>
         unspent[k] &&
-        unspent[k].address.toLowerCase() === address.toLowerCase() &&
+        (address !== undefined
+          ? unspent[k].address.toLowerCase() === address.toLowerCase()
+          : true) &&
         (color !== undefined ? unspent[k].color === color : true)
     )
     .map(k => ({
