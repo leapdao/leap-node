@@ -6,7 +6,7 @@
  */
 
 const { helpers, Tx, Outpoint } = require('leap-core');
-const { unspentForAddress } = require('../utils');
+const { filterUnspent } = require('../utils');
 
 /*
  * Creates transfer tx based on address unspent outputs
@@ -29,7 +29,7 @@ module.exports = async function makeTransfer(
     throw new Error('Insufficient balance');
   }
 
-  const senderUnspent = unspentForAddress(unspent, from, color).map(u => ({
+  const senderUnspent = filterUnspent(unspent, from, color).map(u => ({
     output: u.output,
     outpoint: Outpoint.fromRaw(u.outpoint),
   }));
