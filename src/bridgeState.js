@@ -20,10 +20,7 @@ const operatorABI = require('./abis/operator');
 module.exports = class BridgeState {
   constructor(db, privKey, config, relayBuffer) {
     this.config = config;
-    this.web3 = new Web3();
-    this.web3.setProvider(
-      new this.web3.providers.HttpProvider(config.rootNetwork)
-    );
+    this.web3 = new Web3(config.rootNetwork);
 
     this.exitHandlerContract = new this.web3.eth.Contract(
       exitABI,
