@@ -48,7 +48,7 @@
     "dashdash": "^1.14.1",
     "debug": "^3.1.0",
     "deterministic-json": "^1.0.4",
-    "ethereumjs-util": "^5.2.0",
+    "ethereumjs-util": "6.0.0",
     "express": "^4.16.3",
     "express-http-proxy": "^1.0.7",
     "fs-extra": "^5.0.0",
