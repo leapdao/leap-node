@@ -91,6 +91,7 @@ module.exports = async (state, tx, bridgeState) => {
   checkInsAndOuts(
     tx,
     state,
+    bridgeState,
     ({ address }, i) =>
       address === `0x${utils.ripemd160(tx.inputs[i].script).toString('hex')}`
   );
@@ -178,7 +179,7 @@ module.exports = async (state, tx, bridgeState) => {
         logOuts.push(new Output(transferAmount, toAddr, out.color));
       }
     });
-    if (out.value !== spent) {
+    if (+out.value !== spent) {
       return Promise.reject(
         new Error(
           `balance missmatch for ${out.address}. inputs: ${

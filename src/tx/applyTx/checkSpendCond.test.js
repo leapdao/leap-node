@@ -11,7 +11,7 @@ erc20Tokens.forEach((addr, i) => {
   tokens[i] = addr;
 });
 
-const contract = {
+const exitHandlerContract = {
   methods: {
     erc20TokenCount: () => ({
       call: async () => erc20Tokens.length,
@@ -68,6 +68,9 @@ describe('checkSpendCond', () => {
       unspent: {
         [new Outpoint(deposit.hash(), 0).hex()]: deposit.outputs[0].toJSON(),
       },
+      gas: {
+        minPrice: 0,
+      },
     };
 
     // a token contract exists at address, it has the color 1
@@ -109,7 +112,7 @@ describe('checkSpendCond', () => {
     );
 
     await checkSpendCond(state, condition, {
-      contract,
+      exitHandlerContract,
       tokens: { erc20: [], erc721: [] },
     });
   });
