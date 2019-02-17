@@ -18,6 +18,7 @@ const checks = {
   [Type.TRANSFER]: require('./checkTransfer'),
   [Type.VALIDATOR_JOIN]: require('./checkValidatorJoin'),
   [Type.VALIDATOR_LOGOUT]: require('./checkValidatorLogout'),
+  [Type.SPEND_COND]: require('./checkSpendCond'),
 };
 
 module.exports = async (state, tx, bridgeState) => {
