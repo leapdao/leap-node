@@ -50,7 +50,10 @@ describe('getColors', () => {
 
   test('ERC20 colors cache', async () => {
     const tokensCache = { erc20: [], erc721: [] };
-    const colors = await getColors({ contract, tokens: tokensCache }, false);
+    const colors = await getColors(
+      { exitHandlerContract, tokens: tokensCache },
+      false
+    );
     expect(tokensCache.erc20.map(c => c.toLowerCase())).toEqual(
       erc20Tokens.map(c => c.toLowerCase())
     );
@@ -71,7 +74,10 @@ describe('getColors', () => {
 
   test('ERC721 colors cache', async () => {
     const tokensCache = { erc20: [], erc721: [] };
-    const colors = await getColors({ contract, tokens: tokensCache }, true);
+    const colors = await getColors(
+      { exitHandlerContract, tokens: tokensCache },
+      true
+    );
     expect(tokensCache.erc721.map(c => c.toLowerCase())).toEqual(
       erc721Tokens.map(c => c.toLowerCase())
     );
