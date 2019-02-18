@@ -143,9 +143,9 @@ module.exports = class BridgeState {
       },
       NewToken: ({ returnValues: event }) => {
         if (event.color < NFT_COLOR_BASE) {
-          this.tokens.erc20.push(event._token); // eslint-disable-line no-underscore-dangle
+          this.tokens.erc20.push(event.tokenAddr); // eslint-disable-line no-underscore-dangle
         } else {
-          this.tokens.erc721.push(event._token); // eslint-disable-line  no-underscore-dangle
+          this.tokens.erc721.push(event.tokenAddr); // eslint-disable-line  no-underscore-dangle
         }
       },
       EpochLength: ({ returnValues: event }) => {
