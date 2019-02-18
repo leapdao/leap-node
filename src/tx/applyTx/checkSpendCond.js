@@ -12,6 +12,7 @@ const Transaction = require('ethereumjs-tx');
 const Trie = require('merkle-patricia-tree');
 const VM = require('ethereumjs-vm');
 const utils = require('ethereumjs-util');
+const { BigInt, equal, add, multiply } = require('jsbi-utils');
 const isEqual = require('lodash/isEqual');
 const getColors = require('../../api/methods/getColors');
 const { NFT_COLOR_BASE } = require('../../api/methods/constants');
@@ -168,18 +169,21 @@ module.exports = async (state, tx, bridgeState) => {
     });
     nonceCounter += 1;
 
-    let spent = results.gasUsed.toNumber() * tx.inputs[i].gasPrice;
+    let spent = multiply(
+      BigInt(results.gasUsed),
+      BigInt(tx.inputs[i].gasPrice)
+    );
     const out = inputMap[tx.inputs[i].prevout.getUtxoId()];
     // itterate through all transfer events and sum them up per color
     results.vm.logs.forEach(log => {
       if (log[0].equals(colorMap[out.color])) {
-        const transferAmount = utils.bufferToInt(log[2]);
-        spent += transferAmount;
+        const transferAmount = BigInt(`0x${log[2].toString('hex')}`, 16);
+        spent = add(spent, transferAmount);
         const toAddr = `0x${log[1][2].slice(12, 32).toString('hex')}`;
         logOuts.push(new Output(transferAmount, toAddr, out.color));
       }
     });
-    if (+out.value !== spent) {
+    if (!equal(BigInt(out.value), spent)) {
       return Promise.reject(
         new Error(
           `balance missmatch for ${out.address}. inputs: ${
