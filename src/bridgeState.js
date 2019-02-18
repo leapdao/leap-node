@@ -52,8 +52,8 @@ module.exports = class BridgeState {
     this.deposits = {};
     this.exits = {};
     this.tokens = {
-      erc20: {},
-      erc721: {},
+      erc20: [],
+      erc721: [],
     };
     this.epochLengths = [];
     this.minGasPrices = [];
@@ -143,9 +143,9 @@ module.exports = class BridgeState {
       },
       NewToken: ({ returnValues: event }) => {
         if (event.color < NFT_COLOR_BASE) {
-          this.tokens.erc20[event.color] = event._token; // eslint-disable-line no-underscore-dangle
+          this.tokens.erc20.push(event._token); // eslint-disable-line no-underscore-dangle
         } else {
-          this.tokens.erc721[event.color] = event._token; // eslint-disable-line  no-underscore-dangle
+          this.tokens.erc721.push(event._token); // eslint-disable-line  no-underscore-dangle
         }
       },
       EpochLength: ({ returnValues: event }) => {
