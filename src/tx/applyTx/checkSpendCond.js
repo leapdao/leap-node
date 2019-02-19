@@ -173,6 +173,7 @@ module.exports = async (state, tx, bridgeState) => {
       BigInt(results.gasUsed),
       BigInt(tx.inputs[i].gasPrice)
     );
+
     const out = inputMap[tx.inputs[i].prevout.getUtxoId()];
     // itterate through all transfer events and sum them up per color
     results.vm.logs.forEach(log => {

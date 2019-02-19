@@ -29,23 +29,31 @@ const exitHandlerContract = {
 
 // a script exists that can only be spent by spenderAddr defined in script
 //
-// pragma solidity ^0.4.24;
-// import "./IERC20.sol";
-// contract SpendCondition {
-//     address constant spenderAddr = 0x82e8c6cf42c8d1ff9594b17a3f50e94a12cc860f;
-//     function fullfil(bytes32 _r, bytes32 _s, uint8 _v,      // signature
-//         address _tokenAddr,                               // inputs
-//         address _receiver, uint256 _amount) public {  // outputs
-//         // check signature
-//         address signer = ecrecover(bytes32(address(this)), _v, _r, _s);
-//         require(signer == spenderAddr);
-//         // do transfer
-//         IERC20 token = IERC20(_tokenAddr);
-//         token.transfer(_receiver, _amount);
+// pragma solidity ^0.5.2;
+
+// import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
+
+// contract SpendingCondition {
+//   address constant spenderAddr = 0x82e8C6Cf42C8D1fF9594b17A3F50e94a12cC860f;
+
+//   function fulfil(bytes32 _r, bytes32 _s, uint8 _v,      // signature
+//     address _tokenAddr,                               // inputs
+//     address _receiver, uint256 _amount) public {  // outputs
+//     // check signature
+//     address contractAddr = address(this);
+//     address signer = ecrecover(bytes32(bytes20(contractAddr)), _v, _r, _s);
+//     require(signer == spenderAddr);
+//     // do transfer
+//     IERC20 token = IERC20(_tokenAddr);
+//     uint256 diff = token.balanceOf(contractAddr) - _amount;
+//     token.transfer(_receiver, _amount);
+//     if (diff > 0) {
+//       token.transfer(contractAddr, diff);
 //     }
+//   }
 // }
 const conditionScript = Buffer.from(
-  '6080604052600436106100405763ffffffff7c010000000000000000000000000000000000000000000000000000000060003504166331b3c80e8114610045575b600080fd5b34801561005157600080fd5b5061008860043560243560ff6044351673ffffffffffffffffffffffffffffffffffffffff6064358116906084351660a43561008a565b005b604080516000808252602080830180855230905260ff881683850152606083018a90526080830189905292519092839260019260a08083019392601f19830192908190039091019086865af11580156100e7573d6000803e3d6000fd5b5050604051601f19015192505073ffffffffffffffffffffffffffffffffffffffff82167382e8c6cf42c8d1ff9594b17a3f50e94a12cc860f1461012a57600080fd5b50604080517fa9059cbb00000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff8581166004830152602482018590529151869283169163a9059cbb9160448083019260209291908290030181600087803b1580156101a457600080fd5b505af11580156101b8573d6000803e3d6000fd5b505050506040513d60208110156101ce57600080fd5b505050505050505050505600a165627a7a72305820ff22a508030475240dd61744c3007ea9eb1ec4305eea6eca7d1ab695ececac8e0029',
+  '608060405234801561001057600080fd5b506004361061002e5760e060020a6000350463c84e1a778114610033575b600080fd5b61007e600480360360c081101561004957600080fd5b5080359060208101359060ff60408201351690600160a060020a03606082013581169160808101359091169060a00135610080565b005b6040805160008082526020808301808552606060020a308082026001606060020a0319169190910490915260ff891684860152606084018b9052608084018a90529351919260019260a08083019392601f198301929081900390910190855afa1580156100f1573d6000803e3d6000fd5b5050604051601f190151915050600160a060020a0381167382e8c6cf42c8d1ff9594b17a3f50e94a12cc860f1461012757600080fd5b600085905060008482600160a060020a03166370a08231866040518263ffffffff1660e060020a0281526004018082600160a060020a0316600160a060020a0316815260200191505060206040518083038186803b15801561018857600080fd5b505afa15801561019c573d6000803e3d6000fd5b505050506040513d60208110156101b257600080fd5b50516040805160e060020a63a9059cbb028152600160a060020a038a81166004830152602482018a9052915193909203935084169163a9059cbb916044808201926020929091908290030181600087803b15801561020f57600080fd5b505af1158015610223573d6000803e3d6000fd5b505050506040513d602081101561023957600080fd5b505060008111156102d45781600160a060020a031663a9059cbb85836040518363ffffffff1660e060020a0281526004018083600160a060020a0316600160a060020a0316815260200182815260200192505050602060405180830381600087803b1580156102a757600080fd5b505af11580156102bb573d6000803e3d6000fd5b505050506040513d60208110156102d157600080fd5b50505b5050505050505050505056fea165627a7a723058206a6bdb89a200658901def5b1623c4b3b8f23e08595efdb9c87b65f4b0fa9a3200029',
   'hex'
 );
 
@@ -100,16 +108,16 @@ describe('checkSpendCond', () => {
     // msgData that satisfies the spending condition
     const vBuf = utils.setLengthLeft(utils.toBuffer(sig.v), 32);
     const amountBuf = utils.setLengthLeft(utils.toBuffer(4993673500), 32);
-    condition.inputs[0].setMsgData(
-      '0x31b3c80e' + // function called
+    const msgData =
+      '0xc84e1a77' + // function called
       `${sig.r.toString('hex')}${sig.s.toString('hex')}${vBuf.toString(
         'hex'
       )}` + // signature
       `000000000000000000000000${tokenAddr.toString('hex')}` + // inputs
-        `000000000000000000000000${receiver.toString(
-          'hex'
-        )}${amountBuf.toString('hex')}` // outputs
-    );
+      `000000000000000000000000${receiver.toString('hex')}${amountBuf.toString(
+        'hex'
+      )}`; // outputs
+    condition.inputs[0].setMsgData(msgData);
 
     await checkSpendCond(state, condition, {
       exitHandlerContract,
