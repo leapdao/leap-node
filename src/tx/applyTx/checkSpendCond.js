@@ -132,7 +132,9 @@ module.exports = async (state, tx, bridgeState) => {
 
     // minting amount of output to address of condition
     const amountHex = utils.setLengthLeft(
-      utils.toBuffer(inputMap[inputId].value),
+      // TODO: calculate (ins - outs) * gasPrice and substract from this amount
+      // maybe reuse this: https://github.com/leapdao/leap-node/blob/master/src/tx/applyTx/utils.js#L32-L49
+      utils.toBuffer(`0x${BigInt(inputMap[inputId].value).toString(16)}`),
       32
     );
     // eslint-disable-next-line no-await-in-loop
