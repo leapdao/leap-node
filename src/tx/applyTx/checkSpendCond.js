@@ -101,7 +101,7 @@ module.exports = async (state, tx, bridgeState) => {
   }
 
   // check that script hashes to address
-  const inputTransactions = checkInsAndOuts(
+  checkInsAndOuts(
     tx,
     state,
     bridgeState,
@@ -116,8 +116,9 @@ module.exports = async (state, tx, bridgeState) => {
   // TODO make inputMap
   // convenience mapping from inputs to the previous outputs
   const inputMap = {};
-  for (let i = 0; i < inputTransactions.length; i += 1) {
-    inputMap[inputTransactions[i].prevout.getUtxoId()] = inputTransactions[i];
+  for (let i = 0; i < tx.inputs.length; i += 1) {
+    inputMap[tx.inputs[i].prevout.getUtxoId()] =
+      state.unspent[tx.inputs[i].prevout.hex()];
   }
 
   // creating a trie that just resides in memory
@@ -132,7 +133,7 @@ module.exports = async (state, tx, bridgeState) => {
   // deploying colors and mint tokens
   let results;
   let nonceCounter = 0;
-  const insValues = inputTransactions.reduce(groupValuesByColor, {});
+  const insValues = Object.values(inputMap).reduce(groupValuesByColor, {});
   // eslint-disable-next-line  guard-for-in
   for (const color in insValues) {
     const erc20Account = new Account();
