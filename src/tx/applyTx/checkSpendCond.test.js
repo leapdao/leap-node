@@ -101,8 +101,8 @@ describe('checkSpendCond', () => {
         }),
       ],
       [
-        new Output(1985508300, `0x${receiver.toString('hex')}`, 1),
-        new Output(3000000000, `0x${receiver.toString('hex')}`, 1),
+        new Output(1991834800, `0x${receiver.toString('hex')}`, 1),
+        new Output(3000000000, `0x${scriptHash.toString('hex')}`, 1),
       ]
     );
 
@@ -110,7 +110,7 @@ describe('checkSpendCond', () => {
 
     // msgData that satisfies the spending condition
     const vBuf = utils.setLengthLeft(utils.toBuffer(sig.v), 32);
-    const amountBuf = utils.setLengthLeft(utils.toBuffer(1985508300), 32);
+    const amountBuf = utils.setLengthLeft(utils.toBuffer(1991834800), 32);
     const msgData =
       '0xc84e1a77' + // function called
       `${sig.r.toString('hex')}${sig.s.toString('hex')}${vBuf.toString(

@@ -30,7 +30,11 @@ const groupValuesByColor = (values, { color, value }) => {
 
 const checkInsAndOuts = (tx, state, bridgeState, unspentFilter) => {
   const inputTransactions = tx.inputs
-    .map(input => state.unspent[input.prevout.hex()])
+    .map(input => {
+      const rsp = state.unspent[input.prevout.hex()];
+      rsp.prevout = input.prevout;
+      return rsp;
+    })
     .filter(unspentFilter);
   if (tx.inputs.length !== inputTransactions.length) {
     throw new Error('Wrong inputs');
@@ -65,6 +69,7 @@ const checkInsAndOuts = (tx, state, bridgeState, unspentFilter) => {
       throw new Error(`Ins and outs values are mismatch for color ${color}`);
     }
   }
+  return inputTransactions;
 };
 
 const checkOutpoints = (state, tx) => {
@@ -122,5 +127,6 @@ const removeInputs = ({ unspent, balances, owners }, tx) => {
 
 exports.checkInsAndOuts = checkInsAndOuts;
 exports.checkOutpoints = checkOutpoints;
+exports.groupValuesByColor = groupValuesByColor;
 exports.addOutputs = addOutputs;
 exports.removeInputs = removeInputs;

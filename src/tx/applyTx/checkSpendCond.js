@@ -14,6 +14,7 @@ const VM = require('ethereumjs-vm');
 const utils = require('ethereumjs-util');
 const { BigInt, equal, add, multiply } = require('jsbi-utils');
 const isEqual = require('lodash/isEqual');
+const { groupValuesByColor } = require('./utils');
 const getColors = require('../../api/methods/getColors');
 const { NFT_COLOR_BASE } = require('../../api/methods/constants');
 
@@ -89,7 +90,7 @@ module.exports = async (state, tx, bridgeState) => {
   }
 
   // check that script hashes to address
-  checkInsAndOuts(
+  const inputTransactions = checkInsAndOuts(
     tx,
     state,
     bridgeState,
@@ -104,6 +105,9 @@ module.exports = async (state, tx, bridgeState) => {
   // TODO make inputMap
   // convenience mapping from inputs to the previous outputs
   const inputMap = {};
+  for (let i = 0; i < inputTransactions.length; i += 1) {
+    inputMap[inputTransactions[i].prevout.getUtxoId()] = inputTransactions[i];
+  }
 
   // creating a trie that just resides in memory
   const stateTrie = new Trie();
@@ -117,24 +121,21 @@ module.exports = async (state, tx, bridgeState) => {
   // deploying colors and mint tokens
   let results;
   let nonceCounter = 0;
-  for (let i = 0; i < tx.inputs.length; i += 1) {
-    inputMap[tx.inputs[i].prevout.getUtxoId()] =
-      state.unspent[tx.inputs[i].prevout.hex()];
+  const insValues = inputTransactions.reduce(groupValuesByColor, {});
+  // eslint-disable-next-line  guard-for-in
+  for (const color in insValues) {
     const erc20Account = new Account();
     await setAccountCode(erc20Account, stateTrie, erc20Code); // eslint-disable-line no-await-in-loop
-    const inputId = tx.inputs[i].prevout.getUtxoId();
     // eslint-disable-next-line no-await-in-loop
-    await setAccount(
-      erc20Account,
-      stateTrie,
-      colorMap[inputMap[inputId].color]
-    );
+    await setAccount(erc20Account, stateTrie, colorMap[color]);
 
     // minting amount of output to address of condition
+
+    const outsValues = tx.outputs.reduce(groupValuesByColor, {});
     const amountHex = utils.setLengthLeft(
       // TODO: calculate (ins - outs) * gasPrice and substract from this amount
       // maybe reuse this: https://github.com/leapdao/leap-node/blob/master/src/tx/applyTx/utils.js#L32-L49
-      utils.toBuffer(`0x${BigInt(inputMap[inputId].value).toString(16)}`),
+      utils.toBuffer(`0x${BigInt(outsValues[color]).toString(16)}`),
       32
     );
     // eslint-disable-next-line no-await-in-loop
@@ -142,7 +143,7 @@ module.exports = async (state, tx, bridgeState) => {
       nonce: nonceCounter,
       gasPrice: '0x00',
       gasLimit: '0xffffffffffff',
-      to: colorMap[inputMap[inputId].color],
+      to: colorMap[color],
       data: `0x40c10f19000000000000000000000000${tx
         .sigHash()
         .replace('0x', '')}${amountHex.toString('hex')}`,
@@ -182,7 +183,11 @@ module.exports = async (state, tx, bridgeState) => {
       if (log[0].equals(colorMap[out.color])) {
         const transferAmount = BigInt(`0x${log[2].toString('hex')}`, 16);
         spent = add(spent, transferAmount);
-        const toAddr = `0x${log[1][2].slice(12, 32).toString('hex')}`;
+        let toAddr = `0x${log[1][2].slice(12, 32).toString('hex')}`;
+        // replace injected sigHash with plasma address
+        if (toAddr === tx.sigHash()) {
+          toAddr = `0x${utils.ripemd160(tx.inputs[i].script).toString('hex')}`;
+        }
         logOuts.push(new Output(transferAmount, toAddr, out.color));
       }
     });
