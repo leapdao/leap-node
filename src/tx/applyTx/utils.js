@@ -122,5 +122,6 @@ const removeInputs = ({ unspent, balances, owners }, tx) => {
 
 exports.checkInsAndOuts = checkInsAndOuts;
 exports.checkOutpoints = checkOutpoints;
+exports.groupValuesByColor = groupValuesByColor;
 exports.addOutputs = addOutputs;
 exports.removeInputs = removeInputs;

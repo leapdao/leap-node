@@ -12,6 +12,7 @@ const signatures = {
   balanceOf: '0x70a08231000000000000000000000000',
   unsupported: '0x00000000000000000000000000000000', // represents any unsupported method
 };
+const tokens = { erc20: [], erc721: [] };
 
 describe('executeCall', () => {
   test('tag != latest', async () => {
@@ -37,6 +38,7 @@ describe('executeCall', () => {
     const response = await executeCall(
       {
         exitHandlerContract,
+        tokens,
         currentState: {
           balances: {
             [NFT_COLOR_BASE]: {
@@ -68,6 +70,7 @@ describe('executeCall', () => {
       await executeCall(
         {
           exitHandlerContract,
+          tokens,
           currentState: {
             balances: {},
           },
@@ -92,6 +95,7 @@ describe('executeCall', () => {
       await executeCall(
         {
           exitHandlerContract,
+          tokens,
           currentState: {
             balances: {},
           },
@@ -114,6 +118,7 @@ describe('executeCall', () => {
     const response = await executeCall(
       {
         exitHandlerContract,
+        tokens,
         currentState: {
           balances: {
             0: {
@@ -139,6 +144,7 @@ describe('executeCall', () => {
     const response = await executeCall(
       {
         exitHandlerContract,
+        tokens,
         currentState: {
           balances: {},
         },
@@ -160,6 +166,7 @@ describe('executeCall', () => {
     const response = await executeCall(
       {
         exitHandlerContract,
+        tokens,
         currentState: {
           balances: {
             [NFT_COLOR_BASE]: {
@@ -185,6 +192,7 @@ describe('executeCall', () => {
     const response = await executeCall(
       {
         exitHandlerContract,
+        tokens,
         currentState: {
           balances: {},
         },
