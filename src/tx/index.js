@@ -12,12 +12,12 @@ const printTx = require('../txHelpers/printTx');
 
 const { logTx, logError } = require('../utils/debug');
 
-module.exports = bridgeState => (state, { encoded }, _, isCheck) => {
+module.exports = bridgeState => async (state, { encoded }, _, isCheck) => {
   const tx = Tx.fromRaw(encoded);
   const printedTx = printTx(state, tx);
 
   try {
-    applyTx(state, tx, bridgeState);
+    await applyTx(state, tx, bridgeState);
     accumulateTx(state, tx);
   } catch (err) {
     logError(err.message);
