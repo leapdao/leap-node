@@ -17,6 +17,7 @@ const bridgeABI = require('./abis/bridgeAbi');
 const exitABI = require('./abis/exitHandler');
 const operatorABI = require('./abis/operator');
 const proxyABI = require('./abis/proxy');
+const { NFT_COLOR_BASE } = require('./api/methods/constants');
 
 module.exports = class BridgeState {
   constructor(db, privKey, config, relayBuffer) {
@@ -51,6 +52,10 @@ module.exports = class BridgeState {
     this.previousPeriod = null;
     this.deposits = {};
     this.exits = {};
+    this.tokens = {
+      erc20: [],
+      erc721: [],
+    };
     this.epochLengths = [];
     this.minGasPrices = [];
 
@@ -136,6 +141,13 @@ module.exports = class BridgeState {
           color: event.color,
           amount: event.amount,
         };
+      },
+      NewToken: ({ returnValues: event }) => {
+        if (event.color < NFT_COLOR_BASE) {
+          this.tokens.erc20.push(event.tokenAddr); // eslint-disable-line no-underscore-dangle
+        } else {
+          this.tokens.erc721.push(event.tokenAddr); // eslint-disable-line  no-underscore-dangle
+        }
       },
       EpochLength: ({ returnValues: event }) => {
         this.epochLengths.push(Number(event.epochLength));

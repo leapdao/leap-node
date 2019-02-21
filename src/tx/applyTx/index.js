@@ -18,16 +18,17 @@ const checks = {
   [Type.TRANSFER]: require('./checkTransfer'),
   [Type.VALIDATOR_JOIN]: require('./checkValidatorJoin'),
   [Type.VALIDATOR_LOGOUT]: require('./checkValidatorLogout'),
+  [Type.SPEND_COND]: require('./checkSpendCond'),
 };
 
-module.exports = (state, tx, bridgeState) => {
+module.exports = async (state, tx, bridgeState) => {
   if (!checks[tx.type]) {
     throw new Error('Unsupported tx type');
   }
 
   checkOutpoints(state, tx);
 
-  checks[tx.type](state, tx, bridgeState);
+  await checks[tx.type](state, tx, bridgeState);
 
   removeInputs(state, tx);
   addOutputs(state, tx);
