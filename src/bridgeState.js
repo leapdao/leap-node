@@ -16,6 +16,7 @@ const { logNode } = require('./utils/debug');
 const bridgeABI = require('./abis/bridgeAbi');
 const exitABI = require('./abis/exitHandler');
 const operatorABI = require('./abis/operator');
+const proxyABI = require('./abis/proxy');
 const { NFT_COLOR_BASE } = require('./api/methods/constants');
 
 module.exports = class BridgeState {
@@ -27,15 +28,15 @@ module.exports = class BridgeState {
     );
 
     this.exitHandlerContract = new this.web3.eth.Contract(
-      exitABI,
+      exitABI.concat(proxyABI),
       config.exitHandlerAddr
     );
     this.bridgeContract = new this.web3.eth.Contract(
-      bridgeABI,
+      bridgeABI.concat(proxyABI),
       config.bridgeAddr
     );
     this.operatorContract = new this.web3.eth.Contract(
-      operatorABI,
+      operatorABI.concat(proxyABI),
       config.operatorAddr
     );
 
