@@ -17,6 +17,10 @@ const { logNode } = require('../utils/debug');
 
 const readFile = promisify(fs.readFile);
 
+/*
+ * ToDo: update wh
+ */
+
 module.exports = async (params, bridgeState) => {
   logNode(`Last block synced: ${bridgeState.lastBlockSynced}`);
 
@@ -47,16 +51,6 @@ module.exports = async (params, bridgeState) => {
 
   if (mySlots.length === 0) {
     console.log('\n');
-    console.log(
-      `  ${'You need to become a validator first'.underline.bold.red}`
-    );
-    console.log(
-      `  Open ${colors.bold(
-        `https://bridge-dev.leapdao.org/${
-          bridgeState.bridgeContract.options.address
-        }`
-      )} and buy a slot`
-    );
     console.log(
       `  ${colors.bold('Validator address:')}\t${bridgeState.account.address}`
     );
