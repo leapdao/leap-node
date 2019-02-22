@@ -49,18 +49,24 @@ const swapAbi = [
   },
 ];
 
-async function getPastEvents(contract, fromBlock, toBlock) {
-  const batchCount = Math.ceil((toBlock - fromBlock) / BATCH_SIZE);
+async function getPastEvents(contract, fromBlockStr, toBlockStr) {
+  const fromBlock = parseInt(fromBlockStr, 10);
+  const toBlock = parseInt(toBlockStr, 10);
+  const batchSize = BATCH_SIZE * 100;
+  const batchCount = Math.ceil((toBlock - fromBlock) / batchSize);
   const events = [];
 
   for (let i = 0; i < batchCount; i += 1) {
     /* eslint-disable no-await-in-loop */
+    const localFrom = i * batchSize + fromBlock;
+    const localTo = Math.min(toBlock, i * batchSize + fromBlock + batchSize);
     events.push(
       ...(await contract.getPastEvents('Submission', {
-        fromBlock: i * BATCH_SIZE + fromBlock,
-        toBlock: Math.min(toBlock, i * BATCH_SIZE + fromBlock + BATCH_SIZE),
+        fromBlock: localFrom,
+        toBlock: localTo,
       }))
     );
+    console.log(`fetching events from ${localFrom} to ${localTo}`);
     /* eslint-enable */
   }
 
