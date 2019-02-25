@@ -5,15 +5,19 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
+const getRootGasPrice = require('./getRootGasPrice');
+
 module.exports = async function sendTransaction(web3, method, to, account) {
   const gas = Math.round(
     (await method.estimateGas({ from: account.address })) * 1.21
   );
+  const gasPrice = await getRootGasPrice();
   const data = method.encodeABI();
   const tx = {
     to,
     data,
     gas,
+    gasPrice,
   };
   const signedTx = await web3.eth.accounts.signTransaction(
     tx,
