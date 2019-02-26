@@ -12,13 +12,11 @@ module.exports = async (tendermintPort, rawTx) => {
   const nonce = Math.floor(Math.random() * (2 << 12)); // eslint-disable-line no-bitwise
   const txBytes = `0x${encodeTx({ encoded: rawTx }, nonce).toString('hex')}`;
   const tendermintRpcUrl = `http://localhost:${tendermintPort}/broadcast_tx_commit`;
-  const result = await axios
-    .get(tendermintRpcUrl, {
-      params: {
-        tx: txBytes,
-      },
-    })
-    .catch(e => console.error(e));
+  const result = await axios.get(tendermintRpcUrl, {
+    params: {
+      tx: txBytes,
+    },
+  });
 
   return {
     result: result.data.result,
