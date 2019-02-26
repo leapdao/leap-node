@@ -7,7 +7,7 @@ jest.mock('axios');
 axios.get.mockResolvedValue({
   data: {
     fast: 200.0,
-    fastest: 270.0,
+    fastest: 2700.0,
     safeLow: 134.0,
     average: 180.0,
     block_time: 19.228571428571428,
@@ -32,6 +32,11 @@ describe('getRootGasPrice', () => {
     test('Reads specified gas price from gas station API', async () => {
       const result = await getRootGasPrice(web3, 'safeLow');
       expect(result).toBe(13400000000);
+    });
+
+    test('caps gas price to 200 gwei', async () => {
+      const result = await getRootGasPrice(web3, 'fastest');
+      expect(result).toBe(200000000000);
     });
   });
 
