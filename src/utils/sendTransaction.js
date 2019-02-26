@@ -11,7 +11,7 @@ module.exports = async function sendTransaction(web3, method, to, account) {
   const gas = Math.round(
     (await method.estimateGas({ from: account.address })) * 1.21
   );
-  const gasPrice = await getRootGasPrice(web3);
+  const gasPrice = await getRootGasPrice(web3).catch(() => null);
   const data = method.encodeABI();
   const tx = {
     to,

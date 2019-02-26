@@ -24,12 +24,12 @@ describe('getRootGasPrice', () => {
   describe('mainnet', () => {
     const web3 = new Web3('https://mainnet.infura.io');
 
-    test('Reads "fast" gas price by default from gas station API', async () => {
+    test('reads "fast" gas price by default from gas station API', async () => {
       const result = await getRootGasPrice(web3);
       expect(result).toBe(20000000000);
     });
 
-    test('Reads specified gas price from gas station API', async () => {
+    test('reads specified gas price from gas station API', async () => {
       const result = await getRootGasPrice(web3, 'safeLow');
       expect(result).toBe(13400000000);
     });
@@ -38,9 +38,18 @@ describe('getRootGasPrice', () => {
       const result = await getRootGasPrice(web3, 'fastest');
       expect(result).toBe(200000000000);
     });
+
+    test('returns null if gas station is not available', async () => {
+      axios.get.mockImplementationOnce(() =>
+        Promise.reject(new Error('bad error'))
+      );
+      expect(getRootGasPrice(web3)).rejects.toEqual(
+        new Error('Gas Station error')
+      );
+    });
   });
 
-  test('Returns null for non-mainnet networks', async () => {
+  test('returns null for non-mainnet networks', async () => {
     const result = await getRootGasPrice(new Web3('https://rinkeby.infura.io'));
     expect(result).toBeNull();
   });
