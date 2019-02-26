@@ -17,10 +17,11 @@ const privKey =
 
 const ADDR_2 = '0x8AB21C65041778DFc7eC7995F9cDef3d5221a5ad';
 
-const PORT = 3000;
+const LOTION_PORT = 3000;
+const TENDERMINT_PORT = 26659;
 
 const getState = async () => {
-  const url = `http://localhost:${PORT}/state`;
+  const url = `http://localhost:${LOTION_PORT}/state`;
   const { data } = await axios.get(url);
   return data;
 };
@@ -39,7 +40,7 @@ async function run() {
     [new Output('3376735536791242681353', ADDR_2, 32769)]
   ).signAll(privKey);
   console.log(transfer.toJSON());
-  await sendTx(PORT, transfer.hex());
+  await sendTx(TENDERMINT_PORT, transfer.hex());
   console.log((await getState()).balances);
 }
 
