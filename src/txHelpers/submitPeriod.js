@@ -17,7 +17,7 @@ const { logPeriod } = require('../utils/debug');
 const logError = height => err => {
   logPeriod('submitPeriod error: %s (height: %d)', err.message, height);
 };
-const eventDistance = 4 * 60 * 8; // about 8 hours on main-net
+const eventDistance = 4 * 60 * 12; // about 12 hours on main-net
 
 module.exports = async (period, slots, height, bridgeState) => {
   // query the contracts for submissions
