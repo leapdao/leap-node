@@ -6,6 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: quay.io/leapdao/leap-node:latest
     volumes:
       - leap-node:/root
     ports:
