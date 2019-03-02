@@ -22,6 +22,7 @@ module.exports = (state, tx, bridgeState) => {
   const unspent = state.unspent[prevout.hex()];
   const exit = bridgeState.exits[prevout.getUtxoId()];
   if (
+    !unspent ||
     !exit ||
     !addrCmp(exit.exitor, unspent.address) ||
     !equal(BigInt(exit.amount), BigInt(unspent.value)) ||
