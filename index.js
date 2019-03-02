@@ -82,7 +82,10 @@ async function run() {
 
   const privKey = await readPrivKey(app, cliArgs);
 
-  const eventsRelay = new EventsRelay(config.eventsDelay, cliArgs.port);
+  const eventsRelay = new EventsRelay(
+    config.eventsDelay,
+    cliArgs.tendermintPort
+  );
   const bridgeState = new BridgeState(
     db,
     privKey,
@@ -106,7 +109,7 @@ async function run() {
     blockTicker.subscribe(eventsRelay.onNewBlock);
     await printStartupInfo(params, bridgeState);
 
-    const api = await jsonrpc(bridgeState, params.txServerPort, db, app);
+    const api = await jsonrpc(bridgeState, cliArgs.tendermintPort, db, app);
     api
       .listenHttp({ port: cliArgs.rpcport, host: cliArgs.rpcaddr })
       .then(addr => {

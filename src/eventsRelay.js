@@ -15,7 +15,7 @@ const { handleEvents } = require('./utils');
 const minDelay = 2000;
 
 module.exports = class EventsRelay {
-  constructor(delay, txServerPort) {
+  constructor(delay, tendermintPort) {
     this.relayBuffer = new TinyQueue([], (a, b) => {
       if (a.blockNumber === b.blockNumber) {
         return a.logIndex - b.logIndex;
@@ -24,9 +24,16 @@ module.exports = class EventsRelay {
     });
     this.relayDelay = delay;
 
-    this.txServerPort = txServerPort;
+    this.tendermintPort = tendermintPort;
     this.onNewBlock = this.onNewBlock.bind(this);
   }
+
+  sendDelayed(tx) {
+    setTimeout(() => {
+      sendTx(this.tendermintPort, tx.hex());
+    }, minDelay);
+  }
+
   async onNewBlock(blockNumber) {
     if (this.relayBuffer.length === 0) {
       return;
@@ -55,9 +62,7 @@ module.exports = class EventsRelay {
         signerAddr,
       } = event.returnValues;
       const tx = Tx.validatorJoin(slotId, tenderAddr, eventCounter, signerAddr);
-      setTimeout(() => {
-        sendTx(this.txServerPort, tx.hex());
-      }, minDelay);
+      this.sendDelayed(tx);
     };
 
     const handler = handleEvents({
@@ -65,30 +70,22 @@ module.exports = class EventsRelay {
         const color = Number(event.color);
         const value = BigInt(event.amount);
         const tx = Tx.deposit(event.depositId, value, event.depositor, color);
-        setTimeout(() => {
-          sendTx(this.txServerPort, tx.hex());
-        }, minDelay);
+        this.sendDelayed(tx);
       },
       EpochLength: async event => {
         const { epochLength } = event.returnValues;
         const tx = Tx.epochLength(Number(epochLength));
-        setTimeout(() => {
-          sendTx(this.txServerPort, tx.hex());
-        }, minDelay);
+        this.sendDelayed(tx);
       },
       MinGasPrice: async event => {
         const { minGasPrice } = event.returnValues;
         const tx = Tx.minGasPrice(BigInt(minGasPrice));
-        setTimeout(() => {
-          sendTx(this.txServerPort, tx.hex());
-        }, minDelay);
+        this.sendDelayed(tx);
       },
       ExitStarted: async event => {
         const { txHash, outIndex } = event.returnValues;
         const tx = Tx.exit(new Input(new Outpoint(txHash, Number(outIndex))));
-        setTimeout(() => {
-          sendTx(this.txServerPort, tx.hex());
-        }, minDelay);
+        this.sendDelayed(tx);
       },
       ValidatorJoin: handleJoin,
       ValidatorUpdate: handleJoin,
@@ -100,9 +97,7 @@ module.exports = class EventsRelay {
           Number(event.returnValues.epoch) + 1,
           event.returnValues.newSigner
         );
-        setTimeout(() => {
-          sendTx(this.txServerPort, tx.hex());
-        }, minDelay);
+        this.sendDelayed(tx);
       },
     });
 
