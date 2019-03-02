@@ -300,6 +300,11 @@ module.exports = [
       },
       {
         indexed: false,
+        name: 'newHeight',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
         name: 'owner',
         type: 'address',
       },
