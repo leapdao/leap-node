@@ -43,7 +43,7 @@ function Lotion(opts = {}) {
       ? true
       : opts.createEmptyBlocks;
   const devMode = opts.devMode || false;
-  const { unsafeRpc } = opts;
+  const { unsafeRpc, readonlyValidator } = opts;
   const txMiddleware = [];
   const queryMiddleware = [];
   const initializerMiddleware = [];
@@ -189,6 +189,7 @@ function Lotion(opts = {}) {
             keys,
             initialAppHash,
             unsafeRpc,
+            readonlyValidator,
           });
         } catch (e) {
           console.log('error starting tendermint node:');
