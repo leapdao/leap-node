@@ -8,12 +8,18 @@ RUN npm install --production --no-package-lock yarn
 RUN ./node_modules/.bin/yarn install --production
 RUN ./node_modules/.bin/yarn link
 RUN apk del build_deps
+
+ENV NO_VALIDATORS_UPDATES "false"
+ENV TX_PORT "3000"
+ENV RPC_ADDR "0.0.0.0"
+ENV RPC_PORT "8645"
+ENV WS_ADDR "0.0.0.0"
+ENV WS_PORT "8646"
+ENV P2P_PORT "46691"
+# Either CONFIG_URL or NETWORK needs to be defined, CONFIG_URL takes precedence
+ENV CONFIG_URL "http://node1.testnet.leapdao.org:8645"
+# for presets/leap-NETWORK
+ENV NETWORK "testnet"
+# Needed if validator
+ENV PRIVATE_KEY ""
 ENTRYPOINT ["leap-node"]
-CMD [\
-  "--config=http://node1.testnet.leapdao.org:8645", \
-  "--p2pPort=46691", \
-  "--rpcaddr=0.0.0.0", \
-  "--rpcport=8645", \
-  "--wsaddr=0.0.0.0", \
-  "--wsport=8646" \
-]

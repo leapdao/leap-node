@@ -10,6 +10,9 @@ services:
     volumes:
       - leap-node:/root
     ports:
+      # ATTENTION: if you are going to run this on an untrusted network, guard all ports except `p2p`.
+      # tx server
+      - "3000:3000"
       # rpc
       - "8645:8645"
       # ws
@@ -20,6 +23,10 @@ services:
       - "46691:46691"
     environment:
       - "DEBUG=${DEBUG}"
+      - "NO_VALIDATORS_UPDATES=${NO_VALIDATORS_UPDATES}"
+      - "CONFIG_URL=${CONFIG_URL}"
+      - "NETWORK=${NETWORK}"
+      - "PRIVATE_KEY=${PRIVATE_KEY}"
     stdin_open: true
     tty: true
     deploy:
