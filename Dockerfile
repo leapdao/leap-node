@@ -8,7 +8,8 @@ RUN npm install --production --no-package-lock yarn
 RUN ./node_modules/.bin/yarn install --production
 RUN ./node_modules/.bin/yarn link
 RUN apk del build_deps
-CMD ["leap-node", \
+ENTRYPOINT ["leap-node"]
+CMD [\
   "--config=http://node1.testnet.leapdao.org:8645", \
   "--p2pPort=46691", \
   "--rpcaddr=0.0.0.0", \
