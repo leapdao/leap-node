@@ -94,6 +94,15 @@ module.exports = [
   },
   {
     anonymous: false,
+    inputs: [
+      { indexed: false, name: 'height', type: 'uint256' },
+      { indexed: true, name: 'root', type: 'bytes32' },
+    ],
+    name: 'NewHeight',
+    type: 'event',
+  },
+  {
+    anonymous: false,
     inputs: [{ indexed: false, name: 'operator', type: 'address' }],
     name: 'NewOperator',
     type: 'event',
