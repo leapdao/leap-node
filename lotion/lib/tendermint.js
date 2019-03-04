@@ -16,6 +16,7 @@ module.exports = async ({
   initialAppHash,
   createEmptyBlocks,
   unsafeRpc,
+  readonlyValidator,
 }) => {
   await tendermint.init(lotionPath);
 
@@ -58,11 +59,16 @@ module.exports = async ({
   if (unsafeRpc) {
     opts.rpc.unsafe = true;
   }
+  opts.consensus = {};
   if (createEmptyBlocks === false) {
-    opts.consensus = { createEmptyBlocks: false };
+    opts.consensus.createEmptyBlocks = false;
   }
+
   if (!logTendermint) {
     opts.logLevel = 'error';
+  }
+  if (readonlyValidator) {
+    opts.consensus.readonly = true;
   }
 
   let shuttingDown = false;

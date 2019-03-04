@@ -107,6 +107,12 @@ const options = [
     default: false,
     help: 'Start node with fresh state',
   },
+  {
+    names: ['readonly'],
+    type: 'bool',
+    default: false,
+    help: 'Run validator without producing blocks, only observing',
+  },
 ];
 
 const parser = dashdash.createParser({ options });
