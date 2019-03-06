@@ -118,12 +118,14 @@ const options = [
     names: ['readonly'],
     type: 'bool',
     default: false,
+    env: 'READONLY',
     help: 'Run validator without producing blocks, only observing',
   },
   {
     names: ['unsafeRpc'],
     type: 'bool',
     default: false,
+    env: 'UNSAFE_RPC',
     help: 'Run unsafe Tendermint RPC',
   },
 ];
