@@ -18,42 +18,49 @@ const options = [
   {
     names: ['no-validators-updates'],
     type: 'bool',
+    env: 'NO_VALIDATORS_UPDATES',
     default: false,
     help: 'Disabling validators set updates',
   },
   {
     names: ['port'],
     type: 'number',
+    env: 'TX_PORT',
     default: 3000,
     help: 'Tx endpoint port',
   },
   {
     names: ['rpcaddr'],
     type: 'string',
+    env: 'RPC_ADDR',
     default: 'localhost',
     help: 'Host for http RPC server',
   },
   {
     names: ['rpcport'],
     type: 'number',
+    env: 'RPC_PORT',
     default: 8645,
     help: 'Port for http RPC server',
   },
   {
     names: ['wsaddr'],
     type: 'string',
+    env: 'WS_ADDR',
     default: 'localhost',
     help: 'Host for websocket RPC server',
   },
   {
     names: ['wsport'],
     type: 'number',
+    env: 'WS_PORT',
     default: 8646,
     help: 'Port for websocket RPC server',
   },
   {
     names: ['p2pPort'],
     type: 'number',
+    env: 'P2P_PORT',
     default: undefined,
     help: 'Port for p2p connection',
   },
@@ -78,17 +85,20 @@ const options = [
   {
     names: ['config'],
     type: 'string',
+    env: 'CONFIG_URL',
     help: "Path to config file or other's node JSON RPC url",
   },
   {
     names: ['privateKey'],
     type: 'string',
+    env: 'PRIVATE_KEY',
     help:
       "Path to file with ethereum private key. Will be used for validators' transaction",
   },
   {
     names: ['network'],
     type: 'string',
+    env: 'NETWORK',
     help: 'Config preset',
   },
   {
@@ -116,7 +126,7 @@ if (cliArgs.version) {
 if (cliArgs.network) {
   const configPath = path.join(
     __dirname,
-    '..',
+    '../../',
     'presets',
     `leap-${cliArgs.network}.json`
   );

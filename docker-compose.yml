@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  leap-node:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: quay.io/leapdao/leap-node:latest
+    volumes:
+      - leap-node:/root
+    ports:
+      # ATTENTION: if you are going to run this on an untrusted network, guard all ports except `p2p`.
+      # tx server
+      - "3000:3000"
+      # rpc
+      - "8645:8645"
+      # ws
+      - "8646:8646"
+      # proxy_app
+      - "26659:26659"
+      # p2p
+      - "46691:46691"
+    environment:
+      - "DEBUG=${DEBUG}"
+      - "NO_VALIDATORS_UPDATES=${NO_VALIDATORS_UPDATES}"
+      - "CONFIG_URL=${CONFIG_URL}"
+      - "NETWORK=${NETWORK}"
+      - "PRIVATE_KEY=${PRIVATE_KEY}"
+    stdin_open: true
+    tty: true
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          memory: 2048M
+        reservations:
+          memory: 512M
+
+volumes:
+  leap-node:
