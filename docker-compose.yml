@@ -27,6 +27,8 @@ services:
       - "CONFIG_URL=${CONFIG_URL}"
       - "NETWORK=${NETWORK}"
       - "PRIVATE_KEY=${PRIVATE_KEY}"
+      - "READONLY=${READONLY}"
+      - "UNSAFE_RPC=${UNSAFE_RPC}"
     stdin_open: true
     tty: true
     deploy:
