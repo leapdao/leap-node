@@ -150,6 +150,8 @@ function Lotion(opts = {}) {
           opts.abciPort
         );
 
+        const { tendermintAddr } = opts;
+
         // initialize merk store
         const merkDb = level(join(lotionPath, 'merk'));
         const store = await merk(merkDb);
@@ -176,6 +178,7 @@ function Lotion(opts = {}) {
         try {
           tendermint = await Tendermint({
             lotionPath,
+            tendermintAddr,
             tendermintPort,
             abciPort,
             p2pPort,

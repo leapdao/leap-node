@@ -64,6 +64,7 @@ async function run() {
     abciPort: cliArgs.abciPort,
     peers: config.peers,
     p2pPort: cliArgs.p2pPort,
+    tendermintAddr: cliArgs.tendermintAddr,
     tendermintPort: cliArgs.tendermintPort,
     createEmptyBlocks: false,
     logTendermint: log => {
