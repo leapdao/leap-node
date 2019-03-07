@@ -65,10 +65,17 @@ const options = [
     help: 'Port for p2p connection',
   },
   {
+    names: ['tendermintAddr'],
+    type: 'string',
+    env: 'TENDERMINT_ADDR',
+    default: '0.0.0.0',
+    help: 'Host for tendermint RPC connection',
+  },
+  {
     names: ['tendermintPort'],
     type: 'number',
     default: 26659,
-    help: 'Port for tendermint connection',
+    help: 'Port for tendermint RPC connection',
   },
   {
     names: ['abciPort'],

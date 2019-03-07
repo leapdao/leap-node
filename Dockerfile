@@ -16,6 +16,7 @@ ENV RPC_PORT "8645"
 ENV WS_ADDR "0.0.0.0"
 ENV WS_PORT "8646"
 ENV P2P_PORT "46691"
+ENV TENDERMINT_ADDR "0.0.0.0"
 # Either CONFIG_URL or NETWORK needs to be defined, CONFIG_URL takes precedence
 ENV CONFIG_URL "http://node1.testnet.leapdao.org:8645"
 # for presets/leap-NETWORK
