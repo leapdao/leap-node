@@ -114,6 +114,20 @@ const options = [
     default: false,
     help: 'Start node with fresh state',
   },
+  {
+    names: ['readonly'],
+    type: 'bool',
+    default: false,
+    env: 'READONLY',
+    help: 'Run validator without producing blocks, only observing',
+  },
+  {
+    names: ['unsafeRpc'],
+    type: 'bool',
+    default: false,
+    env: 'UNSAFE_RPC',
+    help: 'Run unsafe Tendermint RPC',
+  },
 ];
 
 const parser = dashdash.createParser({ options });
@@ -150,6 +164,11 @@ if (!cliArgs.config) {
 
 if (cliArgs.privateKey && !fs.existsSync(cliArgs.privateKey)) {
   console.log(`${cliArgs.privateKey} does not exist`);
+  process.exit(0);
+}
+
+if (cliArgs.readonly && !cliArgs.unsafeRpc) {
+  console.log('--readonly flag requires --unsafeRpc');
   process.exit(0);
 }
 

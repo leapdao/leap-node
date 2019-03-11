@@ -72,6 +72,8 @@ async function run() {
         log.replace(/I\[\d{2}-\d{2}\|\d{2}:\d{2}:\d{2}\.\d{3}\] /g, '')
       );
     },
+    unsafeRpc: cliArgs.unsafeRpc,
+    readonlyValidator: cliArgs.readonly,
   });
 
   if (cliArgs.fresh) {
