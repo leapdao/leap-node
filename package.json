@@ -69,7 +69,7 @@
     "rimraf": "^2.6.2",
     "rpc-websockets": "^4.1.2",
     "tendermint": "^3.1.9",
-    "tendermint-node": "leapdao/tendermint-node#a49e23b2104bc201f13f99ac7bd898133cdd3651",
+    "tendermint-node": "leapdao/tendermint-node#0ec65fb8ceed44a06b083e22c5b879a0df586396",
     "tinyqueue": "^2.0.0",
     "truffle-hdwallet-provider": "^1.0.3",
     "varstruct": "^6.1.1",
