@@ -5,6 +5,7 @@ const tendermint = require('tendermint-node');
 
 module.exports = async ({
   lotionPath,
+  tendermintAddr,
   tendermintPort,
   abciPort,
   p2pPort,
@@ -48,7 +49,7 @@ module.exports = async ({
   );
 
   const opts = {
-    rpc: { laddr: `tcp://0.0.0.0:${tendermintPort}` },
+    rpc: { laddr: `tcp://${tendermintAddr}:${tendermintPort}` },
     p2p: { laddr: `tcp://0.0.0.0:${p2pPort}` },
     proxyApp: `tcp://127.0.0.1:${abciPort}`,
   };
