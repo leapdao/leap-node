@@ -176,6 +176,6 @@ describe('submitPeriod', async () => {
     expect(period).toEqual({
       timestamp: '0',
     });
-    expect(submitCalled).toBe(true);
+    expect(submitCalled).toBe(false);
   });
 });
