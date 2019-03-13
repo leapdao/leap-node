@@ -6,7 +6,6 @@
  */
 
 const { Type, Output } = require('leap-core');
-const { checkInsAndOuts } = require('./utils');
 const Account = require('ethereumjs-account');
 const Transaction = require('ethereumjs-tx');
 const Trie = require('merkle-patricia-tree');
@@ -14,7 +13,7 @@ const VM = require('ethereumjs-vm');
 const utils = require('ethereumjs-util');
 const { BigInt, equal, add, multiply } = require('jsbi-utils');
 const isEqual = require('lodash/isEqual');
-const { groupValuesByColor } = require('./utils');
+const { checkInsAndOuts, groupValuesByColor } = require('./utils');
 const getColors = require('../../api/methods/getColors');
 const { NFT_COLOR_BASE } = require('../../api/methods/constants');
 
@@ -84,9 +83,12 @@ const addColors = (map, colors, colorBase = 0) => {
   });
 };
 
-module.exports = async (state, tx, bridgeState) => {
+module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
   if (tx.type !== Type.SPEND_COND) {
     throw new Error('Spending Condition tx expected');
+  }
+  if (nodeConfig.network && nodeConfig.network.noSpendingConditions) {
+    throw new Error('Spending Conditions are not supported on this network');
   }
 
   // check that script hashes to address
