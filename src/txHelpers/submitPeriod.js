@@ -9,7 +9,6 @@ const {
   getSlotsByAddr,
   sendTransaction,
   getCurrentSlotId,
-  GENESIS,
 } = require('../utils');
 const { logPeriod } = require('../utils/debug');
 
@@ -72,11 +71,17 @@ module.exports = async (
     logPeriod('mySlots', currentSlotId, mySlots);
     if (currentSlot) {
       logPeriod('submitPeriod. Slot %d', currentSlot.id);
+      if (!prevPeriodRoot) {
+        logPeriod(
+          'submitPeriod. Not previous period root found. Skipping submission'
+        );
+        return submittedPeriod;
+      }
       const tx = sendTransaction(
         bridgeState.web3,
         bridgeState.operatorContract.methods.submitPeriod(
           currentSlot.id,
-          prevPeriodRoot || GENESIS,
+          prevPeriodRoot,
           period.merkleRoot()
         ),
         bridgeState.operatorContract.options.address,
