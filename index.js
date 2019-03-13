@@ -104,7 +104,9 @@ async function run() {
   await bridgeState.init();
   await blockTicker.init();
 
-  app.useTx(txHandler(bridgeState));
+  const nodeConfig = Object.assign({}, cliArgs, { network: config });
+
+  app.useTx(txHandler(bridgeState, nodeConfig));
   app.useBlock(blockHandler(bridgeState, db, cliArgs.no_validators_updates));
   app.usePeriod(periodHandler(bridgeState));
 

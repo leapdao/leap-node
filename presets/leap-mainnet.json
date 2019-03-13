@@ -7,6 +7,7 @@
   "networkId": 448747055,
   "eventsDelay": 2,
   "bridgeDelay": 6,
+  "noSpendingConditions": true,
   "genesis": {
     "app_hash": "68154a516d6821b07e6b25f76310faeae1d24d1c0a6cf3152ccba90f1fcb9db9",
     "chain_id": "test-chain-egOhov",

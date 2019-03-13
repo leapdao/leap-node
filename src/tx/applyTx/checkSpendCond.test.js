@@ -119,9 +119,23 @@ describe('checkSpendCond', () => {
       )}`; // outputs
     condition.inputs[0].setMsgData(msgData);
 
-    await checkSpendCond(state, condition, {
+    const bridgeState = {
       exitHandlerContract,
       tokens: { erc20: [], erc721: [] },
+    };
+
+    await checkSpendCond(state, condition, bridgeState);
+
+    await checkSpendCond(state, condition, bridgeState, {
+      network: { noSpendingConditions: false },
     });
+
+    expect(
+      checkSpendCond(state, condition, bridgeState, {
+        network: { noSpendingConditions: true },
+      })
+    ).rejects.toEqual(
+      new Error('Spending Conditions are not supported on this network')
+    );
   });
 });
