@@ -39,7 +39,9 @@
     ]
   },
   "peers": [
-    "8e8789d1713de475cddc638a7854406ee2eb09a7@node2.mainnet.leapdao.org:46691",
-    "5165813b4164e0bcfa2ad0fd7aea61af3b5907dc@node1.mainnet.leapdao.org:46691"
+    "8e8789d1713de475cddc638a7854406ee2eb09a7@172.31.24.215:46691",
+    "105b9234cb40c70e1e896f053a8c061842891182@172.31.29.160:46691",
+    "5165813b4164e0bcfa2ad0fd7aea61af3b5907dc@sen1.mainnet.leapdao.org:46691",
+    "fe88ff67d3eb97dcc03a6cca227164eb98b8c59d@sen2.mainnet.leapdao.org:46691"
   ]
 }
