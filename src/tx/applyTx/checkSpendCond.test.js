@@ -11,22 +11,6 @@ erc20Tokens.forEach((addr, i) => {
   tokens[i] = addr;
 });
 
-const exitHandlerContract = {
-  methods: {
-    erc20TokenCount: () => ({
-      call: async () => erc20Tokens.length,
-    }),
-    nftTokenCount: () => ({
-      call: async () => 0,
-    }),
-    tokens: i => ({
-      call: async () => {
-        return { addr: tokens[i] };
-      },
-    }),
-  },
-};
-
 // a script exists that can only be spent by spenderAddr defined in script
 //
 // pragma solidity ^0.5.2;
@@ -119,8 +103,10 @@ describe('checkSpendCond', () => {
     condition.inputs[0].setMsgData(msgData);
 
     const bridgeState = {
-      exitHandlerContract,
-      tokens: { erc20: [], erc721: [] },
+      tokens: {
+        erc20: erc20Tokens,
+        erc721: [],
+      },
       minGasPrices: [100],
     };
 
