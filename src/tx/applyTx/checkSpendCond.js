@@ -11,7 +11,7 @@ const Transaction = require('ethereumjs-tx');
 const Trie = require('merkle-patricia-tree');
 const VM = require('ethereumjs-vm');
 const utils = require('ethereumjs-util');
-const { BigInt, equal, add, multiply } = require('jsbi-utils');
+const { BigInt, add, divide, subtract, lessThan } = require('jsbi-utils');
 const isEqual = require('lodash/isEqual');
 const { checkInsAndOuts, groupValuesByColor } = require('./utils');
 const getColors = require('../../api/methods/getColors');
@@ -125,6 +125,7 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
   let results;
   let nonceCounter = 0;
   const insValues = Object.values(inputMap).reduce(groupValuesByColor, {});
+  const outsValues = tx.outputs.reduce(groupValuesByColor, {});
   // eslint-disable-next-line  guard-for-in
   for (const color in insValues) {
     const erc20Account = new Account();
@@ -133,8 +134,6 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
     await setAccount(erc20Account, stateTrie, colorMap[color]);
 
     // minting amount of output to address of condition
-
-    const outsValues = tx.outputs.reduce(groupValuesByColor, {});
     const amountHex = utils.setLengthLeft(
       utils.toBuffer(`0x${BigInt(outsValues[color]).toString(16)}`),
       32
@@ -142,7 +141,6 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
     // eslint-disable-next-line no-await-in-loop
     await runTx(vm, {
       nonce: nonceCounter,
-      gasPrice: '0x00',
       gasLimit: '0xffffffffffff',
       to: colorMap[color],
       data: `0x40c10f19000000000000000000000000${tx
@@ -161,29 +159,33 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
   });
 
   const logOuts = [];
+  const colorGasSums = {};
   // running conditions with msgData
   for (let i = 0; i < tx.inputs.length; i += 1) {
     // eslint-disable-next-line no-await-in-loop
     results = await runTx(vm, {
       nonce: nonceCounter,
-      gasPrice: tx.inputs[i].gasPrice,
       gasLimit: 6000000, // TODO: set gas Limit to (inputs - outputs) / gasPrice
       to: tx.sigHash(), // the plasma address is replaced with sighash, to prevent replay attacks
       data: tx.inputs[i].msgData,
     });
     nonceCounter += 1;
 
-    let spent = multiply(
-      BigInt(results.gasUsed),
-      BigInt(tx.inputs[i].gasPrice)
-    );
-
     const out = inputMap[tx.inputs[i].prevout.getUtxoId()];
+
+    if (colorGasSums[out.color]) {
+      colorGasSums[out.color] = add(
+        colorGasSums[out.color],
+        BigInt(results.gasUsed)
+      );
+    } else {
+      colorGasSums[out.color] = BigInt(results.gasUsed);
+    }
+
     // itterate through all transfer events and sum them up per color
     results.vm.logs.forEach(log => {
       if (log[0].equals(colorMap[out.color])) {
         const transferAmount = BigInt(`0x${log[2].toString('hex')}`, 16);
-        spent = add(spent, transferAmount);
         let toAddr = `0x${log[1][2].slice(12, 32).toString('hex')}`;
         // replace injected sigHash with plasma address
         if (toAddr === tx.sigHash()) {
@@ -192,12 +194,21 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
         logOuts.push(new Output(transferAmount, toAddr, out.color));
       }
     });
-    if (!equal(BigInt(out.value), spent)) {
+  }
+
+  // eslint-disable-next-line  guard-for-in
+  for (const color in insValues) {
+    const gasPrice = divide(
+      subtract(insValues[color], outsValues[color]),
+      colorGasSums[color]
+    );
+    const minGasPrice = BigInt(
+      bridgeState.minGasPrices[bridgeState.minGasPrices.length - 1]
+    );
+    if (lessThan(gasPrice, minGasPrice)) {
       return Promise.reject(
         new Error(
-          `balance missmatch for ${out.address}. inputs: ${
-            out.value
-          }, output: ${spent}`
+          `tx gasPrice ${gasPrice.toString()} less than minGasPRice: ${minGasPrice.toString()}`
         )
       );
     }

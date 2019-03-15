@@ -60,7 +60,7 @@
     "js-abci": "leapdao/js-abci#34538e252811610b23340a9f5314be4d0a44a501",
     "jsbi-utils": "^1.0.0",
     "jsondiffpatch": "^0.2.5",
-    "leap-core": "^0.28.0",
+    "leap-core": "^0.28.2",
     "level": "^4.0.0",
     "lodash": "^4.17.10",
     "lodash.get": "^4.4.2",

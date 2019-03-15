@@ -94,7 +94,6 @@ describe('checkSpendCond', () => {
       [
         new Input({
           prevout: new Outpoint(deposit.hash(), 0),
-          gasPrice: 100,
           script: conditionScript,
         }),
       ],
@@ -122,6 +121,7 @@ describe('checkSpendCond', () => {
     const bridgeState = {
       exitHandlerContract,
       tokens: { erc20: [], erc721: [] },
+      minGasPrices: [100],
     };
 
     await checkSpendCond(state, condition, bridgeState);
