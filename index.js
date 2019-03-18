@@ -39,7 +39,7 @@ async function run() {
     return result;
   })();
 
-  const app = lotion({
+  global.app = lotion({
     initialState: {
       mempool: [],
       balances: {}, // stores account balances like this { [colorIndex]: { address1: 0, ... } }
@@ -81,21 +81,21 @@ async function run() {
     process.exit(0);
   }
 
-  const db = Db(app);
+  global.db = Db(app);
 
   const privKey = await readPrivKey(app, cliArgs);
 
-  const eventsRelay = new EventsRelay(
+  global.eventsRelay = new EventsRelay(
     config.eventsDelay,
     cliArgs.tendermintPort
   );
-  const bridgeState = new BridgeState(
+  global.bridgeState = new BridgeState(
     db,
     privKey,
     config,
     eventsRelay.relayBuffer
   );
-  const blockTicker = new BlockTicker(bridgeState.web3, [
+  global.blockTicker = new BlockTicker(bridgeState.web3, [
     bridgeState.onNewBlock,
   ]);
 
