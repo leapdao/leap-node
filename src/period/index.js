@@ -8,7 +8,7 @@
 const submitPeriod = require('../txHelpers/submitPeriod');
 const { logPeriod } = require('../utils/debug');
 
-module.exports = bridgeState => async (rsp, chainInfo) => {
+module.exports = (bridgeState, nodeConfig = {}) => async (rsp, chainInfo) => {
   const height = chainInfo.height - 32;
   if (height === 0) {
     // genesis height doesn't need check
@@ -21,7 +21,8 @@ module.exports = bridgeState => async (rsp, chainInfo) => {
     bridgeState.previousPeriod,
     bridgeState.currentState.slots,
     height + bridgeState.checkCallsCount,
-    bridgeState
+    bridgeState,
+    nodeConfig
   );
 
   if (contractPeriod.timestamp === '0') {
