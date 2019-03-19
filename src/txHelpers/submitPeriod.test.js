@@ -25,19 +25,6 @@ describe('submitPeriod', async () => {
       },
     };
 
-    const operatorContract = {
-      getPastEvents: async () => {
-        return [
-          {
-            returnValues: {
-              blocksRoot: '0x',
-              periodRoot: '0x',
-            },
-          },
-        ];
-      },
-    };
-
     const account = {
       address: ADDR,
     };
@@ -45,12 +32,12 @@ describe('submitPeriod', async () => {
     const period = await submitPeriod(
       {
         merkleRoot() {
-          return '0x';
+          return '0x1234';
         },
       },
       [],
       0,
-      { bridgeContract, web3, operatorContract, account }
+      { bridgeContract, web3, account, lastBlocksRoot: '0x1234' }
     );
     expect(period).toEqual({
       timestamp: '100',
@@ -76,16 +63,6 @@ describe('submitPeriod', async () => {
     const operatorContract = {
       options: {
         address: ADDR,
-      },
-      getPastEvents: async () => {
-        return [
-          {
-            returnValues: {
-              blocksRoot: '0x',
-              periodRoot: '0x',
-            },
-          },
-        ];
       },
       methods: {
         submitPeriod: () => {
@@ -137,16 +114,6 @@ describe('submitPeriod', async () => {
     const operatorContract = {
       options: {
         address: ADDR,
-      },
-      getPastEvents: async () => {
-        return [
-          {
-            returnValues: {
-              blocksRoot: '0x',
-              periodRoot: '0x',
-            },
-          },
-        ];
       },
       methods: {
         submitPeriod: () => {

@@ -155,6 +155,10 @@ module.exports = class BridgeState {
       MinGasPrice: ({ returnValues: event }) => {
         this.minGasPrices.push(Number(event.minGasPrice));
       },
+      Submission: ({ returnValues: event }) => {
+        this.lastBlocksRoot = event.blocksRoot;
+        this.lastPeriodRoot = event.periodRoot;
+      },
     });
 
     await handler(events);
