@@ -11,7 +11,7 @@ const activateSlot = require('../txHelpers/activateSlot');
 const { getAuctionedByAddr } = require('../utils');
 const { logPeriod } = require('../utils/debug');
 
-module.exports = async (state, chainInfo, bridgeState) => {
+module.exports = async (state, chainInfo, bridgeState, nodeConfig = {}) => {
   if (chainInfo.height % 32 === 0) {
     logPeriod('updatePeriod');
     try {
@@ -19,7 +19,8 @@ module.exports = async (state, chainInfo, bridgeState) => {
         bridgeState.currentPeriod,
         state.slots,
         chainInfo.height,
-        bridgeState
+        bridgeState,
+        nodeConfig
       );
     } catch (err) {
       logPeriod(err);
@@ -37,7 +38,7 @@ module.exports = async (state, chainInfo, bridgeState) => {
     )
       .filter(({ activationEpoch }) => activationEpoch - state.epoch.epoch >= 2)
       .map(({ id }) => id);
-    if (myAuctionedSlots.length > 0) {
+    if (myAuctionedSlots.length > 0 && !nodeConfig.readonly) {
       logPeriod('found some slots for activation', myAuctionedSlots);
       myAuctionedSlots.forEach(id => {
         const tx = activateSlot(id, bridgeState);

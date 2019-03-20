@@ -107,7 +107,7 @@ async function run() {
   const nodeConfig = Object.assign({}, cliArgs, { network: config });
 
   app.useTx(txHandler(bridgeState, nodeConfig));
-  app.useBlock(blockHandler(bridgeState, db, cliArgs.no_validators_updates));
+  app.useBlock(blockHandler(bridgeState, db, nodeConfig));
   app.usePeriod(periodHandler(bridgeState));
 
   app.listen(cliArgs.port).then(async params => {

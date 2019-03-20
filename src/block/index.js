@@ -5,17 +5,17 @@ const updatePeriod = require('./updatePeriod');
 const updateValidators = require('./updateValidators');
 const updateEpoch = require('./updateEpoch');
 
-module.exports = (bridgeState, db, noValidatorsUpdates) => async (
+module.exports = (bridgeState, db, nodeConfig = {}) => async (
   state,
   chainInfo
 ) => {
   bridgeState.checkCallsCount = 0;
-  await updatePeriod(state, chainInfo, bridgeState);
+  await updatePeriod(state, chainInfo, bridgeState, nodeConfig);
   await addBlock(state, chainInfo, {
     bridgeState,
     db,
   });
-  if (!noValidatorsUpdates && state.slots.length > 0) {
+  if (!nodeConfig.no_validators_updates && state.slots.length > 0) {
     await updateValidators(state, chainInfo);
   }
 

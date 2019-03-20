@@ -19,7 +19,13 @@ const logError = height => err => {
 };
 const eventDistance = 4 * 60 * 12; // about 12 hours on main-net
 
-module.exports = async (period, slots, height, bridgeState) => {
+module.exports = async (
+  period,
+  slots,
+  height,
+  bridgeState,
+  nodeConfig = {}
+) => {
   // query the contracts for submissions
   // to find the period roots to the merkle roots
   const parentHeight = await bridgeState.web3.eth.getBlockNumber();
@@ -52,6 +58,11 @@ module.exports = async (period, slots, height, bridgeState) => {
       .periods(currentPeriodRoot)
       .call();
     logPeriod('submittedPeriod', period.merkleRoot(), submittedPeriod);
+  }
+
+  if (nodeConfig.readonly) {
+    logPeriod('Readonly node. Skipping the rest of submitPeriod');
+    return submittedPeriod;
   }
 
   if (submittedPeriod.timestamp === '0') {
