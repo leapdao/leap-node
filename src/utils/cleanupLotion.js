@@ -15,7 +15,7 @@ module.exports = async app => {
   const lotionPath = app.lotionPath();
   if (await exists(lotionPath)) {
     const configPath = path.join(lotionPath, 'config');
-    const privValidatorPath = path.join(configPath, 'priv_validator.json');
+    const privValidatorPath = path.join(configPath, 'priv_validator_key.json');
     const privValidator = JSON.parse(await readFile(privValidatorPath));
     await writeFile(
       privValidatorPath,
