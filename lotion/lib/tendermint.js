@@ -28,7 +28,7 @@ module.exports = async ({
     );
   }
   if (keys) {
-    const validatorJsonPath = join(lotionPath, 'config', 'priv_validator.json');
+    const validatorJsonPath = join(lotionPath, 'config', 'priv_validator_key.json');
     const generatedValidatorJson = JSON.parse(
       fs.readFileSync(validatorJsonPath, { encoding: 'utf8' })
     );
@@ -62,7 +62,7 @@ module.exports = async ({
   }
   opts.consensus = {};
   if (createEmptyBlocks === false) {
-    opts.consensus.createEmptyBlocks = false;
+    opts.consensus.create_empty_blocks = false;
   }
 
   if (!logTendermint) {

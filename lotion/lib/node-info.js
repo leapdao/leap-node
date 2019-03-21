@@ -3,7 +3,7 @@ const { join } = require('path');
 
 module.exports = lotionPath => {
   const validatorKeyInfo = JSON.parse(
-    fs.readFileSync(join(lotionPath, 'config/priv_validator.json'))
+    fs.readFileSync(join(lotionPath, 'config/priv_validator_key.json'))
   );
 
   const pubkeyAminoPrefix = Buffer.from('1624DE6220', 'hex');
