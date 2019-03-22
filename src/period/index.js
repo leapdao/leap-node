@@ -17,18 +17,25 @@ module.exports = (bridgeState, nodeConfig = {}) => async (rsp, chainInfo) => {
   }
 
   logPeriod('checkBridge');
-  const contractPeriod = await submitPeriod(
-    bridgeState.previousPeriod,
-    bridgeState.currentState.slots,
-    height + bridgeState.checkCallsCount,
-    bridgeState,
-    nodeConfig
-  );
+  // use a timeout to relax race conditions (if period submission is fast)
+  await new Promise((resolve) => {
+    setTimeout(async () => {
+      const contractPeriod = await submitPeriod(
+        bridgeState.previousPeriod,
+        bridgeState.currentState.slots,
+        height + bridgeState.checkCallsCount,
+        bridgeState,
+        nodeConfig
+      );
 
-  if (contractPeriod.timestamp === '0') {
-    rsp.status = 0;
-    bridgeState.checkCallsCount += 1;
-  } else {
-    rsp.status = 1;
-  }
+      if (contractPeriod.timestamp === '0') {
+        rsp.status = 0;
+        bridgeState.checkCallsCount += 1;
+      } else {
+        rsp.status = 1;
+      }
+
+      resolve();
+    }, 300);
+  });
 };

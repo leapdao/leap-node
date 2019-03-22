@@ -160,7 +160,10 @@ module.exports = function configureABCIServer({
       await blockHandler(store, chainInfo);
     }
     const appHash = await getRoot(store);
-    return { data: appHash };
+    // by returning nothing on commit, we get no empty blocks anymore
+    // Maybe we return the wrong hash? ;)
+    // return { data: appHash };
+    return {};
   };
 
   abciApp.initChain = async ({ validators }) => {
@@ -217,6 +220,7 @@ module.exports = function configureABCIServer({
 
   abciApp.info = async () => {
     const rootHash = await getRoot(store);
+    // TODO: should also return lastBlockHeight
     return { lastBlockAppHash: rootHash };
   };
 
