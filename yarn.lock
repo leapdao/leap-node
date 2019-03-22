@@ -4346,9 +4346,9 @@ jest@^23.0.1:
     import-local "^1.0.0"
     jest-cli "^23.6.0"
 
-js-abci@leapdao/js-abci#34538e252811610b23340a9f5314be4d0a44a501:
-  version "4.0.2"
-  resolved "https://codeload.github.com/leapdao/js-abci/tar.gz/34538e252811610b23340a9f5314be4d0a44a501"
+js-abci@leapdao/js-abci#bc6f38f88269503b7b1032cb2294a1f1dc7e8fcc:
+  version "5.0.1"
+  resolved "https://codeload.github.com/leapdao/js-abci/tar.gz/bc6f38f88269503b7b1032cb2294a1f1dc7e8fcc"
   dependencies:
     bl "^1.2.2"
     debug "^3.1.0"
@@ -7094,9 +7094,9 @@ tar@^4:
     safe-buffer "^5.1.2"
     yallist "^3.0.2"
 
-tendermint-node@leapdao/tendermint-node#0ec65fb8ceed44a06b083e22c5b879a0df586396:
+tendermint-node@leapdao/tendermint-node#651dfacb781f184efe16732f78d29aae11bf7e41:
   version "3.4.3"
-  resolved "https://codeload.github.com/leapdao/tendermint-node/tar.gz/0ec65fb8ceed44a06b083e22c5b879a0df586396"
+  resolved "https://codeload.github.com/leapdao/tendermint-node/tar.gz/651dfacb781f184efe16732f78d29aae11bf7e41"
   dependencies:
     axios "^0.18.0"
     cross-spawn "^6.0.5"
@@ -7108,10 +7108,10 @@ tendermint-node@leapdao/tendermint-node#0ec65fb8ceed44a06b083e22c5b879a0df586396
     tendermint "^3.1.3"
     unzip "^0.1.11"
 
-tendermint@^3.1.3, tendermint@^3.1.9:
-  version "3.4.2"
-  resolved "https://registry.yarnpkg.com/tendermint/-/tendermint-3.4.2.tgz#b497c6b582566c624cae864fa0e1634ac14ae348"
-  integrity sha512-7/h8QY2gxxLdOUWvM1dUt8LlDqVnUQPX3HIabWaTZ6PKl91+BDlJLf30FvCae9SnS7DEf1MSZlkkudSVO+Z3ng==
+tendermint@4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/tendermint/-/tendermint-4.0.2.tgz#3ba4c06fa9b4b5a6bc52491f60c8604de419fbe2"
+  integrity sha512-bGvLuvk8JBGXgw5m4GQfRmXNENiqwQyymqYAh/DwtN0X7f9SNZouhRt4Vh3WHkfOoO3sFGCie0PqbhumKkucGg==
   dependencies:
     axios "^0.17.1"
     camelcase "^4.0.0"
