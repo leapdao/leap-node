@@ -195,7 +195,8 @@ function Lotion(opts = {}) {
         } catch (e) {
           console.log('error starting tendermint node:');
           console.log(e);
-          throw e;
+          // exit here, it makes no sense to keep running without tendermint
+          process.exit(1);
         }
 
         await tendermint.synced;

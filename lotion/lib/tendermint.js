@@ -89,7 +89,10 @@ module.exports = async ({
   }
   tendermintProcess.then(() => {
     if (shuttingDown) return;
-    throw new Error('Tendermint node crashed');
+
+    console.log('Tendermint node crashed');
+    // exit here, it makes no sense to keep running without tendermint
+    process.exit(1);
   });
 
   // wait for RPC server
