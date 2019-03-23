@@ -31,6 +31,21 @@ To enable logs use `DEBUG` env variable (see: https://www.npmjs.com/package/debu
 
 Example: `DEBUG=tendermint,leap-node:tx leap-node`
 
+#### Debug via Blink Developer Tools / node-inspector
+
+Start node with `--inspect` and port `9999` for example:
+
+`$ node --inspect=9999 /path/to/leap-node <usual args>`
+
+You can connect to the debugger via `chrome://inspect` in the Chrom{ e, ium } browser,
+or with tools like [node-inspector](https://github.com/node-inspector/node-inspector).
+
+Connecting to Remote host using ssh:
+
+`$ ssh -vNL9999:127.0.0.1:9999 <user@remote host>...`
+
+Your local port `9999` forwards now to the remote host on address `127.0.0.1` and port `9999`.
+
 ### Available cli arguments
 
 - `no-validators-updates` — disabling validators set updates (default: false)

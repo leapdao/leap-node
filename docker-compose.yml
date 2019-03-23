@@ -2,6 +2,10 @@ version: '3'
 
 services:
   leap-node:
+    entrypoint: node
+    command:
+      - --inspect=0.0.0.0:9999
+      - /opt/leap-node/bin.js
     restart: unless-stopped
     build:
       context: .
@@ -21,6 +25,8 @@ services:
       - "26659:26659"
       # p2p
       - "46691:46691"
+      # devtools-protocol
+      - "127.0.0.1:9999:9999"
     environment:
       - "DEBUG=${DEBUG}"
       - "NO_VALIDATORS_UPDATES=${NO_VALIDATORS_UPDATES}"
