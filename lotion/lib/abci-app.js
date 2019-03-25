@@ -43,7 +43,11 @@ async function runTx(
       await txHandler(hookedState, tx, hookedChainInfo, !allowMutation);
     }
   } catch (e) {
-    return [false, e.toString()];
+    let err = e.toString();
+    if (err === '[object Object]') {
+      err = JSON.stringify(e);
+    }
+    return [false, err];
   }
   if (allowMutation) {
     Object.assign(chainInfo, newChainInfo);

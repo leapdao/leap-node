@@ -3,6 +3,7 @@ const sendTx = require('../../txHelpers/sendTx');
 
 module.exports = async (tendermintPort, rawTx) => {
   const tx = Tx.fromRaw(rawTx);
-  await sendTx(tendermintPort, rawTx);
-  return tx.hash();
+  const resp = await sendTx(tendermintPort, rawTx);
+  const error = resp.result.check_tx.code ? resp.result.check_tx.log : 0;
+  return { hash: tx.hash(), error };
 };

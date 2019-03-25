@@ -21,13 +21,13 @@ describe('sendRawTransaction', () => {
   test('success with hex', async () => {
     const tx = Tx.deposit(0, 100, A1, 0);
     const response = await sendRawTransaction(0, tx.hex());
-    expect(response).toBe(tx.hash());
+    expect(response.hash).toBe(tx.hash());
   });
 
   test('success with buffer', async () => {
     const tx = Tx.deposit(0, 100, A1, 0);
     const response = await sendRawTransaction(0, tx.toRaw());
-    expect(response).toBe(tx.hash());
+    expect(response.hash).toBe(tx.hash());
   });
 
   test('error', async () => {
