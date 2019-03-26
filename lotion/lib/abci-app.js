@@ -59,7 +59,8 @@ async function runTx(
 
 function updateAndDiffValidators(validators, newValidators) {
   const diffs = [];
-  const push = validator => {
+  const pubKeys = {};
+  const push = (validator) => {
     diffs.push({
       pubKey: {
         type: validator.pubKey.type,
@@ -70,17 +71,31 @@ function updateAndDiffValidators(validators, newValidators) {
   };
 
   for (const key in newValidators) {
-    if (validators[key] === undefined) {
-      validators[key] = newValidators[key];
-      push(validators[key]);
-    } else if (
-      typeof newValidators[key] === 'number' &&
-      validators[key].power !== newValidators[key]
+    const numberOrObj = newValidators[key];
+    let validator = validators[key];
+
+    if (
+      typeof numberOrObj === 'number' &&
+      validator &&
+      validator.power !== numberOrObj
     ) {
-      validators[key].power = newValidators[key];
-      push(validators[key]);
+      validator.power = numberOrObj;
+    } else {
+      validator = numberOrObj;
+      validators[key] = validator;
+    }
+
+    // can also be 0
+    if (validator) {
+      pubKeys[validator.pubKey.data] = validator;
     }
   }
+
+  // why do we have different validator addrs with the same pubKey?
+  for (const key in pubKeys) {
+    push(pubKeys[key]);
+  }
+
   return diffs;
 }
 
@@ -145,7 +160,10 @@ module.exports = function configureABCIServer({
       await blockHandler(store, chainInfo);
     }
     const appHash = await getRoot(store);
-    return { data: appHash };
+    // by returning nothing on commit, we get no empty blocks anymore
+    // Maybe we return the wrong hash? ;)
+    // return { data: appHash };
+    return {};
   };
 
   abciApp.initChain = async ({ validators }) => {
@@ -202,6 +220,7 @@ module.exports = function configureABCIServer({
 
   abciApp.info = async () => {
     const rootHash = await getRoot(store);
+    // TODO: should also return lastBlockHeight
     return { lastBlockAppHash: rootHash };
   };
 
