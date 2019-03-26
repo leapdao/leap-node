@@ -2,12 +2,12 @@ const getColors = require('./getColors');
 const { NFT_COLOR_BASE } = require('./constants');
 
 const erc20Tokens = [
-  '0x258DaF43D711831b8FD59137F42030784293e9E6',
-  '0x25e70D10AE0E481975aD8fA30f4e67653c444A05',
+  '0x258daf43d711831b8fd59137f42030784293e9e6',
+  '0x25e70d10ae0e481975ad8fa30f4e67653c444a05',
 ];
 const erc721Tokens = [
-  '0x1111aF43D711831b8FD59137F42030784293e9E6',
-  '0x2222aF43D711831b8FD59137F42030784293e9E6',
+  '0x1111af43d711831b8fd59137f42030784293e9e6',
+  '0x2222af43d711831b8fd59137f42030784293e9e6',
 ];
 const tokens = {};
 erc20Tokens.forEach((addr, i) => {
@@ -17,30 +17,13 @@ erc721Tokens.forEach((addr, i) => {
   tokens[NFT_COLOR_BASE + i] = addr;
 });
 
-const exitHandlerContract = {
-  methods: {
-    erc20TokenCount: () => ({
-      call: async () => erc20Tokens.length,
-    }),
-    nftTokenCount: () => ({
-      call: async () => erc721Tokens.length,
-    }),
-    tokens: i => ({
-      call: async () => {
-        return { addr: tokens[i] };
-      },
-    }),
-  },
-};
-
 exports.erc20Tokens = erc20Tokens;
 exports.erc721Tokens = erc721Tokens;
-exports.exitHandlerContract = exitHandlerContract;
 
 describe('getColors', () => {
   test('ERC20 colors', async () => {
     const colors = await getColors(
-      { exitHandlerContract, tokens: { erc20: [], erc721: [] } },
+      { tokens: { erc20: erc20Tokens, erc721: erc721Tokens } },
       false
     );
     expect(colors.length).toBe(2);
@@ -49,11 +32,8 @@ describe('getColors', () => {
   });
 
   test('ERC20 colors cache', async () => {
-    const tokensCache = { erc20: [], erc721: [] };
-    const colors = await getColors(
-      { exitHandlerContract, tokens: tokensCache },
-      false
-    );
+    const tokensCache = { erc20: erc20Tokens, erc721: erc721Tokens };
+    const colors = await getColors({ tokens: tokensCache }, false);
     expect(tokensCache.erc20.map(c => c.toLowerCase())).toEqual(
       erc20Tokens.map(c => c.toLowerCase())
     );
@@ -64,7 +44,7 @@ describe('getColors', () => {
 
   test('ERC721 colors', async () => {
     const colors = await getColors(
-      { exitHandlerContract, tokens: { erc20: [], erc721: [] } },
+      { tokens: { erc20: erc20Tokens, erc721: erc721Tokens } },
       true
     );
     expect(colors.length).toBe(2);
@@ -73,11 +53,8 @@ describe('getColors', () => {
   });
 
   test('ERC721 colors cache', async () => {
-    const tokensCache = { erc20: [], erc721: [] };
-    const colors = await getColors(
-      { exitHandlerContract, tokens: tokensCache },
-      true
-    );
+    const tokensCache = { erc20: erc20Tokens, erc721: erc721Tokens };
+    const colors = await getColors({ tokens: tokensCache }, true);
     expect(tokensCache.erc721.map(c => c.toLowerCase())).toEqual(
       erc721Tokens.map(c => c.toLowerCase())
     );
