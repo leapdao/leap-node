@@ -3,6 +3,7 @@
   "bridgeAddr": "0x314337900B28aFaa04765E59f37f348aa43a82cC",
   "operatorAddr": "0x368211162758B29576D8551adDA6E8480AAdFe5a",
   "rootNetwork": "https://mainnet.infura.io",
+  "rootNetworkId": 1,
   "network": "leap-mainnet",
   "networkId": 448747055,
   "eventsDelay": 2,

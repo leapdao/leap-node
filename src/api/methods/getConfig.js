@@ -9,6 +9,7 @@ module.exports = async (bridgeState, app) => {
     bridgeAddr: bridgeState.config.bridgeAddr,
     operatorAddr: bridgeState.config.operatorAddr,
     rootNetwork: bridgeState.config.rootNetwork,
+    rootNetworkId: bridgeState.config.rootNetworkId,
     network: bridgeState.config.network,
     networkId: bridgeState.config.networkId,
     eventsDelay: bridgeState.config.eventsDelay,

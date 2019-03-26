@@ -23,3 +23,4 @@ exports.base64ToHex = require('./base64ToHex');
 exports.range = require('./range');
 exports.printStartupInfo = require('./printStartupInfo');
 exports.isNFT = require('./isNFT');
+exports.networks = require('./networks');

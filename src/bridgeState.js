@@ -18,14 +18,12 @@ const exitABI = require('./abis/exitHandler');
 const operatorABI = require('./abis/operator');
 const proxyABI = require('./abis/proxy');
 const { NFT_COLOR_BASE } = require('./api/methods/constants');
+const NETWORKS = require('./utils/networks');
 
 module.exports = class BridgeState {
   constructor(db, privKey, config, relayBuffer) {
     this.config = config;
-    this.web3 = new Web3();
-    this.web3.setProvider(
-      new this.web3.providers.HttpProvider(config.rootNetwork)
-    );
+    this.web3 = new Web3(NETWORKS[config.rootNetworkId].provider);
 
     this.exitHandlerContract = new this.web3.eth.Contract(
       exitABI.concat(proxyABI),

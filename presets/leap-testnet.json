@@ -3,6 +3,7 @@
   "bridgeAddr": "0x6c5061abCa1c4Bc95Bc6D605e16BD4D6B94798cD",
   "operatorAddr": "0x65eFD41195062CB1f3FA65E3106F986a0A9cF726",
   "rootNetwork": "https://rinkeby.infura.io",
+  "rootNetworkId": 4,
   "network": "leap-testnet-zeta",
   "networkId": 218508102,
   "eventsDelay": 2,
