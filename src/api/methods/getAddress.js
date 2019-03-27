@@ -8,7 +8,7 @@ module.exports = async (bridgeState, app) => {
   const validatorKeyPath = path.join(
     app.lotionPath(),
     'config',
-    'priv_validator.json'
+    'priv_validator_key.json'
   );
   const validatorKey = JSON.parse(await readFile(validatorKeyPath, 'utf-8'));
   const validatorID = Buffer.from(

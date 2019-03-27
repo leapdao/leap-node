@@ -15,7 +15,8 @@ module.exports = async app => {
   const lotionPath = app.lotionPath();
   if (await exists(lotionPath)) {
     const configPath = path.join(lotionPath, 'config');
-    const privValidatorPath = path.join(configPath, 'priv_validator.json');
+    const dataPath = path.join(lotionPath, 'data');
+    const privValidatorPath = path.join(configPath, 'priv_validator_key.json');
     const privValidator = JSON.parse(await readFile(privValidatorPath));
     await writeFile(
       privValidatorPath,
@@ -30,12 +31,21 @@ module.exports = async app => {
       )
     );
 
-    await rimraf(path.join(lotionPath, 'data'));
+    await rimraf(dataPath);
     await rimraf(path.join(lotionPath, 'merk'));
     await rimraf(path.join(lotionPath, 'leap.db'));
     await rimraf(path.join(configPath, 'addrbook.json'));
     await rimraf(path.join(configPath, 'config.toml'));
     await rimraf(path.join(configPath, 'genesis.json'));
+    fs.mkdirSync(dataPath);
+    await writeFile(
+      path.join(dataPath, 'priv_validator_state.json'),
+      JSON.stringify({
+        height: '0',
+        round: '0',
+        step: 0,
+      })
+    );
   }
   console.log('Done ✅');
 };
