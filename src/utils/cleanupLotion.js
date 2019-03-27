@@ -8,6 +8,19 @@ const rimraf = promisify(require('rimraf'));
 
 const writeFile = promisify(fs.writeFile);
 const exists = promisify(fs.exists);
+const mkdir = promisify(fs.mkdir);
+
+const writeBlankValidatorState = async dataPath => {
+  await mkdir(dataPath);
+  await writeFile(
+    path.join(dataPath, 'priv_validator_state.json'),
+    JSON.stringify({
+      height: '0',
+      round: '0',
+      step: 0,
+    })
+  );
+};
 
 module.exports = async app => {
   console.log('Cleaning up...');
@@ -21,15 +34,7 @@ module.exports = async app => {
     await rimraf(path.join(configPath, 'addrbook.json'));
     await rimraf(path.join(configPath, 'config.toml'));
     await rimraf(path.join(configPath, 'genesis.json'));
-    fs.mkdirSync(dataPath);
-    await writeFile(
-      path.join(dataPath, 'priv_validator_state.json'),
-      JSON.stringify({
-        height: '0',
-        round: '0',
-        step: 0,
-      })
-    );
+    await writeBlankValidatorState(dataPath);
   }
   console.log('Done ✅');
 };
