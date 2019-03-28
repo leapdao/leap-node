@@ -23,7 +23,8 @@ const NETWORKS = require('./utils/networks');
 module.exports = class BridgeState {
   constructor(db, privKey, config, relayBuffer) {
     this.config = config;
-    this.web3 = new Web3((NETWORKS[config.rootNetworkId] || {}).provider);
+    const networkConfig = NETWORKS[config.rootNetworkId] || { provider: {} };
+    this.web3 = new Web3(networkConfig.provider.http);
 
     this.exitHandlerContract = new this.web3.eth.Contract(
       exitABI.concat(proxyABI),
