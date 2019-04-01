@@ -2,7 +2,7 @@
   "exitHandlerAddr": "0x0036192587fD788B75829fbF79BE7F06E4F23B21",
   "bridgeAddr": "0x314337900B28aFaa04765E59f37f348aa43a82cC",
   "operatorAddr": "0x368211162758B29576D8551adDA6E8480AAdFe5a",
-  "rootNetwork": "https://mainnet.infura.io",
+  "rootNetwork": "https://mainnet.infura.io/v3/f039330d8fb747e48a7ce98f51400d65",
   "rootNetworkId": 1,
   "network": "leap-mainnet",
   "networkId": 448747055,
