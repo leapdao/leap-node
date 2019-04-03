@@ -70,11 +70,27 @@ const createDb = levelDb => {
     return getNullable(`tx!${hash}`);
   };
 
+  /*
+   * Returns the `BridgeState.currentState` or null
+   */
+  const getChainState = () => {
+    return getNullable('chainState');
+  };
+
+  /*
+   * Saves the `BridgeState.currentState`
+   */
+  const storeChainState = async (state) => {
+    await levelDb.put('chainState', JSON.stringify(state));
+  };
+
   return {
     getLastBlockSynced,
     storeBlock,
     getBlock,
     getTransaction,
+    getChainState,
+    storeChainState,
   };
 };
 

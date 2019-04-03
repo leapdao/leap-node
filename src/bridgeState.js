@@ -167,4 +167,34 @@ module.exports = class BridgeState {
       this.relayBuffer.push(event);
     }
   }
+
+  async saveState() {
+    this.currentState.blockHeight = this.blockHeight;
+    this.db.storeChainState(this.currentState);
+  }
+
+  async loadState() {
+    const res = await this.db.getChainState();
+    this.currentState = res || {
+      blockHeight: 0,
+      mempool: [],
+      balances: {}, // stores account balances like this { [colorIndex]: { address1: 0, ... } }
+      owners: {}, // index for NFT ownerOf call
+      unspent: {}, // stores unspent outputs (deposits, transfers)
+      processedDeposit: 0,
+      slots: [],
+      epoch: {
+        epoch: 0,
+        lastEpochHeight: 0,
+        epochLength: null,
+        epochLengthIndex: -1,
+      },
+      gas: {
+        minPrice: 0,
+        minPriceIndex: -1,
+      },
+    };
+
+    return this.currentState;
+  }
 };

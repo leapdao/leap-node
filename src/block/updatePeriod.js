@@ -22,6 +22,14 @@ module.exports = async (state, chainInfo, bridgeState, nodeConfig = {}) => {
         bridgeState,
         nodeConfig
       );
+      // catch this extra, it is not fatal if it fails here
+      // Note: it saves state after `submitPeriod`,
+      // that means it can include more blocks since then.
+      try {
+        await bridgeState.saveState();
+      } catch (e) {
+        logPeriod(e);
+      }
     } catch (err) {
       logPeriod(err);
     }

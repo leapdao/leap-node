@@ -6,7 +6,6 @@
  */
 
 const axios = require('axios');
-const encodeTx = require('../../lotion/lib/tx-encoding.js').encode;
 
 const TX_BACKLOG = [];
 
@@ -25,17 +24,13 @@ setInterval(
 );
 
 module.exports = async (tendermintPort, rawTx) => {
-  // After 0x - 4 bytes as nonce.
-  // If `rawTx` is not a `String`, `Buffer` will be assumed
-  const nonce = typeof rawTx === 'string' ? parseInt(rawTx.substring(2, 10), 16) : rawTx.readUInt32LE(0);
-  const txBytes = `0x${encodeTx({ encoded: rawTx }, nonce).toString('hex')}`;
   const tendermintRpcUrl = `http://localhost:${tendermintPort}/broadcast_tx_async`;
 
   TX_BACKLOG.push(
     () => {
       axios.get(tendermintRpcUrl, {
         params: {
-          tx: txBytes,
+          tx: rawTx,
         },
       })
     }

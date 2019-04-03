@@ -1,10 +1,7 @@
 /* eslint-disable no-await-in-loop */
 
 const createABCIServer = require('js-abci');
-const decodeTx = require('./tx-encoding.js').decode;
 const jsondiffpatch = require('jsondiffpatch');
-const getRoot = require('./get-root.js');
-const { stringify } = require('deterministic-json');
 
 const { getAddress } = require('../../src/utils');
 
@@ -105,7 +102,6 @@ module.exports = function configureABCIServer({
   txMiddleware,
   blockMiddleware,
   store,
-  // initialAppHash,
   initChainMiddleware,
   periodMiddleware,
 }) {
@@ -118,11 +114,10 @@ module.exports = function configureABCIServer({
   abciApp.checkTx = async req => {
     const rawTx = req.tx;
     try {
-      const tx = decodeTx(rawTx);
       const [isValid, log] = await runTx(
         txMiddleware,
         store,
-        tx,
+        rawTx,
         chainInfo,
         false
       );
@@ -136,11 +131,10 @@ module.exports = function configureABCIServer({
   abciApp.deliverTx = async req => {
     const rawTx = req.tx;
     try {
-      const tx = decodeTx(rawTx);
       const [isValid, log] = await runTx(
         txMiddleware,
         store,
-        tx,
+        rawTx,
         chainInfo,
         true
       );
@@ -159,10 +153,7 @@ module.exports = function configureABCIServer({
     for (const blockHandler of blockMiddleware) {
       await blockHandler(store, chainInfo);
     }
-    const appHash = await getRoot(store);
-    // by returning nothing on commit, we get no empty blocks anymore
-    // Maybe we return the wrong hash? ;)
-    // return { data: appHash };
+
     return {};
   };
 
@@ -202,26 +193,13 @@ module.exports = function configureABCIServer({
     return { status: rsp.status };
   };
 
-  abciApp.query = () => {
-    try {
-      return {
-        value: Buffer.from(stringify(store)),
-        height: chainInfo.height - 1,
-        proof: '',
-        key: '',
-        index: 0,
-        code: 0,
-        log: '',
-      };
-    } catch (e) {
-      return { code: 2, log: `invalid query: ${e.message}` };
-    }
-  };
-
   abciApp.info = async () => {
-    const rootHash = await getRoot(store);
-    // TODO: should also return lastBlockHeight
-    return { lastBlockAppHash: rootHash };
+    if (store.blockHeight) {
+      chainInfo.height = store.blockHeight;
+      return { lastBlockHeight: store.blockHeight };
+    }
+
+    return {};
   };
 
   const abciServer = createABCIServer(abciApp);

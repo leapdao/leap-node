@@ -1,5 +1,4 @@
 const fs = require('fs');
-const { stringify } = require('deterministic-json');
 const { join } = require('path');
 const tendermint = require('tendermint-node');
 
@@ -28,7 +27,6 @@ module.exports = async ({
   peers,
   genesis,
   keys,
-  initialAppHash,
   createEmptyBlocks,
   unsafeRpc,
   readonlyValidator,
@@ -38,7 +36,7 @@ module.exports = async ({
   if (genesis) {
     fs.writeFileSync(
       join(lotionPath, 'config', 'genesis.json'),
-      stringify(genesis)
+      JSON.stringify(genesis)
     );
   }
   if (keys) {
@@ -55,13 +53,12 @@ module.exports = async ({
     {},
     JSON.parse(fs.readFileSync(join(lotionPath, 'config', 'genesis.json'))),
     {
-      app_hash: initialAppHash,
       consensus_params: CONSENSUS_PARAMS,
     }
   );
   fs.writeFileSync(
     join(lotionPath, 'config', 'genesis.json'),
-    stringify(newGenesis)
+    JSON.stringify(newGenesis)
   );
 
   const opts = {
