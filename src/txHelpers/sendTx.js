@@ -25,8 +25,9 @@ setInterval(
 );
 
 module.exports = async (tendermintPort, rawTx) => {
-  // after 0x - 4 bytes as nonce
-  const nonce = parseInt(rawTx.substring(2, 10), 16);
+  // After 0x - 4 bytes as nonce.
+  // If `rawTx` is not a `String`, `Buffer` will be assumed
+  const nonce = typeof rawTx === 'string' ? parseInt(rawTx.substring(2, 10), 16) : rawTx.readUInt32LE(0);
   const txBytes = `0x${encodeTx({ encoded: rawTx }, nonce).toString('hex')}`;
   const tendermintRpcUrl = `http://localhost:${tendermintPort}/broadcast_tx_async`;
 
