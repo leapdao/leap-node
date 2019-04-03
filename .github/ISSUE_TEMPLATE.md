@@ -39,6 +39,7 @@ Only bounties from the current sprint(if any) are payed out. Unless you are newb
 
 ## Gain for the project
 
+### Publicly visible delivery
 ## Roles
 bounty gardener: name / share
 bounty worker: name / share
