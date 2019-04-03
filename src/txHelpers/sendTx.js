@@ -8,17 +8,35 @@
 const axios = require('axios');
 const encodeTx = require('../../lotion/lib/tx-encoding.js').encode;
 
-module.exports = async (tendermintPort, rawTx) => {
-  const nonce = Math.floor(Math.random() * (2 << 12)); // eslint-disable-line no-bitwise
-  const txBytes = `0x${encodeTx({ encoded: rawTx }, nonce).toString('hex')}`;
-  const tendermintRpcUrl = `http://localhost:${tendermintPort}/broadcast_tx_sync`;
-  const result = await axios.get(tendermintRpcUrl, {
-    params: {
-      tx: txBytes,
-    },
-  });
+const TX_BACKLOG = [];
 
-  return {
-    result: result.data.result,
-  };
+// Drain the tx queue every 1000ms.
+// The goal here is to increase performance and mitigate block congestion.
+// Bursting calls to `broadcast_tx_async` archieves that.
+setInterval(
+  () => {
+    while (TX_BACKLOG.length) {
+      const func = TX_BACKLOG.shift();
+
+      func();
+    }
+  },
+  1000
+);
+
+module.exports = async (tendermintPort, rawTx) => {
+  // after 0x - 4 bytes as nonce
+  const nonce = parseInt(rawTx.substring(2, 10), 16);
+  const txBytes = `0x${encodeTx({ encoded: rawTx }, nonce).toString('hex')}`;
+  const tendermintRpcUrl = `http://localhost:${tendermintPort}/broadcast_tx_async`;
+
+  TX_BACKLOG.push(
+    () => {
+      axios.get(tendermintRpcUrl, {
+        params: {
+          tx: txBytes,
+        },
+      })
+    }
+  );
 };

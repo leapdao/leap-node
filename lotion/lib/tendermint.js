@@ -3,6 +3,20 @@ const { stringify } = require('deterministic-json');
 const { join } = require('path');
 const tendermint = require('tendermint-node');
 
+const CONSENSUS_PARAMS = {
+  'block': {
+    'max_bytes':'22020096',
+    'max_gas':'-1',
+    'time_iota_ms':'1000',
+  },
+  'evidence': {
+    'max_age':'100000',
+  },
+  'validator': {
+    'pub_key_types':['ed25519'],
+  }
+};
+
 module.exports = async ({
   lotionPath,
   tendermintAddr,
@@ -42,6 +56,7 @@ module.exports = async ({
     JSON.parse(fs.readFileSync(join(lotionPath, 'config', 'genesis.json'))),
     {
       app_hash: initialAppHash,
+      consensus_params: CONSENSUS_PARAMS,
     }
   );
   fs.writeFileSync(
