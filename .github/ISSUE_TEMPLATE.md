@@ -5,7 +5,6 @@ This policy allows to write out rewards to complete required tasks. Completed ta
 # How to create a new bounty?
 
 1. Create an issue with bounty description and bounty and draft tags in an appropriate repository.
-   [Bounty template] [Example]
    If the bounty spans across multiple repositories, consider splitting it in a smaller per-repo bounties if possible.
    The bounty definition should be SMART (Specific, Measurable, Achievable, Relevant, Time bound)
 2. Submit proposal via the bounty form: http://bounty.leapdao.org/viewform
@@ -13,11 +12,11 @@ This policy allows to write out rewards to complete required tasks. Completed ta
 4. If no objections for 2 days, the bounty is considered approved
 
 # Bounty sizes
-XS 200
-S  350
-M  550
-L  900
-XL 1400
+XS / 200 DAI / effort ~ 3h
+S / 350 DAI / effort ~5h 
+M / 550 DAI / effort ~8h
+L / 900 DAI / effort ~13h
+XL / 1400 DAI / effort ~21h
 
 # Pair programming
 If 2 people claim the bounty together, the payout increases by 1.5x.
@@ -31,15 +30,23 @@ Only bounties from the current sprint(if any) are payed out. Unless you are newb
 # Bounty
 
 ## Scope
+<!-- A list of specific things which should be done to deliver the bounty. These could be seen as requirements to verify/review bounty against -->
+
 -
 -
 -
 
 ## Deliverables
+<!-- Artifacts produced as the result of this bounty. Something that could be verified/reviewed. Some examples: updated code, deployment made, blog post published, public event conducted etc -->
+
 
 ## Gain for the project
+<!-- How the completion of this bounty helps the project to achieve it is purpose -->
+
 
 ### Publicly visible delivery
+<!-- ideally, each bounty should has at least a part of delivery which is publicly visible. This could be a blog post, tweet, documentation or website update etc. LeapDAO Slack is not considered public. -->
+
 ## Roles
 bounty gardener: name / share
 bounty worker: name / share
