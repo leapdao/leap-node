@@ -90,6 +90,11 @@ module.exports = class BridgeState {
     await this.eventsSubscription.init();
     await this.onNewBlock(blockNumber);
     await this.initBlocks();
+
+    if (this.lastBlocksRoot && this.lastPeriodRoot) {
+      this.currentPeriod = new Period(this.lastBlocksRoot);
+    }
+
     logNode('Synced');
   }
 

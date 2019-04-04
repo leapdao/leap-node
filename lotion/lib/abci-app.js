@@ -196,7 +196,8 @@ module.exports = function configureABCIServer({
   abciApp.info = async () => {
     if (store.blockHeight) {
       chainInfo.height = store.blockHeight;
-      return { lastBlockHeight: store.blockHeight };
+      // we always save current bridgeState = commited block height + 1
+      return { lastBlockHeight: store.blockHeight - 1 };
     }
 
     return {};
