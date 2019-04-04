@@ -8,20 +8,21 @@
 const axios = require('axios');
 
 const TX_BACKLOG = [];
+let AWAITS_DRAIN = false;
 
-// Drain the tx queue every 1000ms.
+// Drain the tx queue every ~1000ms.
 // The goal here is to increase performance and mitigate block congestion.
 // Bursting calls to `broadcast_tx_async` archieves that.
-setInterval(
-  () => {
-    while (TX_BACKLOG.length) {
-      const func = TX_BACKLOG.shift();
 
-      func();
-    }
-  },
-  1000
-);
+function drainBacklog() {
+  AWAITS_DRAIN = false;
+
+  while (TX_BACKLOG.length) {
+    const func = TX_BACKLOG.shift();
+
+    func();
+  }
+}
 
 module.exports = async (tendermintPort, rawTx) => {
   const tendermintRpcUrl = `http://localhost:${tendermintPort}/broadcast_tx_async`;
@@ -35,4 +36,9 @@ module.exports = async (tendermintPort, rawTx) => {
       })
     }
   );
+
+  if (!AWAITS_DRAIN) {
+    setTimeout(drainBacklog, 1000);
+    AWAITS_DRAIN = true;
+  }
 };
