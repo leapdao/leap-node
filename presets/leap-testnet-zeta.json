@@ -1,26 +1,31 @@
 {
-  "bridgeAddr": "0xEB13cc8F0904398d01D7faD8B98bff1FA2977470",
-  "operatorAddr": "0x02f2330CCB5Ce770EeFE0A4066BA1Ca03eC70c74",
-  "exitHandlerAddr": "0x2c2a3b359edbCFE3c3Ac0cD9f9F1349A96C02530",
-  "rootNetwork": "https://rinkeby.infura.io/v3/f039330d8fb747e48a7ce98f51400d65",
+  "exitHandlerAddr": "0x2dE7502C37589E296b7A8b3fD8322839430023eF",
+  "bridgeAddr": "0x6c5061abCa1c4Bc95Bc6D605e16BD4D6B94798cD",
+  "operatorAddr": "0x65eFD41195062CB1f3FA65E3106F986a0A9cF726",
+  "rootNetwork": "https://rinkeby.infura.io",
   "rootNetworkId": 4,
-  "network": "leap-testnet-eta",
-  "networkId": 955601066,
+  "network": "leap-testnet-zeta",
+  "networkId": 218508102,
   "eventsDelay": 2,
   "bridgeDelay": 6,
   "genesis": {
     "app_hash": "68154a516d6821b07e6b25f76310faeae1d24d1c0a6cf3152ccba90f1fcb9db9",
-    "chain_id": "test-chain-RlQzTu",
+    "chain_id": "test-chain-0DrQe4",
     "consensus_params": {
-      "block": {
+      "block_size": {
         "max_bytes": "22020096",
-        "max_gas": "-1",
-        "time_iota_ms": "1000"
+        "max_gas": "-1"
       },
-      "evidence": { "max_age": "100000" },
-      "validator": { "pub_key_types": ["ed25519"] }
+      "evidence": {
+        "max_age": "100000"
+      },
+      "validator": {
+        "pub_key_types": [
+          "ed25519"
+        ]
+      }
     },
-    "genesis_time": "2019-03-26T11:46:25.02713796Z",
+    "genesis_time": "2019-02-01T11:25:00.244444113Z",
     "validators": [
       {
         "address": "4881A447F30F484F046859530083FD27C5F7A70B",
@@ -34,9 +39,9 @@
     ]
   },
   "peers": [
-    "0265efd9152b6d68fe6cfb2916ccd329a5cd8d40@172.31.39.112:46691",
+    "9a8a32b074ccb2406360e770d3a6c0ed8693f67a@172.31.39.112:46691",
     "08e6e74922cb0f1d3af8128f7befa4e6c1793480@172.31.24.196:46691",
-    "0c3bca7abf72190feea432e6715c48b2ee21d3fd@sen1.testnet.leapdao.org:46691",
+    "ad05ba527e43d5d54e5202e062afa829d04ac779@sen1.testnet.leapdao.org:46691",
     "c247bb928c8b5d1ee9777ddbc1260475c9c88286@sen2.testnet.leapdao.org:46691",
     "95837e9c5cb9d90ac17b853f1a2d1fd8de5f5eb6@node-a.leap.whoot.me:46691",
     "d3038ca78370acb23b8b433859d3a99aebedab4f@node-b.leap.whoot.me:46691"
