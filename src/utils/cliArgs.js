@@ -23,13 +23,6 @@ const options = [
     help: 'Disabling validators set updates',
   },
   {
-    names: ['port'],
-    type: 'number',
-    env: 'TX_PORT',
-    default: 3000,
-    help: 'Tx endpoint port',
-  },
-  {
     names: ['rpcaddr'],
     type: 'string',
     env: 'RPC_ADDR',
