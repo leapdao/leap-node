@@ -112,7 +112,7 @@ describe('BridgeState', () => {
 
     const level = {
       async get(key) {
-        methodCalled = 'get' + key;
+        methodCalled = `get${key}`;
 
         if (!storedObj) {
           const err = new Error('NotFoundError');
@@ -124,7 +124,7 @@ describe('BridgeState', () => {
       },
 
       async put(key, val) {
-        methodCalled = 'set' + key;
+        methodCalled = `set${key}`;
 
         if (key === 'chainState') {
           storedObj = val;
