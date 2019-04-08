@@ -14,11 +14,11 @@ const { logTx, logError } = require('../utils/debug');
 
 module.exports = (bridgeState, nodeConfig) => async (
   state,
-  rawTx,
+  { encoded },
   _,
   isCheck
 ) => {
-  const tx = Tx.fromRaw(rawTx);
+  const tx = Tx.fromRaw(encoded);
   const printedTx = printTx(state, tx);
 
   try {

@@ -145,6 +145,7 @@ function Lotion(opts = {}) {
           store,
           periodMiddleware,
           initChainMiddleware,
+          genesis,
         });
         abciServer.listen(abciPort, 'localhost');
 

@@ -1,6 +1,7 @@
 /* eslint-disable no-await-in-loop */
 
 const createABCIServer = require('js-abci');
+const decodeTx = require('./tx-encoding.js').decode;
 const jsondiffpatch = require('jsondiffpatch');
 
 const { getAddress } = require('../../src/utils');
@@ -104,6 +105,7 @@ module.exports = function configureABCIServer({
   store,
   initChainMiddleware,
   periodMiddleware,
+  genesis,
 }) {
   const chainInfo = {
     height: 1,
@@ -114,10 +116,11 @@ module.exports = function configureABCIServer({
   abciApp.checkTx = async req => {
     const rawTx = req.tx;
     try {
+      const tx = decodeTx(rawTx);
       const [isValid, log] = await runTx(
         txMiddleware,
         store,
-        rawTx,
+        tx,
         chainInfo,
         false
       );
@@ -131,10 +134,11 @@ module.exports = function configureABCIServer({
   abciApp.deliverTx = async req => {
     const rawTx = req.tx;
     try {
+      const tx = decodeTx(rawTx);
       const [isValid, log] = await runTx(
         txMiddleware,
         store,
-        rawTx,
+        tx,
         chainInfo,
         true
       );
@@ -194,13 +198,19 @@ module.exports = function configureABCIServer({
   };
 
   abciApp.info = async () => {
+    const rsp = {};
+
+    if (genesis.app_hash) {
+      rsp.lastBlockAppHash = Buffer.from(genesis.app_hash, 'hex');
+    }
+
     if (store.blockHeight) {
       chainInfo.height = store.blockHeight;
       // we always save current bridgeState = commited block height + 1
-      return { lastBlockHeight: store.blockHeight - 1 };
+      rsp.lastBlockHeight = store.blockHeight - 1;
     }
 
-    return {};
+    return rsp;
   };
 
   const abciServer = createABCIServer(abciApp);

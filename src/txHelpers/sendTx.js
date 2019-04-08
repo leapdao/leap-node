@@ -6,6 +6,7 @@
  */
 
 const axios = require('axios');
+const encodeTx = require('../../lotion/lib/tx-encoding.js').encode;
 
 const TX_BACKLOG = [];
 let AWAITS_DRAIN = false;
@@ -26,12 +27,14 @@ function drainBacklog() {
 
 module.exports = async (tendermintPort, rawTx) => {
   const tendermintRpcUrl = `http://localhost:${tendermintPort}/broadcast_tx_async`;
+  const nonce = Math.floor(Math.random() * (2 << 12)); // eslint-disable-line no-bitwise
+  const txBytes = `0x${encodeTx({ encoded: rawTx }, nonce).toString('hex')}`;
 
   TX_BACKLOG.push(
     () => {
       axios.get(tendermintRpcUrl, {
         params: {
-          tx: rawTx,
+          tx: txBytes,
         },
       })
     }
