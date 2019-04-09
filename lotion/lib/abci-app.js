@@ -200,7 +200,7 @@ module.exports = function configureABCIServer({
   abciApp.info = async () => {
     const rsp = {};
 
-    if (genesis.app_hash) {
+    if (genesis && genesis.app_hash) {
       rsp.lastBlockAppHash = Buffer.from(genesis.app_hash, 'hex');
     }
 
