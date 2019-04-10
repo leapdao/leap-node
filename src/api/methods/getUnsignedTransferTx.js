@@ -1,33 +1,15 @@
-const { BigInt } = require('jsbi-utils');
-
-const { helpers, Tx, Outpoint } = require('leap-core');
-
-const getUnspent = require('./getUnspent');
+const makeTransfer = require('../../txHelpers/makeTransfer');
 
 module.exports = async (bridgeState, from, to, color, value) => {
-  from = from.toLowerCase(); // eslint-disable-line
-  to = to.toLowerCase(); // eslint-disable-line
-
-  const unspent = await getUnspent(bridgeState, from, color);
-
-  const unspent1 = [];
-  unspent.forEach((val, index) => {
-    unspent1[index] = {
-      outpoint: Outpoint.fromRaw(val.outpoint),
-      output: val.output,
-    };
-  });
-
-  const inputs = helpers.calcInputs(unspent1, from, BigInt(value), color);
-
-  const outputs = helpers.calcOutputs(
-    unspent1,
-    inputs,
+  const tx = await makeTransfer(
+    {
+      balances: bridgeState.currentState.balances,
+      unspent: bridgeState.currentState.unspent,
+    },
     from,
     to,
-    BigInt(value),
+    value,
     color
   );
-
-  return Tx.transfer(inputs, outputs).toJSON();
+  return tx.toJSON();
 };

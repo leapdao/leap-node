@@ -43,5 +43,7 @@ module.exports = async function makeTransfer(
     amount,
     color
   );
-  return Tx.transfer(inputs, outputs).signAll(privKey);
+  return privKey
+    ? Tx.transfer(inputs, outputs).signAll(privKey)
+    : Tx.transfer(inputs, outputs);
 };

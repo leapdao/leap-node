@@ -48,11 +48,15 @@ const tx2 = Tx.transfer(
   ]
 ).signAll(PRIV1);
 
+const A1_LOWERCASE = A1.toLowerCase();
 const state = {
   unspent: {
     [new Outpoint(tx1.hash(), 0).hex()]: tx1.outputs[0].toJSON(),
     [new Outpoint(tx1.hash(), 1).hex()]: tx1.outputs[1].toJSON(),
     [new Outpoint(tx1.hash(), 2).hex()]: tx1.outputs[2].toJSON(),
+  },
+  balances: {
+    '0': { [A1_LOWERCASE]: 200 },
   },
 };
 
@@ -62,6 +66,9 @@ const state2 = {
     [new Outpoint(tx2.hash(), 1).hex()]: tx2.outputs[1].toJSON(),
     [new Outpoint(tx2.hash(), 2).hex()]: tx2.outputs[2].toJSON(),
     [new Outpoint(tx2.hash(), 3).hex()]: tx2.outputs[3].toJSON(),
+  },
+  balances: {
+    '1': { [A1_LOWERCASE]: 300 },
   },
 };
 
@@ -80,7 +87,7 @@ describe('getUnsignedTransferTx', () => {
     } catch (err) {
       error = err.message;
     }
-    expect(error).toBe('Not enough inputs');
+    expect(error).toBe('Insufficient balance');
   });
 
   test('Generate transfer transaction successfully', async () => {
