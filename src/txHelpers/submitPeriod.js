@@ -25,11 +25,11 @@ const mySlotToSubmitFor = (slots, height, bridgeState) => {
   return mySlots.find(slot => slot.id === currentSlotId);
 };
 
-const getPrevPeriodRoot = (period, bridgeState, height) => {
+const getPrevPeriodRoot = (period, bridgeState) => {
   const { lastBlocksRoot, lastPeriodRoot } = bridgeState;
 
+  if (!lastBlocksRoot) return GENESIS; // not submissions yet = first period to be submitted
   if (lastBlocksRoot === period.prevHash) return lastPeriodRoot; // found
-  if (height === 32) return GENESIS; // not found on 32 block = first period to be submitted
   return null; // not found
 };
 
