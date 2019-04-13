@@ -7122,9 +7122,9 @@ tar@^4:
     safe-buffer "^5.1.2"
     yallist "^3.0.2"
 
-tendermint-node@leapdao/tendermint-node#031e6bbef35cba31a866acc23fd0d0b7cecc9438:
+tendermint-node@leapdao/tendermint-node#6774c48b1eba22faca3fd47e7be9e6358c0d78a8:
   version "3.4.3"
-  resolved "https://codeload.github.com/leapdao/tendermint-node/tar.gz/031e6bbef35cba31a866acc23fd0d0b7cecc9438"
+  resolved "https://codeload.github.com/leapdao/tendermint-node/tar.gz/6774c48b1eba22faca3fd47e7be9e6358c0d78a8"
   dependencies:
     axios "^0.18.0"
     cross-spawn "^6.0.5"
