@@ -1,409 +1,428 @@
 module.exports = [
   {
-    constant: true,
-    inputs: [
+    "constant": true,
+    "inputs": [
       {
-        name: '',
-        type: 'uint256',
-      },
+        "name": "",
+        "type": "uint256"
+      }
     ],
-    name: 'slots',
-    outputs: [
+    "name": "slots",
+    "outputs": [
       {
-        name: 'eventCounter',
-        type: 'uint32',
+        "name": "eventCounter",
+        "type": "uint32"
       },
       {
-        name: 'owner',
-        type: 'address',
+        "name": "owner",
+        "type": "address"
       },
       {
-        name: 'stake',
-        type: 'uint64',
+        "name": "stake",
+        "type": "uint64"
       },
       {
-        name: 'signer',
-        type: 'address',
+        "name": "signer",
+        "type": "address"
       },
       {
-        name: 'tendermint',
-        type: 'bytes32',
+        "name": "tendermint",
+        "type": "bytes32"
       },
       {
-        name: 'activationEpoch',
-        type: 'uint32',
+        "name": "activationEpoch",
+        "type": "uint32"
       },
       {
-        name: 'newOwner',
-        type: 'address',
+        "name": "newOwner",
+        "type": "address"
       },
       {
-        name: 'newStake',
-        type: 'uint64',
+        "name": "newStake",
+        "type": "uint64"
       },
       {
-        name: 'newSigner',
-        type: 'address',
+        "name": "newSigner",
+        "type": "address"
       },
       {
-        name: 'newTendermint',
-        type: 'bytes32',
-      },
+        "name": "newTendermint",
+        "type": "bytes32"
+      }
     ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x387dd9e9"
   },
   {
-    constant: true,
-    inputs: [],
-    name: 'lastCompleteEpoch',
-    outputs: [
+    "constant": true,
+    "inputs": [],
+    "name": "lastCompleteEpoch",
+    "outputs": [
       {
-        name: '',
-        type: 'uint256',
-      },
+        "name": "",
+        "type": "uint256"
+      }
     ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x5620d1d7"
   },
   {
-    constant: true,
-    inputs: [],
-    name: 'epochLength',
-    outputs: [
+    "constant": true,
+    "inputs": [],
+    "name": "epochLength",
+    "outputs": [
       {
-        name: '',
-        type: 'uint256',
-      },
+        "name": "",
+        "type": "uint256"
+      }
     ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x57d775f8"
   },
   {
-    constant: true,
-    inputs: [],
-    name: 'lastEpochBlockHeight',
-    outputs: [
+    "constant": true,
+    "inputs": [],
+    "name": "lastEpochBlockHeight",
+    "outputs": [
       {
-        name: '',
-        type: 'uint256',
-      },
+        "name": "",
+        "type": "uint256"
+      }
     ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0x659f9e3c"
   },
   {
-    constant: true,
-    inputs: [],
-    name: 'bridge',
-    outputs: [
+    "constant": true,
+    "inputs": [],
+    "name": "bridge",
+    "outputs": [
       {
-        name: '',
-        type: 'address',
-      },
+        "name": "",
+        "type": "address"
+      }
     ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xe78cea92"
   },
   {
-    constant: true,
-    inputs: [],
-    name: 'admin',
-    outputs: [
+    "constant": true,
+    "inputs": [],
+    "name": "admin",
+    "outputs": [
       {
-        name: '',
-        type: 'address',
-      },
+        "name": "",
+        "type": "address"
+      }
     ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xf851a440"
   },
   {
-    constant: true,
-    inputs: [],
-    name: 'vault',
-    outputs: [
+    "constant": true,
+    "inputs": [],
+    "name": "vault",
+    "outputs": [
       {
-        name: '',
-        type: 'address',
-      },
+        "name": "",
+        "type": "address"
+      }
     ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function",
+    "signature": "0xfbfa77cf"
   },
   {
-    anonymous: false,
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        indexed: false,
-        name: 'epoch',
-        type: 'uint256',
-      },
+        "indexed": false,
+        "name": "epoch",
+        "type": "uint256"
+      }
     ],
-    name: 'Epoch',
-    type: 'event',
+    "name": "Epoch",
+    "type": "event",
+    "signature": "0xc1d4931e10652da8ab23604510531810d2eebfcd33a81ba4946d702ce8057b64"
   },
   {
-    anonymous: false,
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        indexed: false,
-        name: 'epochLength',
-        type: 'uint256',
-      },
+        "indexed": false,
+        "name": "epochLength",
+        "type": "uint256"
+      }
     ],
-    name: 'EpochLength',
-    type: 'event',
+    "name": "EpochLength",
+    "type": "event",
+    "signature": "0x0d6907b9b2ea7da47011fac3f7a9cd92db6a465b919c62b15e61cc74e360ed42"
   },
   {
-    anonymous: false,
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        indexed: true,
-        name: 'signerAddr',
-        type: 'address',
+        "indexed": true,
+        "name": "signerAddr",
+        "type": "address"
       },
       {
-        indexed: true,
-        name: 'slotId',
-        type: 'uint256',
+        "indexed": true,
+        "name": "slotId",
+        "type": "uint256"
       },
       {
-        indexed: true,
-        name: 'tenderAddr',
-        type: 'bytes32',
+        "indexed": true,
+        "name": "tenderAddr",
+        "type": "bytes32"
       },
       {
-        indexed: false,
-        name: 'eventCounter',
-        type: 'uint256',
+        "indexed": false,
+        "name": "eventCounter",
+        "type": "uint256"
       },
       {
-        indexed: false,
-        name: 'epoch',
-        type: 'uint256',
-      },
+        "indexed": false,
+        "name": "epoch",
+        "type": "uint256"
+      }
     ],
-    name: 'ValidatorJoin',
-    type: 'event',
+    "name": "ValidatorJoin",
+    "type": "event",
+    "signature": "0x4c9088728a29490bef2515a7613c7a87145317c97c5a6db0cfc39b7603dc5d05"
   },
   {
-    anonymous: false,
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        indexed: true,
-        name: 'signerAddr',
-        type: 'address',
+        "indexed": true,
+        "name": "signerAddr",
+        "type": "address"
       },
       {
-        indexed: true,
-        name: 'slotId',
-        type: 'uint256',
+        "indexed": true,
+        "name": "slotId",
+        "type": "uint256"
       },
       {
-        indexed: true,
-        name: 'tenderAddr',
-        type: 'bytes32',
+        "indexed": true,
+        "name": "tenderAddr",
+        "type": "bytes32"
       },
       {
-        indexed: false,
-        name: 'newSigner',
-        type: 'address',
+        "indexed": false,
+        "name": "newSigner",
+        "type": "address"
       },
       {
-        indexed: false,
-        name: 'eventCounter',
-        type: 'uint256',
+        "indexed": false,
+        "name": "eventCounter",
+        "type": "uint256"
       },
       {
-        indexed: false,
-        name: 'epoch',
-        type: 'uint256',
-      },
+        "indexed": false,
+        "name": "epoch",
+        "type": "uint256"
+      }
     ],
-    name: 'ValidatorLogout',
-    type: 'event',
+    "name": "ValidatorLogout",
+    "type": "event",
+    "signature": "0xfc17170df6a99106bd17e260bba5bf947bd69496cec7ee38c77d819af73682b6"
   },
   {
-    anonymous: false,
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        indexed: true,
-        name: 'signerAddr',
-        type: 'address',
+        "indexed": true,
+        "name": "signerAddr",
+        "type": "address"
       },
       {
-        indexed: true,
-        name: 'slotId',
-        type: 'uint256',
+        "indexed": true,
+        "name": "slotId",
+        "type": "uint256"
       },
       {
-        indexed: true,
-        name: 'tenderAddr',
-        type: 'bytes32',
+        "indexed": true,
+        "name": "tenderAddr",
+        "type": "bytes32"
       },
       {
-        indexed: false,
-        name: 'epoch',
-        type: 'uint256',
-      },
+        "indexed": false,
+        "name": "epoch",
+        "type": "uint256"
+      }
     ],
-    name: 'ValidatorLeave',
-    type: 'event',
+    "name": "ValidatorLeave",
+    "type": "event",
+    "signature": "0x8c7dcd0d98dd0f717c7cb4db1dec8bccf98dec6114eba26c026815b0046fb40f"
   },
   {
-    anonymous: false,
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        indexed: true,
-        name: 'signerAddr',
-        type: 'address',
+        "indexed": true,
+        "name": "signerAddr",
+        "type": "address"
       },
       {
-        indexed: true,
-        name: 'slotId',
-        type: 'uint256',
+        "indexed": true,
+        "name": "slotId",
+        "type": "uint256"
       },
       {
-        indexed: true,
-        name: 'tenderAddr',
-        type: 'bytes32',
+        "indexed": true,
+        "name": "tenderAddr",
+        "type": "bytes32"
       },
       {
-        indexed: false,
-        name: 'eventCounter',
-        type: 'uint256',
-      },
+        "indexed": false,
+        "name": "eventCounter",
+        "type": "uint256"
+      }
     ],
-    name: 'ValidatorUpdate',
-    type: 'event',
+    "name": "ValidatorUpdate",
+    "type": "event",
+    "signature": "0x544de641c952cf567862150ebe0f2a364e9863b490e8b3bf0f48d9cfda7c843c"
   },
   {
-    anonymous: false,
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        indexed: true,
-        name: 'blocksRoot',
-        type: 'bytes32',
+        "indexed": true,
+        "name": "blocksRoot",
+        "type": "bytes32"
       },
       {
-        indexed: true,
-        name: 'slotId',
-        type: 'uint256',
+        "indexed": true,
+        "name": "slotId",
+        "type": "uint256"
       },
       {
-        indexed: false,
-        name: 'owner',
-        type: 'address',
+        "indexed": false,
+        "name": "owner",
+        "type": "address"
       },
       {
-        indexed: false,
-        name: 'periodRoot',
-        type: 'bytes32',
-      },
+        "indexed": false,
+        "name": "periodRoot",
+        "type": "bytes32"
+      }
     ],
-    name: 'Submission',
-    type: 'event',
+    "name": "Submission",
+    "type": "event",
+    "signature": "0x6690fe1f2634f1045e46d9adb5863d34ad6e548e6eb55fac8189444a403f8ee0"
   },
   {
-    constant: false,
-    inputs: [
+    "constant": false,
+    "inputs": [
       {
-        name: '_bridge',
-        type: 'address',
+        "name": "_bridge",
+        "type": "address"
       },
       {
-        name: '_vault',
-        type: 'address',
+        "name": "_vault",
+        "type": "address"
       },
       {
-        name: '_epochLength',
-        type: 'uint256',
-      },
+        "name": "_epochLength",
+        "type": "uint256"
+      }
     ],
-    name: 'initialize',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
+    "name": "initialize",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x1794bb3c"
   },
   {
-    constant: false,
-    inputs: [
+    "constant": false,
+    "inputs": [
       {
-        name: '_epochLength',
-        type: 'uint256',
-      },
+        "name": "_epochLength",
+        "type": "uint256"
+      }
     ],
-    name: 'setEpochLength',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
+    "name": "setEpochLength",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x54eea796"
   },
   {
-    constant: false,
-    inputs: [
+    "constant": false,
+    "inputs": [
       {
-        name: '_slotId',
-        type: 'uint256',
+        "name": "_slotId",
+        "type": "uint256"
       },
       {
-        name: '_signerAddr',
-        type: 'address',
+        "name": "_signerAddr",
+        "type": "address"
       },
       {
-        name: '_tenderAddr',
-        type: 'bytes32',
-      },
+        "name": "_tenderAddr",
+        "type": "bytes32"
+      }
     ],
-    name: 'setSlot',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
+    "name": "setSlot",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0xe3c9e9b3"
   },
   {
-    constant: false,
-    inputs: [
+    "constant": false,
+    "inputs": [
       {
-        name: '_slotId',
-        type: 'uint256',
-      },
+        "name": "_slotId",
+        "type": "uint256"
+      }
     ],
-    name: 'activate',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
+    "name": "activate",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0xb260c42a"
   },
   {
-    constant: false,
-    inputs: [
+    "constant": false,
+    "inputs": [
       {
-        name: '_slotId',
-        type: 'uint256',
+        "name": "_slotId",
+        "type": "uint256"
       },
       {
-        name: '_prevHash',
-        type: 'bytes32',
+        "name": "_prevHash",
+        "type": "bytes32"
       },
       {
-        name: '_blocksRoot',
-        type: 'bytes32',
-      },
+        "name": "_blocksRoot",
+        "type": "bytes32"
+      }
     ],
-    name: 'submitPeriod',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-];
+    "name": "submitPeriod",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function",
+    "signature": "0x877c4f6e"
+  }
+]

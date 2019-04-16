@@ -26,7 +26,8 @@ module.exports = (state, tx, bridgeState) => {
     !exit ||
     !addrCmp(exit.exitor, unspent.address) ||
     !equal(BigInt(exit.amount), BigInt(unspent.value)) ||
-    Number(exit.color) !== unspent.color
+    Number(exit.color) !== unspent.color ||
+    exit.data !== unspent.data
   ) {
     throw new Error('Trying to submit incorrect exit');
   }
