@@ -12,6 +12,14 @@ const PRIV_1 =
   '0xad8e31c8862f5f86459e7cca97ac9302c5e1817077902540779eef66e21f394a';
 const ADDR_2 = '0xc5a72c0bf9f59ed5a1d2ac9f29bd80c55279d2d3';
 
+function getDefaultState() {
+  return {
+    balances: {},
+    owners: {},
+    unspent: {},
+  };
+}
+
 describe('applyTx utils', () => {
   describe('checkInsAndOuts', () => {
     test('ERC20', () => {
@@ -354,11 +362,7 @@ describe('applyTx utils', () => {
       const outpoint1 = new Outpoint(deposit1.hash(), 0);
       const outpoint2 = new Outpoint(deposit2.hash(), 0);
       const outpoint3 = new Outpoint(deposit3.hash(), 0);
-      const state = {
-        balances: {},
-        owners: {},
-        unspent: {},
-      };
+      const state = getDefaultState();
 
       addOutputs(state, deposit1);
       expect(state.unspent[outpoint1.hex()]).toBeDefined();
@@ -376,11 +380,7 @@ describe('applyTx utils', () => {
 
     test('Existing outpoint', () => {
       const deposit = Tx.deposit(12, 500, ADDR_1, 0);
-      const state = {
-        balances: {},
-        owners: {},
-        unspent: {},
-      };
+      const state = getDefaultState();
 
       addOutputs(state, deposit);
       expect(() => addOutputs(state, deposit)).toThrow(
@@ -393,11 +393,7 @@ describe('applyTx utils', () => {
     test('ERC20', () => {
       const deposit = Tx.deposit(12, 500, ADDR_1, 0);
       const outpoint = new Outpoint(deposit.hash(), 0);
-      const state = {
-        balances: {},
-        owners: {},
-        unspent: {},
-      };
+      const state = getDefaultState();
 
       addOutputs(state, deposit);
       expect(state.unspent[outpoint.hex()]).toBeDefined();
@@ -427,11 +423,7 @@ describe('applyTx utils', () => {
       const outpoint1 = new Outpoint(deposit1.hash(), 0);
       const outpoint2 = new Outpoint(deposit2.hash(), 0);
       const outpoint3 = new Outpoint(deposit3.hash(), 0);
-      const state = {
-        balances: {},
-        owners: {},
-        unspent: {},
-      };
+      const state = getDefaultState();
 
       addOutputs(state, deposit1);
       expect(state.unspent[outpoint1.hex()]).toBeDefined();

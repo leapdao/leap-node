@@ -14,15 +14,15 @@ const {
   lessThan,
   greaterThan,
 } = require('jsbi-utils');
-const { isNFT } = require('../../utils');
+const { isNFT, isNST } = require('../../utils');
 const { uniq, isEqual } = require('lodash');
 
 const groupValuesByColor = (values, { color, value }) => {
-  if (!isNFT(color) && lessThan(BigInt(value), BigInt(1))) {
+  if ((!isNFT(color) && !isNST(color)) && lessThan(BigInt(value), BigInt(1))) {
     throw new Error('One of the outs has value < 1');
   }
   return Object.assign({}, values, {
-    [color]: isNFT(color)
+    [color]: (isNFT(color) || isNST(color))
       ? (values[color] || new Set()).add(BigInt(value))
       : add(values[color] || BigInt(0), BigInt(value)),
   });
@@ -58,9 +58,10 @@ const checkInsAndOuts = (tx, state, bridgeState, unspentFilter) => {
         throw new Error(`Tx underpriced`);
       }
     }
+    const isNFTByColor = isNFT(color) || isNST(color);
     if (
-      (isNFT(color) && !isEqual(inputValue, outputValue)) ||
-      (!isNFT(color) && greaterThan(outputValue, inputValue))
+      (isNFTByColor && !isEqual(inputValue, outputValue)) ||
+      (!isNFTByColor && greaterThan(outputValue, inputValue))
     ) {
       throw new Error(`Ins and outs values are mismatch for color ${color}`);
     }
@@ -82,11 +83,15 @@ const addOutputs = ({ balances, owners, unspent }, tx) => {
     if (unspent[outpoint.hex()] !== undefined) {
       throw new Error('Attempt to create existing output');
     }
-    balances[out.color] = balances[out.color] || {};
-    owners[out.color] = owners[out.color] || {};
-    const cBalances = balances[out.color];
-    const cOwners = owners[out.color];
-    if (isNFT(out.color)) {
+    const cBalances = balances[out.color] || {};
+    const cOwners = owners[out.color] || {};
+    const tokenIsNFT = isNFT(out.color);
+    const tokenIsNST = isNST(out.color);
+
+    balances[out.color] = cBalances;
+    owners[out.color] = cOwners;
+
+    if (tokenIsNFT || tokenIsNST) {
       cBalances[out.address] = cBalances[out.address] || [];
       cBalances[out.address].push(out.value);
       cOwners[out.value] = out.address;
@@ -106,7 +111,7 @@ const removeInputs = ({ unspent, balances, owners }, tx) => {
     const outpointId = input.prevout.hex();
     const { address, value, color } = unspent[outpointId];
 
-    if (isNFT(color)) {
+    if (isNFT(color) || isNST(color)) {
       const index = balances[color][address].indexOf(value);
       balances[color][address].splice(index, 1);
       delete owners[color][BigInt(value).toString()];
