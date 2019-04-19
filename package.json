@@ -1,6 +1,6 @@
 {
   "name": "leap-node",
-  "version": "4.2.0",
+  "version": "4.2.1",
   "main": "index.js",
   "author": "Alex Lunyov <isuntc@gmail.com>",
   "license": "MPL-2.0",
@@ -65,7 +65,7 @@
     "lodash.get": "^4.4.2",
     "rimraf": "^2.6.2",
     "rpc-websockets": "^4.1.2",
-    "tendermint-node": "github:leapdao/tendermint-node#6774c48b1eba22faca3fd47e7be9e6358c0d78a8",
+    "tendermint-node": "leapdao/tendermint-node#v0.31.0-leap.3",
     "tinyqueue": "^2.0.0",
     "truffle-hdwallet-provider": "^1.0.3",
     "varstruct": "^6.1.1",
