@@ -67,11 +67,11 @@ const conditionScript = Buffer.from(
 const PRIV =
   '0x94890218f2b0d04296f30aeafd13655eba4c5bbf1770273276fee52cbe3f2cb4';
 
-async function expectToThrow(func) {
+async function expectToThrow(func, args) {
   let err;
 
   try {
-    await func();
+    await func.apply(args);
   } catch (e) {
     err = e;
   }
@@ -215,15 +215,13 @@ describe('checkSpendCond', () => {
 
     await checkSpendCond(state, condition, bridgeState);
 
-    let err;
-
     condition.outputs.push(new Output(4000000, `0x${scriptHash.toString('hex')}`, 0));
-    await expectToThrow(async () => await checkSpendCond(state, condition, bridgeState));
+    await expectToThrow(checkSpendCond, [state, condition, bridgeState]);
     condition.outputs.pop();
 
     // remove LEAP input for gas
     condition.inputs.pop();
-    await expectToThrow(async () => await checkSpendCond(state, condition, bridgeState));
+    await expectToThrow(checkSpendCond, [state, condition, bridgeState]);
   });
 
   test('Spending Condition: NFT no input for gas', async () => {
@@ -278,10 +276,10 @@ describe('checkSpendCond', () => {
 
     condition.inputs[0].setMsgData(msgData);
 
-    await expectToThrow(async () => await checkSpendCond(state, condition, bridgeState));
+    await expectToThrow(checkSpendCond, [state, condition, bridgeState]);
   });
 
-  test('Spending Condition: Breeding/NST', async () => {
+  test('Spending Condition: NST', async () => {
     const nstAddr = erc1948Tokens[0];
     const tokenId = '0x0000000000000000000000005555555555555555555555555555555555555555';
     const tokenData = '0x00000000000000000000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa00005';
@@ -314,10 +312,6 @@ describe('checkSpendCond', () => {
     };
 
     // a spending condition transaction that spends the deposit is created
-    const receiver = Buffer.from(
-      '9999999999999999999999999999999999999999',
-      'hex'
-    );
     const condition = Tx.spendCond(
       [
         new Input({

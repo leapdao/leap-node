@@ -166,13 +166,13 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
 
   for (let i = 0; i < txInputLen; i += 1) {
     const unspent = state.unspent[tx.inputs[i].prevout.hex()];
-    const tokenId = '0x' + utils.setLengthLeft(
+    const tokenId = utils.setLengthLeft(
       utils.toBuffer(`0x${BigInt(unspent.value).toString(16)}`),
       32
     ).toString('hex');
 
     inputMap[tx.inputs[i].prevout.getUtxoId()] = unspent;
-    tokenDataMap[tokenId] = unspent.data;
+    tokenDataMap[`0x${tokenId}`] = unspent.data;
   }
 
   // for deploying colors and mint tokens
@@ -201,8 +201,7 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
         );
 
         if (nst) {
-          const val = '0x' + tokenId.toString('hex');
-          const tokenData = utils.toBuffer(tokenDataMap[val]);
+          const tokenData = utils.toBuffer(tokenDataMap[`0x${tokenId.toString('hex')}`]);
           callData = Buffer.concat([ERC1948_MINT_FUNCSIG, sigHashBuf, tokenId, tokenData]);
           bytecode = ERC1948_BYTECODE;
         }
@@ -214,9 +213,9 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
         toMint.push({ contractAddr, callData, bytecode, color });
       }
     } else {
-      // default to ERC20
-      // it does not need an output actually,
-      // input can be burned completely
+      // usually we burn the output, so that token.balance(address(this)) returns the balance after gas subtracted.
+      // this is a special case where there is a color input, but no color output.
+      // in that case we mint it, and token.balance(address(this)) will return it.
       const value = utils.setLengthLeft(
         utils.toBuffer(`0x${BigInt(outputValues || inputValues).toString(16)}`),
         32
@@ -236,7 +235,7 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
     if (deployed[obj.contractAddr] === undefined) {
       // we get the color as string somehow from up of the call-chain
       // TODO: replace call-chain with block-chain
-      deployed[obj.contractAddr.toString('hex')] = parseInt(obj.color);
+      deployed[obj.contractAddr.toString('hex')] = parseInt(obj.color, 10);
       // eslint-disable-next-line no-await-in-loop
       await setAccountCode(obj.bytecode, obj.contractAddr, vm.stateManager);
     }
@@ -267,7 +266,6 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
     data: spendingInput.msgData,
   });
 
-  //const out = inputMap[spendingInput.prevout.getUtxoId()];
   const logOuts = [];
 
   // iterate through all transfer events and sum them up per color

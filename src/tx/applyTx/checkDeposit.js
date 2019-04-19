@@ -39,7 +39,8 @@ module.exports = (state, tx, bridgeState) => {
     !equal(BigInt(deposit.amount), BigInt(tx.outputs[0].value)) ||
     Number(deposit.color) !== txColor ||
     !addrCmp(deposit.depositor, tx.outputs[0].address) ||
-    deposit.data !== tx.outputs[0].data
+    // NFTs do not have data :)
+    isNST(txColor) && (deposit.data !== tx.outputs[0].data)
   ) {
     throw new Error('Trying to submit incorrect deposit');
   }
