@@ -14,7 +14,7 @@ async function getPastEvents(contract, fromBlock, toBlock) {
 
   // somehow fromBlock or toBlock are delivered to us as a string -.-
   fromBlock = parseInt(fromBlock, 10);
-  toBlock = parseInt(fromBlock, 10);
+  toBlock = parseInt(toBlock, 10);
 
   for (let i = 0; i < batchCount; i += 1) {
     /* eslint-disable no-await-in-loop */
