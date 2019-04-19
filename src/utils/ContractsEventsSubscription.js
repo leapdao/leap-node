@@ -12,6 +12,10 @@ async function getPastEvents(contract, fromBlock, toBlock) {
   const batchCount = Math.ceil((toBlock - fromBlock) / BATCH_SIZE);
   const events = [];
 
+  // somehow fromBlock or toBlock are delivered to us as a string -.-
+  fromBlock = parseInt(fromBlock, 10);
+  toBlock = parseInt(fromBlock, 10);
+
   for (let i = 0; i < batchCount; i += 1) {
     /* eslint-disable no-await-in-loop */
     events.push(
