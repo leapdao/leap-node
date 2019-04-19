@@ -7104,7 +7104,7 @@ tar@^4:
     safe-buffer "^5.1.2"
     yallist "^3.0.2"
 
-tendermint-node@leapdao/tendermint-node#v0.31.0-leap.3:
+"tendermint-node@github:leapdao/tendermint-node#v0.31.0-leap.3":
   version "3.4.3"
   resolved "https://codeload.github.com/leapdao/tendermint-node/tar.gz/89ed1091233dd89636bf4d74a2d99dca1c8b64b6"
   dependencies:
