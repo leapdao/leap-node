@@ -3,8 +3,6 @@
 const createABCIServer = require('js-abci');
 const decodeTx = require('./tx-encoding.js').decode;
 const jsondiffpatch = require('jsondiffpatch');
-const getRoot = require('./get-root.js');
-const { stringify } = require('deterministic-json');
 
 const { getAddress } = require('../../src/utils');
 
@@ -105,9 +103,9 @@ module.exports = function configureABCIServer({
   txMiddleware,
   blockMiddleware,
   store,
-  // initialAppHash,
   initChainMiddleware,
   periodMiddleware,
+  genesis,
 }) {
   const chainInfo = {
     height: 1,
@@ -159,10 +157,7 @@ module.exports = function configureABCIServer({
     for (const blockHandler of blockMiddleware) {
       await blockHandler(store, chainInfo);
     }
-    const appHash = await getRoot(store);
-    // by returning nothing on commit, we get no empty blocks anymore
-    // Maybe we return the wrong hash? ;)
-    // return { data: appHash };
+
     return {};
   };
 
@@ -202,26 +197,20 @@ module.exports = function configureABCIServer({
     return { status: rsp.status };
   };
 
-  abciApp.query = () => {
-    try {
-      return {
-        value: Buffer.from(stringify(store)),
-        height: chainInfo.height - 1,
-        proof: '',
-        key: '',
-        index: 0,
-        code: 0,
-        log: '',
-      };
-    } catch (e) {
-      return { code: 2, log: `invalid query: ${e.message}` };
-    }
-  };
-
   abciApp.info = async () => {
-    const rootHash = await getRoot(store);
-    // TODO: should also return lastBlockHeight
-    return { lastBlockAppHash: rootHash };
+    const rsp = {};
+
+    if (genesis && genesis.app_hash) {
+      rsp.lastBlockAppHash = Buffer.from(genesis.app_hash, 'hex');
+    }
+
+    if (store.blockHeight) {
+      chainInfo.height = store.blockHeight;
+      // we always save current bridgeState = commited block height + 1
+      rsp.lastBlockHeight = store.blockHeight - 1;
+    }
+
+    return rsp;
   };
 
   const abciServer = createABCIServer(abciApp);

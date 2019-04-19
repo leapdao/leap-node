@@ -1,4 +1,5 @@
 const BridgeState = require('./bridgeState');
+const createDb = require('./api/createDb');
 
 jest.mock('./utils/ContractsEventsSubscription');
 
@@ -103,5 +104,48 @@ describe('BridgeState', () => {
     expect(state.account.address).toBe(
       '0xB8205608d54cb81f44F263bE086027D8610F3C94'
     );
+  });
+
+  test('BridgeState.{loadState, saveState}', async () => {
+    let methodCalled = '';
+    let storedObj = null;
+
+    const level = {
+      async get(key) {
+        methodCalled = `get${key}`;
+
+        if (!storedObj) {
+          const err = new Error('NotFoundError');
+          err.type = 'NotFoundError';
+          throw err;
+        }
+
+        return storedObj;
+      },
+
+      async put(key, val) {
+        methodCalled = `set${key}`;
+
+        if (key === 'chainState') {
+          storedObj = val;
+        }
+      },
+    };
+
+    const db = createDb(level);
+    const bridgeState = new BridgeState(db, null, {});
+    const initialState = await bridgeState.loadState();
+    expect(methodCalled === 'getchainState').toBe(true);
+
+    expect(await bridgeState.loadState()).toEqual(initialState);
+    expect(methodCalled === 'getchainState').toBe(true);
+
+    const newState = bridgeState.currentState;
+    newState.blockHeight = 1;
+    bridgeState.saveState(newState);
+    expect(methodCalled === 'setchainState').toBe(true);
+
+    expect(await bridgeState.loadState()).toEqual(newState);
+    expect(methodCalled === 'getchainState').toBe(true);
   });
 });

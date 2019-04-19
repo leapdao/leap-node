@@ -51,8 +51,6 @@ module.exports = async (
     return submittedPeriod;
   }
 
-  const prevPeriodRoot = getPrevPeriodRoot(period, bridgeState);
-
   if (nodeConfig.readonly) {
     logPeriod('Readonly node. Skipping the rest of submitPeriod');
     return submittedPeriod;
@@ -61,6 +59,10 @@ module.exports = async (
   const mySlotToSubmit = mySlotToSubmitFor(slots, height, bridgeState);
   if (mySlotToSubmit) {
     logPeriod('submitPeriod. Slot %d', mySlotToSubmit.id);
+
+    // always try to use the last submitted one
+    const prevPeriodRoot = getPrevPeriodRoot(period, bridgeState) || lastPeriodRoot;
+
     if (!prevPeriodRoot) {
       logPeriod(
         'submitPeriod. Not previous period root found. Skipping submission'

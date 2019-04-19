@@ -136,7 +136,7 @@ describe('submitPeriod', async () => {
     expect(bridgeState.operatorContract.test.prevPeriodRoot).toEqual(GENESIS);
   });
 
-  test('not submitted, own slot, wrong prev hash', async () => {
+  test('submitted, own slot, always try to submit for lastPeriodRoot', async () => {
     const bridgeState = bridgeStateMock({
       bridgeContract: bridgeContractMock({
         returnPeriod: { timestamp: '0' },
@@ -156,7 +156,7 @@ describe('submitPeriod', async () => {
     expect(submittedPeriod).toEqual({
       timestamp: '0',
     });
-    expect(bridgeState.operatorContract.test.submitCalled).toBe(false);
+    expect(bridgeState.operatorContract.test.submitCalled).toBe(true);
   });
 
   test('not submitted, own slot, readonly validator', async () => {

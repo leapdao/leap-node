@@ -3,7 +3,6 @@ ARG BUILD_DEPS="git g++ cmake make python2"
 WORKDIR /opt/leap-node
 RUN apk add --no-cache --update --virtual build_deps $BUILD_DEPS
 COPY . /opt/leap-node
-RUN chmod 755 bin.js
 RUN yarn install --production
 RUN yarn link
 RUN apk del build_deps

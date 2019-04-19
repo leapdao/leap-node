@@ -30,4 +30,14 @@ module.exports = (bridgeState, db, nodeConfig = {}) => async (
   // state is merk here. TODO: assign object copy or something immutable
   bridgeState.currentState = state;
   bridgeState.blockHeight = chainInfo.height;
+
+  if (chainInfo.height % 32 === 0) {
+    // catch this, it is not fatal if it fails here
+    logNode('Saving state');
+    try {
+      await bridgeState.saveState();
+    } catch (e) {
+      logNode(e);
+    }
+  }
 };

@@ -1,7 +1,22 @@
 const fs = require('fs');
-const { stringify } = require('deterministic-json');
 const { join } = require('path');
+// eslint-disable-next-line import/no-extraneous-dependencies
 const tendermint = require('tendermint-node');
+
+// default params (as of version 0.31), except `time_iota_ms`
+const CONSENSUS_PARAMS = {
+  block: {
+    max_bytes: '22020096',
+    max_gas: '-1',
+    time_iota_ms: '1000',
+  },
+  evidence: {
+    max_age: '100000',
+  },
+  validator: {
+    pub_key_types: ['ed25519'],
+  },
+};
 
 module.exports = async ({
   lotionPath,
@@ -14,7 +29,6 @@ module.exports = async ({
   peers,
   genesis,
   keys,
-  initialAppHash,
   createEmptyBlocks,
   unsafeRpc,
   readonlyValidator,
@@ -24,11 +38,15 @@ module.exports = async ({
   if (genesis) {
     fs.writeFileSync(
       join(lotionPath, 'config', 'genesis.json'),
-      stringify(genesis)
+      JSON.stringify(genesis)
     );
   }
   if (keys) {
-    const validatorJsonPath = join(lotionPath, 'config', 'priv_validator_key.json');
+    const validatorJsonPath = join(
+      lotionPath,
+      'config',
+      'priv_validator_key.json'
+    );
     const generatedValidatorJson = JSON.parse(
       fs.readFileSync(validatorJsonPath, { encoding: 'utf8' })
     );
@@ -41,12 +59,12 @@ module.exports = async ({
     {},
     JSON.parse(fs.readFileSync(join(lotionPath, 'config', 'genesis.json'))),
     {
-      app_hash: initialAppHash,
+      consensus_params: CONSENSUS_PARAMS,
     }
   );
   fs.writeFileSync(
     join(lotionPath, 'config', 'genesis.json'),
-    stringify(newGenesis)
+    JSON.stringify(newGenesis)
   );
 
   const opts = {
