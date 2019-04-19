@@ -1,19 +1,21 @@
 const fs = require('fs');
 const { join } = require('path');
+// eslint-disable-next-line import/no-extraneous-dependencies
 const tendermint = require('tendermint-node');
 
+// default params (as of version 0.31), except `time_iota_ms`
 const CONSENSUS_PARAMS = {
-  'block': {
-    'max_bytes':'22020096',
-    'max_gas':'-1',
-    'time_iota_ms':'1000',
+  block: {
+    max_bytes: '22020096',
+    max_gas: '-1',
+    time_iota_ms: '1000',
   },
-  'evidence': {
-    'max_age':'100000',
+  evidence: {
+    max_age: '100000',
   },
-  'validator': {
-    'pub_key_types':['ed25519'],
-  }
+  validator: {
+    pub_key_types: ['ed25519'],
+  },
 };
 
 module.exports = async ({
@@ -40,7 +42,11 @@ module.exports = async ({
     );
   }
   if (keys) {
-    const validatorJsonPath = join(lotionPath, 'config', 'priv_validator_key.json');
+    const validatorJsonPath = join(
+      lotionPath,
+      'config',
+      'priv_validator_key.json'
+    );
     const generatedValidatorJson = JSON.parse(
       fs.readFileSync(validatorJsonPath, { encoding: 'utf8' })
     );
