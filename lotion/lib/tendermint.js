@@ -5,6 +5,7 @@ const tendermint = require('tendermint-node');
 
 module.exports = async ({
   lotionPath,
+  tendermintAddr,
   tendermintPort,
   abciPort,
   p2pPort,
@@ -16,6 +17,7 @@ module.exports = async ({
   initialAppHash,
   createEmptyBlocks,
   unsafeRpc,
+  readonlyValidator,
 }) => {
   await tendermint.init(lotionPath);
 
@@ -48,7 +50,7 @@ module.exports = async ({
   );
 
   const opts = {
-    rpc: { laddr: `tcp://0.0.0.0:${tendermintPort}` },
+    rpc: { laddr: `tcp://${tendermintAddr}:${tendermintPort}` },
     p2p: { laddr: `tcp://0.0.0.0:${p2pPort}` },
     proxyApp: `tcp://127.0.0.1:${abciPort}`,
   };
@@ -58,11 +60,16 @@ module.exports = async ({
   if (unsafeRpc) {
     opts.rpc.unsafe = true;
   }
+  opts.consensus = {};
   if (createEmptyBlocks === false) {
-    opts.consensus = { createEmptyBlocks: false };
+    opts.consensus.createEmptyBlocks = false;
   }
+
   if (!logTendermint) {
     opts.logLevel = 'error';
+  }
+  if (readonlyValidator) {
+    opts.consensus.readonly = true;
   }
 
   let shuttingDown = false;

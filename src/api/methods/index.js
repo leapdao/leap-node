@@ -1,6 +1,6 @@
 /* eslint-disable global-require */
 
-module.exports = (bridgeState, db, app, lotionPort) => {
+module.exports = (bridgeState, db, app, tendermintPort) => {
   const withCallback = method => {
     return function handler(args, cb) {
       method(...args)
@@ -15,7 +15,7 @@ module.exports = (bridgeState, db, app, lotionPort) => {
     eth_getBalance: require('./getBalance').bind(null, bridgeState),
     eth_sendRawTransaction: require('./sendRawTransaction').bind(
       null,
-      lotionPort
+      tendermintPort
     ),
     eth_getTransactionByHash: require('./getTransactionByHash').bind(null, db),
     eth_getTransactionReceipt: require('./getTransactionByHash').bind(null, db),

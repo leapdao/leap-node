@@ -49,7 +49,7 @@ describe('checkExit', () => {
     ).toThrow('Exit tx should have one input');
   });
 
-  test('non-existent', () => {
+  test('non-existent exit', () => {
     const deposit = Tx.deposit(12, 500, ADDR_1, 0);
     const outpoint = new Outpoint(deposit.hash(), 0);
     const state = {
@@ -60,6 +60,19 @@ describe('checkExit', () => {
     const exit = Tx.exit(new Input(outpoint));
     expect(() => {
       checkExit(state, exit, { exits: {} });
+    }).toThrow('Trying to submit incorrect exit');
+  });
+
+  test('non-existent utxo', () => {
+    const deposit = Tx.deposit(12, 500, ADDR_1, 0);
+    const outpoint = new Outpoint(deposit.hash(), 0);
+    const state = {
+      unspent: {},
+    };
+
+    const exit = Tx.exit(new Input(outpoint));
+    expect(() => {
+      checkExit(state, exit, makeExitMock(ADDR_1, '500', 0));
     }).toThrow('Trying to submit incorrect exit');
   });
 

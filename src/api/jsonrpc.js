@@ -17,9 +17,9 @@ api.use(
 api.use(jsonParser());
 
 /*
-* Starts JSON RPC server
-*/
-module.exports = async (bridgeState, lotionPort, db, app) => {
+ * Starts JSON RPC server
+ */
+module.exports = async (bridgeState, tendermintPort, db, app) => {
   const withParams = method => {
     return params => method(...params);
   };
@@ -28,7 +28,7 @@ module.exports = async (bridgeState, lotionPort, db, app) => {
     bridgeState,
     db,
     app,
-    lotionPort
+    tendermintPort
   );
 
   api.use(jayson.server(methodsWithCallback).middleware());

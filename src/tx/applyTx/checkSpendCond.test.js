@@ -94,7 +94,6 @@ describe('checkSpendCond', () => {
       [
         new Input({
           prevout: new Outpoint(deposit.hash(), 0),
-          gasPrice: 100,
           script: conditionScript,
         }),
       ],
@@ -119,9 +118,24 @@ describe('checkSpendCond', () => {
       )}`; // outputs
     condition.inputs[0].setMsgData(msgData);
 
-    await checkSpendCond(state, condition, {
+    const bridgeState = {
       exitHandlerContract,
       tokens: { erc20: [], erc721: [] },
+      minGasPrices: [100],
+    };
+
+    await checkSpendCond(state, condition, bridgeState);
+
+    await checkSpendCond(state, condition, bridgeState, {
+      network: { noSpendingConditions: false },
     });
+
+    expect(
+      checkSpendCond(state, condition, bridgeState, {
+        network: { noSpendingConditions: true },
+      })
+    ).rejects.toEqual(
+      new Error('Spending Conditions are not supported on this network')
+    );
   });
 });

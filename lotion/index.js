@@ -12,8 +12,6 @@ const rimraf = require('rimraf');
 const generateNetworkId = require('./lib/network-id.js');
 const getNodeInfo = require('./lib/node-info.js');
 const getRoot = require('./lib/get-root.js');
-const serveGenesisGCI = require('./lib/gci-serve-genesis.js');
-const announceSelfAsFullNode = require('./lib/gci-announce-self.js');
 const os = require('os');
 const merk = require('merk');
 const { EventEmitter } = require('events');
@@ -43,7 +41,7 @@ function Lotion(opts = {}) {
       ? true
       : opts.createEmptyBlocks;
   const devMode = opts.devMode || false;
-  const { unsafeRpc } = opts;
+  const { unsafeRpc, readonlyValidator } = opts;
   const txMiddleware = [];
   const queryMiddleware = [];
   const initializerMiddleware = [];
@@ -152,6 +150,8 @@ function Lotion(opts = {}) {
           opts.abciPort
         );
 
+        const { tendermintAddr } = opts;
+
         // initialize merk store
         const merkDb = level(join(lotionPath, 'merk'));
         const store = await merk(merkDb);
@@ -178,6 +178,7 @@ function Lotion(opts = {}) {
         try {
           tendermint = await Tendermint({
             lotionPath,
+            tendermintAddr,
             tendermintPort,
             abciPort,
             p2pPort,
@@ -189,6 +190,7 @@ function Lotion(opts = {}) {
             keys,
             initialAppHash,
             unsafeRpc,
+            readonlyValidator,
           });
         } catch (e) {
           console.log('error starting tendermint node:');
@@ -198,16 +200,7 @@ function Lotion(opts = {}) {
 
         await tendermint.synced;
 
-        // serve genesis.json and get GCI
-        const genesisJson = fs.readFileSync(
-          join(lotionPath, 'config', 'genesis.json'),
-          'utf8'
-        );
-        const { GCI } = serveGenesisGCI(genesisJson);
-
-        announceSelfAsFullNode({ GCI, tendermintPort });
         const nodeInfo = await getNodeInfo(lotionPath);
-        nodeInfo.GCI = GCI;
         const txServer = TxServer({
           tendermintRpcUrl,
           store,
@@ -221,7 +214,6 @@ function Lotion(opts = {}) {
             tendermintPort,
             abciPort,
             txServerPort,
-            GCI,
             p2pPort,
             lotionPath,
             genesisPath: join(lotionPath, 'config', 'genesis.json'),

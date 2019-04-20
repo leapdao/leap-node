@@ -21,14 +21,14 @@ const checks = {
   [Type.SPEND_COND]: require('./checkSpendCond'),
 };
 
-module.exports = async (state, tx, bridgeState) => {
+module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
   if (!checks[tx.type]) {
     throw new Error('Unsupported tx type');
   }
 
   checkOutpoints(state, tx);
 
-  await checks[tx.type](state, tx, bridgeState);
+  await checks[tx.type](state, tx, bridgeState, nodeConfig);
 
   removeInputs(state, tx);
   addOutputs(state, tx);

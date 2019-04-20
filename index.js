@@ -64,6 +64,7 @@ async function run() {
     abciPort: cliArgs.abciPort,
     peers: config.peers,
     p2pPort: cliArgs.p2pPort,
+    tendermintAddr: cliArgs.tendermintAddr,
     tendermintPort: cliArgs.tendermintPort,
     createEmptyBlocks: false,
     logTendermint: log => {
@@ -71,6 +72,8 @@ async function run() {
         log.replace(/I\[\d{2}-\d{2}\|\d{2}:\d{2}:\d{2}\.\d{3}\] /g, '')
       );
     },
+    unsafeRpc: cliArgs.unsafeRpc,
+    readonlyValidator: cliArgs.readonly,
   });
 
   if (cliArgs.fresh) {
@@ -82,7 +85,10 @@ async function run() {
 
   const privKey = await readPrivKey(app, cliArgs);
 
-  const eventsRelay = new EventsRelay(config.eventsDelay, cliArgs.port);
+  const eventsRelay = new EventsRelay(
+    config.eventsDelay,
+    cliArgs.tendermintPort
+  );
   const bridgeState = new BridgeState(
     db,
     privKey,
@@ -98,7 +104,9 @@ async function run() {
   await bridgeState.init();
   await blockTicker.init();
 
-  app.useTx(txHandler(bridgeState));
+  const nodeConfig = Object.assign({}, cliArgs, { network: config });
+
+  app.useTx(txHandler(bridgeState, nodeConfig));
   app.useBlock(blockHandler(bridgeState, db, cliArgs.no_validators_updates));
   app.usePeriod(periodHandler(bridgeState));
 
@@ -106,7 +114,7 @@ async function run() {
     blockTicker.subscribe(eventsRelay.onNewBlock);
     await printStartupInfo(params, bridgeState);
 
-    const api = await jsonrpc(bridgeState, params.txServerPort, db, app);
+    const api = await jsonrpc(bridgeState, cliArgs.tendermintPort, db, app);
     api
       .listenHttp({ port: cliArgs.rpcport, host: cliArgs.rpcaddr })
       .then(addr => {
