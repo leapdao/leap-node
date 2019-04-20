@@ -9,7 +9,7 @@ const { Type, Output } = require('leap-core');
 const Transaction = require('ethereumjs-tx');
 const VM = require('ethereumjs-vm');
 const utils = require('ethereumjs-util');
-const { BigInt, divide, subtract, lessThan } = require('jsbi-utils');
+const { BigInt, divide, multiply, subtract, lessThan } = require('jsbi-utils');
 const isEqual = require('lodash/isEqual');
 const { checkInsAndOuts, groupValuesByColor } = require('./utils');
 const getColors = require('../../api/methods/getColors');
@@ -48,6 +48,13 @@ const ERC1948_DATA_UPDATED_EVENT = Buffer.from(
   '8ec06c2117d45dcb6bcb6ecf8918414a7ff1cb1ed07da8175e2cf638d0f4777f',
   'hex'
 );
+
+// 6 mil as gas limit
+const GAS_LIMIT = BigInt(6000000);
+const GAS_LIMIT_HEX = `0x${GAS_LIMIT.toString(16)}`;
+
+// is a fixed value until we get support in transaction format
+const FIXED_GAS_PRICE = BigInt(42);
 
 function setAccount(account, address, stateManager) {
   return new Promise((resolve, reject) => {
@@ -171,16 +178,29 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
       32
     ).toString('hex');
 
+    // for nst/nft
+    // owners
+    //cOwners[out.value] = out.address;
+    console.log(unspent);
     inputMap[tx.inputs[i].prevout.getUtxoId()] = unspent;
     tokenDataMap[`0x${tokenId}`] = unspent.data;
   }
 
-  // for deploying colors and mint tokens
-  let nonceCounter = 0;
-
   const insValues = Object.values(inputMap).reduce(groupValuesByColor, {});
   const outsValues = tx.outputs.reduce(groupValuesByColor, {});
   const toMint = [];
+  // For now we require LEAP token (color = 0) for paying gas.
+  // In the future we may want a new transaction type for
+  // proposing other tokens to be eligible for paying gas to a specifiec ratio to
+  // the LEAP token.
+  const LEAPTokenColor = 0;
+
+  console.log('old',insValues[LEAPTokenColor].toString())
+  insValues[LEAPTokenColor] = subtract(insValues[LEAPTokenColor], multiply(GAS_LIMIT, FIXED_GAS_PRICE));
+  console.log('new',insValues[LEAPTokenColor].toString())
+
+  // for deploying colors and mint tokens
+  let nonceCounter = 0;
 
   // eslint-disable-next-line guard-for-in
   for (const color in insValues) {
@@ -243,7 +263,7 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
     // eslint-disable-next-line no-await-in-loop
     await runTx(vm, {
       nonce: nonceCounter,
-      gasLimit: '0xffffffffffff',
+      gasLimit: GAS_LIMIT_HEX,
       to: obj.contractAddr,
       data: obj.callData,
     });
@@ -312,11 +332,6 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
     }
   });
 
-  // For now we require LEAP token (color = 0) for paying gas.
-  // In the future we may want a new transaction type for
-  // proposing other tokens to be eligible for paying gas to a specifiec ratio to
-  // the LEAP token.
-  const LEAPTokenColor = 0;
   const gasUsed = BigInt(evmResult.gasUsed);
   // does not have to be in the output either -> fails here
   const gasPrice = divide(

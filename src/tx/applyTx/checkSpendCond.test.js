@@ -386,6 +386,7 @@ describe('checkSpendCond', () => {
     await checkSpendCond(state, condition, bridgeState);
   });
 
+  /*
   test('Spending Condition: MultiCondition', async () => {
     const nstAddr = erc1948Tokens[0];
     const tokenId =
@@ -497,4 +498,5 @@ describe('checkSpendCond', () => {
 
     await checkSpendCond(state, condition, bridgeState);
   });
+  */
 });
