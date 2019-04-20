@@ -1,6 +1,8 @@
+const axios = require('axios');
 const submitPeriod = require('./submitPeriod');
 const { GENESIS } = require('../utils');
 
+jest.mock('axios');
 jest.mock('../utils/sendTransaction');
 
 const ADDR = '0x4436373705394267350db2c06613990d34621d69';
@@ -54,6 +56,10 @@ const bridgeContractMock = ({ returnPeriod }) => ({
     }),
   },
 });
+
+axios.get.mockImplementation(() =>
+  Promise.resolve({ result: { validator_info: { is_readonly: false } } })
+);
 
 describe('submitPeriod', async () => {
   test('period is already submitted', async () => {
@@ -160,6 +166,10 @@ describe('submitPeriod', async () => {
   });
 
   test('not submitted, own slot, readonly validator', async () => {
+    axios.get.mockImplementation(() =>
+      Promise.resolve({ result: { validator_info: { is_readonly: true } } })
+    );
+
     const bridgeState = bridgeStateMock({
       bridgeContract: bridgeContractMock({
         returnPeriod: { timestamp: '0' },
@@ -181,5 +191,33 @@ describe('submitPeriod', async () => {
       timestamp: '0',
     });
     expect(bridgeState.operatorContract.test.submitCalled).toBe(false);
+  });
+
+  test('not submitted, own slot, started readonly, switched over to block producing', async () => {
+    axios.get.mockImplementation(() =>
+      Promise.resolve({ result: { validator_info: { is_readonly: false } } })
+    );
+
+    const bridgeState = bridgeStateMock({
+      bridgeContract: bridgeContractMock({
+        returnPeriod: { timestamp: '0' },
+      }),
+      operatorContract: operatorContractMock(),
+      lastBlocksRoot: period.prevHash,
+      lastPeriodRoot: '0x1337',
+    });
+
+    const submittedPeriod = await submitPeriod(
+      period,
+      [{ signerAddr: ADDR, id: 0 }],
+      1,
+      bridgeState,
+      { readonly: true }
+    );
+
+    expect(submittedPeriod).toEqual({
+      timestamp: '0',
+    });
+    expect(bridgeState.operatorContract.test.submitCalled).toBe(true);
   });
 });

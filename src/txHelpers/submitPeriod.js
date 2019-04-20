@@ -5,6 +5,7 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
+const axios = require('axios');
 const {
   getSlotsByAddr,
   sendTransaction,
@@ -51,7 +52,16 @@ module.exports = async (
     return submittedPeriod;
   }
 
-  if (nodeConfig.readonly) {
+  const tendermintRpcUrl = `http://localhost:${
+    nodeConfig.tendermintPort
+  }/status`;
+  const { result } = await axios.get(tendermintRpcUrl).catch(e => {
+    console.error(e);
+    return { result: { validator_info: { is_readonly: false } } };
+  });
+  const isReadonly = result.validator_info.is_readonly || false;
+
+  if (isReadonly) {
     logPeriod('Readonly node. Skipping the rest of submitPeriod');
     return submittedPeriod;
   }
@@ -61,7 +71,8 @@ module.exports = async (
     logPeriod('submitPeriod. Slot %d', mySlotToSubmit.id);
 
     // always try to use the last submitted one
-    const prevPeriodRoot = getPrevPeriodRoot(period, bridgeState) || lastPeriodRoot;
+    const prevPeriodRoot =
+      getPrevPeriodRoot(period, bridgeState) || lastPeriodRoot;
 
     if (!prevPeriodRoot) {
       logPeriod(
