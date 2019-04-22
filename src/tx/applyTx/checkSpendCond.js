@@ -128,6 +128,8 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
   const toMint = [];
   const LEAPTokenColor = 0;
   const txInputLen = tx.inputs.length;
+  // signature for replay protection
+  const sigHashBuf = tx.sigHashBuf();
 
   let spendingInput;
   let spendingInputUnspent;
@@ -175,8 +177,9 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
       continue;
     }
 
-    // owner
-    const addrBuf = Buffer.from(unspent.address.replace('0x', ''), 'hex');
+    // XXX: owner
+    // const addrBuf = Buffer.from(unspent.address.replace('0x', ''), 'hex');
+    const addrBuf = sigHashBuf;
 
     let callData;
     let bytecode;
@@ -199,8 +202,6 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
   const spendingAddress = `0x${spendingAddrBuf.toString('hex')}`;
   // creating a new VM instance
   const vm = new VM({ hardfork: 'petersburg' });
-  // signature for replay protection
-  const sigHashBuf = tx.sigHashBuf();
 
   // deploy spending condition
   await setAccountCode(spendingInput.script, sigHashBuf, vm.stateManager);
