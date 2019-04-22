@@ -154,7 +154,7 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
     }
 
     if (input.script) {
-      if (!input.script && !input.msgData) {
+      if (!input.msgData) {
         throw new Error('You need to supply both the script and message data');
       }
 
