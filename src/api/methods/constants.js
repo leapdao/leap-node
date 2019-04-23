@@ -1,8 +1,6 @@
 // JSON RPC 2.0 invalid params error code
 const INVALID_PARAMS = -32602;
 const NFT_COLOR_BASE = 32769; // 2^15 + 1
-const NST_COLOR_BASE = 49153; // 2^15 + 1 + 2^14
 
 exports.INVALID_PARAMS = INVALID_PARAMS;
 exports.NFT_COLOR_BASE = NFT_COLOR_BASE;
-exports.NST_COLOR_BASE = NST_COLOR_BASE;

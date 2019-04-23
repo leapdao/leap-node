@@ -9,51 +9,29 @@ const { Type, Output } = require('leap-core');
 const Transaction = require('ethereumjs-tx');
 const VM = require('ethereumjs-vm');
 const utils = require('ethereumjs-util');
-const { BigInt, multiply, subtract, lessThan } = require('jsbi-utils');
+const { BigInt, add, divide, subtract, lessThan } = require('jsbi-utils');
 const isEqual = require('lodash/isEqual');
+const { checkInsAndOuts, groupValuesByColor } = require('./utils');
 const getColors = require('../../api/methods/getColors');
-const { NFT_COLOR_BASE, NST_COLOR_BASE } = require('../../api/methods/constants');
-const { ERC20_BYTECODE, ERC721_BYTECODE, ERC1948_BYTECODE } = require('./ercBytecode');
-const { isNFT, isNST } = require('./../../utils');
+const { NFT_COLOR_BASE } = require('../../api/methods/constants');
 
 const { Account } = VM.deps;
+
+// commpiled https://github.com/leapdao/spending-conditions/blob/master/contracts/ERC20Min.sol
+const erc20Code = Buffer.from(
+  '608060405234801561001057600080fd5b506004361061005d577c0100000000000000000000000000000000000000000000000000000000600035046340c10f19811461006257806370a08231146100a2578063a9059cbb146100da575b600080fd5b61008e6004803603604081101561007857600080fd5b50600160a060020a038135169060200135610106565b604080519115158252519081900360200190f35b6100c8600480360360208110156100b857600080fd5b5035600160a060020a0316610128565b60408051918252519081900360200190f35b61008e600480360360408110156100f057600080fd5b50600160a060020a038135169060200135610143565b60006001331461011557600080fd5b61011f8383610150565b50600192915050565b600160a060020a031660009081526020819052604090205490565b600061011f3384846101e4565b600160a060020a038216151561016557600080fd5b600160a060020a03821660009081526020819052604090205461018e908263ffffffff6102b116565b600160a060020a0383166000818152602081815260408083209490945583518581529351929391927fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef9281900390910190a35050565b600160a060020a03821615156101f957600080fd5b600160a060020a038316600090815260208190526040902054610222908263ffffffff6102ca16565b600160a060020a038085166000908152602081905260408082209390935590841681522054610257908263ffffffff6102b116565b600160a060020a038084166000818152602081815260409182902094909455805185815290519193928716927fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef92918290030190a3505050565b6000828201838110156102c357600080fd5b9392505050565b6000828211156102d957600080fd5b5090039056fea165627a7a72305820b48eed6297042d728d0fddfa2756bf34e6a1faa2965516c2d03dbfc53e01065d0029',
+  'hex'
+);
 
 const REACTOR_ADDR = Buffer.from(
   '0000000000000000000000000000000000000001',
   'hex'
 );
 
-const ERC20_MINT_FUNCSIG = Buffer.from(
+const MINT_FUNCSIG = Buffer.from(
   '40c10f19000000000000000000000000',
   'hex'
 );
-
-const ERC721_MINT_FUNCSIG = Buffer.from(
-  '40c10f19000000000000000000000000',
-  'hex',
-);
-
-const ERC1948_MINT_FUNCSIG = Buffer.from(
-  '1e458bee000000000000000000000000',
-  'hex'
-);
-
-const ERC20_ERC721_TRANSFER_EVENT = Buffer.from(
-  'ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
-  'hex'
-);
-
-const ERC1948_DATA_UPDATED_EVENT = Buffer.from(
-  '8ec06c2117d45dcb6bcb6ecf8918414a7ff1cb1ed07da8175e2cf638d0f4777f',
-  'hex'
-);
-
-// 6 mil as gas limit
-const GAS_LIMIT = BigInt(6000000);
-const GAS_LIMIT_HEX = `0x${GAS_LIMIT.toString(16)}`;
-
-// fixed value until we get support for it in the transaction format
-const FIXED_GAS_PRICE = BigInt(142);
 
 function setAccount(account, address, stateManager) {
   return new Promise((resolve, reject) => {
@@ -118,126 +96,66 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
     throw new Error('Spending Conditions are not supported on this network');
   }
 
-  // colorMap for a color to address mapping
-  const colorMap = {};
+  // check that script hashes to address
+  checkInsAndOuts(
+    tx,
+    state,
+    bridgeState,
+    ({ address }, i) =>
+      address === `0x${utils.ripemd160(tx.inputs[i].script).toString('hex')}`
+  );
 
+  const colorMap = {};
   addColors(colorMap, await getColors(bridgeState, false), 0);
   addColors(colorMap, await getColors(bridgeState, true), NFT_COLOR_BASE);
-  addColors(colorMap, await getColors(bridgeState, false, true), NST_COLOR_BASE);
 
-  const toMint = [];
-  const LEAPTokenColor = 0;
-  const txInputLen = tx.inputs.length;
-  // signature for replay protection
-  const sigHashBuf = tx.sigHashBuf();
-
-  let spendingInput;
-  let spendingInputUnspent;
-
-  for (let i = 0; i < txInputLen; i += 1) {
-    const input = tx.inputs[i];
-    const unspent = state.unspent[input.prevout.hex()];
-
-    if (!unspent) {
-      throw new Error(`unspent: ${input.prevout.hex()} does not exists`);
-    }
-
-    const tokenValueBuf = utils.setLengthLeft(
-      utils.toBuffer(`0x${BigInt(unspent.value).toString(16)}`),
-      32
-    );
-    const contractAddr = colorMap[unspent.color];
-
-    if (!contractAddr) {
-      // just to make sure
-      throw new Error(`No contract for color: ${unspent.color}`);
-    }
-
-    if (input.script) {
-      if (!input.msgData) {
-        throw new Error('You need to supply both the script and message data');
-      }
-
-      // For now we require LEAP token (color = 0) for paying gas.
-      // In the future we may want a new transaction type for
-      // proposing other tokens to be eligible for paying gas to a specifiec ratio to
-      // the LEAP token.
-      if (unspent.color !== LEAPTokenColor) {
-        throw new Error('Only color 0 is supported to pay for gas right now.');
-      }
-
-      // TODO:
-      // we only allow one spending condition in an transaction, do we want to throw if we find more?
-      spendingInput = input;
-      spendingInputUnspent = unspent;
-      // continue, input of spending condition is just for gas and will not be minted
-      // but any leftover after subtracting gas is returned to the owner as the last output.
-
-      // eslint-disable-next-line no-continue
-      continue;
-    }
-
-    // XXX: owner
-    // const addrBuf = Buffer.from(unspent.address.replace('0x', ''), 'hex');
-    const addrBuf = sigHashBuf;
-
-    let callData;
-    let bytecode;
-
-    if (isNST(unspent.color)) {
-      callData = Buffer.concat([ERC1948_MINT_FUNCSIG, addrBuf, tokenValueBuf, utils.toBuffer(unspent.data)]);
-      bytecode = ERC1948_BYTECODE;
-    } else if (isNFT(unspent.color)) {
-      callData = Buffer.concat([ERC721_MINT_FUNCSIG, addrBuf, tokenValueBuf]);
-      bytecode = ERC721_BYTECODE;
-    } else {
-      callData = Buffer.concat([ERC20_MINT_FUNCSIG, addrBuf, tokenValueBuf]);
-      bytecode = ERC20_BYTECODE;
-    }
-
-    toMint.push({ contractAddr, callData, bytecode, color: unspent.color });
+  // TODO make inputMap
+  // convenience mapping from inputs to the previous outputs
+  const inputMap = {};
+  for (let i = 0; i < tx.inputs.length; i += 1) {
+    inputMap[tx.inputs[i].prevout.getUtxoId()] =
+      state.unspent[tx.inputs[i].prevout.hex()];
   }
 
-  const spendingAddrBuf = utils.ripemd160(spendingInput.script);
-  const spendingAddress = `0x${spendingAddrBuf.toString('hex')}`;
   // creating a new VM instance
   const vm = new VM({ hardfork: 'petersburg' });
-
-  // deploy spending condition
-  await setAccountCode(spendingInput.script, sigHashBuf, vm.stateManager);
-
-  // creating the reactor account with some wei for minting
+  // creating the reactor account with some wei
   const reactorAccount = new Account();
-
   reactorAccount.balance = '0xf00000000000000001';
   await setAccount(reactorAccount, REACTOR_ADDR, vm.stateManager);
 
-  // for deploying colors and mint tokens
+  // deploying colors and mint tokens
+  let results;
   let nonceCounter = 0;
 
-  // keep track of deployed contracts
-  const deployed = {};
+  const sigHashBuf = tx.sigHashBuf();
+  const insValues = Object.values(inputMap).reduce(groupValuesByColor, {});
+  const outsValues = tx.outputs.reduce(groupValuesByColor, {});
+  // eslint-disable-next-line  guard-for-in
+  for (const color in insValues) {
+    // eslint-disable-next-line no-await-in-loop
+    await setAccountCode(erc20Code, colorMap[color], vm.stateManager); // eslint-disable-line no-await-in-loop
 
-  // now deploy the contracts and mint all tokens
-  while (toMint.length) {
-    const obj = toMint.pop();
-    const addrHex = obj.contractAddr.toString('hex');
-
-    if (deployed[addrHex] === undefined) {
-      deployed[addrHex] = obj.color;
-      // eslint-disable-next-line no-await-in-loop
-      await setAccountCode(obj.bytecode, obj.contractAddr, vm.stateManager);
-    }
-
+    // minting amount of output to address of condition
+    const amountHex = utils.setLengthLeft(
+      utils.toBuffer(`0x${BigInt(outsValues[color]).toString(16)}`),
+      32
+    );
     // eslint-disable-next-line no-await-in-loop
     await runTx(vm, {
       nonce: nonceCounter,
-      gasLimit: GAS_LIMIT_HEX,
-      to: obj.contractAddr,
-      data: obj.callData,
+      gasLimit: '0xffffffffffff',
+      to: colorMap[color],
+      data: Buffer.concat([MINT_FUNCSIG, sigHashBuf, amountHex]),
     });
     nonceCounter += 1;
   }
+
+  // deploying conditions
+  tx.inputs.forEach(async input => {
+    // TODO: what if there are multiple condition scripts in one tx?
+    await setAccountCode(input.script, sigHashBuf, vm.stateManager);
+  });
 
   // need to commit to trie, needs a checkpoint first 🤪
   await new Promise((resolve) => {
@@ -248,83 +166,61 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
     });
   });
 
-  const evmResult = await runTx(vm, {
-    nonce: nonceCounter,
-    gasLimit: GAS_LIMIT_HEX, // TODO: set gas Limit to (inputs - outputs) / gasPrice
-    to: sigHashBuf, // the plasma address is replaced with sighash, to prevent replay attacks
-    data: spendingInput.msgData,
-  });
-
   const logOuts = [];
+  const colorGasSums = {};
+  // running conditions with msgData
+  for (let i = 0; i < tx.inputs.length; i += 1) {
+    // eslint-disable-next-line no-await-in-loop
+    results = await runTx(vm, {
+      nonce: nonceCounter,
+      gasLimit: 6000000, // TODO: set gas Limit to (inputs - outputs) / gasPrice
+      to: sigHashBuf, // the plasma address is replaced with sighash, to prevent replay attacks
+      data: tx.inputs[i].msgData,
+    });
+    nonceCounter += 1;
 
-  // iterate through all events
-  evmResult.vm.logs.forEach(log => {
-    const originAddr = log[0].toString('hex');
-    const topics = log[1];
-    const data = log[2];
-    const originColor = deployed[originAddr];
+    const out = inputMap[tx.inputs[i].prevout.getUtxoId()];
 
-    if (originColor === undefined) {
-      return;
+    if (colorGasSums[out.color]) {
+      colorGasSums[out.color] = add(
+        colorGasSums[out.color],
+        BigInt(results.gasUsed)
+      );
+    } else {
+      colorGasSums[out.color] = BigInt(results.gasUsed);
     }
 
-    if (isNST(originColor) && topics[0].equals(ERC1948_DATA_UPDATED_EVENT)) {
-      const nstTokenId = `0x${topics[1].toString('hex')}`;
-      // const nstFromData = data.slice(0, 32);
-      const nstToData = `0x${data.slice(32, 64).toString('hex')}`;
+    // itterate through all transfer events and sum them up per color
+    results.vm.logs.forEach(log => {
+      if (log[0].equals(colorMap[out.color])) {
+        const transferAmount = BigInt(`0x${log[2].toString('hex')}`, 16);
+        let toAddr = log[1][2].slice(12, 32);
+        // replace injected sigHash with plasma address
+        if (toAddr.equals(sigHashBuf)) {
+          toAddr = utils.ripemd160(tx.inputs[i].script);
+        }
+        logOuts.push(new Output(transferAmount, `0x${toAddr.toString('hex')}`, out.color));
+      }
+    });
+  }
 
-      logOuts.push(
-        new Output(
-          BigInt(nstTokenId),
-          spendingAddress,
-          originColor,
-          nstToData
+  // eslint-disable-next-line  guard-for-in
+  for (const color in insValues) {
+    const gasPrice = divide(
+      subtract(insValues[color], outsValues[color]),
+      colorGasSums[color]
+    );
+    const minGasPrice = BigInt(
+      bridgeState.minGasPrices[bridgeState.minGasPrices.length - 1]
+    );
+    if (lessThan(gasPrice, minGasPrice)) {
+      return Promise.reject(
+        new Error(
+          `tx gasPrice ${gasPrice.toString()} less than minGasPRice: ${minGasPrice.toString()}`
         )
       );
-      return;
     }
-
-    if (topics[0].equals(ERC20_ERC721_TRANSFER_EVENT)) {
-      let toAddr = topics[2].slice(12, 32);
-      // replace injected sigHash with plasma address
-      if (toAddr.equals(sigHashBuf)) {
-        toAddr = spendingAddress;
-      } else {
-        toAddr = `0x${toAddr.toString('hex')}`;
-      }
-      // ? ERC721(tokenId) : ERC20(transferAmount)
-      const transferAmount =
-        isNFT(originColor) ? BigInt(`0x${topics[3].toString('hex')}`) : BigInt(`0x${data.toString('hex')}`, 16);
-
-      logOuts.push(new Output(transferAmount, toAddr, originColor));
-    }
-  });
-
-  const gasUsed = BigInt(evmResult.gasUsed);
-  // XXX: Fixed gasPrice for now. We include it again in the tx format as the next breaking change.
-  const gasPrice = FIXED_GAS_PRICE;
-
-  const minGasPrice = BigInt(
-    bridgeState.minGasPrices[bridgeState.minGasPrices.length - 1]
-  );
-
-  if (lessThan(gasPrice, minGasPrice)) {
-    return Promise.reject(
-      new Error(
-        `tx gasPrice ${gasPrice.toString()} less than minGasPrice: ${minGasPrice.toString()}`
-      )
-    );
   }
-
-  const gasChange = subtract(BigInt(spendingInputUnspent.value), multiply(gasPrice, gasUsed));
-
-  if (lessThan(gasChange, BigInt(0))) {
-    throw new Error('Not enough input for spending condition to cover gas costs');
-  }
-
-  // Now return the leftovers
-  logOuts.push(new Output(gasChange, spendingInputUnspent.address, spendingInputUnspent.color));
-
   // TODO: compact logOuts
   if (!isEqual(tx.outputs, logOuts)) {
     const txOuts = tx.outputs
