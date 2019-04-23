@@ -5,6 +5,7 @@ const getConfig = require('./getConfig');
 
 const NODE_ID = '51dcb849fd7870881750c1ef5503b61341ea3a1c';
 const P2P_PORT = 41000;
+const version = `v${require('../../../package.json').version}`; //eslint-disable-line
 const appMock = {
   info: () => ({
     p2pPort: P2P_PORT,
@@ -44,6 +45,7 @@ describe('getConfig', () => {
       nodeId: NODE_ID,
       eventsDelay: 6,
       bridgeDelay: 2,
+      version,
     });
   });
 
@@ -72,6 +74,7 @@ describe('getConfig', () => {
       nodeId: NODE_ID,
       eventsDelay: 0,
       bridgeDelay: 0,
+      version,
     });
   });
 
@@ -100,6 +103,7 @@ describe('getConfig', () => {
       'networkId',
       'eventsDelay',
       'bridgeDelay',
+      'version',
       'genesis',
       'peers',
       'p2pPort',

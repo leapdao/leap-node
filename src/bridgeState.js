@@ -85,7 +85,7 @@ module.exports = class BridgeState {
       this.web3,
       contracts,
       this.eventsBuffer,
-      genesisBlock
+      parseInt(genesisBlock, 10)
     );
     const blockNumber = await this.web3.eth.getBlockNumber();
     await this.eventsSubscription.init();

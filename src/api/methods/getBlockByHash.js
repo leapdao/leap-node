@@ -1,6 +1,11 @@
 const { Block } = require('leap-core');
 const txResponse = require('./txResponse');
 
+const NULL_HASH =
+  '0x0000000000000000000000000000000000000000000000000000000000000000';
+const NULL_ADDR = '0x0000000000000000000000000000000000000000';
+const NA = 0;
+
 module.exports = async (db, hash, showFullTxs = false) => {
   if (!hash) return null;
   const blockDoc = await db.getBlock(hash);
@@ -18,7 +23,12 @@ module.exports = async (db, hash, showFullTxs = false) => {
   return {
     number: `0x${block.height.toString(16)}`,
     hash: block.hash(),
-    parentHash: block.parent,
+    parentHash: NULL_HASH,
+    difficulty: NA,
+    gasLimit: NA,
+    gasUsed: NA,
+    miner: NULL_ADDR,
+    extraData: NA,
     size: `0x${block.hex().length.toString(16)}`,
     timestamp: `0x${block.timestamp.toString(16)}`,
     transactions: txs,
