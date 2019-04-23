@@ -5,8 +5,15 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-const getColors = async (bridgeState, nft) => {
-  return nft ? bridgeState.tokens.erc721 : bridgeState.tokens.erc20;
+const getColors = async (bridgeState, nft, nst) => {
+  if (nft) {
+    return bridgeState.tokens.erc721;
+  }
+  if (nst) {
+    return bridgeState.tokens.erc1948;
+  }
+
+  return bridgeState.tokens.erc20;
 };
 
 module.exports = getColors;

@@ -4593,15 +4593,16 @@ lcid@^1.0.0:
   dependencies:
     invert-kv "^1.0.0"
 
-leap-core@^0.28.5:
-  version "0.28.5"
-  resolved "https://registry.yarnpkg.com/leap-core/-/leap-core-0.28.5.tgz#43e48794dd17649270d1e8df956445d50f10daef"
-  integrity sha512-0nzrgYrY0Szk8b6MRpBC/8T717U3+OMyf/DXHWrrT50Y2A4hLq0fKxgnWPZciVAACIksCRr/3v5rGxAK4n+wSA==
+leap-core@0.30.0:
+  version "0.30.0"
+  resolved "https://registry.yarnpkg.com/leap-core/-/leap-core-0.30.0.tgz#7efbb6710914e025de8407220cec6eeed6d56ae6"
+  integrity sha512-Ywu3htCVc1JaAbf8Gua9TGa2JpEHa63oikjSnJWNrssr8BzNELFUf5Lsezd9fRTK+5oH/nn9K2rr38QWbH7UcA==
   dependencies:
     "@types/web3" "^1.0.18"
     babel-polyfill "^6.26.0"
     ethereumjs-util "6.0.0"
     jsbi-utils "^1.0.0"
+    node-fetch "^2.3.0"
 
 left-pad@^1.3.0:
   version "1.3.0"
@@ -5282,6 +5283,11 @@ node-abi@^2.7.0:
   integrity sha512-OV8Bq1OrPh6z+Y4dqwo05HqrRL9YNF7QVMRfq1/pguwKLG+q9UB/Lk0x5qXjO23JjJg+/jqCHSTaG1P3tfKfuw==
   dependencies:
     semver "^5.4.1"
+
+node-fetch@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.3.0.tgz#1a1d940bbfb916a1d3e0219f037e89e71f8c5fa5"
+  integrity sha512-MOd8pV3fxENbryESLgVIeaGKrdl+uaYhCSSVkjeOb/31/njTpcis5aWfdqgNlHIrKOLRbMnfPINPOML2CIFeXA==
 
 node-int64@^0.4.0:
   version "0.4.0"
