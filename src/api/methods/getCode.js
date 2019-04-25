@@ -14,25 +14,25 @@ module.exports = async (bridgeState, contractAddr, tag) => {
     };
   }
 
-  contractAddr = contractAddr.toLowerCase();
+  const tokenAddr = contractAddr.toLowerCase();
 
   let len = bridgeState.tokens.erc20.length;
-  for (let i = 0; i < len; i++) {
-    if (bridgeState.tokens.erc20[i].toLowerCase() === contractAddr) {
+  for (let i = 0; i < len; i += 1) {
+    if (bridgeState.tokens.erc20[i].toLowerCase() === tokenAddr) {
       return CODE_ERC20;
     }
   }
 
   len = bridgeState.tokens.erc721.length;
-  for (let i = 0; i < len; i++) {
-    if (bridgeState.tokens.erc721[i].toLowerCase() === contractAddr) {
+  for (let i = 0; i < len; i += 1) {
+    if (bridgeState.tokens.erc721[i].toLowerCase() === tokenAddr) {
       return CODE_ERC721;
     }
   }
 
   len = bridgeState.tokens.erc1948.length;
-  for (let i = 0; i < len; i++) {
-    if (bridgeState.tokens.erc1948[i].toLowerCase() === contractAddr) {
+  for (let i = 0; i < len; i += 1) {
+    if (bridgeState.tokens.erc1948[i].toLowerCase() === tokenAddr) {
       return CODE_ERC1948;
     }
   }
