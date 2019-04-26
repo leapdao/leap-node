@@ -37,6 +37,13 @@ const NSTCondition =
 const MultiCondition =
   '608060405234801561001057600080fd5b506004361061002e5760e060020a60003504635bac6c1e8114610033575b600080fd5b6100656004803603606081101561004957600080fd5b5080359060208101359060400135600160a060020a0316610067565b005b6040805160e060020a63a983d43f0281526004810185905260248101849052905173333333333333333333333333333333333333333391829163a983d43f9160448082019260009290919082900301818387803b1580156100c757600080fd5b505af11580156100db573d6000803e3d6000fd5b50506040805160e060020a6323b872dd028152306004820152600160a060020a038616602482015260448101889052905173555555555555555555555555555555555555555593508392506323b872dd9160648082019260009290919082900301818387803b15801561014d57600080fd5b505af1158015610161573d6000803e3d6000fd5b50506040805160e060020a6370a082310281523060048201529051731111111111111111111111111111111111111111935083925063a9059cbb91879184916370a08231916024808301926020929190829003018186803b1580156101c557600080fd5b505afa1580156101d9573d6000803e3d6000fd5b505050506040513d60208110156101ef57600080fd5b50516040805160e060020a63ffffffff8616028152600160a060020a03909316600484015260248301919091525160448083019260209291908290030181600087803b15801561023e57600080fd5b505af1158015610252573d6000803e3d6000fd5b505050506040513d602081101561026857600080fd5b50506040805160e060020a6370a08231028152306004820152905173222222222222222222222222222222222222222291829163a9059cbb91889184916370a08231916024808301926020929190829003018186803b1580156102ca57600080fd5b505afa1580156102de573d6000803e3d6000fd5b505050506040513d60208110156102f457600080fd5b50516040805160e060020a63ffffffff8616028152600160a060020a03909316600484015260248301919091525160448083019260209291908290030181600087803b15801561034357600080fd5b505af1158015610357573d6000803e3d6000fd5b505050506040513d602081101561036d57600080fd5b50505050505050505056fea165627a7a723058207e221fd58b2d5943b615bc77011474e47caa90f6b686409991d704d015ebec9c0029';
 
+const MultiConditionAllowance =
+  '608060405234801561001057600080fd5b506004361061002e5760e060020a60003504635bac6c1e8114610033575b600080fd5b6100656004803603606081101561004957600080fd5b5080359060208101359060400135600160a060020a0316610067565b005b6040805160e060020a6323b872dd028152600160a060020a03831660048201523060248201526044810185905290517355555555555555555555555555555555555555559182916323b872dd9160648082019260009290919082900301818387803b1580156100d557600080fd5b505af11580156100e9573d6000803e3d6000fd5b50506040805160e160020a636eb1769f028152600160a060020a03861660048201523060248201529051731111111111111111111111111111111111111111935060009250839163dd62ed3e916044808301926020929190829003018186803b15801561015557600080fd5b505afa158015610169573d6000803e3d6000fd5b505050506040513d602081101561017f57600080fd5b50516040805160e060020a6323b872dd028152600160a060020a038781166004830152306024830152604482018490529151929350908416916323b872dd916064808201926020929091908290030181600087803b1580156101e057600080fd5b505af11580156101f4573d6000803e3d6000fd5b505050506040513d602081101561020a57600080fd5b50506040805160e160020a636eb1769f028152600160a060020a0386166004820152306024820152905173222222222222222222222222222222222222222291829163dd62ed3e91604480820192602092909190829003018186803b15801561027257600080fd5b505afa158015610286573d6000803e3d6000fd5b505050506040513d602081101561029c57600080fd5b50516040805160e060020a6323b872dd028152600160a060020a038881166004830152306024830152604482018490529151929450908316916323b872dd916064808201926020929091908290030181600087803b1580156102fd57600080fd5b505af1158015610311573d6000803e3d6000fd5b505050506040513d602081101561032757600080fd5b50505050505050505056fea165627a7a723058206b2d9289ffe41ef706d920793144e5ddec39d3c8d74ef8bd4bf51ea02837a3fb0029';
+
+const ADDR_1 = '0x4436373705394267350db2c06613990d34621d69';
+const PRIV_1 =
+  '0xad8e31c8862f5f86459e7cca97ac9302c5e1817077902540779eef66e21f394a';
+
 /*
 pragma solidity ^0.5.2;
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
@@ -128,7 +135,11 @@ describe('checkSpendCond', () => {
         new Output(1992076700, `0x${receiver.toString('hex')}`, 0),
         new Output(3007923300, `0x${scriptHash.toString('hex')}`, 0),
         // gas change
-        new Output(6989891872, deposit2.outputs[0].address, deposit2.outputs[0].color),
+        new Output(
+          6989874974,
+          deposit2.outputs[0].address,
+          deposit2.outputs[0].color
+        ),
       ]
     );
 
@@ -136,7 +147,9 @@ describe('checkSpendCond', () => {
     const amountBuf = utils.setLengthLeft(utils.toBuffer(1992076700), 32);
     const msgData =
       '0xd01a81e1' + // function called
-      `000000000000000000000000${receiver.toString('hex')}${amountBuf.toString('hex')}`; // outputs
+      `000000000000000000000000${receiver.toString('hex')}${amountBuf.toString(
+        'hex'
+      )}`; // outputs
     condition.inputs[0].setMsgData(msgData);
 
     await checkSpendCond(state, condition, bridgeState);
@@ -210,7 +223,11 @@ describe('checkSpendCond', () => {
       [
         new Output(nftAddr, `0x${receiver.toString('hex')}`, NFT_COLOR_BASE),
         // gas change returned
-        new Output(4993380102, leapDeposit.outputs[0].address, leapDeposit.outputs[0].color),
+        new Output(
+          4993380102,
+          leapDeposit.outputs[0].address,
+          leapDeposit.outputs[0].color
+        ),
       ]
     );
 
@@ -290,7 +307,11 @@ describe('checkSpendCond', () => {
       ],
       [
         new Output(nftAddr, `0x${receiver.toString('hex')}`, NFT_COLOR_BASE),
-        new Output(4995187904, leapDeposit.outputs[0].address, leapDeposit.outputs[0].color),
+        new Output(
+          4995187904,
+          leapDeposit.outputs[0].address,
+          leapDeposit.outputs[0].color
+        ),
       ]
     );
 
@@ -367,7 +388,11 @@ describe('checkSpendCond', () => {
           tokenData
         ),
         // gas change returned
-        new Output(4995187904, leapDeposit.outputs[0].address, leapDeposit.outputs[0].color),
+        new Output(
+          4995187904,
+          leapDeposit.outputs[0].address,
+          leapDeposit.outputs[0].color
+        ),
       ]
     );
 
@@ -426,11 +451,26 @@ describe('checkSpendCond', () => {
 
     const state = {
       unspent: {
-        [new Outpoint(leapDeposit.hash(), 0).hex()]: leapDeposit.outputs[0].toJSON(),
-        [new Outpoint(token1Deposit.hash(), 0).hex()]: token1Deposit.outputs[0].toJSON(),
-        [new Outpoint(token2Deposit.hash(), 0).hex()]: token2Deposit.outputs[0].toJSON(),
-        [new Outpoint(nftDeposit.hash(), 0).hex()]: nftDeposit.outputs[0].toJSON(),
-        [new Outpoint(nstDeposit.hash(), 0).hex()]: nstDeposit.outputs[0].toJSON(),
+        [new Outpoint(
+          leapDeposit.hash(),
+          0
+        ).hex()]: leapDeposit.outputs[0].toJSON(),
+        [new Outpoint(
+          token1Deposit.hash(),
+          0
+        ).hex()]: token1Deposit.outputs[0].toJSON(),
+        [new Outpoint(
+          token2Deposit.hash(),
+          0
+        ).hex()]: token2Deposit.outputs[0].toJSON(),
+        [new Outpoint(
+          nftDeposit.hash(),
+          0
+        ).hex()]: nftDeposit.outputs[0].toJSON(),
+        [new Outpoint(
+          nstDeposit.hash(),
+          0
+        ).hex()]: nstDeposit.outputs[0].toJSON(),
       },
       gas: {
         minPrice: 0,
@@ -465,16 +505,135 @@ describe('checkSpendCond', () => {
           tokenData
         ),
         new Output(tokenId, `0x${receiver.replace('0x', '')}`, NFT_COLOR_BASE),
-        new Output(
-          5000000000,
-          `0x${receiver.replace('0x', '')}`,
-          0
-        ),
+        new Output(5000000000, `0x${receiver.replace('0x', '')}`, 0),
         new Output(5000000000, `0x${receiver.replace('0x', '')}`, 1),
-        new Output(4986841428, `0x${scriptHash.toString('hex')}`, 0),
+        new Output(4986820980, `0x${scriptHash.toString('hex')}`, 0),
       ]
     );
+    condition.signAll(PRIV_1);
+    const msgData =
+      '0x5bac6c1e' + // function called
+      `${tokenId.replace('0x', '') +
+        tokenData.replace('0x', '')}000000000000000000000000${receiver.replace(
+        '0x',
+        ''
+      )}`;
 
+    condition.inputs[0].setMsgData(msgData);
+
+    await checkSpendCond(state, condition, bridgeState);
+    await checkSpendCond(state, Tx.fromRaw(condition.toRaw()), bridgeState);
+  });
+
+  test('Spending Condition: MultiCondition with approval', async () => {
+    const tokenId =
+      '0x0000000000000000000000005555555555555555555555555555555555555555';
+    const tokenData =
+      '0x00000000000000000000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa00005';
+    const receiver = ADDR_1.toLowerCase();
+    const script = Buffer.from(MultiConditionAllowance, 'hex');
+    const scriptHash = utils.ripemd160(script);
+    const owner = receiver;
+
+    // to pay for gas
+    const leapDeposit = Tx.deposit(
+      1, // depositId
+      5000000000,
+      `0x${scriptHash.toString('hex')}`, // owner (spending condition)
+      0
+    );
+    // to transfer token1
+    const token1Deposit = Tx.deposit(
+      2, // depositId
+      5000000000,
+      owner,
+      0
+    );
+    // to transfer token2
+    const token2Deposit = Tx.deposit(
+      3, // depositId
+      5000000000,
+      owner,
+      1
+    );
+    const nftDeposit = Tx.deposit(
+      4, // depositId
+      tokenId,
+      owner,
+      NFT_COLOR_BASE
+    );
+    const nstDeposit = Tx.deposit(
+      5, // depositId
+      tokenId,
+      owner,
+      NST_COLOR_BASE,
+      '0x0000000000000000000000005555555555555555555555555555555555554444' // tokenData
+    );
+
+    const state = {
+      unspent: {
+        [new Outpoint(
+          leapDeposit.hash(),
+          0
+        ).hex()]: leapDeposit.outputs[0].toJSON(),
+        [new Outpoint(
+          token1Deposit.hash(),
+          0
+        ).hex()]: token1Deposit.outputs[0].toJSON(),
+        [new Outpoint(
+          token2Deposit.hash(),
+          0
+        ).hex()]: token2Deposit.outputs[0].toJSON(),
+        [new Outpoint(
+          nftDeposit.hash(),
+          0
+        ).hex()]: nftDeposit.outputs[0].toJSON(),
+        [new Outpoint(
+          nstDeposit.hash(),
+          0
+        ).hex()]: nstDeposit.outputs[0].toJSON(),
+      },
+      gas: {
+        minPrice: 0,
+      },
+    };
+
+    // a spending condition transaction that spends the deposit is created
+    const condition = Tx.spendCond(
+      [
+        new Input({
+          prevout: new Outpoint(leapDeposit.hash(), 0),
+          script,
+        }),
+        new Input({
+          prevout: new Outpoint(token1Deposit.hash(), 0),
+        }),
+        new Input({
+          prevout: new Outpoint(token2Deposit.hash(), 0),
+        }),
+        new Input({
+          prevout: new Outpoint(nftDeposit.hash(), 0),
+        }),
+        // new Input({
+        //  prevout: new Outpoint(nstDeposit.hash(), 0),
+        // }),
+      ],
+      [
+        /*
+         new Output(
+          tokenId,
+          `0x${scriptHash.toString('hex')}`,
+          NST_COLOR_BASE,
+          tokenData
+        ),
+        */
+        new Output(tokenId, `0x${scriptHash.toString('hex')}`, NFT_COLOR_BASE),
+        new Output(5000000000, `0x${scriptHash.toString('hex')}`, 0),
+        new Output(5000000000, `0x${scriptHash.toString('hex')}`, 1),
+        new Output(4989275592, `0x${scriptHash.toString('hex')}`, 0),
+      ]
+    );
+    condition.signAll(PRIV_1);
     const msgData =
       '0x5bac6c1e' + // function called
       `${tokenId.replace('0x', '') +
