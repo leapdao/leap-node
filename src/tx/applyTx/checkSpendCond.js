@@ -38,6 +38,18 @@ const ERC1948_MINT_FUNCSIG = Buffer.from(
   'hex'
 );
 
+// increaseAllowance(address spender, uint256 addedValue)
+const ERC20_INCREASE_ALLOWANCE_FUNCSIG = Buffer.from(
+  '39509351000000000000000000000000',
+  'hex'
+);
+
+// approve(address to, uint256 tokenId)
+const ERC721_APPROVE_FUNCSIG = Buffer.from(
+  '095ea7b3000000000000000000000000',
+  'hex'
+);
+
 const ERC20_ERC721_TRANSFER_EVENT = Buffer.from(
   'ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
   'hex'
@@ -78,7 +90,7 @@ function setAccountCode(code, address, stateManager) {
 }
 
 // runs a transaction through the vm
-function runTx(vm, raw) {
+function runTx(vm, raw, from) {
   // create a new transaction out of the js object
   const tx = new Transaction(raw);
 
@@ -86,7 +98,7 @@ function runTx(vm, raw) {
     // instead of tx.sign(Buffer.from(secretKey, 'hex'))
     // eslint-disable-next-line object-shorthand
     get() {
-      return REACTOR_ADDR;
+      return from || REACTOR_ADDR;
     },
   });
 
@@ -129,10 +141,13 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
   const LEAPTokenColor = 0;
   const txInputLen = tx.inputs.length;
   // signature for replay protection
-  const sigHashBuf = tx.sigHashBuf();
+  // will all be fixed later with proper signature support
+  // const sigHashBuf = tx.sigHashBuf();
 
   let spendingInput;
   let spendingInputUnspent;
+  let spendingAddrBuf;
+  let spendingAddress;
 
   for (let i = 0; i < txInputLen; i += 1) {
     const input = tx.inputs[i];
@@ -170,6 +185,9 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
       // we only allow one spending condition in an transaction, do we want to throw if we find more?
       spendingInput = input;
       spendingInputUnspent = unspent;
+      spendingAddrBuf = utils.ripemd160(spendingInput.script);
+      spendingAddress = `0x${spendingAddrBuf.toString('hex')}`;
+
       // continue, input of spending condition is just for gas and will not be minted
       // but any leftover after subtracting gas is returned to the owner as the last output.
 
@@ -178,33 +196,49 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
     }
 
     // XXX: owner
-    // const addrBuf = Buffer.from(unspent.address.replace('0x', ''), 'hex');
-    const addrBuf = sigHashBuf;
+    const addrBuf = Buffer.from(unspent.address.replace('0x', ''), 'hex');
+    const spendingIsOwner = addrBuf.equals(spendingAddrBuf);
+    // const addrBuf = sigHashBuf;
 
     let callData;
     let bytecode;
+    let allowance;
+
+    if (!spendingIsOwner) {
+      allowance = {};
+    }
 
     if (isNST(unspent.color)) {
       callData = Buffer.concat([ERC1948_MINT_FUNCSIG, addrBuf, tokenValueBuf, utils.toBuffer(unspent.data)]);
       bytecode = ERC1948_BYTECODE;
+
+      if (allowance) {
+        allowance = { from: addrBuf, callData: Buffer.concat([ERC721_APPROVE_FUNCSIG, spendingAddrBuf, tokenValueBuf]) };
+      }
     } else if (isNFT(unspent.color)) {
       callData = Buffer.concat([ERC721_MINT_FUNCSIG, addrBuf, tokenValueBuf]);
       bytecode = ERC721_BYTECODE;
+
+      if (allowance) {
+        allowance = { from: addrBuf, callData: Buffer.concat([ERC721_APPROVE_FUNCSIG, spendingAddrBuf, tokenValueBuf]) };
+      }
     } else {
       callData = Buffer.concat([ERC20_MINT_FUNCSIG, addrBuf, tokenValueBuf]);
       bytecode = ERC20_BYTECODE;
+
+      if (allowance) {
+        allowance = { from: addrBuf, callData: Buffer.concat([ERC20_INCREASE_ALLOWANCE_FUNCSIG, spendingAddrBuf, tokenValueBuf]) };
+      }
     }
 
-    toMint.push({ contractAddr, callData, bytecode, color: unspent.color });
+    toMint.push({ contractAddr, callData, bytecode, color: unspent.color, allowance });
   }
 
-  const spendingAddrBuf = utils.ripemd160(spendingInput.script);
-  const spendingAddress = `0x${spendingAddrBuf.toString('hex')}`;
   // creating a new VM instance
   const vm = new VM({ hardfork: 'petersburg' });
 
   // deploy spending condition
-  await setAccountCode(spendingInput.script, sigHashBuf, vm.stateManager);
+  await setAccountCode(spendingInput.script, spendingAddrBuf, vm.stateManager);
 
   // creating the reactor account with some wei for minting
   const reactorAccount = new Account();
@@ -217,6 +251,7 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
 
   // keep track of deployed contracts
   const deployed = {};
+  const nonces = {};
 
   // now deploy the contracts and mint all tokens
   while (toMint.length) {
@@ -237,6 +272,31 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
       data: obj.callData,
     });
     nonceCounter += 1;
+
+    // for approval / allowance
+    if (obj.allowance) {
+      const owner = obj.allowance.from.toString('hex');
+      // eslint-disable-next-line no-bitwise
+      const nonce = nonces[owner] | 0;
+
+      if (nonce === 0) {
+        const acc = new Account();
+        acc.balance = '0xf00000000000000001';
+        // eslint-disable-next-line no-await-in-loop
+        await setAccount(acc, obj.allowance.from, vm.stateManager);
+      }
+
+      // eslint-disable-next-line no-await-in-loop
+      await runTx(vm, {
+        nonce,
+        gasLimit: GAS_LIMIT_HEX,
+        to: obj.contractAddr,
+        data: obj.allowance.callData,
+      }, obj.allowance.from);
+
+      // update nonce
+      nonces[owner] = nonce + 1;
+    }
   }
 
   // need to commit to trie, needs a checkpoint first 🤪
@@ -251,7 +311,8 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
   const evmResult = await runTx(vm, {
     nonce: nonceCounter,
     gasLimit: GAS_LIMIT_HEX, // TODO: set gas Limit to (inputs - outputs) / gasPrice
-    to: sigHashBuf, // the plasma address is replaced with sighash, to prevent replay attacks
+    to: spendingAddrBuf,
+    // NOPE: the plasma address is replaced with sighash, to prevent replay attacks
     data: spendingInput.msgData,
   });
 
@@ -285,13 +346,15 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
     }
 
     if (topics[0].equals(ERC20_ERC721_TRANSFER_EVENT)) {
-      let toAddr = topics[2].slice(12, 32);
+      const toAddr = `0x${topics[2].slice(12, 32).toString('hex')}`;
+
+      // let toAddr = topics[2].slice(12, 32);
       // replace injected sigHash with plasma address
-      if (toAddr.equals(sigHashBuf)) {
-        toAddr = spendingAddress;
-      } else {
-        toAddr = `0x${toAddr.toString('hex')}`;
-      }
+      // if (toAddr.equals(sigHashBuf)) {
+      //  toAddr = spendingAddress;
+      // } else {
+      // toAddr = `0x${toAddr.toString('hex')}`;
+      // }
       // ? ERC721(tokenId) : ERC20(transferAmount)
       const transferAmount =
         isNFT(originColor) ? BigInt(`0x${topics[3].toString('hex')}`) : BigInt(`0x${data.toString('hex')}`, 16);
