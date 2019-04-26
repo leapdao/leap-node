@@ -152,8 +152,7 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
   const LEAPTokenColor = 0;
   const txInputLen = tx.inputs.length;
   // signature for replay protection
-  // will all be fixed later with proper signature support
-  // const sigHashBuf = tx.sigHashBuf();
+  const sigHashBuf = tx.sigHashBuf();
 
   let spendingInput;
   let spendingInputUnspent;
@@ -207,9 +206,8 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
     }
 
     // XXX: owner
-    const addrBuf = Buffer.from(unspent.address.replace('0x', ''), 'hex');
+    let addrBuf = Buffer.from(unspent.address.replace('0x', ''), 'hex');
     const spendingIsOwner = addrBuf.equals(spendingAddrBuf);
-    // const addrBuf = sigHashBuf;
 
     let callData;
     let bytecode;
@@ -224,6 +222,8 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
         );
       }
       allowance = {};
+    } else {
+      addrBuf = sigHashBuf;
     }
 
     if (isNST(unspent.color)) {
@@ -240,7 +240,7 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
           from: addrBuf,
           callData: Buffer.concat([
             ERC721_APPROVE_FUNCSIG,
-            spendingAddrBuf,
+            sigHashBuf,
             tokenValueBuf,
           ]),
         };
@@ -254,7 +254,7 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
           from: addrBuf,
           callData: Buffer.concat([
             ERC721_APPROVE_FUNCSIG,
-            spendingAddrBuf,
+            sigHashBuf,
             tokenValueBuf,
           ]),
         };
@@ -268,7 +268,7 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
           from: addrBuf,
           callData: Buffer.concat([
             ERC20_INCREASE_ALLOWANCE_FUNCSIG,
-            spendingAddrBuf,
+            sigHashBuf,
             tokenValueBuf,
           ]),
         };
@@ -288,7 +288,7 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
   const vm = new VM({ hardfork: 'petersburg' });
 
   // deploy spending condition
-  await setAccountCode(spendingInput.script, spendingAddrBuf, vm.stateManager);
+  await setAccountCode(spendingInput.script, sigHashBuf, vm.stateManager);
 
   // creating the reactor account with some wei for minting
   const reactorAccount = new Account();
@@ -365,7 +365,7 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
   const evmResult = await runTx(vm, {
     nonce: nonceCounter,
     gasLimit: GAS_LIMIT_HEX, // TODO: set gas Limit to (inputs - outputs) / gasPrice
-    to: spendingAddrBuf,
+    to: sigHashBuf,
     // NOPE: the plasma address is replaced with sighash, to prevent replay attacks
     data: spendingInput.msgData,
   });
@@ -395,15 +395,14 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
     }
 
     if (topics[0].equals(ERC20_ERC721_TRANSFER_EVENT)) {
-      const toAddr = `0x${topics[2].slice(12, 32).toString('hex')}`;
+      let toAddr = topics[2].slice(12, 32);
 
-      // let toAddr = topics[2].slice(12, 32);
       // replace injected sigHash with plasma address
-      // if (toAddr.equals(sigHashBuf)) {
-      //  toAddr = spendingAddress;
-      // } else {
-      // toAddr = `0x${toAddr.toString('hex')}`;
-      // }
+      if (toAddr.equals(sigHashBuf)) {
+        toAddr = spendingAddress;
+      } else {
+        toAddr = `0x${toAddr.toString('hex')}`;
+      }
       // ? ERC721(tokenId) : ERC20(transferAmount)
       const transferAmount = isNFT(originColor)
         ? BigInt(`0x${topics[3].toString('hex')}`)
