@@ -37,6 +37,7 @@ module.exports = (bridgeState, db, app, tendermintPort) => {
     plasma_status: require('./getNodeStatus').bind(null, bridgeState, app),
     plasma_getConfig: require('./getConfig').bind(null, bridgeState, app),
     validator_getAddress: require('./getAddress').bind(null, bridgeState, app),
+    checkSpendingCondition: require('./checkSpendingCondition.js').bind(null, bridgeState),
   };
 
   const methodsWithCallback = Object.keys(nodeApi).reduce((set, key) => {

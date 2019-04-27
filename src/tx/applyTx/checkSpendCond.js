@@ -456,11 +456,11 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
     const logs = logOuts
       .map(output => JSON.stringify(output.toJSON()))
       .join(',');
-    return Promise.reject(
-      new Error(
-        `outputs do not match computation results. \n outputs ${txOuts} \n calculated: ${logs}`
-      )
+    const err = new Error(
+      `outputs do not match computation results. \n outputs ${txOuts} \n calculated: ${logs}`
     );
+    err.logOuts = logOuts;
+    return Promise.reject(err);
   }
-  return Promise.resolve();
+  return Promise.resolve(logOuts);
 };
