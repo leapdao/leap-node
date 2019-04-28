@@ -159,6 +159,9 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
   let spendingAddrBuf;
   let spendingAddress;
 
+  // this is a bag of N(F/S)Ts to remember and update owners
+  const nftBag = {};
+
   for (let i = 0; i < txInputLen; i += 1) {
     const input = tx.inputs[i];
     const unspent = state.unspent[input.prevout.hex()];
@@ -172,6 +175,12 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
       32
     );
     const contractAddr = colorMap[unspent.color];
+    const contractAddrStr = contractAddr.toString('hex');
+    const tokenId = `0x${tokenValueBuf.toString('hex')}`;
+    nftBag[contractAddrStr] = !nftBag[contractAddrStr]
+      ? {}
+      : nftBag[contractAddrStr];
+    nftBag[contractAddrStr][tokenId] = unspent.address;
 
     if (!contractAddr) {
       // just to make sure
@@ -388,8 +397,9 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
       // const nstFromData = data.slice(0, 32);
       const nstToData = `0x${data.slice(32, 64).toString('hex')}`;
 
+      const tokenOwner = nftBag[originAddr][nstTokenId];
       logOuts.push(
-        new Output(BigInt(nstTokenId), spendingAddress, originColor, nstToData)
+        new Output(BigInt(nstTokenId), tokenOwner, originColor, nstToData)
       );
       return;
     }
@@ -402,6 +412,15 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
         toAddr = spendingAddress;
       } else {
         toAddr = `0x${toAddr.toString('hex')}`;
+      }
+
+      // todo: support transfer of ERC1948
+      if (!isNFT(originColor) && data.length === 0) {
+        // this hack assumes that an ERC1949 is minted
+        // and that Transfer Event is emmited before UpdateData Event
+        // so in only puts the new owner into the nftBag
+        nftBag[originAddr][`0x${topics[3].toString('hex')}`] = toAddr;
+        return;
       }
       // ? ERC721(tokenId) : ERC20(transferAmount)
       const transferAmount = isNFT(originColor)
