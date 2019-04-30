@@ -9,7 +9,14 @@ const { Type, Output } = require('leap-core');
 const Transaction = require('ethereumjs-tx');
 const VM = require('ethereumjs-vm');
 const utils = require('ethereumjs-util');
-const { BigInt, multiply, subtract, lessThan } = require('jsbi-utils');
+const {
+  BigInt,
+  multiply,
+  add,
+  subtract,
+  lessThan,
+  greaterThan,
+} = require('jsbi-utils');
 const isEqual = require('lodash/isEqual');
 const getColors = require('../../api/methods/getColors');
 const {
@@ -161,6 +168,8 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
 
   // this is a bag of N(F/S)Ts to remember and update owners
   const nftBag = {};
+  // this is a bag of ERC20s to help transform inputs to outputs
+  const tokenBag = {};
 
   for (let i = 0; i < txInputLen; i += 1) {
     const input = tx.inputs[i];
@@ -175,12 +184,26 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
       32
     );
     const contractAddr = colorMap[unspent.color];
-    const contractAddrStr = contractAddr.toString('hex');
-    const tokenId = `0x${tokenValueBuf.toString('hex')}`;
-    nftBag[contractAddrStr] = !nftBag[contractAddrStr]
-      ? {}
-      : nftBag[contractAddrStr];
-    nftBag[contractAddrStr][tokenId] = unspent.address;
+    const contractAddrStr = `0x${contractAddr.toString('hex')}`;
+    if (isNFT(unspent.color) || isNST(unspent.color)) {
+      const tokenId = `0x${tokenValueBuf.toString('hex')}`;
+      nftBag[contractAddrStr] = !nftBag[contractAddrStr]
+        ? {}
+        : nftBag[contractAddrStr];
+      nftBag[contractAddrStr][tokenId] = unspent.address;
+    } else if (i > 0) {
+      tokenBag[contractAddrStr] = !tokenBag[contractAddrStr]
+        ? {}
+        : tokenBag[contractAddrStr];
+      if (!tokenBag[contractAddrStr][unspent.address]) {
+        tokenBag[contractAddrStr][unspent.address] = BigInt(unspent.value);
+      } else {
+        tokenBag[contractAddrStr][unspent.address] = add(
+          tokenBag[contractAddrStr][unspent.address],
+          BigInt(unspent.value)
+        );
+      }
+    }
 
     if (!contractAddr) {
       // just to make sure
@@ -292,7 +315,6 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
       allowance,
     });
   }
-
   // creating a new VM instance
   const vm = new VM({ hardfork: 'petersburg' });
 
@@ -317,8 +339,8 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
     const obj = toMint.pop();
     const addrHex = obj.contractAddr.toString('hex');
 
-    if (deployed[addrHex] === undefined) {
-      deployed[addrHex] = obj.color;
+    if (deployed[`0x${addrHex}`] === undefined) {
+      deployed[`0x${addrHex}`] = obj.color;
       // eslint-disable-next-line no-await-in-loop
       await setAccountCode(obj.bytecode, obj.contractAddr, vm.stateManager);
     }
@@ -383,7 +405,7 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
 
   // iterate through all events
   evmResult.vm.logs.forEach(log => {
-    const originAddr = log[0].toString('hex');
+    const originAddr = `0x${log[0].toString('hex')}`;
     const topics = log[1];
     const data = log[2];
     const originColor = deployed[originAddr];
@@ -405,6 +427,7 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
     }
 
     if (topics[0].equals(ERC20_ERC721_TRANSFER_EVENT)) {
+      let fromAddr = topics[1].slice(12, 32);
       let toAddr = topics[2].slice(12, 32);
 
       // replace injected sigHash with plasma address
@@ -412,6 +435,11 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
         toAddr = spendingAddress;
       } else {
         toAddr = `0x${toAddr.toString('hex')}`;
+      }
+      if (fromAddr.equals(sigHashBuf)) {
+        fromAddr = spendingAddress;
+      } else {
+        fromAddr = `0x${fromAddr.toString('hex')}`;
       }
 
       // todo: support transfer of ERC1948
@@ -427,9 +455,40 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
         ? BigInt(`0x${topics[3].toString('hex')}`)
         : BigInt(`0x${data.toString('hex')}`, 16);
 
-      logOuts.push(new Output(transferAmount, toAddr, originColor));
+      if (isNFT(originColor) || isNST(originColor)) {
+        logOuts.push(new Output(transferAmount, toAddr, originColor));
+      } else {
+        tokenBag[originAddr][fromAddr] = subtract(
+          tokenBag[originAddr][fromAddr],
+          transferAmount
+        );
+        if (!tokenBag[originAddr][toAddr]) {
+          tokenBag[originAddr][toAddr] = BigInt(0);
+        }
+        tokenBag[originAddr][toAddr] = add(
+          tokenBag[originAddr][toAddr],
+          transferAmount
+        );
+      }
     }
   });
+  for (const originAddr in tokenBag) {
+    if (Object.prototype.hasOwnProperty.call(tokenBag, originAddr)) {
+      for (const owner in tokenBag[originAddr]) {
+        if (Object.prototype.hasOwnProperty.call(tokenBag[originAddr], owner)) {
+          if (greaterThan(tokenBag[originAddr][owner], BigInt(0))) {
+            logOuts.push(
+              new Output(
+                tokenBag[originAddr][owner],
+                owner,
+                deployed[originAddr]
+              )
+            );
+          }
+        }
+      }
+    }
+  }
 
   const gasUsed = BigInt(evmResult.gasUsed);
   // XXX: Fixed gasPrice for now. We include it again in the tx format as the next breaking change.
