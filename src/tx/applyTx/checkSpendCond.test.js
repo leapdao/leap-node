@@ -142,8 +142,8 @@ describe('checkSpendCond', () => {
         }),
       ],
       [
-        new Output(1992076700, `0x${receiver.toString('hex')}`, 0),
         new Output(3007923300, `0x${scriptHash.toString('hex')}`, 0),
+        new Output(1992076700, `0x${receiver.toString('hex')}`, 0),
         // gas change
         new Output(
           6989874974,
@@ -766,18 +766,18 @@ describe('checkSpendCond', () => {
     // to pay for gas
     const leapDeposit = Tx.deposit(
       1, // depositId
-      5000000000,
+      100000000,
       `0x${scriptHash.toString('hex')}`, // owner (spending condition)
       0
     );
     const leap1Deposit = Tx.deposit(
-      1, // depositId
+      2, // depositId
       5000000000,
       `0x${scriptHash.toString('hex')}`, // owner (spending condition)
       0
     );
     const leap2Deposit = Tx.deposit(
-      1, // depositId
+      3, // depositId
       1000000000,
       player,
       0
@@ -832,7 +832,7 @@ describe('checkSpendCond', () => {
       ],
       [
         new Output(6000000000, player, 0),
-        new Output(4991487526, `0x${scriptHash.toString('hex')}`, 0),
+        new Output(91487526, `0x${scriptHash.toString('hex')}`, 0),
       ]
     );
     condition.signAll(PRIV_1);
@@ -843,7 +843,6 @@ describe('checkSpendCond', () => {
       )}00000000000000000000000000000000000000000000000000000000000000${sig.v.toString(
         16
       )}`;
-    console.log(msgData);
     condition.inputs[0].setMsgData(msgData);
 
     await checkSpendCond(state, condition, bridgeState);
