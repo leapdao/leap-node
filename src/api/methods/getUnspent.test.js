@@ -130,6 +130,14 @@ describe('getUnspent', () => {
         output: tx1.outputs[1].toJSON(),
       },
     ]);
+
+    const unspent2 = await getUnspent({ currentState: state }, A1, '0');
+    expect(unspent2).toEqual([
+      {
+        outpoint: new Outpoint(tx1.hash(), 1).hex(),
+        output: tx1.outputs[1].toJSON(),
+      },
+    ]);
   });
 
   test('empty unspent list', async () => {
