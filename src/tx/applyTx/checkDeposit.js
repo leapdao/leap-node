@@ -7,7 +7,7 @@
 
 const { Type } = require('leap-core');
 const { BigInt, equal, lessThan } = require('jsbi-utils');
-const { isNFT, isNST, addrCmp } = require('../../utils');
+const { isNFT, addrCmp } = require('../../utils');
 
 module.exports = (state, tx, bridgeState) => {
   if (tx.type !== Type.DEPOSIT) {
@@ -25,10 +25,8 @@ module.exports = (state, tx, bridgeState) => {
     );
   }
 
-  const txColor = tx.outputs[0].color;
   if (
-    !isNFT(txColor) &&
-    !isNST(txColor) &&
+    !isNFT(tx.outputs[0].color) &&
     lessThan(BigInt(tx.outputs[0].value), BigInt(1))
   ) {
     throw new Error('Deposit out has value < 1');
@@ -37,10 +35,8 @@ module.exports = (state, tx, bridgeState) => {
   if (
     !deposit ||
     !equal(BigInt(deposit.amount), BigInt(tx.outputs[0].value)) ||
-    Number(deposit.color) !== txColor ||
-    !addrCmp(deposit.depositor, tx.outputs[0].address) ||
-    // NFTs do not have data :)
-    isNST(txColor) && (deposit.data !== tx.outputs[0].data)
+    Number(deposit.color) !== tx.outputs[0].color ||
+    !addrCmp(deposit.depositor, tx.outputs[0].address)
   ) {
     throw new Error('Trying to submit incorrect deposit');
   }

@@ -7,7 +7,7 @@
 
 const { Type } = require('leap-core');
 const { BigInt, equal } = require('jsbi-utils');
-const { addrCmp, isNST } = require('../../utils');
+const { addrCmp } = require('../../utils');
 
 module.exports = (state, tx, bridgeState) => {
   if (tx.type !== Type.EXIT) {
@@ -26,9 +26,7 @@ module.exports = (state, tx, bridgeState) => {
     !exit ||
     !addrCmp(exit.exitor, unspent.address) ||
     !equal(BigInt(exit.amount), BigInt(unspent.value)) ||
-    Number(exit.color) !== unspent.color ||
-    // only NSTs can have data
-    isNST(exit.color) && (exit.data !== unspent.data)
+    Number(exit.color) !== unspent.color
   ) {
     throw new Error('Trying to submit incorrect exit');
   }

@@ -72,12 +72,6 @@ module.exports = class EventsRelay {
         const tx = Tx.deposit(event.depositId, value, event.depositor, color);
         this.sendDelayed(tx);
       },
-      NewDepositV2: async ({ returnValues: event }) => {
-        const color = Number(event.color);
-        const value = BigInt(event.amount);
-        const tx = Tx.deposit(event.depositId, value, event.depositor, color, event.data);
-        this.sendDelayed(tx);
-      },
       EpochLength: async event => {
         const { epochLength } = event.returnValues;
         const tx = Tx.epochLength(Number(epochLength));
@@ -89,11 +83,6 @@ module.exports = class EventsRelay {
         this.sendDelayed(tx);
       },
       ExitStarted: async event => {
-        const { txHash, outIndex } = event.returnValues;
-        const tx = Tx.exit(new Input(new Outpoint(txHash, Number(outIndex))));
-        this.sendDelayed(tx);
-      },
-      ExitStartedV2: async event => {
         const { txHash, outIndex } = event.returnValues;
         const tx = Tx.exit(new Input(new Outpoint(txHash, Number(outIndex))));
         this.sendDelayed(tx);
