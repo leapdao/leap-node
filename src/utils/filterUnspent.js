@@ -12,7 +12,7 @@ const hasAddress = (utxo, address) => {
 
 const hasColor = (utxo, color) => {
   if (color === undefined) return true;
-  return utxo.color === color;
+  return Number(utxo.color) === Number(color);
 };
 
 module.exports = function filterUnspent(unspent, address, color) {
