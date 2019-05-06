@@ -6,7 +6,7 @@
  */
 
 const hasAddress = (utxo, address) => {
-  if (address === undefined) return true;
+  if (!address) return true;
   return utxo.address.toLowerCase() === address.toLowerCase();
 };
 

@@ -59,7 +59,7 @@
     "js-abci": "github:leapdao/js-abci#bc6f38f88269503b7b1032cb2294a1f1dc7e8fcc",
     "jsbi-utils": "^1.0.0",
     "jsondiffpatch": "^0.2.5",
-    "leap-core": "0.30.0",
+    "leap-core": "0.30.1",
     "level": "^4.0.0",
     "lodash": "^4.17.10",
     "lodash.get": "^4.4.2",
@@ -118,10 +118,10 @@
     ],
     "coverageThreshold": {
       "global": {
-        "branches": 86,
-        "functions": 88,
-        "lines": 90,
-        "statements": 90
+        "branches": 82,
+        "functions": 86,
+        "lines": 89,
+        "statements": 89
       }
     }
   }

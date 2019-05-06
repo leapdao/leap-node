@@ -30,12 +30,14 @@ module.exports = (bridgeState, db, app, tendermintPort) => {
       db
     ),
     eth_call: require('./executeCall').bind(null, bridgeState),
+    eth_getCode: require('./getCode').bind(null, bridgeState),
     plasma_unspent: require('./getUnspent').bind(null, bridgeState),
     plasma_getColor: require('./getColor').bind(null, bridgeState),
     plasma_getColors: require('./getColors').bind(null, bridgeState),
     plasma_status: require('./getNodeStatus').bind(null, bridgeState, app),
     plasma_getConfig: require('./getConfig').bind(null, bridgeState, app),
     validator_getAddress: require('./getAddress').bind(null, bridgeState, app),
+    checkSpendingCondition: require('./checkSpendingCondition.js').bind(null, bridgeState),
   };
 
   const methodsWithCallback = Object.keys(nodeApi).reduce((set, key) => {
