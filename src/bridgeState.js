@@ -17,7 +17,7 @@ const bridgeABI = require('./abis/bridgeAbi');
 const exitABI = require('./abis/exitHandler');
 const operatorABI = require('./abis/operator');
 const proxyABI = require('./abis/proxy');
-const { NFT_COLOR_BASE, NST_COLOR_BASE } = require('./api/methods/constants');
+const { NFT_COLOR_BASE } = require('./api/methods/constants');
 const NETWORKS = require('./utils/networks');
 
 module.exports = class BridgeState {
@@ -54,7 +54,6 @@ module.exports = class BridgeState {
     this.tokens = {
       erc20: [],
       erc721: [],
-      erc1948: [],
     };
     this.epochLengths = [];
     this.minGasPrices = [];
@@ -137,14 +136,6 @@ module.exports = class BridgeState {
           amount: event.amount,
         };
       },
-      NewDepositV2: ({ returnValues: event }) => {
-        this.deposits[event.depositId] = {
-          depositor: event.depositor,
-          color: event.color,
-          amount: event.amount,
-          data: event.data,
-        };
-      },
       ExitStarted: ({ returnValues: event }) => {
         const outpoint = new Outpoint(event.txHash, Number(event.outIndex));
         this.exits[outpoint.getUtxoId()] = {
@@ -155,24 +146,11 @@ module.exports = class BridgeState {
           amount: event.amount,
         };
       },
-      ExitStartedV2: ({ returnValues: event }) => {
-        const outpoint = new Outpoint(event.txHash, Number(event.outIndex));
-        this.exits[outpoint.getUtxoId()] = {
-          txHash: event.txHash,
-          outIndex: Number(event.outIndex),
-          exitor: event.exitor,
-          color: event.color,
-          amount: event.amount,
-          data: event.data,
-        };
-      },
       NewToken: ({ returnValues: event }) => {
-        if (event.color >= NST_COLOR_BASE) {
-          this.tokens.erc1948.push(event.tokenAddr); // eslint-disable-line  no-underscore-dangle
-        } else if (event.color >= NFT_COLOR_BASE) {
-          this.tokens.erc721.push(event.tokenAddr); // eslint-disable-line  no-underscore-dangle
-        } else {
+        if (event.color < NFT_COLOR_BASE) {
           this.tokens.erc20.push(event.tokenAddr); // eslint-disable-line no-underscore-dangle
+        } else {
+          this.tokens.erc721.push(event.tokenAddr); // eslint-disable-line  no-underscore-dangle
         }
       },
       EpochLength: ({ returnValues: event }) => {

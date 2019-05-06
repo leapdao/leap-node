@@ -1,6 +1,6 @@
 const getColor = require('./getColor');
 const { INVALID_PARAMS } = require('./constants');
-const { isNFT, isNST } = require('../../utils');
+const { isNFT } = require('../../utils');
 const { BigInt } = require('jsbi-utils');
 
 const formatUint256 = n => `0x${n.toString(16).padStart(64, '0')}`;
@@ -22,7 +22,7 @@ module.exports = async (bridgeState, txObj, tag) => {
       const color = parseInt(await getColor(bridgeState, txObj.to), 16);
       const address = `0x${paramsData}`;
       const balances = bridgeState.currentState.balances[color] || {};
-      if (isNFT(color) || isNST(color)) {
+      if (isNFT(color)) {
         const nfts = balances[address] || [];
         return formatUint256(nfts.length);
       }
@@ -34,7 +34,7 @@ module.exports = async (bridgeState, txObj, tag) => {
     // tokenOfOwnerByIndex(address,uint256)
     case '0x2f745c59': {
       const color = parseInt(await getColor(bridgeState, txObj.to), 16);
-      if (isNFT(color) || isNST(color)) {
+      if (isNFT(color)) {
         const address = `0x${paramsData.substring(0, 40)}`;
         const index = parseInt(paramsData.substring(40), 16);
         const balances = bridgeState.currentState.balances[color] || {};
