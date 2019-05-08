@@ -30,6 +30,8 @@ describe('sendRawTransaction', () => {
     expect(response).toBe(tx.hash());
   });
 
+  /*
+   * We do not return an error anymore because it's async.
   test('error', async () => {
     const error = new Error();
     axios.get.mockImplementation(() => {
@@ -42,4 +44,5 @@ describe('sendRawTransaction', () => {
       expect(err).toBe(error);
     }
   });
+  */
 });

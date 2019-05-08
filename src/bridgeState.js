@@ -84,12 +84,17 @@ module.exports = class BridgeState {
       this.web3,
       contracts,
       this.eventsBuffer,
-      genesisBlock
+      parseInt(genesisBlock, 10)
     );
     const blockNumber = await this.web3.eth.getBlockNumber();
     await this.eventsSubscription.init();
     await this.onNewBlock(blockNumber);
     await this.initBlocks();
+
+    if (this.lastBlocksRoot && this.lastPeriodRoot) {
+      this.currentPeriod = new Period(this.lastBlocksRoot);
+    }
+
     logNode('Synced');
   }
 
@@ -166,5 +171,35 @@ module.exports = class BridgeState {
     for (const event of events) {
       this.relayBuffer.push(event);
     }
+  }
+
+  async saveState() {
+    this.currentState.blockHeight = this.blockHeight;
+    this.db.storeChainState(this.currentState);
+  }
+
+  async loadState() {
+    const res = await this.db.getChainState();
+    this.currentState = res || {
+      blockHeight: 0,
+      mempool: [],
+      balances: {}, // stores account balances like this { [colorIndex]: { address1: 0, ... } }
+      owners: {}, // index for NFT ownerOf call
+      unspent: {}, // stores unspent outputs (deposits, transfers)
+      processedDeposit: 0,
+      slots: [],
+      epoch: {
+        epoch: 0,
+        lastEpochHeight: 0,
+        epochLength: null,
+        epochLengthIndex: -1,
+      },
+      gas: {
+        minPrice: 0,
+        minPriceIndex: -1,
+      },
+    };
+
+    return this.currentState;
   }
 };

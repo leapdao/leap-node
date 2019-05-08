@@ -1,14 +1,14 @@
 const createDb = levelDb => {
   /*
-  * Returns last synced block number from the db. If there is no such a number, returns 0
-  */
+   * Returns last synced block number from the db. If there is no such a number, returns 0
+   */
   const getLastBlockSynced = () =>
     levelDb.get('lastBlockSynced').catch(maybeNotFound => 0); // eslint-disable-line no-unused-vars
 
   /*
-* Stores block and all it's txs into level db.
-* Sets lastBlockSynced value to the given block height.
-*/
+   * Stores block and all it's txs into level db.
+   * Sets lastBlockSynced value to the given block height.
+   */
   const storeBlock = async block => {
     const dbOpsBatch = levelDb.batch();
     block.txList.forEach((tx, txPos) => {
@@ -47,7 +47,6 @@ const createDb = levelDb => {
       .then(jsonStr => {
         // hash, not object
         if (jsonStr.indexOf('0x') === 0) return jsonStr;
-
         return JSON.parse(jsonStr);
       })
       .catch(e => {
@@ -57,17 +56,31 @@ const createDb = levelDb => {
   };
 
   /*
-* Returns block data for given hash
-*/
+   * Returns block data for given hash
+   */
   const getBlock = hash => {
     return getNullable(`block!${hash}`);
   };
 
   /*
-* Returns tx data for given hash
-*/
+   * Returns tx data for given hash
+   */
   const getTransaction = hash => {
     return getNullable(`tx!${hash}`);
+  };
+
+  /*
+   * Returns the `BridgeState.currentState` or null
+   */
+  const getChainState = () => {
+    return getNullable('chainState');
+  };
+
+  /*
+   * Saves the `BridgeState.currentState`
+   */
+  const storeChainState = async (state) => {
+    await levelDb.put('chainState', JSON.stringify(state));
   };
 
   return {
@@ -75,6 +88,8 @@ const createDb = levelDb => {
     storeBlock,
     getBlock,
     getTransaction,
+    getChainState,
+    storeChainState,
   };
 };
 

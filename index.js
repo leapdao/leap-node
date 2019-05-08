@@ -40,24 +40,6 @@ async function run() {
   })();
 
   global.app = lotion({
-    initialState: {
-      mempool: [],
-      balances: {}, // stores account balances like this { [colorIndex]: { address1: 0, ... } }
-      owners: {}, // index for NFT ownerOf call
-      unspent: {}, // stores unspent outputs (deposits, transfers)
-      processedDeposit: 0,
-      slots: [],
-      epoch: {
-        epoch: 0,
-        lastEpochHeight: 0,
-        epochLength: null,
-        epochLengthIndex: -1,
-      },
-      gas: {
-        minPrice: 0,
-        minPriceIndex: -1,
-      },
-    },
     networkId: `${config.network}-${config.networkId}`,
     genesis: config.genesis,
     devMode: cliArgs.devMode,
@@ -110,7 +92,9 @@ async function run() {
   app.useBlock(blockHandler(bridgeState, db, nodeConfig));
   app.usePeriod(periodHandler(bridgeState));
 
-  app.listen(cliArgs.port).then(async params => {
+  const lastGoodState = await bridgeState.loadState();
+
+  app.listen(lastGoodState).then(async params => {
     blockTicker.subscribe(eventsRelay.onNewBlock);
     await printStartupInfo(params, bridgeState);
 

@@ -49,7 +49,6 @@ Your local port `9999` forwards now to the remote host on address `127.0.0.1` an
 ### Available cli arguments
 
 - `no-validators-updates` — disabling validators set updates (default: false)
-- `port` — tx endpoint port (default: 3000)
 - `rpcaddr` — host for http RPC server (default: localhost)
 - `rpcport` — port for http RPC server (default: 8645)
 - `wsaddr` — host for websocket RPC server (default: localhost)
