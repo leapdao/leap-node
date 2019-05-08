@@ -93,8 +93,6 @@ describe('getUnsignedTransferTx', () => {
   test('Generate transfer transaction successfully', async () => {
     const expected = {
       type: 3,
-      hash:
-        '0x582a072f50b0cd47a028d09bb6d0e984a4ac12b281f96c82e796a35cdb252c43',
       inputs: [
         {
           hash: tx1.hash(),
@@ -123,8 +121,6 @@ describe('getUnsignedTransferTx', () => {
   test('Need two inputs and generate two outputs', async () => {
     const expected = {
       type: 3,
-      hash:
-        '0xb31b4b333120c4d844c1b5bee0a74b4661f542120a067b756edeb4ebea23b80c',
       inputs: [
         {
           hash: tx2.hash(),
