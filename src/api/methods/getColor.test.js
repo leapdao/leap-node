@@ -1,9 +1,17 @@
 const getColor = require('./getColor');
-const { NFT_COLOR_BASE } = require('./constants');
+const { NFT_COLOR_BASE, NST_COLOR_BASE } = require('./constants');
 
-const { erc20Tokens, erc721Tokens } = require('./getColors.test');
+const {
+  erc20Tokens,
+  erc721Tokens,
+  erc1948Tokens,
+} = require('./getColors.test');
 
-const tokens = { erc20: erc20Tokens, erc721: erc721Tokens };
+const tokens = {
+  erc20: erc20Tokens,
+  erc721: erc721Tokens,
+  erc1948: erc1948Tokens,
+};
 
 describe('getColor', () => {
   test('erc20 color', async () => {
@@ -17,6 +25,15 @@ describe('getColor', () => {
     );
     expect(await getColor({ tokens }, erc721Tokens[1])).toBe(
       `0x${(NFT_COLOR_BASE + 1).toString(16)}`
+    );
+  });
+
+  test('erc1948 color', async () => {
+    expect(await getColor({ tokens }, erc1948Tokens[0])).toBe(
+      `0x${NST_COLOR_BASE.toString(16)}`
+    );
+    expect(await getColor({ tokens }, erc1948Tokens[1])).toBe(
+      `0x${(NST_COLOR_BASE + 1).toString(16)}`
     );
   });
 
