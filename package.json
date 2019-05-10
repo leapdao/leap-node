@@ -10,7 +10,9 @@
     "lint": "./node_modules/.bin/eslint src",
     "test:watch": "./node_modules/.bin/jest --watch --coverage=false",
     "precommit": "./node_modules/.bin/lint-staged",
-    "machine-gun": "node tools/machine-gun.js"
+    "machine-gun": "node tools/machine-gun.js",
+    "install": "node ./lotion/bin/download.js",
+    "build:abci": "pbjs -t static-module -w commonjs -o lotion/abci/types.js lotion/abci/proto/*.proto"
   },
   "bin": {
     "leap-node": "./bin.js"
@@ -42,6 +44,7 @@
   ],
   "dependencies": {
     "axios": "^0.18.0",
+    "bl": "^3.0.0",
     "body-parser": "^1.18.3",
     "colors": "^1.3.1",
     "cors": "^2.8.4",
@@ -51,29 +54,26 @@
     "ethereumjs-util": "6.1.0",
     "ethereumjs-vm": "2.6.0",
     "express": "^4.16.3",
-    "express-http-proxy": "^1.0.7",
     "fs-extra": "^5.0.0",
     "get-port": "^3.1.0",
     "jayson": "^2.0.6",
-    "js-abci": "github:leapdao/js-abci#bc6f38f88269503b7b1032cb2294a1f1dc7e8fcc",
     "jsbi-utils": "^1.0.0",
     "jsondiffpatch": "^0.2.5",
     "leap-core": "0.30.1",
     "level": "^4.0.0",
     "lodash": "^4.17.10",
     "lodash.get": "^4.4.2",
+    "mkdirp": "^0.5.1",
+    "protocol-buffers-encodings": "^1.1.0",
     "rimraf": "^2.6.2",
     "rpc-websockets": "^4.1.2",
-    "tendermint-node": "github:leapdao/tendermint-node#v0.31.0-leap.3",
     "tinyqueue": "^2.0.0",
-    "truffle-hdwallet-provider": "^1.0.3",
+    "unzip": "^0.1.11",
     "varstruct": "^6.1.1",
     "web3": "1.0.0-beta.37"
   },
   "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-eslint": "^8.2.3",
-    "babel-preset-env": "^1.6.1",
+    "babel-eslint": "^10.0.1",
     "eslint": "^4.19.1",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-config-airbnb-base": "^12.1.0",
@@ -83,7 +83,8 @@
     "husky": "^0.14.3",
     "jest": "^23.0.1",
     "lint-staged": "^7.0.5",
-    "prettier": "^1.12.1"
+    "prettier": "^1.12.1",
+    "protobufjs": "^6.8.8"
   },
   "jest": {
     "testEnvironment": "node",

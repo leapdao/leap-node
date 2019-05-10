@@ -1,7 +1,6 @@
 const fs = require('fs');
 const { join } = require('path');
-// eslint-disable-next-line import/no-extraneous-dependencies
-const tendermint = require('tendermint-node');
+const tendermint = require('./tendermint-node');
 
 // default params (as of version 0.31), except `time_iota_ms`
 const CONSENSUS_PARAMS = {
@@ -70,10 +69,10 @@ module.exports = async ({
   const opts = {
     rpc: { laddr: `tcp://${tendermintAddr}:${tendermintPort}` },
     p2p: { laddr: `tcp://0.0.0.0:${p2pPort}` },
-    proxyApp: `tcp://127.0.0.1:${abciPort}`,
+    proxy_app: `tcp://127.0.0.1:${abciPort}`,
   };
   if (peers.length) {
-    opts.p2p.persistentPeers = peers.join(',');
+    opts.p2p.persistent_peers = peers.join(',');
   }
   if (unsafeRpc) {
     opts.rpc.unsafe = true;
@@ -82,9 +81,8 @@ module.exports = async ({
   if (createEmptyBlocks === false) {
     opts.consensus.create_empty_blocks = false;
   }
-
   if (!logTendermint) {
-    opts.logLevel = 'error';
+    opts.log_level = 'error';
   }
   if (readonlyValidator) {
     opts.consensus.readonly = true;
