@@ -79,7 +79,7 @@ const createDb = levelDb => {
   /*
    * Saves the `BridgeState.currentState`
    */
-  const storeChainState = async (state) => {
+  const storeChainState = async state => {
     await levelDb.put('chainState', JSON.stringify(state));
   };
 

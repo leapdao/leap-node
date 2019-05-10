@@ -1,7 +1,6 @@
-/* eslint-disable no-await-in-loop */
+/* eslint-disable no-await-in-loop, import/no-extraneous-dependencies, guard-for-in */
 
 const createABCIServer = require('js-abci');
-const decodeTx = require('./tx-encoding.js').decode;
 const jsondiffpatch = require('jsondiffpatch');
 
 const { getAddress } = require('../../src/utils');
@@ -58,7 +57,7 @@ async function runTx(
 function updateAndDiffValidators(validators, newValidators) {
   const diffs = [];
   const pubKeys = {};
-  const push = (validator) => {
+  const push = validator => {
     diffs.push({
       pubKey: {
         type: validator.pubKey.type,
@@ -116,11 +115,10 @@ module.exports = function configureABCIServer({
   abciApp.checkTx = async req => {
     const rawTx = req.tx;
     try {
-      const tx = decodeTx(rawTx);
       const [isValid, log] = await runTx(
         txMiddleware,
         store,
-        tx,
+        rawTx,
         chainInfo,
         false
       );
@@ -134,11 +132,10 @@ module.exports = function configureABCIServer({
   abciApp.deliverTx = async req => {
     const rawTx = req.tx;
     try {
-      const tx = decodeTx(rawTx);
       const [isValid, log] = await runTx(
         txMiddleware,
         store,
-        tx,
+        rawTx,
         chainInfo,
         true
       );

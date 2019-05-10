@@ -61,7 +61,8 @@ module.exports = async (
     logPeriod('submitPeriod. Slot %d', mySlotToSubmit.id);
 
     // always try to use the last submitted one
-    const prevPeriodRoot = getPrevPeriodRoot(period, bridgeState) || lastPeriodRoot;
+    const prevPeriodRoot =
+      getPrevPeriodRoot(period, bridgeState) || lastPeriodRoot;
 
     if (!prevPeriodRoot) {
       logPeriod(
