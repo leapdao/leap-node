@@ -31,6 +31,18 @@ ContractsEventsSubscription.__setEventBatches([
         amount: '100',
       },
     },
+    {
+      event: 'NewDepositV2',
+      returnValues: {
+        depositId: '0',
+        depositor: '0xB8205608d54cb81f44F263bE086027D8610F3C94',
+        color: '0',
+        amount: '100',
+        data: `0x${Buffer.alloc(32)
+          .fill(1)
+          .toString('hex')}`,
+      },
+    },
   ],
 ]);
 /* eslint-enable */
