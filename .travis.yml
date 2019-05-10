@@ -23,4 +23,4 @@ jobs:
           contracts_repo=" --single-branch -b staging https://github.com/leapdao/leap-contracts.git"
           node_repo=" `pwd`"
           EOF
-        - cd /tmp/tests && yarn build && yarn test
+        - cd /tmp/tests && yarn && yarn build && yarn test
