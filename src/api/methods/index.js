@@ -30,6 +30,10 @@ module.exports = (bridgeState, db, app, tendermintPort) => {
       db
     ),
     eth_call: require('./executeCall').bind(null, bridgeState),
+    plasma_getUnsignedTransferTx: require('./getUnsignedTransferTx').bind(
+      null,
+      bridgeState
+    ),
     plasma_unspent: require('./getUnspent').bind(null, bridgeState),
     plasma_getColor: require('./getColor').bind(null, bridgeState),
     plasma_getColors: require('./getColors').bind(null, bridgeState),

@@ -14,6 +14,7 @@ module.exports = async (bridgeState, app) => {
     networkId: bridgeState.config.networkId,
     eventsDelay: bridgeState.config.eventsDelay,
     bridgeDelay: bridgeState.config.bridgeDelay,
+    version: `v${require('../../../package.json').version}`, // eslint-disable-line
   };
 
   const genesis =

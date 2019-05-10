@@ -1,4 +1,4 @@
-/* eslint-disable no-await-in-loop */
+/* eslint-disable no-await-in-loop, import/no-extraneous-dependencies, guard-for-in */
 
 const createABCIServer = require('js-abci');
 const jsondiffpatch = require('jsondiffpatch');
@@ -57,7 +57,7 @@ async function runTx(
 function updateAndDiffValidators(validators, newValidators) {
   const diffs = [];
   const pubKeys = {};
-  const push = (validator) => {
+  const push = validator => {
     diffs.push({
       pubKey: {
         type: validator.pubKey.type,
@@ -197,7 +197,7 @@ module.exports = function configureABCIServer({
   abciApp.info = async () => {
     const rsp = {};
 
-    if (genesis.app_hash) {
+    if (genesis && genesis.app_hash) {
       rsp.lastBlockAppHash = Buffer.from(genesis.app_hash, 'hex');
     }
 

@@ -4348,7 +4348,7 @@ jest@^23.0.1:
     import-local "^1.0.0"
     jest-cli "^23.6.0"
 
-js-abci@leapdao/js-abci#bc6f38f88269503b7b1032cb2294a1f1dc7e8fcc:
+"js-abci@github:leapdao/js-abci#bc6f38f88269503b7b1032cb2294a1f1dc7e8fcc":
   version "5.0.1"
   resolved "https://codeload.github.com/leapdao/js-abci/tar.gz/bc6f38f88269503b7b1032cb2294a1f1dc7e8fcc"
   dependencies:
@@ -4593,15 +4593,16 @@ lcid@^1.0.0:
   dependencies:
     invert-kv "^1.0.0"
 
-leap-core@^0.28.2:
-  version "0.28.3"
-  resolved "https://registry.yarnpkg.com/leap-core/-/leap-core-0.28.3.tgz#6dbc8344eed119fb067b2a53a4a9aae37b861abe"
-  integrity sha512-9Rwo/5Uuo7sOCwmNTq1aksmUMjAkLg+Q/Im0NLDXGN/M53uXfJlAjJS2Xs/fL21iw4pK4wZKI4zpYy72xCdhAg==
+leap-core@^0.29.1:
+  version "0.29.1"
+  resolved "https://registry.yarnpkg.com/leap-core/-/leap-core-0.29.1.tgz#333cf701c42e49a09c8a9fc422aa6bbbbdc49068"
+  integrity sha512-qgmR/+3+VX3pLJ/bMckxnntxRKzUfA7r2vL8VFT4IcUWcRwAB0uDAr8w6oRlf2Lk27lfBq0VkQ4KZa2CSuhLhw==
   dependencies:
     "@types/web3" "^1.0.18"
     babel-polyfill "^6.26.0"
     ethereumjs-util "6.0.0"
     jsbi-utils "^1.0.0"
+    node-fetch "^2.3.0"
 
 left-pad@^1.3.0:
   version "1.3.0"
@@ -4988,17 +4989,6 @@ merge@^1.2.0:
   resolved "https://registry.yarnpkg.com/merge/-/merge-1.2.1.tgz#38bebf80c3220a8a487b6fcfb3941bb11720c145"
   integrity sha512-VjFo4P5Whtj4vsLzsYBu5ayHhoHJ0UqNm7ibvShmbmoz7tGi0vXaoJbGdB+GmDMLUdg8DpQXEIeVDAe8MaABvQ==
 
-merk@^1.3.1:
-  version "1.3.4"
-  resolved "https://registry.yarnpkg.com/merk/-/merk-1.3.4.tgz#7f60c4f367b6d130367b5e5f557f2dc746c1d94a"
-  integrity sha512-SnB1QTwDMvKGVtGXLmB6Cdw/2npcPaXUgMvE43UxoSrY47537s8vpQGMGR9MNvhYTwoal8URaseOskJZBBxg8Q==
-  dependencies:
-    create-hash "^1.1.3"
-    deterministic-json "^1.0.4"
-    old "^0.2.0"
-    varint "^5.0.0"
-    varstruct "^6.1.1"
-
 merkle-patricia-tree@^2.1.2, merkle-patricia-tree@^2.3.2:
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/merkle-patricia-tree/-/merkle-patricia-tree-2.3.2.tgz#982ca1b5a0fde00eed2f6aeed1f9152860b8208a"
@@ -5294,6 +5284,11 @@ node-abi@^2.7.0:
   dependencies:
     semver "^5.4.1"
 
+node-fetch@^2.3.0:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.5.0.tgz#8028c49fc1191bba56a07adc6e2a954644a48501"
+  integrity sha512-YuZKluhWGJwCcUu4RlZstdAxr8bFfOVHakc1mplwHkk8J+tqM1Y5yraYvIUpeX8aY7+crCwiELJq7Vl0o0LWXw==
+
 node-int64@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/node-int64/-/node-int64-0.4.0.tgz#87a9065cdb355d3182d8f94ce11188b825c68a3b"
@@ -5495,13 +5490,6 @@ old@^0.1.3:
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/old/-/old-0.1.3.tgz#5824d99ffc4ec6e8c52b3f3ce955a17a5f814ad1"
   integrity sha1-WCTZn/xOxujFKz886VWhel+BStE=
-  dependencies:
-    object-assign "^4.1.0"
-
-old@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/old/-/old-0.2.0.tgz#ae75a9f33bae7cb3fe06312899b7ae5a73ba24ef"
-  integrity sha1-rnWp8zuufLP+BjEombeuWnO6JO8=
   dependencies:
     object-assign "^4.1.0"
 
@@ -7122,9 +7110,9 @@ tar@^4:
     safe-buffer "^5.1.2"
     yallist "^3.0.2"
 
-tendermint-node@leapdao/tendermint-node#031e6bbef35cba31a866acc23fd0d0b7cecc9438:
+"tendermint-node@github:leapdao/tendermint-node#v0.31.0-leap.3":
   version "3.4.3"
-  resolved "https://codeload.github.com/leapdao/tendermint-node/tar.gz/031e6bbef35cba31a866acc23fd0d0b7cecc9438"
+  resolved "https://codeload.github.com/leapdao/tendermint-node/tar.gz/89ed1091233dd89636bf4d74a2d99dca1c8b64b6"
   dependencies:
     axios "^0.18.0"
     cross-spawn "^6.0.5"
