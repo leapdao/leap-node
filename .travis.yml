@@ -17,10 +17,10 @@ jobs:
     - stage: tests
       name: "integration tests"
       script:
-        - git clone -b staging https://github.com/leapdao/integration-tests.git /tmp/tests
+        - git clone --single-branch -b master https://github.com/leapdao/integration-tests.git /tmp/tests
         - |
           cat > /tmp/tests/configs/build << EOF
-          contracts_repo=" --single-branch -b staging https://github.com/leapdao/leap-contracts.git"
+          contracts_repo=" --single-branch -b master https://github.com/leapdao/leap-contracts.git"
           node_repo=" `pwd`"
           EOF
         - cd /tmp/tests && yarn && yarn build && yarn test
