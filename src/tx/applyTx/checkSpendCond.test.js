@@ -5,6 +5,7 @@ const {
   NFT_COLOR_BASE,
   NST_COLOR_BASE,
 } = require('../../api/methods/constants');
+const checkSpendingCondition = require('./../../api/methods/checkSpendingCondition');
 
 const erc20Tokens = [
   '0x1111111111111111111111111111111111111111',
@@ -175,6 +176,22 @@ describe('checkSpendCond', () => {
     ).rejects.toEqual(
       new Error('Spending Conditions are not supported on this network')
     );
+
+    // check the checkSpendingCondition API call
+    condition.signAll(PRIV_1);
+    bridgeState.currentState = state;
+
+    let apiResult = await checkSpendingCondition(bridgeState, condition.hex());
+    expect(apiResult.outputs).toEqual(condition.outputs);
+
+    // test the error-case
+    const outs = condition.outputs;
+
+    condition.outputs = [];
+    condition.signAll(PRIV_1);
+    apiResult = await checkSpendingCondition(bridgeState, condition.hex());
+    expect(apiResult.outputs).toEqual(outs);
+    expect(apiResult.error.startsWith('Error: outputs do not match computation results')).toEqual(true);
   });
 
   test('Spending Condition: NFT', async () => {
