@@ -10,7 +10,6 @@
     "lint": "./node_modules/.bin/eslint src",
     "test:watch": "./node_modules/.bin/jest --watch --coverage=false",
     "precommit": "./node_modules/.bin/lint-staged",
-    "machine-gun": "node tools/machine-gun.js",
     "install": "node ./lotion/bin/download.js",
     "build:abci": "pbjs -t static-module -w commonjs -o lotion/abci/types.js lotion/abci/proto/*.proto"
   },
