@@ -1,4 +1,4 @@
-import updatePeriod from './updatePeriod';
+const updatePeriod = require('./updatePeriod');
 
 jest.mock('../txHelpers/submitPeriod');
 jest.mock('../utils//sendTransaction');

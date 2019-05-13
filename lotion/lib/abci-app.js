@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop, import/no-extraneous-dependencies, guard-for-in */
 
-const createABCIServer = require('js-abci');
+const createABCIServer = require('../abci');
 const jsondiffpatch = require('jsondiffpatch');
 
 const { getAddress } = require('../../src/utils');

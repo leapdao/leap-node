@@ -8,7 +8,6 @@ RUN yarn link
 RUN apk del build_deps
 
 ENV NO_VALIDATORS_UPDATES "false"
-ENV TX_PORT "3000"
 ENV RPC_ADDR "0.0.0.0"
 ENV RPC_PORT "8645"
 ENV WS_ADDR "0.0.0.0"

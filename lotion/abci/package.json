@@ -1,0 +1,28 @@
+{
+  "name": "js-abci",
+  "version": "5.0.1",
+  "description": "Tendermint ABCI server",
+  "main": "index.js",
+  "keywords": [
+    "abci",
+    "tendermint",
+    "cosmos",
+    "blockchain"
+  ],
+  "author": "Matt Bell <mappum@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "bl": "^1.2.2",
+    "debug": "^3.1.0",
+    "protobufjs": "^6.8.8",
+    "protocol-buffers-encodings": "^1.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tendermint/js-abci.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tendermint/js-abci/issues"
+  },
+  "homepage": "https://github.com/tendermint/js-abci#readme"
+}
