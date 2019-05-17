@@ -69,7 +69,8 @@
     "tinyqueue": "^2.0.0",
     "unzip": "^0.1.11",
     "varstruct": "^6.1.1",
-    "web3": "1.0.0-beta.37"
+    "web3": "1.0.0-beta.37",
+    "protobufjs": "^6.8.8"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.1",
@@ -82,8 +83,7 @@
     "husky": "^0.14.3",
     "jest": "^23.0.1",
     "lint-staged": "^7.0.5",
-    "prettier": "^1.12.1",
-    "protobufjs": "^6.8.8"
+    "prettier": "^1.12.1"
   },
   "jest": {
     "testEnvironment": "node",
