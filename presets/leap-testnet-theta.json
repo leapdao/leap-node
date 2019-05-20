@@ -1,7 +1,7 @@
 {
-  "exitHandlerAddr": "0xC145959525f33Abc8513bE5f147c903CF4525251",
-  "bridgeAddr": "0xB85AF7e27A4Ca08aE46eFC77405c67ea2756e548",
-  "operatorAddr": "0xE3Bf719975b0Dec47F7D629B77cf1bf996893CF4",
+  "exitHandlerAddr": "0x7DC67d56f5487D612985718221bD62D7b415Fc50",
+  "bridgeAddr": "0x1d41DBeeBBa8DD71A60A3413229961BC8D25d785",
+  "operatorAddr": "0xC0AEA6bC76982AC30a28c4251A40F6E282161137",
   "rootNetworkId": 4,
   "network": "leap-testnet-theta",
   "networkId": 218508104,
