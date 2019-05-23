@@ -26,7 +26,7 @@ module.exports = async function getRootGasPrice(web3, urgency = 'fast') {
   return axios
     .get(GAS_STATION_API)
     .then(response => {
-      return Math.min(MAX_GAS_PRICE, (response.data[urgency] / 10) * 10 ** 9);
+      return Math.min(MAX_GAS_PRICE, (response.data[urgency] * 10 ** 9) / 10);
     })
     .catch(e => {
       throw new Error('Gas Station error', e);
