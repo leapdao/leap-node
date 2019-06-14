@@ -648,15 +648,6 @@ babel-plugin-syntax-object-rest-spread@^6.13.0:
   resolved "https://registry.yarnpkg.com/babel-plugin-syntax-object-rest-spread/-/babel-plugin-syntax-object-rest-spread-6.13.0.tgz#fd6536f2bce13836ffa3a5458c4903a597bb3bf5"
   integrity sha1-/WU28rzhODb/o6VFjEkDpZe7O/U=
 
-babel-polyfill@^6.26.0:
-  version "6.26.0"
-  resolved "https://registry.yarnpkg.com/babel-polyfill/-/babel-polyfill-6.26.0.tgz#379937abc67d7895970adc621f284cd966cf2153"
-  integrity sha1-N5k3q8Z9eJWXCtxiHyhM2WbPIVM=
-  dependencies:
-    babel-runtime "^6.26.0"
-    core-js "^2.5.0"
-    regenerator-runtime "^0.10.5"
-
 babel-preset-jest@^23.2.0:
   version "23.2.0"
   resolved "https://registry.yarnpkg.com/babel-preset-jest/-/babel-preset-jest-23.2.0.tgz#8ec7a03a138f001a1a8fb1e8113652bf1a55da46"
@@ -4118,13 +4109,12 @@ lcid@^1.0.0:
   dependencies:
     invert-kv "^1.0.0"
 
-leap-core@0.30.1:
-  version "0.30.1"
-  resolved "https://registry.yarnpkg.com/leap-core/-/leap-core-0.30.1.tgz#efe8c88f78e8a7c5e2a0e0b9611282cedd117076"
-  integrity sha512-jJDovG7vPzzOr7LhpAM8BLs17+baTjz2NCaqLPPJGa7pyDuSDItvGVQolaOc9ogHupCNzXqFX/8KnhxImrjneg==
+leap-core@0.32.0:
+  version "0.32.0"
+  resolved "https://registry.yarnpkg.com/leap-core/-/leap-core-0.32.0.tgz#63a1d30d72798755c7aaf59173ed6d4d4db8336d"
+  integrity sha512-QG/I4lDaKVddpLhFu77HcP6ijRVhrGTi5ne9YTrsxYOHVtSgGyoUXV3U2WV89c9KOTVtG6uhspAVXw/AYRzJVg==
   dependencies:
     "@types/web3" "^1.0.18"
-    babel-polyfill "^6.26.0"
     ethereumjs-util "6.0.0"
     jsbi-utils "^1.0.0"
     node-fetch "^2.3.0"
@@ -5646,11 +5636,6 @@ realpath-native@^1.0.0:
   integrity sha512-wlgPA6cCIIg9gKz0fgAPjnzh4yR/LnXovwuo9hvyGvx3h8nX4+/iLZplfUWasXpqD8BdnGnP5njOFjkUwPzvjA==
   dependencies:
     util.promisify "^1.0.0"
-
-regenerator-runtime@^0.10.5:
-  version "0.10.5"
-  resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.10.5.tgz#336c3efc1220adcedda2c9fab67b5a7955a33658"
-  integrity sha1-M2w+/BIgrc7dosn6tntaeVWjNlg=
 
 regenerator-runtime@^0.11.0:
   version "0.11.1"
