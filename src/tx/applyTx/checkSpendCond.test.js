@@ -101,7 +101,10 @@ async function expectToThrow(func, args) {
 describe('checkSpendCond', () => {
   test('valid tx', async () => {
     // a deposit to the above script has been done
-    const scriptHash = utils.ripemd160(conditionScript);
+    const scriptHash = utils.ripemd160(
+      conditionScript.length,
+      utils.keccak256(conditionScript)
+    );
     const deposit = Tx.deposit(
       123,
       5000000000,
@@ -191,7 +194,11 @@ describe('checkSpendCond', () => {
     condition.signAll(PRIV_1);
     apiResult = await checkSpendingCondition(bridgeState, condition.hex());
     expect(apiResult.outputs).toEqual(outs);
-    expect(apiResult.error.startsWith('Error: outputs do not match computation results')).toEqual(true);
+    expect(
+      apiResult.error.startsWith(
+        'Error: outputs do not match computation results'
+      )
+    ).toEqual(true);
   });
 
   test('Spending Condition: NFT', async () => {
@@ -203,7 +210,7 @@ describe('checkSpendCond', () => {
       ),
       'hex'
     );
-    const scriptHash = utils.ripemd160(script);
+    const scriptHash = utils.ripemd160(script.length, utils.keccak256(script));
     const NFTDeposit = Tx.deposit(
       123, // depositId
       nftAddr,
@@ -288,7 +295,7 @@ describe('checkSpendCond', () => {
       ),
       'hex'
     );
-    const scriptHash = utils.ripemd160(script);
+    const scriptHash = utils.ripemd160(script.length, utils.keccak256(script));
     const NFTDeposit = Tx.deposit(
       123, // depositId
       nftAddr,
@@ -366,7 +373,7 @@ describe('checkSpendCond', () => {
       ),
       'hex'
     );
-    const scriptHash = utils.ripemd160(script);
+    const scriptHash = utils.ripemd160(script.length, utils.keccak256(script));
 
     const deposit = Tx.deposit(
       123, // depositId
@@ -439,7 +446,7 @@ describe('checkSpendCond', () => {
       '0x00000000000000000000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa00005';
     const receiver = '0x82e8C6Cf42C8D1fF9594b17A3F50e94a12cC860f'.toLowerCase();
     const script = Buffer.from(MultiCondition, 'hex');
-    const scriptHash = utils.ripemd160(script);
+    const scriptHash = utils.ripemd160(script.length, utils.keccak256(script));
 
     // to pay for gas
     const leapDeposit = Tx.deposit(
@@ -559,7 +566,7 @@ describe('checkSpendCond', () => {
       '0x00000000000000000000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa00005';
     const receiver = ADDR_1.toLowerCase();
     const script = Buffer.from(MultiConditionAllowance, 'hex');
-    const scriptHash = utils.ripemd160(script);
+    const scriptHash = utils.ripemd160(script.length, utils.keccak256(script));
     const owner = receiver;
 
     // to pay for gas
@@ -680,7 +687,7 @@ describe('checkSpendCond', () => {
       '0x0000000000000000000000005555555555555555555555555555555555555555';
     const receiver = ADDR_1.toLowerCase();
     const script = Buffer.from(BreedingCondition, 'hex');
-    const scriptHash = utils.ripemd160(script);
+    const scriptHash = utils.ripemd160(script.length, utils.keccak256(script));
 
     // to pay for gas
     const leapDeposit = Tx.deposit(
@@ -778,7 +785,7 @@ describe('checkSpendCond', () => {
     );
 
     const script = Buffer.from(tmp, 'hex');
-    const scriptHash = utils.ripemd160(script);
+    const scriptHash = utils.ripemd160(script.length, utils.keccak256(script));
 
     // to pay for gas
     const leapDeposit = Tx.deposit(

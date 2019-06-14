@@ -227,7 +227,8 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
       // we only allow one spending condition in an transaction, do we want to throw if we find more?
       spendingInput = input;
       spendingInputUnspent = unspent;
-      spendingAddrBuf = utils.ripemd160(spendingInput.script);
+      const { script } = spendingInput;
+      spendingAddrBuf = utils.ripemd160(script.length, utils.keccak256(script));
       spendingAddress = `0x${spendingAddrBuf.toString('hex')}`;
 
       // continue, input of spending condition is just for gas and will not be minted
