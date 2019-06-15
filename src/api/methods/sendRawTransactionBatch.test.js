@@ -3,6 +3,8 @@ const sendRawTransactionBatch = require('./sendRawTransactionBatch');
 
 const A1 = '0xB8205608d54cb81f44F263bE086027D8610F3C94';
 
+jest.mock('axios');
+
 describe('sendRawTransactionBatch', () => {
   test('should return number of transactions', async () => {
     const txs = [Tx.deposit(0, 100, A1, 0)];
