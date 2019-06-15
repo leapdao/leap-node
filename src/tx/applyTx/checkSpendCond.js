@@ -5,7 +5,7 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-const { Type, Output } = require('leap-core');
+const { Type, Output, Consensus } = require('leap-core');
 const Transaction = require('ethereumjs-tx');
 const VM = require('ethereumjs-vm');
 const utils = require('ethereumjs-util');
@@ -29,6 +29,8 @@ const {
   ERC1948_BYTECODE,
 } = require('./ercBytecode');
 const { isNFT, isNST } = require('./../../utils');
+
+const { getAddress, getScriptHash } = Consensus.spendingCondition;
 
 const { Account } = VM.deps;
 
@@ -228,8 +230,8 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
       spendingInput = input;
       spendingInputUnspent = unspent;
       const { script } = spendingInput;
-      spendingAddrBuf = utils.ripemd160(script.length, utils.keccak256(script));
-      spendingAddress = `0x${spendingAddrBuf.toString('hex')}`;
+      spendingAddrBuf = getScriptHash(script);
+      spendingAddress = getAddress(script);
 
       // continue, input of spending condition is just for gas and will not be minted
       // but any leftover after subtracting gas is returned to the owner as the last output.

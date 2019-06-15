@@ -1,4 +1,4 @@
-const { Tx, Input, Outpoint, Output } = require('leap-core');
+const { Tx, Input, Outpoint, Output, Consensus } = require('leap-core');
 const utils = require('ethereumjs-util');
 const checkSpendCond = require('./checkSpendCond');
 const {
@@ -6,6 +6,8 @@ const {
   NST_COLOR_BASE,
 } = require('../../api/methods/constants');
 const checkSpendingCondition = require('./../../api/methods/checkSpendingCondition');
+
+const { getScriptHash } = Consensus.spendingCondition;
 
 const erc20Tokens = [
   '0x1111111111111111111111111111111111111111',
@@ -101,10 +103,7 @@ async function expectToThrow(func, args) {
 describe('checkSpendCond', () => {
   test('valid tx', async () => {
     // a deposit to the above script has been done
-    const scriptHash = utils.ripemd160(
-      conditionScript.length,
-      utils.keccak256(conditionScript)
-    );
+    const scriptHash = getScriptHash(conditionScript);
     const deposit = Tx.deposit(
       123,
       5000000000,
@@ -210,7 +209,7 @@ describe('checkSpendCond', () => {
       ),
       'hex'
     );
-    const scriptHash = utils.ripemd160(script.length, utils.keccak256(script));
+    const scriptHash = getScriptHash(script);
     const NFTDeposit = Tx.deposit(
       123, // depositId
       nftAddr,
@@ -295,7 +294,7 @@ describe('checkSpendCond', () => {
       ),
       'hex'
     );
-    const scriptHash = utils.ripemd160(script.length, utils.keccak256(script));
+    const scriptHash = getScriptHash(script);
     const NFTDeposit = Tx.deposit(
       123, // depositId
       nftAddr,
@@ -373,7 +372,7 @@ describe('checkSpendCond', () => {
       ),
       'hex'
     );
-    const scriptHash = utils.ripemd160(script.length, utils.keccak256(script));
+    const scriptHash = getScriptHash(script);
 
     const deposit = Tx.deposit(
       123, // depositId
@@ -446,7 +445,7 @@ describe('checkSpendCond', () => {
       '0x00000000000000000000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa00005';
     const receiver = '0x82e8C6Cf42C8D1fF9594b17A3F50e94a12cC860f'.toLowerCase();
     const script = Buffer.from(MultiCondition, 'hex');
-    const scriptHash = utils.ripemd160(script.length, utils.keccak256(script));
+    const scriptHash = getScriptHash(script);
 
     // to pay for gas
     const leapDeposit = Tx.deposit(
@@ -566,7 +565,7 @@ describe('checkSpendCond', () => {
       '0x00000000000000000000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa00005';
     const receiver = ADDR_1.toLowerCase();
     const script = Buffer.from(MultiConditionAllowance, 'hex');
-    const scriptHash = utils.ripemd160(script.length, utils.keccak256(script));
+    const scriptHash = getScriptHash(script);
     const owner = receiver;
 
     // to pay for gas
@@ -687,7 +686,7 @@ describe('checkSpendCond', () => {
       '0x0000000000000000000000005555555555555555555555555555555555555555';
     const receiver = ADDR_1.toLowerCase();
     const script = Buffer.from(BreedingCondition, 'hex');
-    const scriptHash = utils.ripemd160(script.length, utils.keccak256(script));
+    const scriptHash = getScriptHash(script);
 
     // to pay for gas
     const leapDeposit = Tx.deposit(
@@ -785,7 +784,7 @@ describe('checkSpendCond', () => {
     );
 
     const script = Buffer.from(tmp, 'hex');
-    const scriptHash = utils.ripemd160(script.length, utils.keccak256(script));
+    const scriptHash = getScriptHash(script);
 
     // to pay for gas
     const leapDeposit = Tx.deposit(
