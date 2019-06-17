@@ -6,7 +6,7 @@
   "license": "MPL-2.0",
   "scripts": {
     "start": "node index.js",
-    "test": "./node_modules/.bin/jest --maxWorkers=4 --detectOpenHandles",
+    "test": "./node_modules/.bin/jest --maxWorkers=4 --detectOpenHandles --forceExit",
     "lint": "./node_modules/.bin/eslint src",
     "test:watch": "./node_modules/.bin/jest --watch --coverage=false",
     "precommit": "./node_modules/.bin/lint-staged",
@@ -58,7 +58,7 @@
     "jayson": "^2.0.6",
     "jsbi-utils": "^1.0.0",
     "jsondiffpatch": "^0.2.5",
-    "leap-core": "0.30.1",
+    "leap-core": "0.32.0",
     "level": "^4.0.0",
     "lodash": "^4.17.10",
     "lodash.get": "^4.4.2",
@@ -81,7 +81,7 @@
     "eslint-plugin-import": "^2.11.0",
     "eslint-plugin-jest": "^21.17.0",
     "husky": "^0.14.3",
-    "jest": "^23.0.1",
+    "jest": "^24.8.0",
     "lint-staged": "^7.0.5",
     "prettier": "^1.12.1"
   },

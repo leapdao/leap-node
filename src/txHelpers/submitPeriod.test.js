@@ -55,7 +55,7 @@ const bridgeContractMock = ({ returnPeriod }) => ({
   },
 });
 
-describe('submitPeriod', async () => {
+describe('submitPeriod', () => {
   test('period is already submitted', async () => {
     const bridgeState = bridgeStateMock({
       bridgeContract: bridgeContractMock({

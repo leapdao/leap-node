@@ -14,7 +14,7 @@ const db = {
   },
 };
 
-describe('getBlockByNumber', async () => {
+describe('getBlockByNumber', () => {
   test('tag', async () => {
     const response = await getBlockByNumber({ blockHeight: 2 }, db, 'latest');
     expect(response).toEqual({ hash: hashes[2] });
