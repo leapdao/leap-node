@@ -12,7 +12,6 @@ module.exports = [
     payable: false,
     stateMutability: 'view',
     type: 'function',
-    signature: '0x0356fe3a',
   },
   {
     constant: true,
@@ -27,7 +26,6 @@ module.exports = [
     payable: false,
     stateMutability: 'view',
     type: 'function',
-    signature: '0x117546c5',
   },
   {
     constant: true,
@@ -42,7 +40,6 @@ module.exports = [
     payable: false,
     stateMutability: 'view',
     type: 'function',
-    signature: '0x570ca735',
   },
   {
     constant: true,
@@ -62,11 +59,18 @@ module.exports = [
         name: 'timestamp',
         type: 'uint32',
       },
+      {
+        name: 'parentBlockNumber',
+        type: 'uint32',
+      },
+      {
+        name: 'parentBlockHash',
+        type: 'bytes32',
+      },
     ],
     payable: false,
     stateMutability: 'view',
     type: 'function',
-    signature: '0xc222ef6d',
   },
   {
     constant: true,
@@ -81,7 +85,6 @@ module.exports = [
     payable: false,
     stateMutability: 'view',
     type: 'function',
-    signature: '0xed3e46ae',
   },
   {
     constant: true,
@@ -96,7 +99,6 @@ module.exports = [
     payable: false,
     stateMutability: 'view',
     type: 'function',
-    signature: '0xf851a440',
   },
   {
     anonymous: false,
@@ -114,8 +116,6 @@ module.exports = [
     ],
     name: 'NewHeight',
     type: 'event',
-    signature:
-      '0xe31f975aec703affe1ea897d4c5a536d03b9858b6a563a7e3225cd5444c26937',
   },
   {
     anonymous: false,
@@ -128,8 +128,6 @@ module.exports = [
     ],
     name: 'NewOperator',
     type: 'event',
-    signature:
-      '0xda12ee837e6978172aaf54b16145ffe08414fd8710092ef033c71b8eb6ec189a',
   },
   {
     constant: false,
@@ -144,7 +142,6 @@ module.exports = [
     payable: false,
     stateMutability: 'nonpayable',
     type: 'function',
-    signature: '0xfe4b84df',
   },
   {
     constant: false,
@@ -159,7 +156,6 @@ module.exports = [
     payable: false,
     stateMutability: 'nonpayable',
     type: 'function',
-    signature: '0xb3ab15fb',
   },
   {
     constant: true,
@@ -174,7 +170,6 @@ module.exports = [
     payable: false,
     stateMutability: 'view',
     type: 'function',
-    signature: '0xb99c9157',
   },
   {
     constant: false,
@@ -189,7 +184,6 @@ module.exports = [
     payable: false,
     stateMutability: 'nonpayable',
     type: 'function',
-    signature: '0x994c748b',
   },
   {
     constant: false,
@@ -213,6 +207,5 @@ module.exports = [
     payable: false,
     stateMutability: 'nonpayable',
     type: 'function',
-    signature: '0x5848ce71',
   },
 ];
