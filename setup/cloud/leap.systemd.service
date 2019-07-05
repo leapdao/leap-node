@@ -7,7 +7,7 @@ User=ubuntu
 Group=ubuntu
 PermissionsStartOnly=true
 Environment="DEBUG=tendermint,leap-node*"
-ExecStart=/bin/sh -c 'exec node --inspect=9999 /usr/local/bin/leap-node --p2pPort=46691 --rpcaddr=0.0.0.0 --rpcport=8645 --wsaddr=0.0.0.0 --wsport=8646 --tendermintAddr=127.0.0.1 --unsafeRpc --readonly --config=/home/ubuntu/${network}.json >>/home/ubuntu/logs/leap-node.log 2>> /home/ubuntu/logs/leap-node.log'
+ExecStart=/usr/local/bin/leap-node --p2pPort=46691 --tendermintAddr=127.0.0.1 --unsafeRpc --rpcaddr=0.0.0.0 --rpcport=8645 --wsaddr=0.0.0.0 --wsport=8646 --config=/home/ubuntu/leap-mainnet.json
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGTERM
 
