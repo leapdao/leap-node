@@ -246,11 +246,9 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
     let allowance;
 
     if (!spendingIsOwner) {
-      if (unspent.address !== input.signer) {
+      if (input.signer && unspent.address !== input.signer) {
         throw new Error(
-          `output owner ${unspent.address} unequal input signer: ${
-            input.signer
-          }`
+          `output owner ${unspent.address} unequal input signer: ${input.signer}`
         );
       }
       allowance = {};
@@ -393,16 +391,21 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
     });
   });
 
-  const evmResult = await runTx(vm, {
-    nonce: nonceCounter,
-    gasLimit: GAS_LIMIT_HEX, // TODO: set gas Limit to (inputs - outputs) / gasPrice
-    to: sigHashBuf,
-    // NOPE: the plasma address is replaced with sighash, to prevent replay attacks
-    data: spendingInput.msgData,
-  });
+  let evmResult;
+
+  try {
+    evmResult = await runTx(vm, {
+      nonce: nonceCounter,
+      gasLimit: GAS_LIMIT_HEX, // TODO: set gas Limit to (inputs - outputs) / gasPrice
+      to: sigHashBuf,
+      // NOPE: the plasma address is replaced with sighash, to prevent replay attacks
+      data: spendingInput.msgData,
+    });
+  } catch (err) {
+    console.log(err);
+  }
 
   const logOuts = [];
-
   // iterate through all events
   evmResult.vm.logs.forEach(log => {
     const originAddr = `0x${log[0].toString('hex')}`;
