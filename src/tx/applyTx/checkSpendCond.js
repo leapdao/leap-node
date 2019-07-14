@@ -27,6 +27,7 @@ const {
   ERC20_BYTECODE,
   ERC721_BYTECODE,
   ERC1948_BYTECODE,
+  ERC1948_BYTECODE_OLD,
 } = require('./ercBytecode');
 const { isNFT, isNST } = require('./../../utils');
 
@@ -263,7 +264,10 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
         tokenValueBuf,
         utils.toBuffer(unspent.data),
       ]);
-      bytecode = ERC1948_BYTECODE;
+      bytecode =
+        bridgeState.blockHeight < 41000
+          ? ERC1948_BYTECODE_OLD
+          : ERC1948_BYTECODE;
 
       if (allowance) {
         allowance = {

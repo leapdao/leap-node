@@ -26,6 +26,7 @@ const bridgeState = {
     erc721: erc721Tokens,
     erc1948: erc1948Tokens,
   },
+  blockHeight: 123,
   minGasPrices: [100],
 };
 
@@ -433,7 +434,7 @@ describe('checkSpendCond', () => {
         ),
         // gas change returned
         new Output(
-          4995169302,
+          4995187904,
           leapDeposit.outputs[0].address,
           leapDeposit.outputs[0].color
         ),
@@ -551,7 +552,7 @@ describe('checkSpendCond', () => {
         new Output(tokenId, `0x${receiver.replace('0x', '')}`, NFT_COLOR_BASE),
         new Output(5000000000, `0x${receiver.replace('0x', '')}`, 0),
         new Output(5000000000, `0x${receiver.replace('0x', '')}`, 1),
-        new Output(4986802378, `0x${scriptHash.toString('hex')}`, 0),
+        new Output(4986820980, `0x${scriptHash.toString('hex')}`, 0),
       ]
     );
     condition.signAll(PRIV_1);
@@ -760,7 +761,7 @@ describe('checkSpendCond', () => {
           NST_COLOR_BASE,
           '0x0000000000000000000000000000000000000000000000000000000000000000'
         ),
-        new Output(4987755056, `0x${scriptHash.toString('hex')}`, 0),
+        new Output(4987781468, `0x${scriptHash.toString('hex')}`, 0),
       ]
     );
     const msgData =
@@ -972,6 +973,7 @@ describe('checkSpendCond', () => {
 
     condition.inputs[0].setMsgData(msgData);
 
+    bridgeState.blockHeight = 42000;
     await checkSpendCond(state, condition, bridgeState);
   });
 
@@ -1105,6 +1107,7 @@ describe('checkSpendCond', () => {
       )}`;
     condition.inputs[0].setMsgData(msgData);
 
+    bridgeState.blockHeight = 42000;
     await checkSpendCond(state, condition, bridgeState);
   });
 
@@ -1263,6 +1266,7 @@ describe('checkSpendCond', () => {
       '00000000000000000000000000000000000000000000000000000000000000';
     condition.inputs[0].setMsgData(msgData);
 
+    bridgeState.blockHeight = 42000;
     await checkSpendCond(state, condition, bridgeState);
   });
 });
