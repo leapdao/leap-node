@@ -265,7 +265,7 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
         utils.toBuffer(unspent.data),
       ]);
       bytecode =
-        bridgeState.blockHeight < 41000
+        bridgeState.networkId === 218508104 && bridgeState.blockHeight < 41000
           ? ERC1948_BYTECODE_OLD
           : ERC1948_BYTECODE;
 

@@ -26,6 +26,7 @@ const bridgeState = {
     erc721: erc721Tokens,
     erc1948: erc1948Tokens,
   },
+  networkId: 218508104,
   blockHeight: 123,
   minGasPrices: [100],
 };
