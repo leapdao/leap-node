@@ -27,7 +27,7 @@ const {
   ERC20_BYTECODE,
   ERC721_BYTECODE,
   ERC1948_BYTECODE,
-  ERC1948_BYTECODE_OLD,
+  ERC1948_BYTECODE_218508104,
 } = require('./ercBytecode');
 const { isNFT, isNST } = require('./../../utils');
 
@@ -266,7 +266,7 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
       ]);
       bytecode =
         bridgeState.networkId === 218508104 && bridgeState.blockHeight < 41000
-          ? ERC1948_BYTECODE_OLD
+          ? ERC1948_BYTECODE_218508104
           : ERC1948_BYTECODE;
 
       if (allowance) {
