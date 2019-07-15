@@ -15,7 +15,8 @@ const { logNode } = require('./utils/debug');
 
 const bridgeABI = require('./abis/bridgeAbi');
 const exitABI = require('./abis/exitHandler');
-const operatorABI = require('./abis/operator');
+const singleOperatorABI = require('./abis/singleOperator');
+let operatorABI = require('./abis/operator');
 const proxyABI = require('./abis/proxy');
 const { NFT_COLOR_BASE, NST_COLOR_BASE } = require('./api/methods/constants');
 const NETWORKS = require('./utils/networks');
@@ -34,6 +35,13 @@ module.exports = class BridgeState {
       bridgeABI.concat(proxyABI),
       config.bridgeAddr
     );
+    // if theta mainnet or theta testnet, use old operator ABI
+    if (
+      networkConfig.networkId === 448747062 ||
+      networkConfig.networkId === 218508104
+    ) {
+      operatorABI = singleOperatorABI;
+    }
     this.operatorContract = new this.web3.eth.Contract(
       operatorABI.concat(proxyABI),
       config.operatorAddr
