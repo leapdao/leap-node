@@ -22,7 +22,10 @@ module.exports = (bridgeState, db, app, tendermintPort) => {
       tendermintPort
     ),
     eth_getTransactionByHash: require('./getTransactionByHash').bind(null, db),
-    eth_getTransactionReceipt: require('./getTransactionByHash').bind(null, db),
+    eth_getTransactionReceipt: require('./getTransactionReceipt').bind(
+      null,
+      db
+    ),
     eth_getBlockByHash: require('./getBlockByHash').bind(null, db),
     eth_getBlockByNumber: require('./getBlockByNumber').bind(
       null,

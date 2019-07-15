@@ -84,7 +84,7 @@ describe('txResponse', () => {
     );
     expect(response).toEqual({
       hash: tx.hash(),
-      from: '',
+      from: '0x0000000000000000000000000000000000000000',
       to: A2,
       value: '0x64', // hex 100
       color: 0,
@@ -127,7 +127,7 @@ describe('txResponse', () => {
     expect(response).toEqual({
       hash: tx.hash(),
       from: A1,
-      to: null,
+      to: '0x0000000000000000000000000000000000000000',
       value: '0x78', // hex 120
       color: 0,
       transactionIndex: txIndex,
@@ -155,8 +155,8 @@ describe('txResponse', () => {
     );
     expect(response).toEqual({
       hash: tx.hash(),
-      from: '',
-      to: null,
+      from: '0x0000000000000000000000000000000000000000',
+      to: '0x0000000000000000000000000000000000000000',
       value: '0x0',
       color: 0,
       transactionIndex: txIndex,

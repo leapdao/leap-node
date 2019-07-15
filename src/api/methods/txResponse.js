@@ -1,39 +1,13 @@
-const { Tx, Type, Util } = require('leap-core');
-
-const txValue = (tx, prevTx) => {
-  // assuming first output is transfer, second one is change
-  if (tx.outputs && tx.outputs.length > 0) {
-    return {
-      value: tx.outputs[0].value,
-      color: tx.outputs[0].color,
-    };
-  }
-
-  if (tx.type === Type.EXIT && prevTx) {
-    const output = prevTx.outputs[tx.inputs[0].prevout.index];
-    return {
-      value: output.value,
-      color: output.color,
-    };
-  }
-
-  return { value: 0, color: 0 };
-};
+/**
+ * Copyright (c) 2019-present, Leap DAO (leapdao.org)
+ *
+ * This source code is licensed under the Mozilla Public License Version 2.0
+ * found in the LICENSE file in the root directory of this source tree.
+ */
+const getTxValueAndSource = require('./utils/getTxValueAndSource');
 
 module.exports = async (db, tx, blockHash, height, txPos) => {
-  let prevTx = null;
-  let from = '';
-  if (tx.inputs && tx.inputs.length > 0 && tx.inputs[0].prevout) {
-    const prevTxHash = tx.inputs[0].prevout.hash;
-    const outputIndex = tx.inputs[0].prevout.index;
-    const txDoc = await db.getTransaction(Util.toHexString(prevTxHash));
-    if (txDoc) {
-      prevTx = Tx.fromJSON(txDoc.txData);
-      from = prevTx.outputs[outputIndex].address;
-    }
-  }
-
-  const { value, color } = txValue(tx, prevTx);
+  const { value, color, from, to } = await getTxValueAndSource(db, tx);
 
   return {
     value: `0x${value.toString(16)}`,
@@ -44,7 +18,7 @@ module.exports = async (db, tx, blockHash, height, txPos) => {
     blockHash,
     blockNumber: `0x${height.toString(16)}`,
     transactionIndex: txPos,
-    to: tx.outputs && tx.outputs.length ? tx.outputs[0].address : null,
+    to,
     gas: '0x0',
     gasPrice: '0x0',
     nonce: 0,
