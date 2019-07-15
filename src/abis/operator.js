@@ -318,9 +318,14 @@ module.exports = [
         type: 'uint256',
       },
       {
-        indexed: false,
+        indexed: true,
         name: 'owner',
         type: 'address',
+      },
+      {
+        indexed: false,
+        name: 'casRoot',
+        type: 'bytes32',
       },
       {
         indexed: false,
@@ -330,8 +335,6 @@ module.exports = [
     ],
     name: 'Submission',
     type: 'event',
-    signature:
-      '0x6690fe1f2634f1045e46d9adb5863d34ad6e548e6eb55fac8189444a403f8ee0',
   },
   {
     constant: false,
