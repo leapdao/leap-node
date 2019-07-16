@@ -5,7 +5,7 @@ const PRIV1 =
   '0x9b63fe8147edb8d251a6a66fd18c0ed73873da9fff3f08ea202e1c0a8ead7311';
 const PRIV2 =
   '0xea3a59a673a9f7e74ad65e92ee04c2330fc5b905d0fa47bb2ae36c0b94af61cd';
-const A1 = '0xB8205608d54cb81f44F263bE086027D8610F3C94';
+const A1 = '0xb8205608d54cb81f44f263be086027d8610f3c94';
 const A2 = '0xD56F7dFCd2BaFfBC1d885F0266b21C7F2912020c';
 
 describe('getTransactionReceipt', () => {
@@ -30,11 +30,11 @@ describe('getTransactionReceipt', () => {
         ),
       ],
       [new Output(120, A1, 0)]
-    ).signAll(PRIV1);
+    ).signAll(PRIV2);
     const tx = Tx.transfer(
       [new Input(new Outpoint(prevTx.hash(), 0))],
       [new Output(100, A2, 0)]
-    ).signAll(PRIV2);
+    ).signAll(PRIV1);
 
     const data = {
       [tx.hash()]: {

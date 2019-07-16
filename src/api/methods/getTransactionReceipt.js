@@ -5,7 +5,7 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 const { Tx } = require('leap-core');
-const getTxValueAndSource = require('./utils/getTxValueAndSource');
+const getPrevTx = require('./utils/getPrevTx');
 
 module.exports = async (db, hash) => {
   const txDoc = await db.getTransaction(hash);
@@ -13,15 +13,17 @@ module.exports = async (db, hash) => {
 
   const { txData, blockHash, height, txPos } = txDoc;
 
-  const { from, to } = await getTxValueAndSource(db, Tx.fromJSON(txData));
+  const tx = Tx.fromJSON(txData);
+
+  const prevTx = await getPrevTx(db, tx);
 
   return {
     transactionHash: hash,
     transactionIndex: txPos,
     blockHash,
     blockNumber: `0x${height.toString(16)}`,
-    from,
-    to,
+    from: tx.from(prevTx),
+    to: tx.to(),
     cumulativeGasUsed: '0x0',
     gasUsed: '0x0',
     contractAddress: null,
