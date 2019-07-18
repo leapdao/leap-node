@@ -407,6 +407,7 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
     });
   } catch (err) {
     console.log(err);
+    throw err;
   }
 
   const logOuts = [];
