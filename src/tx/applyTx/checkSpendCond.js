@@ -123,8 +123,14 @@ function runTx(vm, raw, from) {
       if (err) {
         return reject(err);
       }
-      if (results.vm.exceptionError) {
-        return reject(results.vm.exceptionError);
+      if (results.vm && results.vm.exceptionError) {
+        const rv = results.vm.exceptionError;
+        rv.gasUsed = results.vm.gasUsed.toString(10);
+        rv.logs = results.vm.logs;
+        if (results.vm.return.length > 0) {
+          rv.return = results.vm.return.toString('hex');
+        }
+        return reject(rv);
       }
       return resolve(results);
     });
@@ -406,7 +412,6 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
       data: spendingInput.msgData,
     });
   } catch (err) {
-    console.log(err); // eslint-disable-line no-console
     throw err;
   }
 
