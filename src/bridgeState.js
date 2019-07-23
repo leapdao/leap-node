@@ -184,7 +184,7 @@ module.exports = class BridgeState {
         }
 
         if (array.indexOf(event.tokenAddr) === -1) {
-          array.push(event.tokenAddr); // eslint-disable-line  no-underscore-dangle
+          array.push(event.tokenAddr);
         }
       },
       EpochLength: ({ returnValues: event }) => {
