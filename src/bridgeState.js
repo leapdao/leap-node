@@ -175,12 +175,16 @@ module.exports = class BridgeState {
         };
       },
       NewToken: ({ returnValues: event }) => {
+        let array = this.tokens.erc20;
+
         if (event.color >= NST_COLOR_BASE) {
-          this.tokens.erc1948.push(event.tokenAddr); // eslint-disable-line  no-underscore-dangle
+          array = this.tokens.erc1948;
         } else if (event.color >= NFT_COLOR_BASE) {
-          this.tokens.erc721.push(event.tokenAddr); // eslint-disable-line  no-underscore-dangle
-        } else {
-          this.tokens.erc20.push(event.tokenAddr); // eslint-disable-line no-underscore-dangle
+          array = this.tokens.erc721;
+        }
+
+        if (array.indexOf(event.tokenAddr) === -1) {
+          array.push(event.tokenAddr);
         }
       },
       EpochLength: ({ returnValues: event }) => {
