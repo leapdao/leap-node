@@ -39,9 +39,9 @@
     "app_hash": ""
   },
   "peers": [
-    "0265efd9152b6d68fe6cfb2916ccd329a5cd8d40@172.31.39.112:46691",
-    "08e6e74922cb0f1d3af8128f7befa4e6c1793480@172.31.24.196:46691",
-    "0c3bca7abf72190feea432e6715c48b2ee21d3fd@sen1.testnet.leapdao.org:46691",
-    "c247bb928c8b5d1ee9777ddbc1260475c9c88286@sen2.testnet.leapdao.org:46691"
+    "cc30db6d116ca6ff440277c8e13e3ca253a774e7@sen1.testnet.leapdao.org:46691",
+    "23d57231b620575c03f0e136fc37b5ec5812bb35@val.testnet.leapdao.org:46691",
+    "deb472911a7a0ff3867b39c6ffa375ddbb42db5d@sen2.testnet.leapdao.org:46691",
+    "5d27949fb42efc829bdc663f914fe0c069a96f2d@54.72.111.55:46691"
   ]
 }
