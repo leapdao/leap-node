@@ -1,9 +1,9 @@
 const { Block } = require('leap-core');
+const { EMPTY_ADDRESS } = require('../../utils/constants');
 const txResponse = require('./txResponse');
 
 const NULL_HASH =
   '0x0000000000000000000000000000000000000000000000000000000000000000';
-const NULL_ADDR = '0x0000000000000000000000000000000000000000';
 const NA = 0;
 
 module.exports = async (db, hash, showFullTxs = false) => {
@@ -27,7 +27,7 @@ module.exports = async (db, hash, showFullTxs = false) => {
     difficulty: NA,
     gasLimit: NA,
     gasUsed: NA,
-    miner: NULL_ADDR,
+    miner: EMPTY_ADDRESS,
     extraData: NA,
     size: `0x${block.hex().length.toString(16)}`,
     timestamp: `0x${block.timestamp.toString(16)}`,
