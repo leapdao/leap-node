@@ -1,4 +1,6 @@
 const { Tx, Input, Outpoint, Output } = require('leap-core');
+const { bi } = require('jsbi-utils');
+const { EMPTY_ADDRESS } = require('../../utils/constants');
 
 const getUnsignedTransferTx = require('./getUnsignedTransferTx');
 
@@ -106,6 +108,10 @@ describe('getUnsignedTransferTx', () => {
           color: 0,
         },
       ],
+      to: A2.toLowerCase(),
+      from: EMPTY_ADDRESS,
+      value: bi('200'),
+      color: 0,
     };
 
     const result = await getUnsignedTransferTx(
@@ -143,6 +149,10 @@ describe('getUnsignedTransferTx', () => {
           color: 1,
         },
       ],
+      to: A2.toLowerCase(),
+      from: EMPTY_ADDRESS,
+      value: bi('260'),
+      color: 1,
     };
 
     const result = await getUnsignedTransferTx(
