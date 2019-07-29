@@ -69,7 +69,7 @@ describe('getTransactionReceipt', () => {
       contractAddress: null,
       logs: [],
       logsBloom: '0x',
-      status: 1,
+      status: '0x1',
     });
   });
 });
