@@ -110,10 +110,8 @@ describe('getUnsignedTransferTx', () => {
       ],
       to: A2.toLowerCase(),
       from: EMPTY_ADDRESS,
-      value: {
-        color: 0,
-        value: bi('200'),
-      },
+      value: bi('200'),
+      color: 0,
     };
 
     const result = await getUnsignedTransferTx(
@@ -153,10 +151,8 @@ describe('getUnsignedTransferTx', () => {
       ],
       to: A2.toLowerCase(),
       from: EMPTY_ADDRESS,
-      value: {
-        color: 1,
-        value: bi('260'),
-      },
+      value: bi('260'),
+      color: 1,
     };
 
     const result = await getUnsignedTransferTx(
