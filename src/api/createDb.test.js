@@ -1,7 +1,9 @@
-const { Tx, Block } = require('leap-core');
+const { Tx, Block, Input, Outpoint, Output } = require('leap-core');
 const createDb = require('./createDb');
 
-const ADDR_1 = '0x4436373705394267350db2c06613990d34621d69';
+const ADDR_1 = '0xB8205608d54cb81f44F263bE086027D8610F3C94';
+const PRIV =
+  '0x9b63fe8147edb8d251a6a66fd18c0ed73873da9fff3f08ea202e1c0a8ead7311';
 
 describe('db', () => {
   test('getLastBlockSynced', async () => {
@@ -129,9 +131,21 @@ describe('db', () => {
 
   test('storeBlock', async () => {
     const block = new Block(0);
-    const deposit = Tx.deposit(0, 100, ADDR_1, 0);
-    block.addTx(deposit);
-    const calls = [];
+    const out1 = new Outpoint(
+      '0x7777777777777777777777777777777777777777777777777777777777777777',
+      0
+    );
+
+    const out2 = new Outpoint(
+      '0x6666666666666666666666666666666666666666666666666666666666666666',
+      1
+    );
+    const tx = Tx.transfer(
+      [new Input(out1), new Input(out2)],
+      [new Output(100, ADDR_1, 0)]
+    ).signAll(PRIV);
+    block.addTx(tx);
+    let calls = [];
     const level = {
       batch() {
         return {
@@ -147,24 +161,86 @@ describe('db', () => {
 
     const db = createDb(level);
     await db.storeBlock(block);
-    expect(calls.length).toBe(4);
+    expect(calls.length).toBe(6);
     expect(calls[0]).toEqual([
-      `tx!${deposit.hash()}`,
+      `tx!${tx.hash()}`,
       JSON.stringify({
-        txData: deposit.toJSON(),
+        txData: tx.toJSON(),
         blockHash: block.hash(),
         height: block.height,
         txPos: 0,
       }),
     ]);
     expect(calls[1]).toEqual([
+      `out!0x7777777777777777777777777777777777777777777777777777777777777777:0`,
+      `tx!${tx.hash()}`,
+    ]);
+    expect(calls[2]).toEqual([
+      `out!0x6666666666666666666666666666666666666666666666666666666666666666:1`,
+      `tx!${tx.hash()}`,
+    ]);
+    expect(calls[3]).toEqual([
       `block!${block.hash()}`,
       JSON.stringify({
         blockData: block.toJSON(),
         height: block.height,
       }),
     ]);
-    expect(calls[2]).toEqual([`block!${block.height}`, block.hash()]);
-    expect(calls[3]).toEqual(['lastBlockSynced', block.height]);
+    expect(calls[4]).toEqual([`block!${block.height}`, block.hash()]);
+    expect(calls[5]).toEqual(['lastBlockSynced', block.height]);
+
+    // adding deposit should not add prevOut records
+    calls = [];
+    const deposit = Tx.deposit(1, 100, ADDR_1, 0);
+    const block1 = new Block(1);
+    block1.addTx(deposit);
+    await db.storeBlock(block1);
+    expect(calls.length).toBe(4);
+  });
+
+  test('getTransactionByPrevOut', async () => {
+    let methodCalled = false;
+    const prevTxHash =
+      '0x6666666666666666666666666666666666666666666666666666666666666666';
+    const outIndex = 1;
+    const utxo = `${prevTxHash}:${outIndex}`;
+    const tx = Tx.transfer(
+      [new Input(new Outpoint(prevTxHash, outIndex))],
+      [new Output(100, ADDR_1, 0)]
+    ).signAll(PRIV);
+
+    let callCount = 0;
+    const level = {
+      async get(key) {
+        methodCalled = true;
+        callCount += 1;
+
+        if (callCount === 1 && key === `out!${utxo}`) {
+          // return tx hash
+          return `tx!${tx.hash()}`;
+        }
+
+        if (callCount === 2 && key === `tx!${tx.hash()}`) {
+          return JSON.stringify({
+            txData: tx.toJSON(),
+            blockHash: '0x3447',
+            height: 2,
+            txPos: 0,
+          });
+        }
+
+        methodCalled = false;
+        throw new Error('no call or unexpected call:', key);
+      },
+    };
+
+    const db = createDb(level);
+    expect(await db.getTransactionByPrevOut(utxo)).toEqual({
+      txData: tx.toJSON(),
+      blockHash: '0x3447',
+      height: 2,
+      txPos: 0,
+    });
+    expect(methodCalled).toBe(true);
   });
 });

@@ -12,8 +12,9 @@ const createDb = levelDb => {
   const storeBlock = async block => {
     const dbOpsBatch = levelDb.batch();
     block.txList.forEach((tx, txPos) => {
+      const txKey = `tx!${tx.hash()}`;
       dbOpsBatch.put(
-        `tx!${tx.hash()}`,
+        txKey,
         JSON.stringify({
           txData: tx.toJSON(),
           blockHash: block.hash(),
@@ -21,6 +22,13 @@ const createDb = levelDb => {
           txPos,
         })
       );
+
+      const outputsSpentByTx = tx.inputs
+        .filter(i => i.isSpend())
+        .map(i => `${i.prevout.txid()}:${i.prevout.index}`);
+
+      // create 'utxoId → tx' index
+      outputsSpentByTx.forEach(utxo => dbOpsBatch.put(`out!${utxo}`, txKey));
     });
 
     dbOpsBatch.put(
@@ -47,7 +55,11 @@ const createDb = levelDb => {
       .then(jsonStr => {
         // hash, not object
         if (jsonStr.indexOf('0x') === 0) return jsonStr;
-        return JSON.parse(jsonStr);
+        try {
+          return JSON.parse(jsonStr);
+        } catch (e) {
+          return jsonStr;
+        }
       })
       .catch(e => {
         if (e.type === 'NotFoundError') return null;
@@ -56,17 +68,27 @@ const createDb = levelDb => {
   };
 
   /*
-   * Returns block data for given hash
+   * Returns block data for a given hash
    */
   const getBlock = hash => {
     return getNullable(`block!${hash}`);
   };
 
   /*
-   * Returns tx data for given hash
+   * Returns tx data for a given hash
    */
   const getTransaction = hash => {
     return getNullable(`tx!${hash}`);
+  };
+
+  /*
+   * Returns tx data for tx spending a given utxo
+   */
+  const getTransactionByPrevOut = outpoint => {
+    return getNullable(`out!${outpoint}`).then(txKey => {
+      if (!txKey) return null;
+      return getNullable(txKey);
+    });
   };
 
   /*
@@ -88,6 +110,7 @@ const createDb = levelDb => {
     storeBlock,
     getBlock,
     getTransaction,
+    getTransactionByPrevOut,
     getChainState,
     storeChainState,
   };
