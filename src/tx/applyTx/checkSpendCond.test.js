@@ -471,16 +471,6 @@ describe('checkSpendCond', () => {
     condition.inputs[0].setMsgData(msgData);
 
     await checkSpendCond(state, condition, bridgeState);
-
-    condition.outputs.push(
-      new Output(4000000, `0x${scriptHash.toString('hex')}`, 0)
-    );
-    await expectToThrow(checkSpendCond, [state, condition, bridgeState]);
-    condition.outputs.pop();
-
-    // remove LEAP input for gas
-    condition.inputs.pop();
-    await expectToThrow(checkSpendCond, [state, condition, bridgeState]);
   });
 
   test('Spending Condition: NFT no input for gas', async () => {
@@ -1281,7 +1271,7 @@ describe('checkSpendCond', () => {
         new Output(82384190, `0x${scriptHash.toString('hex')}`, 0), // gas change
       ]
     );
-    condition.sign([null, null, PRIV_1, PRIV_1]);
+    condition.sign([null, null, PRIV_1, null]);
 
     const msgData =
       '0x9abc2cc8' + // plantTree()
@@ -1294,7 +1284,7 @@ describe('checkSpendCond', () => {
     condition.inputs[0].setMsgData(msgData);
 
     bridgeState.blockHeight = 42000;
-    await checkSpendCond(state, condition, bridgeState);
+    await expectToThrow(checkSpendCond, [state, condition, bridgeState]);
   });
 
   test('Earth Contract', async () => {
