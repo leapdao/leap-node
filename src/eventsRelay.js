@@ -9,13 +9,10 @@ const { Tx, Input, Outpoint } = require('leap-core');
 const { BigInt } = require('jsbi-utils');
 const TinyQueue = require('tinyqueue');
 
-const sendTx = require('./txHelpers/sendTx');
 const { handleEvents } = require('./utils');
 
-const minDelay = 2000;
-
 module.exports = class EventsRelay {
-  constructor(delay, tendermintPort) {
+  constructor(delay, sendDelayed) {
     this.relayBuffer = new TinyQueue([], (a, b) => {
       if (a.blockNumber === b.blockNumber) {
         return a.logIndex - b.logIndex;
@@ -23,15 +20,9 @@ module.exports = class EventsRelay {
       return a.blockNumber - b.blockNumber;
     });
     this.relayDelay = delay;
+    this.sendDelayed = sendDelayed;
 
-    this.tendermintPort = tendermintPort;
     this.onNewBlock = this.onNewBlock.bind(this);
-  }
-
-  sendDelayed(tx) {
-    setTimeout(() => {
-      sendTx(this.tendermintPort, tx.hex());
-    }, minDelay);
   }
 
   async onNewBlock(blockNumber) {

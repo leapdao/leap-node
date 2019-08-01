@@ -8,7 +8,11 @@
 const submitPeriod = require('../txHelpers/submitPeriod');
 const { logPeriod } = require('../utils/debug');
 
-module.exports = (bridgeState, nodeConfig = {}) => async (rsp, chainInfo, chainHeight) => {
+module.exports = (bridgeState, sendDelayed, nodeConfig = {}) => async (
+  rsp,
+  chainInfo,
+  chainHeight
+) => {
   const height = chainHeight - 32;
 
   if (height <= 0 || !bridgeState.previousPeriod) {
@@ -19,14 +23,15 @@ module.exports = (bridgeState, nodeConfig = {}) => async (rsp, chainInfo, chainH
 
   logPeriod('checkBridge');
   // use a timeout to relax race conditions (if period submission is fast)
-  await new Promise((resolve) => {
+  await new Promise(resolve => {
     setTimeout(async () => {
       const contractPeriod = await submitPeriod(
         bridgeState.previousPeriod,
         bridgeState.currentState.slots,
         height + bridgeState.checkCallsCount,
         bridgeState,
-        nodeConfig
+        nodeConfig,
+        sendDelayed
       );
 
       if (contractPeriod.timestamp === '0') {

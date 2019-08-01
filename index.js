@@ -24,6 +24,7 @@ const BridgeState = require('./src/bridgeState');
 const BlockTicker = require('./src/utils/BlockTicker');
 const EventsRelay = require('./src/eventsRelay');
 const lotion = require('./lotion');
+const delayedSender = require('./src/txHelpers/delayedSender');
 
 const { logNode, logTendermint } = require('./src/utils/debug');
 
@@ -69,10 +70,9 @@ async function run() {
 
   const privKey = await readPrivKey(app, cliArgs);
 
-  global.eventsRelay = new EventsRelay(
-    config.eventsDelay,
-    cliArgs.tendermintPort
-  );
+  const sendDelayed = delayedSender(cliArgs.tendermintPort);
+
+  global.eventsRelay = new EventsRelay(config.eventsDelay, sendDelayed);
   global.bridgeState = new BridgeState(
     db,
     privKey,
@@ -91,8 +91,8 @@ async function run() {
   const nodeConfig = Object.assign({}, cliArgs, { network: config });
 
   app.useTx(txHandler(bridgeState, nodeConfig));
-  app.useBlock(blockHandler(bridgeState, db, nodeConfig));
-  app.usePeriod(periodHandler(bridgeState));
+  app.useBlock(blockHandler(bridgeState, db, nodeConfig, sendDelayed));
+  app.usePeriod(periodHandler(bridgeState, sendDelayed));
 
   const lastGoodState = await bridgeState.loadState();
 

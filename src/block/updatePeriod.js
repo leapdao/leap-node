@@ -11,7 +11,13 @@ const activateSlot = require('../txHelpers/activateSlot');
 const { getAuctionedByAddr } = require('../utils');
 const { logPeriod } = require('../utils/debug');
 
-module.exports = async (state, chainInfo, bridgeState, nodeConfig = {}) => {
+module.exports = async (
+  state,
+  chainInfo,
+  bridgeState,
+  nodeConfig = {},
+  sendDelayed
+) => {
   if (chainInfo.height % 32 === 0) {
     logPeriod('updatePeriod');
     try {
@@ -20,7 +26,8 @@ module.exports = async (state, chainInfo, bridgeState, nodeConfig = {}) => {
         state.slots,
         chainInfo.height,
         bridgeState,
-        nodeConfig
+        nodeConfig,
+        sendDelayed
       );
     } catch (err) {
       logPeriod(err);
