@@ -6,6 +6,7 @@
  */
 
 const { Tx, Input, Outpoint } = require('leap-core');
+const { bufferToHex } = require('ethereumjs-util');
 const {
   getSlotsByAddr,
   sendTransaction,
@@ -69,7 +70,12 @@ module.exports = async (
       bridgeState.account.privateKey
     );
 
-    sendDelayed(periodVoteTx);
+    // fast track our own vote
+    bridgeState.currentState.periodVotes[mySlots[0].id] = bufferToHex(
+      period.merkleRoot()
+    );
+    // broadcast our vote
+    await sendDelayed(periodVoteTx);
   }
   const mySlotToSubmit = mySlotToSubmitFor(slots, height, mySlots);
   if (mySlotToSubmit) {
@@ -85,6 +91,16 @@ module.exports = async (
       );
       return submittedPeriod;
     }
+    const numVotes = Object.keys(bridgeState.currentState.periodVotes).length;
+    const votesForConsensus = Math.floor((slots.length * 2) / 3) + 1;
+
+    if (numVotes < votesForConsensus) {
+      logPeriod(
+        `submitPeriod. Not enough period votes collected: ${numVotes}/${votesForConsensus}. Waiting..`
+      );
+      return submittedPeriod;
+    }
+
     const tx = sendTransaction(
       bridgeState.web3,
       bridgeState.operatorContract.methods.submitPeriod(

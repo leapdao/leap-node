@@ -8,6 +8,8 @@ const ADDR = '0xb8205608d54cb81f44f263be086027d8610f3c94';
 const PRIV =
   '0x9b63fe8147edb8d251a6a66fd18c0ed73873da9fff3f08ea202e1c0a8ead7311';
 
+const ADDR_1 = '0xd56f7dfcd2baffbc1d885f0266b21c7f2912020c';
+
 const web3 = {};
 
 const PERIOD_ROOT =
@@ -264,6 +266,77 @@ describe('submitPeriod', () => {
       expect(tx.inputs[0].signer).toEqual(ADDR);
       expect(tx.options.slotId).toEqual(0);
       expect(tx.inputs[0].prevout.hash).toEqual(toBuffer(PERIOD_ROOT));
+    });
+
+    test('not enough votes collected', async () => {
+      const bridgeState = bridgeStateMock({
+        bridgeContract: bridgeContractMock({
+          returnPeriod: { timestamp: '0' },
+        }),
+        operatorContract: operatorContractMock(),
+        lastBlocksRoot: period.prevHash,
+        lastPeriodRoot: '0x1337',
+        currentState: {
+          periodVotes: {
+            1: period.merkleRoot(),
+          },
+        },
+      });
+
+      const submittedPeriod = await submitPeriod(
+        period,
+        [
+          { signerAddr: ADDR, id: 0 },
+          { signerAddr: ADDR_1, id: 1 },
+          { signerAddr: ADDR_1, id: 2 },
+          { signerAddr: ADDR_1, id: 3 },
+        ],
+        0,
+        bridgeState,
+        {},
+        sendTxMock().send
+      );
+
+      expect(submittedPeriod).toEqual({
+        timestamp: '0',
+      });
+      expect(bridgeState.operatorContract.test.submitCalled).toBe(false);
+    });
+
+    test('got enough votes', async () => {
+      const bridgeState = bridgeStateMock({
+        bridgeContract: bridgeContractMock({
+          returnPeriod: { timestamp: '0' },
+        }),
+        operatorContract: operatorContractMock(),
+        lastBlocksRoot: period.prevHash,
+        lastPeriodRoot: '0x1337',
+        currentState: {
+          periodVotes: {
+            1: period.merkleRoot(),
+            2: period.merkleRoot(),
+          },
+        },
+      });
+
+      const submittedPeriod = await submitPeriod(
+        period,
+        [
+          { signerAddr: ADDR, id: 0 },
+          { signerAddr: ADDR_1, id: 1 },
+          { signerAddr: ADDR_1, id: 2 },
+          { signerAddr: ADDR_1, id: 3 },
+        ],
+        0,
+        bridgeState,
+        {},
+        sendTxMock().send
+      );
+
+      expect(submittedPeriod).toEqual({
+        timestamp: '0',
+      });
+      expect(bridgeState.operatorContract.test.submitCalled).toBe(true);
     });
   });
 });
