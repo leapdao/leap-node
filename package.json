@@ -58,7 +58,7 @@
     "jayson": "^2.0.6",
     "jsbi-utils": "^1.0.0",
     "jsondiffpatch": "^0.2.5",
-    "leap-core": "^0.34.1-beta.0",
+    "leap-core": "^0.34.1",
     "level": "^4.0.0",
     "lodash": "^4.17.13",
     "lodash.get": "^4.4.2",
