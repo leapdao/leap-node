@@ -23,12 +23,11 @@ const createDb = levelDb => {
         })
       );
 
-      const outputsSpentByTx = tx.inputs
-        .filter(i => i.isSpend())
-        .map(i => `${i.prevout.txid()}:${i.prevout.index}`);
-
       // create 'utxoId → tx' index
-      outputsSpentByTx.forEach(utxo => dbOpsBatch.put(`out!${utxo}`, txKey));
+      tx.inputs
+        .filter(i => i.isSpend())
+        .map(i => `${i.prevout.txid()}:${i.prevout.index}`)
+        .forEach(utxo => dbOpsBatch.put(`out!${utxo}`, txKey));
     });
 
     dbOpsBatch.put(
