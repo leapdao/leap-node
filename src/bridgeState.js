@@ -232,6 +232,7 @@ module.exports = class BridgeState {
         minPrice: 0,
         minPriceIndex: -1,
       },
+      periodVotes: {},
     };
 
     return this.currentState;
