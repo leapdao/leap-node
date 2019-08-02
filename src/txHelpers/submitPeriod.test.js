@@ -1,4 +1,5 @@
 const { toBuffer } = require('ethereumjs-util');
+
 const submitPeriod = require('./submitPeriod');
 const { GENESIS } = require('../utils');
 
@@ -37,6 +38,7 @@ const operatorContractMock = () => {
   const test = {
     submitCalled: false,
     prevPeriodRoot: undefined,
+    cas: undefined,
   };
 
   return {
@@ -45,9 +47,10 @@ const operatorContractMock = () => {
       address: ADDR,
     },
     methods: {
-      submitPeriod: (_, prevRootHash) => {
+      submitPeriodWithCas: (_slotId, prevRootHash, _periodRoot, cas) => {
         test.submitCalled = true;
         test.prevPeriodRoot = prevRootHash;
+        test.cas = cas;
         return {};
       },
     },
@@ -152,6 +155,9 @@ describe('submitPeriod', () => {
     });
     expect(bridgeState.operatorContract.test.submitCalled).toBe(true);
     expect(bridgeState.operatorContract.test.prevPeriodRoot).toEqual('0x1337');
+    expect(bridgeState.operatorContract.test.cas).toEqual(
+      '0x8000000000000000000000000000000000000000000000000000000000000000'
+    );
   });
 
   test('not submitted, own slot, first period', async () => {
@@ -337,6 +343,9 @@ describe('submitPeriod', () => {
         timestamp: '0',
       });
       expect(bridgeState.operatorContract.test.submitCalled).toBe(true);
+      expect(bridgeState.operatorContract.test.cas).toEqual(
+        '0xe000000000000000000000000000000000000000000000000000000000000000'
+      );
     });
   });
 });

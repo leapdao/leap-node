@@ -11,6 +11,7 @@ const {
   getSlotsByAddr,
   sendTransaction,
   getCurrentSlotId,
+  buildCas,
   GENESIS,
 } = require('../utils');
 const { logPeriod } = require('../utils/debug');
@@ -46,6 +47,8 @@ module.exports = async (
   sendDelayed
 ) => {
   const { lastBlocksRoot, lastPeriodRoot } = bridgeState;
+  const { periodVotes } = bridgeState.currentState;
+
   let submittedPeriod = { timestamp: '0' };
   if (lastBlocksRoot === period.merkleRoot()) {
     submittedPeriod = await bridgeState.bridgeContract.methods
@@ -71,9 +74,7 @@ module.exports = async (
     );
 
     // fast track our own vote
-    bridgeState.currentState.periodVotes[mySlots[0].id] = bufferToHex(
-      period.merkleRoot()
-    );
+    periodVotes[mySlots[0].id] = bufferToHex(period.merkleRoot());
     // broadcast our vote
     await sendDelayed(periodVoteTx);
   }
@@ -91,7 +92,7 @@ module.exports = async (
       );
       return submittedPeriod;
     }
-    const numVotes = Object.keys(bridgeState.currentState.periodVotes).length;
+    const numVotes = Object.keys(periodVotes).length;
     const votesForConsensus = Math.floor((slots.length * 2) / 3) + 1;
 
     if (numVotes < votesForConsensus) {
@@ -101,12 +102,24 @@ module.exports = async (
       return submittedPeriod;
     }
 
+    const votedSlots = Object.keys(periodVotes).filter(slotId => {
+      if (periodVotes[slotId] !== period.merkleRoot()) {
+        logPeriod(
+          `submitPeriod. Slot ${slotId} voted for different root: ${periodVotes[slotId]}`
+        );
+        return false;
+      }
+      return true;
+    });
+
+    const cas = buildCas(votedSlots);
     const tx = sendTransaction(
       bridgeState.web3,
-      bridgeState.operatorContract.methods.submitPeriod(
+      bridgeState.operatorContract.methods.submitPeriodWithCas(
         mySlotToSubmit.id,
         prevPeriodRoot,
-        period.merkleRoot()
+        period.merkleRoot(),
+        `0x${cas.toString(16)}`
       ),
       bridgeState.operatorContract.options.address,
       bridgeState.account

@@ -88,6 +88,21 @@ module.exports = [
   {
     constant: true,
     inputs: [],
+    name: 'implementation',
+    outputs: [
+      {
+        name: 'impl',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+    signature: '0x5c60da1b',
+  },
+  {
+    constant: true,
+    inputs: [],
     name: 'lastEpochBlockHeight',
     outputs: [
       {
@@ -335,6 +350,8 @@ module.exports = [
     ],
     name: 'Submission',
     type: 'event',
+    signature:
+      '0xf986eac9872d4e0d99f75c012fa3e120147044f1e92bd63c196ff43f19f1e7ce',
   },
   {
     constant: false,
@@ -411,6 +428,33 @@ module.exports = [
     stateMutability: 'nonpayable',
     type: 'function',
     signature: '0xb260c42a',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        name: '_slotId',
+        type: 'uint256',
+      },
+      {
+        name: '_prevHash',
+        type: 'bytes32',
+      },
+      {
+        name: '_blocksRoot',
+        type: 'bytes32',
+      },
+      {
+        name: '_cas',
+        type: 'bytes32',
+      },
+    ],
+    name: 'submitPeriodWithCas',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+    signature: '0x58d40279',
   },
   {
     constant: false,
