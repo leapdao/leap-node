@@ -35,7 +35,7 @@ const getPrevPeriodRoot = (period, bridgeState) => {
 };
 
 const alreadyVotedForPeriod = (period, mySlots, bridgeState) =>
-  bridgeState.currentState.periodVotes[mySlots[0]] === period.merkleRoot();
+  bridgeState.currentState.periodVotes[mySlots[0].id] === period.merkleRoot();
 
 module.exports = async (
   period,
