@@ -274,7 +274,35 @@ describe('submitPeriod', () => {
       expect(tx.inputs[0].prevout.hash).toEqual(toBuffer(PERIOD_ROOT));
     });
 
-    test('not enough votes collected', async () => {
+    test('not enough votes collected: 1/2', async () => {
+      const bridgeState = bridgeStateMock({
+        bridgeContract: bridgeContractMock({
+          returnPeriod: { timestamp: '0' },
+        }),
+        operatorContract: operatorContractMock(),
+        lastBlocksRoot: period.prevHash,
+        lastPeriodRoot: '0x1337',
+        currentState: {
+          periodVotes: {},
+        },
+      });
+
+      const submittedPeriod = await submitPeriod(
+        period,
+        [{ signerAddr: ADDR, id: 0 }, { signerAddr: ADDR_1, id: 1 }],
+        0,
+        bridgeState,
+        {},
+        sendTxMock().send
+      );
+
+      expect(submittedPeriod).toEqual({
+        timestamp: '0',
+      });
+      expect(bridgeState.operatorContract.test.submitCalled).toBe(false);
+    });
+
+    test('not enough votes collected: 2/4', async () => {
       const bridgeState = bridgeStateMock({
         bridgeContract: bridgeContractMock({
           returnPeriod: { timestamp: '0' },
@@ -309,7 +337,7 @@ describe('submitPeriod', () => {
       expect(bridgeState.operatorContract.test.submitCalled).toBe(false);
     });
 
-    test('got enough votes', async () => {
+    test('got enough votes: 3/4', async () => {
       const bridgeState = bridgeStateMock({
         bridgeContract: bridgeContractMock({
           returnPeriod: { timestamp: '0' },
