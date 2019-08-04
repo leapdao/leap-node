@@ -6,6 +6,7 @@
  */
 
 /* eslint-disable no-console */
+/* global app, bridgeState, blockTicker, eventsRelay, db */
 
 const cliArgs = require('./src/utils/cliArgs');
 const cleanupLotion = require('./src/utils/cleanupLotion');

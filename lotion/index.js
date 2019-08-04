@@ -1,8 +1,5 @@
-/* eslint-disable no-await-in-loop */
-
 const getPort = require('get-port');
 const fs = require('fs-extra');
-const level = require('level');
 const axios = require('axios');
 const { join } = require('path');
 const ABCIServer = require('./lib/abci-app.js');
@@ -43,7 +40,6 @@ function Lotion(opts = {}) {
   const periodMiddleware = [];
   const initChainMiddleware = [];
   const postListenMiddleware = [];
-  const txEndpoints = [];
   const keys =
     typeof opts.keys === 'string'
       ? JSON.parse(fs.readFileSync(opts.keys, { encoding: 'utf8' }))
@@ -126,7 +122,7 @@ function Lotion(opts = {}) {
       // TODO: rename "post listen", there's probably a more descriptive name.
       postListenMiddleware.push(postListener);
     },
-    listen: (store) => {
+    listen: store => {
       return new Promise(async resolve => {
         // set up abci server, then tendermint node
         const { tendermintPort, abciPort, p2pPort } = await getPorts(
@@ -136,7 +132,6 @@ function Lotion(opts = {}) {
         );
 
         const { tendermintAddr } = opts;
-        const tendermintRpcUrl = `http://localhost:${tendermintPort}`;
 
         abciServer = ABCIServer({
           txMiddleware,
