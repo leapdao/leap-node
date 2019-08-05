@@ -121,6 +121,12 @@ const options = [
     env: 'UNSAFE_RPC',
     help: 'Run unsafe Tendermint RPC',
   },
+  {
+    names: ['dataPath'],
+    type: 'string',
+    env: 'DATA_PATH',
+    help: 'Path to lotion folder',
+  },
 ];
 
 const parser = dashdash.createParser({ options });

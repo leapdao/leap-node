@@ -68,7 +68,7 @@ function Lotion(opts = {}) {
       devMode,
       genesis
     );
-  lotionPath = join(LOTION_HOME, 'networks', networkId);
+  lotionPath = opts.dataPath || join(LOTION_HOME, 'networks', networkId);
 
   if (devMode) {
     lotionPath += Math.floor(Math.random() * 1e9);
@@ -126,7 +126,7 @@ function Lotion(opts = {}) {
       // TODO: rename "post listen", there's probably a more descriptive name.
       postListenMiddleware.push(postListener);
     },
-    listen: (store) => {
+    listen: store => {
       return new Promise(async resolve => {
         // set up abci server, then tendermint node
         const { tendermintPort, abciPort, p2pPort } = await getPorts(

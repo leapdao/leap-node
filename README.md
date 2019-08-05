@@ -56,6 +56,7 @@ Your local port `9999` forwards now to the remote host on address `127.0.0.1` an
 - `p2pPort` — port for p2p connection (default: random)
 - `config` — path to config file or node's JSON RPC url (eg https://testnet-2.leapdao.org)
 - `version` — print version of the node
+- `dataPath` — path to folder with network data (default: `~/.lotion/networks/<network>—<networkdId>`)
 
 ### Config file options
   "bridgeAddr": "0x7b8342412883f4b34f335d4e1391ec190eb887ca",
