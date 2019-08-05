@@ -406,7 +406,7 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
       data: spendingInput.msgData,
     });
   } catch (err) {
-    console.log(err);
+    console.log(err); // eslint-disable-line no-console
     throw err;
   }
 
