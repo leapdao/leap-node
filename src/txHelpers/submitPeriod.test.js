@@ -1,5 +1,3 @@
-const { toBuffer } = require('ethereumjs-util');
-
 const submitPeriod = require('./submitPeriod');
 const { GENESIS } = require('../utils');
 
@@ -34,28 +32,16 @@ const bridgeStateMock = attrs => ({
   ...attrs,
 });
 
-const operatorContractMock = () => {
-  const test = {
-    submitCalled: false,
-    prevPeriodRoot: undefined,
-    cas: undefined,
-  };
+const submitPeriodWithCas = jest.fn(() => null);
 
-  return {
-    test,
-    options: {
-      address: ADDR,
-    },
-    methods: {
-      submitPeriodWithCas: (_slotId, prevRootHash, _periodRoot, cas) => {
-        test.submitCalled = true;
-        test.prevPeriodRoot = prevRootHash;
-        test.cas = cas;
-        return {};
-      },
-    },
-  };
-};
+const operatorContractMock = () => ({
+  options: {
+    address: ADDR,
+  },
+  methods: {
+    submitPeriodWithCas,
+  },
+});
 
 const bridgeContractMock = ({ returnPeriod }) => ({
   options: {
@@ -70,18 +56,6 @@ const bridgeContractMock = ({ returnPeriod }) => ({
   },
 });
 
-const sendTxMock = () => {
-  this.calls = 0;
-  return {
-    calls: () => this.calls,
-    tx: () => this.tx,
-    send: tx => {
-      this.calls += 1;
-      this.tx = tx;
-    },
-  };
-};
-
 describe('submitPeriod', () => {
   test('period is already submitted', async () => {
     const bridgeState = bridgeStateMock({
@@ -94,14 +68,7 @@ describe('submitPeriod', () => {
 
     // submitted period has merkle root == lastBlocksRoot
     // lastBlocksRoot is being read from Submission event
-    const submittedPeriod = await submitPeriod(
-      period,
-      [],
-      0,
-      bridgeState,
-      {},
-      sendTxMock().send
-    );
+    const submittedPeriod = await submitPeriod(period, [], 0, bridgeState, {});
 
     expect(submittedPeriod).toEqual({
       timestamp: '100',
@@ -116,22 +83,15 @@ describe('submitPeriod', () => {
       operatorContract: operatorContractMock(),
     });
 
-    const submittedPeriod = await submitPeriod(
-      period,
-      [],
-      0,
-      bridgeState,
-      {},
-      sendTxMock().send
-    );
+    const submittedPeriod = await submitPeriod(period, [], 0, bridgeState, {});
 
     expect(submittedPeriod).toEqual({
       timestamp: '0',
     });
-    expect(bridgeState.operatorContract.test.submitCalled).toBe(false);
+    expect(submitPeriodWithCas).not.toBeCalled();
   });
 
-  test('not submitted, own slot', async () => {
+  test('not submitted, own slot, enough votes', async () => {
     const bridgeState = bridgeStateMock({
       bridgeContract: bridgeContractMock({
         returnPeriod: { timestamp: '0' },
@@ -139,6 +99,12 @@ describe('submitPeriod', () => {
       operatorContract: operatorContractMock(),
       lastBlocksRoot: period.prevHash,
       lastPeriodRoot: '0x1337',
+      currentState: {
+        periodVotes: {
+          [PERIOD_ROOT]: [0],
+        },
+        slots: [{ signerAddr: ADDR, id: 0 }],
+      },
     });
 
     const submittedPeriod = await submitPeriod(
@@ -146,16 +112,16 @@ describe('submitPeriod', () => {
       [{ signerAddr: ADDR, id: 0 }],
       1,
       bridgeState,
-      {},
-      sendTxMock().send
+      {}
     );
 
     expect(submittedPeriod).toEqual({
       timestamp: '0',
     });
-    expect(bridgeState.operatorContract.test.submitCalled).toBe(true);
-    expect(bridgeState.operatorContract.test.prevPeriodRoot).toEqual('0x1337');
-    expect(bridgeState.operatorContract.test.cas).toEqual(
+    expect(submitPeriodWithCas).toBeCalledWith(
+      0,
+      '0x1337',
+      PERIOD_ROOT,
       '0x8000000000000000000000000000000000000000000000000000000000000000'
     );
   });
@@ -166,6 +132,12 @@ describe('submitPeriod', () => {
         returnPeriod: { timestamp: '0' },
       }),
       operatorContract: operatorContractMock(),
+      currentState: {
+        periodVotes: {
+          [PERIOD_ROOT]: [0],
+        },
+        slots: [{ signerAddr: ADDR, id: 0 }],
+      },
     });
 
     const submittedPeriod = await submitPeriod(
@@ -173,15 +145,18 @@ describe('submitPeriod', () => {
       [{ signerAddr: ADDR, id: 0 }],
       0,
       bridgeState,
-      {},
-      sendTxMock().send
+      {}
     );
 
     expect(submittedPeriod).toEqual({
       timestamp: '0',
     });
-    expect(bridgeState.operatorContract.test.submitCalled).toBe(true);
-    expect(bridgeState.operatorContract.test.prevPeriodRoot).toEqual(GENESIS);
+    expect(submitPeriodWithCas).toBeCalledWith(
+      0,
+      GENESIS,
+      PERIOD_ROOT,
+      '0x8000000000000000000000000000000000000000000000000000000000000000'
+    );
   });
 
   test('submitted, own slot, always try to submit for lastPeriodRoot', async () => {
@@ -192,6 +167,12 @@ describe('submitPeriod', () => {
       operatorContract: operatorContractMock(),
       lastBlocksRoot: '0x9999', // doesn't match period.prevHash
       lastPeriodRoot: '0x1337',
+      currentState: {
+        periodVotes: {
+          [PERIOD_ROOT]: [0],
+        },
+        slots: [{ signerAddr: ADDR, id: 0 }],
+      },
     });
 
     const submittedPeriod = await submitPeriod(
@@ -199,14 +180,13 @@ describe('submitPeriod', () => {
       [{ signerAddr: ADDR, id: 0 }],
       0,
       bridgeState,
-      {},
-      sendTxMock().send
+      {}
     );
 
     expect(submittedPeriod).toEqual({
       timestamp: '0',
     });
-    expect(bridgeState.operatorContract.test.submitCalled).toBe(true);
+    expect(submitPeriodWithCas).toBeCalled();
   });
 
   test('not submitted, own slot, readonly validator', async () => {
@@ -217,6 +197,12 @@ describe('submitPeriod', () => {
       operatorContract: operatorContractMock(),
       lastBlocksRoot: period.prevHash,
       lastPeriodRoot: '0x1337',
+      currentState: {
+        periodVotes: {
+          [PERIOD_ROOT]: [0],
+        },
+        slots: [{ signerAddr: ADDR, id: 0 }],
+      },
     });
 
     const submittedPeriod = await submitPeriod(
@@ -224,56 +210,16 @@ describe('submitPeriod', () => {
       [{ signerAddr: ADDR, id: 0 }],
       1,
       bridgeState,
-      { readonly: true },
-      sendTxMock().send
+      { readonly: true }
     );
 
     expect(submittedPeriod).toEqual({
       timestamp: '0',
     });
-    expect(bridgeState.operatorContract.test.submitCalled).toBe(false);
+    expect(submitPeriodWithCas).not.toBeCalled();
   });
 
   describe('period vote', () => {
-    test('no slot, no period vote', async () => {
-      const bridgeState = bridgeStateMock({
-        bridgeContract: bridgeContractMock({
-          returnPeriod: { timestamp: '0' },
-        }),
-        operatorContract: operatorContractMock(),
-      });
-
-      const sendMock = sendTxMock();
-      await submitPeriod(period, [], 0, bridgeState, {}, sendMock.send);
-
-      expect(sendMock.calls()).toEqual(0);
-    });
-
-    test('own slot, submit period vote tx', async () => {
-      const bridgeState = bridgeStateMock({
-        bridgeContract: bridgeContractMock({
-          returnPeriod: { timestamp: '0' },
-        }),
-        operatorContract: operatorContractMock(),
-      });
-
-      const sendMock = sendTxMock();
-      await submitPeriod(
-        period,
-        [{ signerAddr: ADDR, id: 0 }],
-        0,
-        bridgeState,
-        {},
-        sendMock.send
-      );
-
-      expect(sendMock.calls()).toEqual(1);
-      const tx = sendMock.tx();
-      expect(tx.inputs[0].signer).toEqual(ADDR);
-      expect(tx.options.slotId).toEqual(0);
-      expect(tx.inputs[0].prevout.hash).toEqual(toBuffer(PERIOD_ROOT));
-    });
-
     test('not enough votes collected: 1/2', async () => {
       const bridgeState = bridgeStateMock({
         bridgeContract: bridgeContractMock({
@@ -283,7 +229,10 @@ describe('submitPeriod', () => {
         lastBlocksRoot: period.prevHash,
         lastPeriodRoot: '0x1337',
         currentState: {
-          periodVotes: {},
+          periodVotes: {
+            [period.merkleRoot()]: [1],
+          },
+          slots: [{ signerAddr: ADDR, id: 0 }, { signerAddr: ADDR_1, id: 1 }],
         },
       });
 
@@ -292,14 +241,13 @@ describe('submitPeriod', () => {
         [{ signerAddr: ADDR, id: 0 }, { signerAddr: ADDR_1, id: 1 }],
         0,
         bridgeState,
-        {},
-        sendTxMock().send
+        {}
       );
 
       expect(submittedPeriod).toEqual({
         timestamp: '0',
       });
-      expect(bridgeState.operatorContract.test.submitCalled).toBe(false);
+      expect(submitPeriodWithCas).not.toBeCalled();
     });
 
     test('not enough votes collected: 2/4', async () => {
@@ -312,8 +260,14 @@ describe('submitPeriod', () => {
         lastPeriodRoot: '0x1337',
         currentState: {
           periodVotes: {
-            1: period.merkleRoot(),
+            [period.merkleRoot()]: [1, 2],
           },
+          slots: [
+            { signerAddr: ADDR, id: 0 },
+            { signerAddr: ADDR_1, id: 1 },
+            { signerAddr: ADDR_1, id: 2 },
+            { signerAddr: ADDR_1, id: 3 },
+          ],
         },
       });
 
@@ -327,14 +281,13 @@ describe('submitPeriod', () => {
         ],
         0,
         bridgeState,
-        {},
-        sendTxMock().send
+        {}
       );
 
       expect(submittedPeriod).toEqual({
         timestamp: '0',
       });
-      expect(bridgeState.operatorContract.test.submitCalled).toBe(false);
+      expect(submitPeriodWithCas).not.toBeCalled();
     });
 
     test('got enough votes: 3/4', async () => {
@@ -347,9 +300,14 @@ describe('submitPeriod', () => {
         lastPeriodRoot: '0x1337',
         currentState: {
           periodVotes: {
-            1: period.merkleRoot(),
-            2: period.merkleRoot(),
+            [period.merkleRoot()]: [0, 2, 3],
           },
+          slots: [
+            { signerAddr: ADDR, id: 0 },
+            { signerAddr: ADDR_1, id: 1 },
+            { signerAddr: ADDR_1, id: 2 },
+            { signerAddr: ADDR_1, id: 3 },
+          ],
         },
       });
 
@@ -363,16 +321,15 @@ describe('submitPeriod', () => {
         ],
         0,
         bridgeState,
-        {},
-        sendTxMock().send
+        {}
       );
 
       expect(submittedPeriod).toEqual({
         timestamp: '0',
       });
-      expect(bridgeState.operatorContract.test.submitCalled).toBe(true);
-      expect(bridgeState.operatorContract.test.cas).toEqual(
-        '0xe000000000000000000000000000000000000000000000000000000000000000'
+      expect(submitPeriodWithCas).toBeCalled();
+      expect(submitPeriodWithCas.mock.calls[0][3]).toEqual(
+        '0xb000000000000000000000000000000000000000000000000000000000000000'
       );
     });
   });

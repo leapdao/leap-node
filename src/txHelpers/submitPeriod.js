@@ -5,8 +5,6 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-const { Tx, Input, Outpoint } = require('leap-core');
-const { bufferToHex } = require('ethereumjs-util');
 const {
   getSlotsByAddr,
   sendTransaction,
@@ -14,6 +12,7 @@ const {
   buildCas,
   GENESIS,
 } = require('../utils');
+const checkEnoughVotes = require('../period/utils/checkEnoughVotes');
 const { logPeriod } = require('../utils/debug');
 
 /* istanbul ignore next */
@@ -35,26 +34,23 @@ const getPrevPeriodRoot = (period, bridgeState) => {
   return null; // not found
 };
 
-const alreadyVotedForPeriod = (period, mySlots, bridgeState) =>
-  bridgeState.currentState.periodVotes[mySlots[0].id] === period.merkleRoot();
-
 module.exports = async (
   period,
   slots,
   height,
   bridgeState,
-  nodeConfig = {},
-  sendDelayed
+  nodeConfig = {}
 ) => {
   const { lastBlocksRoot, lastPeriodRoot } = bridgeState;
   const { periodVotes } = bridgeState.currentState;
+  const periodRoot = period.merkleRoot();
 
   let submittedPeriod = { timestamp: '0' };
-  if (lastBlocksRoot === period.merkleRoot()) {
+  if (lastBlocksRoot === periodRoot) {
     submittedPeriod = await bridgeState.bridgeContract.methods
       .periods(lastPeriodRoot)
       .call();
-    logPeriod('submittedPeriod', period.merkleRoot(), submittedPeriod);
+    logPeriod('submittedPeriod', periodRoot, submittedPeriod);
     return submittedPeriod;
   }
 
@@ -64,21 +60,8 @@ module.exports = async (
   }
 
   const mySlots = getSlotsByAddr(slots, bridgeState.account.address);
-  if (
-    mySlots.length > 0 &&
-    !alreadyVotedForPeriod(period, mySlots, bridgeState)
-  ) {
-    const input = new Input(new Outpoint(period.merkleRoot(), 0));
-    const periodVoteTx = Tx.periodVote(mySlots[0].id, input).signAll(
-      bridgeState.account.privateKey
-    );
-
-    // fast track our own vote
-    periodVotes[mySlots[0].id] = bufferToHex(period.merkleRoot());
-    // broadcast our vote
-    await sendDelayed(periodVoteTx);
-  }
   const mySlotToSubmit = mySlotToSubmitFor(slots, height, mySlots);
+
   if (mySlotToSubmit) {
     logPeriod('submitPeriod. Slot %d', mySlotToSubmit.id);
 
@@ -92,33 +75,27 @@ module.exports = async (
       );
       return submittedPeriod;
     }
-    const numVotes = Object.keys(periodVotes).length;
-    const votesForConsensus = Math.floor((slots.length * 2) / 3) + 1;
 
-    if (numVotes < votesForConsensus) {
+    const { result, votes, needed } = checkEnoughVotes(
+      periodRoot,
+      bridgeState.currentState
+    );
+
+    if (!result) {
       logPeriod(
-        `submitPeriod. Not enough period votes collected: ${numVotes}/${votesForConsensus}. Waiting..`
+        `submitPeriod. Not enough period votes collected: ${votes}/${needed}. Waiting..`
       );
       return submittedPeriod;
     }
 
-    const votedSlots = Object.keys(periodVotes).filter(slotId => {
-      if (periodVotes[slotId] !== period.merkleRoot()) {
-        logPeriod(
-          `submitPeriod. Slot ${slotId} voted for different root: ${periodVotes[slotId]}`
-        );
-        return false;
-      }
-      return true;
-    });
+    const cas = buildCas(periodVotes[periodRoot]);
 
-    const cas = buildCas(votedSlots);
     const tx = sendTransaction(
       bridgeState.web3,
       bridgeState.operatorContract.methods.submitPeriodWithCas(
         mySlotToSubmit.id,
         prevPeriodRoot,
-        period.merkleRoot(),
+        periodRoot,
         `0x${cas.toString(16)}`
       ),
       bridgeState.operatorContract.options.address,
