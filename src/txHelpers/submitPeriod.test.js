@@ -24,9 +24,6 @@ const bridgeStateMock = attrs => ({
     address: ADDR,
     privateKey: PRIV,
   },
-  currentState: {
-    periodVotes: {},
-  },
   ...attrs,
 });
 
@@ -97,12 +94,6 @@ describe('submitPeriod', () => {
       operatorContract: operatorContractMock(),
       lastBlocksRoot: period.prevHash,
       lastPeriodRoot: '0x1337',
-      currentState: {
-        periodVotes: {
-          [PERIOD_ROOT]: [0],
-        },
-        slots: [{ signerAddr: ADDR, id: 0 }],
-      },
     });
 
     const submittedPeriod = await submitPeriod(
@@ -125,12 +116,6 @@ describe('submitPeriod', () => {
         returnPeriod: { timestamp: '0' },
       }),
       operatorContract: operatorContractMock(),
-      currentState: {
-        periodVotes: {
-          [PERIOD_ROOT]: [0],
-        },
-        slots: [{ signerAddr: ADDR, id: 0 }],
-      },
     });
 
     const submittedPeriod = await submitPeriod(
@@ -155,12 +140,6 @@ describe('submitPeriod', () => {
       operatorContract: operatorContractMock(),
       lastBlocksRoot: '0x9999', // doesn't match period.prevHash
       lastPeriodRoot: '0x1337',
-      currentState: {
-        periodVotes: {
-          [PERIOD_ROOT]: [0],
-        },
-        slots: [{ signerAddr: ADDR, id: 0 }],
-      },
     });
 
     const submittedPeriod = await submitPeriod(
@@ -185,12 +164,6 @@ describe('submitPeriod', () => {
       operatorContract: operatorContractMock(),
       lastBlocksRoot: period.prevHash,
       lastPeriodRoot: '0x1337',
-      currentState: {
-        periodVotes: {
-          [PERIOD_ROOT]: [0],
-        },
-        slots: [{ signerAddr: ADDR, id: 0 }],
-      },
     });
 
     const submittedPeriod = await submitPeriod(

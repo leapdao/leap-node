@@ -22,7 +22,12 @@ module.exports = async (
   if (chainInfo.height % 32 === 0) {
     logPeriod('updatePeriod');
     try {
-      await submitPeriodVote(bridgeState.currentPeriod, bridgeState, sender);
+      await submitPeriodVote(
+        bridgeState.currentPeriod,
+        state,
+        bridgeState,
+        sender
+      );
 
       await submitPeriod(
         bridgeState.currentPeriod,

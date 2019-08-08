@@ -1,5 +1,4 @@
 const { toBuffer } = require('ethereumjs-util');
-const { merge } = require('lodash');
 const submitPeriodVote = require('./submitPeriodVote');
 
 jest.mock('../txHelpers/sendTx');
@@ -19,28 +18,29 @@ const TENDER_KEY_0 = '0x7640D69D9EDB21592CBDF4CC49956EA53E59656FC2D8BBD1AE3F427B
 const ADDR_1 = '0xd56f7dfcd2baffbc1d885f0266b21c7f2912020c';
 const TENDER_KEY_1 = '0x0000069D9EDB21592CBDF4CC49956EA53E59656FC2D8BBD1AE3F427BF67D47FA'.toLowerCase();
 
-const getInitialState = () => ({
-  currentState: {
-    periodVotes: {},
-    slots: [
-      {
-        id: 0,
-        tenderKey: TENDER_KEY_0,
-        signerAddr: ADDR_0,
-        eventsCount: 1,
-      },
-      {
-        id: 1,
-        tenderKey: TENDER_KEY_1,
-        signerAddr: ADDR_1,
-        eventsCount: 1,
-      },
-    ],
-  },
+const bridgeStateMock = () => ({
   account: {
     address: ADDR_0,
     privateKey: PRIV_0,
   },
+});
+
+const stateMock = () => ({
+  periodVotes: {},
+  slots: [
+    {
+      id: 0,
+      tenderKey: TENDER_KEY_0,
+      signerAddr: ADDR_0,
+      eventsCount: 1,
+    },
+    {
+      id: 1,
+      tenderKey: TENDER_KEY_1,
+      signerAddr: ADDR_1,
+      eventsCount: 1,
+    },
+  ],
 });
 
 const PERIOD_ROOT =
@@ -54,22 +54,24 @@ const period = {
 
 describe('submit period vote', () => {
   test('no slot, no period vote', async () => {
+    const state = stateMock();
     const bridgeState = {
-      ...getInitialState(),
+      ...bridgeStateMock(),
       account: {
         address: NO_SLOT_ADDR,
       },
     };
 
-    await submitPeriodVote(period, bridgeState, sender);
+    await submitPeriodVote(period, state, bridgeState, sender);
 
     expect(sender.send).not.toBeCalled();
   });
 
   test('own slot, submit period vote tx', async () => {
-    const bridgeState = getInitialState();
+    const bridgeState = bridgeStateMock();
+    const state = stateMock();
 
-    await submitPeriodVote(period, bridgeState, sender);
+    await submitPeriodVote(period, state, bridgeState, sender);
 
     expect(sender.send).toBeCalled();
     const tx = sender.send.mock.calls[0][0];
@@ -79,15 +81,15 @@ describe('submit period vote', () => {
   });
 
   test('own slot, already submitted vote', async () => {
-    const bridgeState = merge(getInitialState(), {
-      currentState: {
-        periodVotes: {
-          [PERIOD_ROOT]: [0],
-        },
+    const bridgeState = bridgeStateMock();
+    const state = {
+      ...stateMock(),
+      periodVotes: {
+        [PERIOD_ROOT]: [0],
       },
-    });
+    };
 
-    await submitPeriodVote(period, bridgeState, sender);
+    await submitPeriodVote(period, state, bridgeState, sender);
 
     expect(sender.send).not.toBeCalled();
   });
