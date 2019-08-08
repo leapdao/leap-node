@@ -29,6 +29,12 @@ module.exports = async (state, tx) => {
     );
   }
 
+  if (tx.inputs[0].prevout.index !== 0) {
+    throw new Error(
+      `[period vote] Input should have prevout index of 0. Got: ${tx.inputs[0].prevout.index}`
+    );
+  }
+
   const periodRoot = bufferToHex(tx.inputs[0].prevout.hash);
 
   if (!state.periodVotes[periodRoot]) {

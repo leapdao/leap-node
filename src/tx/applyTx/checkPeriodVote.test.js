@@ -143,4 +143,19 @@ describe('checkPeriodVote', () => {
       new Error(`[period vote] Input should be signed by validator: ${ADDR_1}`)
     );
   });
+
+  test('reject: wrong prevout index', async () => {
+    const bridgeState = bridgeStateMock();
+
+    const periodVoteTx = Tx.periodVote(
+      1,
+      new Input(new Outpoint(merkleRoot, 9))
+    ).signAll(PRIV_1);
+
+    expect(
+      checkPeriodVote(bridgeState.currentState, periodVoteTx, bridgeState)
+    ).rejects.toEqual(
+      new Error(`[period vote] Input should have prevout index of 0. Got: 9`)
+    );
+  });
 });
