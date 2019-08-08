@@ -254,12 +254,14 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
     let allowance;
 
     if (!spendingIsOwner) {
-      if (input.signer && unspent.address !== input.signer) {
-        throw new Error(
-          `output owner ${unspent.address} unequal input signer: ${input.signer}`
-        );
+      if (input.signer) {
+        if (unspent.address !== input.signer) {
+          throw new Error(
+            `output owner ${unspent.address} unequal input signer: ${input.signer}`
+          );
+        }
+        allowance = {};
       }
-      allowance = {};
     } else {
       addrBuf = sigHashBuf;
     }
