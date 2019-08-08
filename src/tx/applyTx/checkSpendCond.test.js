@@ -5,6 +5,7 @@ const {
   NFT_COLOR_BASE,
   NST_COLOR_BASE,
 } = require('../../api/methods/constants');
+const Web3 = require('web3');
 const checkSpendingCondition = require('./../../api/methods/checkSpendingCondition');
 
 const erc20Tokens = [
@@ -29,6 +30,7 @@ const bridgeState = {
   networkId: 218508104,
   blockHeight: 123,
   minGasPrices: [100],
+  web3: new Web3(),
 };
 
 const NFTCondition =
@@ -102,17 +104,25 @@ const conditionScript = Buffer.from(
 // const PRIV =
 //  '0x94890218f2b0d04296f30aeafd13655eba4c5bbf1770273276fee52cbe3f2cb4';
 
-async function expectToThrow(func, args) {
+async function expectToThrow(func, msg, args) {
   let err;
-
+  if (Array.isArray(msg)) {
+    // eslint-disable-next-line no-param-reassign
+    args = msg;
+  }
   try {
     await func(...args);
   } catch (e) {
     err = e;
   }
-  console.log(err);
   if (!err) {
     throw new Error('expected to throw');
+  }
+  if (err.return && Buffer.isBuffer(err.return) && err.return.length === 0) {
+    err.return = '';
+  }
+  if (err.return && err.return !== msg) {
+    throw new Error(`expected ${msg}, but received ${err.return}`);
   }
 }
 
@@ -298,7 +308,7 @@ describe('checkSpendCond', () => {
 
     // remove LEAP input for gas
     condition.inputs.pop();
-    await expectToThrow(checkSpendCond, [state, condition, bridgeState]);
+    await expectToThrow(checkSpendCond, null, [state, condition, bridgeState]);
   });
 
   test('Spending Condition: return error', async () => {
@@ -367,7 +377,11 @@ describe('checkSpendCond', () => {
 
     condition.inputs[0].setMsgData(msgData);
 
-    await expectToThrow(checkSpendCond, [state, condition, bridgeState]);
+    await expectToThrow(checkSpendCond, 'error', [
+      state,
+      condition,
+      bridgeState,
+    ]);
   });
 
   test('Spending Condition: NFT no input for gas', async () => {
