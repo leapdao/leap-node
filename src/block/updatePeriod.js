@@ -7,6 +7,7 @@
 
 const { Period } = require('leap-core');
 const submitPeriodVote = require('../period/submitPeriodVote');
+const submitPeriod = require('../txHelpers/submitPeriod');
 const activateSlot = require('../txHelpers/activateSlot');
 const { getAuctionedByAddr } = require('../utils');
 const { logPeriod } = require('../utils/debug');
@@ -25,6 +26,14 @@ module.exports = async (
         bridgeState.currentPeriod,
         bridgeState,
         sendDelayed
+      );
+
+      await submitPeriod(
+        bridgeState.currentPeriod,
+        state.slots,
+        chainInfo.height,
+        bridgeState,
+        nodeConfig
       );
     } catch (err) {
       logPeriod(`period vote: ${err}`);
