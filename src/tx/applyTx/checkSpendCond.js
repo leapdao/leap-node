@@ -195,7 +195,10 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
       nftBag[contractAddrStr] = !nftBag[contractAddrStr]
         ? {}
         : nftBag[contractAddrStr];
-      nftBag[contractAddrStr][tokenId] = unspent.address;
+      nftBag[contractAddrStr][tokenId] = {
+        addr: unspent.address,
+        touched: false,
+      };
     } else if (i > 0) {
       tokenBag[contractAddrStr] = !tokenBag[contractAddrStr]
         ? {}
@@ -437,10 +440,11 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
       // const nstFromData = data.slice(0, 32);
       const nstToData = `0x${data.slice(32, 64).toString('hex')}`;
 
-      const tokenOwner = nftBag[originAddr][nstTokenId];
+      const tokenOwner = nftBag[originAddr][nstTokenId].addr;
       logOuts.push(
         new Output(BigInt(nstTokenId), tokenOwner, originColor, nstToData)
       );
+      nftBag[originAddr][nstTokenId].touched = true;
       return;
     }
 
@@ -465,7 +469,10 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
         // this hack assumes that an ERC1949 is minted
         // and that Transfer Event is emmited before UpdateData Event
         // so in only puts the new owner into the nftBag
-        nftBag[originAddr][`0x${topics[3].toString('hex')}`] = toAddr;
+        nftBag[originAddr][`0x${topics[3].toString('hex')}`] = {
+          addr: toAddr,
+          touched: true,
+        };
         return;
       }
       // ? ERC721(tokenId) : ERC20(transferAmount)
@@ -475,6 +482,7 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
 
       if (isNFT(originColor) || isNST(originColor)) {
         logOuts.push(new Output(transferAmount, toAddr, originColor));
+        nftBag[originAddr][`0x${topics[3].toString('hex')}`].touched = true;
       } else {
         tokenBag[originAddr][fromAddr] = subtract(
           tokenBag[originAddr][fromAddr],
@@ -490,6 +498,7 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
       }
     }
   });
+  // itterate over tokenBag, add all leftovers to outputs
   for (const originAddr in tokenBag) {
     if (Object.prototype.hasOwnProperty.call(tokenBag, originAddr)) {
       for (const owner in tokenBag[originAddr]) {
@@ -501,6 +510,20 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
                 owner,
                 deployed[originAddr]
               )
+            );
+          }
+        }
+      }
+    }
+  }
+  // itterate over nftBag and make sure each is in outputs
+  for (const originAddr in nftBag) {
+    if (Object.prototype.hasOwnProperty.call(nftBag, originAddr)) {
+      for (const owner in nftBag[originAddr]) {
+        if (Object.prototype.hasOwnProperty.call(nftBag[originAddr], owner)) {
+          if (!nftBag[originAddr][owner].touched) {
+            return Promise.reject(
+              new Error(`not touched ${nftBag[originAddr][owner].addr}`)
             );
           }
         }

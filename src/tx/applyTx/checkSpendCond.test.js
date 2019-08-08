@@ -470,7 +470,7 @@ describe('checkSpendCond', () => {
 
     condition.inputs[0].setMsgData(msgData);
 
-    await checkSpendCond(state, condition, bridgeState);
+    await expectToThrow(checkSpendCond, [state, condition, bridgeState]);
   });
 
   test('Spending Condition: NFT no input for gas', async () => {
