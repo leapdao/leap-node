@@ -12,7 +12,7 @@ const TinyQueue = require('tinyqueue');
 const { handleEvents } = require('./utils');
 
 module.exports = class EventsRelay {
-  constructor(delay, sendDelayed) {
+  constructor(delay, { sendDelayed }) {
     this.relayBuffer = new TinyQueue([], (a, b) => {
       if (a.blockNumber === b.blockNumber) {
         return a.logIndex - b.logIndex;

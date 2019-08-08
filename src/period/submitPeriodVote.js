@@ -12,7 +12,7 @@ const { getSlotsByAddr } = require('../utils');
 const alreadyVoted = (periodRoot, slotId, periodVotes) =>
   (periodVotes[periodRoot] || []).indexOf(slotId) >= 0;
 
-module.exports = async (period, bridgeState, sendDelayed) => {
+module.exports = async (period, bridgeState, { send }) => {
   const { periodVotes, slots } = bridgeState.currentState;
   const periodRoot = period.merkleRoot();
 
@@ -36,5 +36,5 @@ module.exports = async (period, bridgeState, sendDelayed) => {
     bridgeState.account.privateKey
   );
 
-  await sendDelayed(periodVoteTx);
+  await send(periodVoteTx);
 };

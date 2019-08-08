@@ -5,7 +5,7 @@ jest.mock('../period/submitPeriodVote');
 
 const submitPeriodVote = require('../period/submitPeriodVote');
 
-const sendDelayed = () => {};
+const sender = () => {};
 
 const EXISTENT_PERIOD = {
   prevHash: '0x000000',
@@ -37,11 +37,11 @@ describe('Period handler', () => {
       },
       checkCallsCount: 0,
     };
-    await periodHandler(bridgeState, sendDelayed)(rsp, { height: 64 });
+    await periodHandler(bridgeState, sender)(rsp, { height: 64 });
     expect(submitPeriodVote).toBeCalledWith(
       EXISTENT_PERIOD,
       bridgeState,
-      sendDelayed
+      sender
     );
     expect(rsp.status).toBe(0);
     expect(bridgeState.checkCallsCount).toBe(1);

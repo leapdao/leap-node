@@ -5,7 +5,10 @@ const submitPeriodVote = require('./submitPeriodVote');
 jest.mock('../txHelpers/sendTx');
 jest.mock('../txHelpers/submitPeriod');
 
-const sendDelayed = jest.fn(() => null);
+const sender = {
+  sendDelayed: jest.fn(() => null),
+  send: jest.fn(() => null),
+};
 
 const NO_SLOT_ADDR = '0x1111111111111111111113be086027d8610f3c94';
 const ADDR_0 = '0xb8205608d54cb81f44f263be086027d8610f3c94';
@@ -58,18 +61,18 @@ describe('submit period vote', () => {
       },
     };
 
-    await submitPeriodVote(period, bridgeState, sendDelayed);
+    await submitPeriodVote(period, bridgeState, sender);
 
-    expect(sendDelayed).not.toBeCalled();
+    expect(sender.send).not.toBeCalled();
   });
 
   test('own slot, submit period vote tx', async () => {
     const bridgeState = getInitialState();
 
-    await submitPeriodVote(period, bridgeState, sendDelayed);
+    await submitPeriodVote(period, bridgeState, sender);
 
-    expect(sendDelayed).toBeCalled();
-    const tx = sendDelayed.mock.calls[0][0];
+    expect(sender.send).toBeCalled();
+    const tx = sender.send.mock.calls[0][0];
     expect(tx.inputs[0].signer).toEqual(ADDR_0);
     expect(tx.options.slotId).toEqual(0);
     expect(tx.inputs[0].prevout.hash).toEqual(toBuffer(PERIOD_ROOT));
@@ -84,8 +87,8 @@ describe('submit period vote', () => {
       },
     });
 
-    await submitPeriodVote(period, bridgeState, sendDelayed);
+    await submitPeriodVote(period, bridgeState, sender);
 
-    expect(sendDelayed).not.toBeCalled();
+    expect(sender.send).not.toBeCalled();
   });
 });

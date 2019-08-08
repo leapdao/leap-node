@@ -70,9 +70,9 @@ async function run() {
 
   const privKey = await readPrivKey(app, cliArgs);
 
-  const sendDelayed = delayedSender(cliArgs.tendermintPort);
+  const sender = delayedSender(cliArgs.tendermintPort);
 
-  global.eventsRelay = new EventsRelay(config.eventsDelay, sendDelayed);
+  global.eventsRelay = new EventsRelay(config.eventsDelay, sender);
   global.bridgeState = new BridgeState(
     db,
     privKey,
@@ -91,8 +91,8 @@ async function run() {
   const nodeConfig = Object.assign({}, cliArgs, { network: config });
 
   app.useTx(txHandler(bridgeState, nodeConfig));
-  app.useBlock(blockHandler(bridgeState, db, nodeConfig, sendDelayed));
-  app.usePeriod(periodHandler(bridgeState, sendDelayed));
+  app.useBlock(blockHandler(bridgeState, db, nodeConfig, sender));
+  app.usePeriod(periodHandler(bridgeState, sender));
 
   const lastGoodState = await bridgeState.loadState();
 

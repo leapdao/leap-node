@@ -17,16 +17,12 @@ module.exports = async (
   chainInfo,
   bridgeState,
   nodeConfig = {},
-  sendDelayed
+  sender
 ) => {
   if (chainInfo.height % 32 === 0) {
     logPeriod('updatePeriod');
     try {
-      await submitPeriodVote(
-        bridgeState.currentPeriod,
-        bridgeState,
-        sendDelayed
-      );
+      await submitPeriodVote(bridgeState.currentPeriod, bridgeState, sender);
 
       await submitPeriod(
         bridgeState.currentPeriod,

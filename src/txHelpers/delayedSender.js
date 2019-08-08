@@ -9,7 +9,10 @@ const sendTx = require('./sendTx');
 
 const MIN_DELAY = 2000;
 
-module.exports = tendermintPort => tx =>
-  setTimeout(() => {
-    sendTx(tendermintPort, tx.hex());
-  }, MIN_DELAY);
+module.exports = tendermintPort => ({
+  send: tx => sendTx(tendermintPort, tx.hex()),
+  sendDelayed: tx =>
+    setTimeout(() => {
+      sendTx(tendermintPort, tx.hex());
+    }, MIN_DELAY),
+});

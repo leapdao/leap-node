@@ -9,7 +9,7 @@ const submitPeriod = require('../txHelpers/submitPeriod');
 const submitPeriodVote = require('./submitPeriodVote');
 const { logPeriod } = require('../utils/debug');
 
-module.exports = (bridgeState, sendDelayed, nodeConfig = {}) => async (
+module.exports = (bridgeState, sender, nodeConfig = {}) => async (
   rsp,
   chainInfo,
   chainHeight
@@ -26,11 +26,7 @@ module.exports = (bridgeState, sendDelayed, nodeConfig = {}) => async (
   // use a timeout to relax race conditions (if period submission is fast)
   await new Promise(resolve => {
     setTimeout(async () => {
-      await submitPeriodVote(
-        bridgeState.previousPeriod,
-        bridgeState,
-        sendDelayed
-      );
+      await submitPeriodVote(bridgeState.previousPeriod, bridgeState, sender);
 
       const contractPeriod = await submitPeriod(
         bridgeState.previousPeriod,
