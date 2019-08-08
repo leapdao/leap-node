@@ -9,10 +9,8 @@ const {
   getSlotsByAddr,
   sendTransaction,
   getCurrentSlotId,
-  //  buildCas,
   GENESIS,
 } = require('../utils');
-// const checkEnoughVotes = require('../period/utils/checkEnoughVotes');
 const { logPeriod } = require('../utils/debug');
 
 /* istanbul ignore next */
@@ -42,7 +40,6 @@ module.exports = async (
   nodeConfig = {}
 ) => {
   const { lastBlocksRoot, lastPeriodRoot } = bridgeState;
-  // const { periodVotes } = bridgeState.currentState;
   const periodRoot = period.merkleRoot();
 
   let submittedPeriod = { timestamp: '0' };
@@ -76,27 +73,12 @@ module.exports = async (
       return submittedPeriod;
     }
 
-    // const { result, votes, needed } = checkEnoughVotes(
-    //   periodRoot,
-    //   bridgeState.currentState
-    // );
-
-    // if (!result) {
-    //   logPeriod(
-    //     `submitPeriod. Not enough period votes collected: ${votes}/${needed}. Waiting..`
-    //   );
-    //   return submittedPeriod;
-    // }
-
-    // const cas = buildCas(periodVotes[periodRoot]);
-
     const tx = sendTransaction(
       bridgeState.web3,
       bridgeState.operatorContract.methods.submitPeriod(
         mySlotToSubmit.id,
         prevPeriodRoot,
         periodRoot
-        // `0x${cas.toString(16)}`
       ),
       bridgeState.operatorContract.options.address,
       bridgeState.account

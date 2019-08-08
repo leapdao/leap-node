@@ -8,10 +8,6 @@
 const { Type } = require('leap-core');
 const { bufferToHex } = require('ethereumjs-util');
 
-// const checkEnoughVotes = require('../../period/utils/checkEnoughVotes');
-// const submitPeriod = require('../../txHelpers/submitPeriod');
-// const { logTx } = require('../../utils/debug');
-
 module.exports = async (state, tx) => {
   if (tx.type !== Type.PERIOD_VOTE) {
     throw new Error('[period vote] periodVote tx expected');
@@ -46,23 +42,4 @@ module.exports = async (state, tx) => {
   }
 
   state.periodVotes[periodRoot].push(slotId);
-
-  // validators are not in consensus on period roots atm
-  // disabling this until resolved
-  // https://github.com/leapdao/leap-node/issues/282#issuecomment-519160276
-  // const { result } = checkEnoughVotes(periodRoot, state);
-  // if (result) {
-  //   logTx(`Enough votes to submit period: `, periodRoot);
-  //   try {
-  //     await submitPeriod(
-  //       periodRoot,
-  //       state.slots,
-  //       bridgeState.blockHeight,
-  //       bridgeState
-  //     );
-  //   } catch (err) {
-  //     /* istanbul ignore next */
-  //     logTx(`submit period: ${err}`);
-  //   }
-  // }
 };

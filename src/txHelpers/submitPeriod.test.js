@@ -116,12 +116,7 @@ describe('submitPeriod', () => {
     expect(submittedPeriod).toEqual({
       timestamp: '0',
     });
-    expect(submitPeriodWithCas).toBeCalledWith(
-      0,
-      '0x1337',
-      PERIOD_ROOT
-      //      '0x8000000000000000000000000000000000000000000000000000000000000000'
-    );
+    expect(submitPeriodWithCas).toBeCalledWith(0, '0x1337', PERIOD_ROOT);
   });
 
   test('not submitted, own slot, first period', async () => {
@@ -149,12 +144,7 @@ describe('submitPeriod', () => {
     expect(submittedPeriod).toEqual({
       timestamp: '0',
     });
-    expect(submitPeriodWithCas).toBeCalledWith(
-      0,
-      GENESIS,
-      PERIOD_ROOT
-      //      '0x8000000000000000000000000000000000000000000000000000000000000000'
-    );
+    expect(submitPeriodWithCas).toBeCalledWith(0, GENESIS, PERIOD_ROOT);
   });
 
   test('submitted, own slot, always try to submit for lastPeriodRoot', async () => {
@@ -216,119 +206,4 @@ describe('submitPeriod', () => {
     });
     expect(submitPeriodWithCas).not.toBeCalled();
   });
-
-  // describe('period vote', () => {
-  //   test('not enough votes collected: 1/2', async () => {
-  //     const bridgeState = bridgeStateMock({
-  //       bridgeContract: bridgeContractMock({
-  //         returnPeriod: { timestamp: '0' },
-  //       }),
-  //       operatorContract: operatorContractMock(),
-  //       lastBlocksRoot: period.prevHash,
-  //       lastPeriodRoot: '0x1337',
-  //       currentState: {
-  //         periodVotes: {
-  //           [period.merkleRoot()]: [1],
-  //         },
-  //         slots: [{ signerAddr: ADDR, id: 0 }, { signerAddr: ADDR_1, id: 1 }],
-  //       },
-  //     });
-
-  //     const submittedPeriod = await submitPeriod(
-  //       period,
-  //       [{ signerAddr: ADDR, id: 0 }, { signerAddr: ADDR_1, id: 1 }],
-  //       0,
-  //       bridgeState,
-  //       {}
-  //     );
-
-  //     expect(submittedPeriod).toEqual({
-  //       timestamp: '0',
-  //     });
-  //     expect(submitPeriodWithCas).not.toBeCalled();
-  //   });
-
-  //   test('not enough votes collected: 2/4', async () => {
-  //     const bridgeState = bridgeStateMock({
-  //       bridgeContract: bridgeContractMock({
-  //         returnPeriod: { timestamp: '0' },
-  //       }),
-  //       operatorContract: operatorContractMock(),
-  //       lastBlocksRoot: period.prevHash,
-  //       lastPeriodRoot: '0x1337',
-  //       currentState: {
-  //         periodVotes: {
-  //           [period.merkleRoot()]: [1, 2],
-  //         },
-  //         slots: [
-  //           { signerAddr: ADDR, id: 0 },
-  //           { signerAddr: ADDR_1, id: 1 },
-  //           { signerAddr: ADDR_1, id: 2 },
-  //           { signerAddr: ADDR_1, id: 3 },
-  //         ],
-  //       },
-  //     });
-
-  //     const submittedPeriod = await submitPeriod(
-  //       period,
-  //       [
-  //         { signerAddr: ADDR, id: 0 },
-  //         { signerAddr: ADDR_1, id: 1 },
-  //         { signerAddr: ADDR_1, id: 2 },
-  //         { signerAddr: ADDR_1, id: 3 },
-  //       ],
-  //       0,
-  //       bridgeState,
-  //       {}
-  //     );
-
-  //     expect(submittedPeriod).toEqual({
-  //       timestamp: '0',
-  //     });
-  //     expect(submitPeriodWithCas).not.toBeCalled();
-  //   });
-
-  //   test('got enough votes: 3/4', async () => {
-  //     const bridgeState = bridgeStateMock({
-  //       bridgeContract: bridgeContractMock({
-  //         returnPeriod: { timestamp: '0' },
-  //       }),
-  //       operatorContract: operatorContractMock(),
-  //       lastBlocksRoot: period.prevHash,
-  //       lastPeriodRoot: '0x1337',
-  //       currentState: {
-  //         periodVotes: {
-  //           [period.merkleRoot()]: [0, 2, 3],
-  //         },
-  //         slots: [
-  //           { signerAddr: ADDR, id: 0 },
-  //           { signerAddr: ADDR_1, id: 1 },
-  //           { signerAddr: ADDR_1, id: 2 },
-  //           { signerAddr: ADDR_1, id: 3 },
-  //         ],
-  //       },
-  //     });
-
-  //     const submittedPeriod = await submitPeriod(
-  //       period,
-  //       [
-  //         { signerAddr: ADDR, id: 0 },
-  //         { signerAddr: ADDR_1, id: 1 },
-  //         { signerAddr: ADDR_1, id: 2 },
-  //         { signerAddr: ADDR_1, id: 3 },
-  //       ],
-  //       0,
-  //       bridgeState,
-  //       {}
-  //     );
-
-  //     expect(submittedPeriod).toEqual({
-  //       timestamp: '0',
-  //     });
-  //     expect(submitPeriodWithCas).toBeCalled();
-  //     expect(submitPeriodWithCas.mock.calls[0][3]).toEqual(
-  //       '0xb000000000000000000000000000000000000000000000000000000000000000'
-  //     );
-  //   });
-  // });
 });
