@@ -27,6 +27,22 @@ describe('checkEpochLength', () => {
     expect(state.epoch.epochLength).toBe(4);
   });
 
+  test('series of txs', () => {
+    const state = getInitialState();
+
+    const epochLength1 = Tx.epochLength(4);
+    checkEpochLength(state, epochLength1, {
+      epochLengths: [4],
+    });
+
+    const epochLength2 = Tx.epochLength(3);
+    checkEpochLength(state, epochLength2, {
+      epochLengths: [4, 3],
+    });
+
+    expect(state.epoch.epochLength).toBe(3);
+  });
+
   test('tx without corresponding event', () => {
     const state = getInitialState();
     const epochLength = Tx.epochLength(4);

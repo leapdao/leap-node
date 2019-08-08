@@ -138,7 +138,7 @@ module.exports = class BridgeState {
       }
     }
 
-    const handler = handleEvents({
+    this.handleEvents = handleEvents({
       NewDeposit: ({ returnValues: event }) => {
         this.deposits[event.depositId] = {
           depositor: event.depositor,
@@ -199,13 +199,6 @@ module.exports = class BridgeState {
         this.lastPeriodRoot = event.periodRoot;
       },
     });
-
-    await handler(events);
-
-    // now push to second buffer
-    for (const event of events) {
-      this.relayBuffer.push(event);
-    }
   }
 
   async saveState() {
