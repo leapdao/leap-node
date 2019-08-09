@@ -37,6 +37,10 @@ module.exports = async (state, tx) => {
 
   const periodRoot = bufferToHex(tx.inputs[0].prevout.hash);
 
+  if (!state.periodVotes) {
+    state.periodVotes = {};
+  }
+
   if (!state.periodVotes[periodRoot]) {
     state.periodVotes[periodRoot] = [];
   }

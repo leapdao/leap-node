@@ -13,7 +13,8 @@ const alreadyVoted = (periodRoot, slotId, periodVotes) =>
   (periodVotes[periodRoot] || []).indexOf(slotId) >= 0;
 
 module.exports = async (period, state, bridgeState, { send }) => {
-  const { periodVotes, slots } = state;
+  const { slots } = state;
+  const periodVotes = state.periodVotes || {};
   const periodRoot = period.merkleRoot();
 
   const mySlots = getSlotsByAddr(slots, bridgeState.account.address);
