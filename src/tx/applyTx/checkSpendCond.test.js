@@ -5,6 +5,7 @@ const {
   NFT_COLOR_BASE,
   NST_COLOR_BASE,
 } = require('../../api/methods/constants');
+const Web3 = require('web3');
 const checkSpendingCondition = require('./../../api/methods/checkSpendingCondition');
 
 const erc20Tokens = [
@@ -29,10 +30,14 @@ const bridgeState = {
   networkId: 218508104,
   blockHeight: 123,
   minGasPrices: [100],
+  web3: new Web3(),
 };
 
 const NFTCondition =
   '6080604052348015600f57600080fd5b5060043610602b5760e060020a6000350463d01a81e181146030575b600080fd5b605960048036036040811015604457600080fd5b50600160a060020a038135169060200135605b565b005b6040805160e060020a6323b872dd028152306004820152600160a060020a03841660248201526044810183905290517311111111111111111111111111111111111111119182916323b872dd9160648082019260009290919082900301818387803b15801560c857600080fd5b505af115801560db573d6000803e3d6000fd5b5050505050505056fea165627a7a723058206e658cc8b44fd3d32eef8c4222a0f8773e93bc6efa0fb08e4db77979dacc9e790029';
+
+const ErrorCondition =
+  '6080604052348015600f57600080fd5b5060043610602b5760e060020a6000350463d01a81e181146030575b600080fd5b605960048036036040811015604457600080fd5b50600160a060020a038135169060200135605b565b005b6040805160e560020a62461bcd028152602060048201526005602482015260d960020a6432b93937b902604482015290519081900360640190fdfea165627a7a7230582075dba245d93b438fceee346da19c502033c7def2a2ad830b0f9bb0f87ef2d53f0029';
 
 const NSTCondition =
   '6080604052348015600f57600080fd5b5060043610602b5760e060020a6000350463d3b7576c81146030575b600080fd5b605060048036036040811015604457600080fd5b50803590602001356052565b005b6040805160e060020a63a983d43f0281526004810184905260248101839052905173111111111111111111111111111111111111111191829163a983d43f9160448082019260009290919082900301818387803b15801560b157600080fd5b505af115801560c4573d6000803e3d6000fd5b5050505050505056fea165627a7a723058209d7c918824f80651fee7b4f8b99ed305e72e70fad4ff09430ebab4adf0eed3d40029';
@@ -99,17 +104,25 @@ const conditionScript = Buffer.from(
 // const PRIV =
 //  '0x94890218f2b0d04296f30aeafd13655eba4c5bbf1770273276fee52cbe3f2cb4';
 
-async function expectToThrow(func, args) {
+async function expectToThrow(func, msg, args) {
   let err;
-
+  if (Array.isArray(msg)) {
+    // eslint-disable-next-line no-param-reassign
+    args = msg;
+  }
   try {
-    await func.apply(args);
+    await func(...args);
   } catch (e) {
     err = e;
   }
-
   if (!err) {
     throw new Error('expected to throw');
+  }
+  if (err.return && Buffer.isBuffer(err.return) && err.return.length === 0) {
+    err.return = '';
+  }
+  if (err.return && err.return !== msg) {
+    throw new Error(`expected ${msg}, but received ${err.return}`);
   }
 }
 
@@ -295,7 +308,80 @@ describe('checkSpendCond', () => {
 
     // remove LEAP input for gas
     condition.inputs.pop();
-    await expectToThrow(checkSpendCond, [state, condition, bridgeState]);
+    await expectToThrow(checkSpendCond, null, [state, condition, bridgeState]);
+  });
+
+  test('Spending Condition: return error', async () => {
+    const nftAddr = erc721Tokens[0];
+    const script = Buffer.from(ErrorCondition, 'hex');
+    const scriptHash = utils.ripemd160(script);
+    const NFTDeposit = Tx.deposit(
+      123, // depositId
+      nftAddr,
+      ADDR_1, // owner (spending condition)
+      NFT_COLOR_BASE
+    );
+    const leapDeposit = Tx.deposit(
+      1230, // depositId
+      5000000000,
+      `0x${scriptHash.toString('hex')}`, // owner (spending condition)
+      0
+    );
+    const state = {
+      unspent: {
+        [new Outpoint(
+          NFTDeposit.hash(),
+          3
+        ).hex()]: NFTDeposit.outputs[0].toJSON(),
+        [new Outpoint(
+          leapDeposit.hash(),
+          0
+        ).hex()]: leapDeposit.outputs[0].toJSON(),
+      },
+      gas: {
+        minPrice: 0,
+      },
+    };
+
+    // a spending condition transaction that spends the deposit is created
+    const receiver = Buffer.from(
+      '9999999999999999999999999999999999999999',
+      'hex'
+    );
+    const condition = Tx.spendCond(
+      [
+        new Input({
+          prevout: new Outpoint(leapDeposit.hash(), 0),
+          script,
+        }),
+        new Input({
+          prevout: new Outpoint(NFTDeposit.hash(), 3),
+        }),
+      ],
+      [
+        new Output(nftAddr, `0x${receiver.toString('hex')}`, NFT_COLOR_BASE),
+        // gas change returned
+        new Output(
+          4993380102,
+          leapDeposit.outputs[0].address,
+          leapDeposit.outputs[0].color
+        ),
+      ]
+    );
+
+    const tokenId =
+      '0000000000000000000000005555555555555555555555555555555555555555';
+    const msgData =
+      '0xd01a81e1000000000000000000000000' + // function called
+      `${receiver.toString('hex') + tokenId}`;
+
+    condition.inputs[0].setMsgData(msgData);
+
+    await expectToThrow(checkSpendCond, 'error', [
+      state,
+      condition,
+      bridgeState,
+    ]);
   });
 
   test('Spending Condition: NFT no input for gas', async () => {
