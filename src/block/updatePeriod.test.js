@@ -1,7 +1,7 @@
 const updatePeriod = require('./updatePeriod');
 
 jest.mock('../txHelpers/submitPeriod');
-jest.mock('../utils//sendTransaction');
+jest.mock('../utils/sendTransaction');
 
 const ADDR = '0x4436373705394267350db2c06613990d34621d69';
 const ADDR_2 = '0x4436373705394267350db2c06613990d34621d61';

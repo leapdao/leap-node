@@ -25,3 +25,4 @@ exports.printStartupInfo = require('./printStartupInfo');
 exports.isNFT = require('./isNFT');
 exports.isNST = require('./isNST');
 exports.networks = require('./networks');
+exports.buildCas = require('./buildCas');

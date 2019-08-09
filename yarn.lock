@@ -3953,6 +3953,11 @@ jsbi@^2.0.5:
   resolved "https://registry.yarnpkg.com/jsbi/-/jsbi-2.0.5.tgz#82589011da87dc59b4b549d94dcef51a9155f6fe"
   integrity sha512-TzO/62Hxeb26QMb4IGlI/5X+QLr9Uqp1FPkwp2+KOICW+Q+vSuFj61c8pkT6wAns4WcK56X7CmSHhJeDGWOqxQ==
 
+jsbi@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/jsbi/-/jsbi-3.0.0.tgz#c3e8a08713736e57231c210d93393df86d20747e"
+  integrity sha512-3gj+H13urlMGogSVM5rZvvgrhFwLmLisVQKRoxPU7KunFHpeJk+Jfjkp2E/79QSMyUa45aDDNG8yHnKD6Gro6Q==
+
 jsbn@~0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/jsbn/-/jsbn-0.1.1.tgz#a5e654c2e5a2deb5f201d96cefbca80c0ef2f513"
@@ -4129,10 +4134,10 @@ lcid@^2.0.0:
   dependencies:
     invert-kv "^2.0.0"
 
-leap-core@^0.34.1:
-  version "0.34.1"
-  resolved "https://registry.yarnpkg.com/leap-core/-/leap-core-0.34.1.tgz#d3ac8cd5d30aee5a6651096ce425274c635e0073"
-  integrity sha512-ARgwZGbMLSTDoDMtOQPT9e6CrsaRWAJ2KfzQOzhLHfFn++Z7NPrAGorncUpN5/Cj+SiSSR1CUXERupN4Z1cOlw==
+leap-core@^0.34.2:
+  version "0.34.2"
+  resolved "https://registry.yarnpkg.com/leap-core/-/leap-core-0.34.2.tgz#24c78de02c1a7730d15beaac0a363980a8850e7a"
+  integrity sha512-gHzSJ+tYvnRCiY3WfK8oP8SjQ4xTh1EFPxQbm6+5kTGuDBTzWD/LhOHiRZ+s3/9IpkiCPppu/9Ae+DBjUnPxhg==
   dependencies:
     "@types/web3" "^1.0.18"
     ethereumjs-util "6.0.0"

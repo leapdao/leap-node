@@ -1,6 +1,11 @@
 const periodHandler = require('./index');
 
 jest.mock('../txHelpers/submitPeriod');
+jest.mock('../period/submitPeriodVote');
+
+const submitPeriodVote = require('../period/submitPeriodVote');
+
+const sender = () => {};
 
 const EXISTENT_PERIOD = {
   prevHash: '0x000000',
@@ -32,7 +37,12 @@ describe('Period handler', () => {
       },
       checkCallsCount: 0,
     };
-    await periodHandler(bridgeState)(rsp, { height: 64 });
+    await periodHandler(bridgeState, sender)(rsp, { height: 64 });
+    expect(submitPeriodVote).toBeCalledWith(
+      EXISTENT_PERIOD,
+      bridgeState,
+      sender
+    );
     expect(rsp.status).toBe(0);
     expect(bridgeState.checkCallsCount).toBe(1);
   });

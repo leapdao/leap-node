@@ -1,4 +1,5 @@
 const { Type } = require('leap-core');
+const { bufferToHex } = require('ethereumjs-util');
 const { range } = require('../utils');
 
 const printOutput = (output, sign) =>
@@ -38,18 +39,14 @@ module.exports = (state, tx) => {
         return `transfer:\n ${balance}`;
       }
       case Type.VALIDATOR_JOIN: {
-        return `validatorJoin: slotId: ${tx.options.slotId}, tenderKey: ${
-          tx.options.tenderKey
-        }, signerAddr: ${tx.options.signerAddr}, eventsCount: ${
-          tx.options.eventsCount
-        }`;
+        return `validatorJoin: slotId: ${tx.options.slotId}, tenderKey: ${tx.options.tenderKey}, signerAddr: ${tx.options.signerAddr}, eventsCount: ${tx.options.eventsCount}`;
       }
       case Type.VALIDATOR_LOGOUT: {
-        return `validatorLogout: slotId: ${
-          tx.options.slotId
-        }, activationEpoch: ${tx.options.activationEpoch}, newSigner: ${
-          tx.options.newSigner
-        }, eventsCount: ${tx.options.eventsCount}`;
+        return `validatorLogout: slotId: ${tx.options.slotId}, activationEpoch: ${tx.options.activationEpoch}, newSigner: ${tx.options.newSigner}, eventsCount: ${tx.options.eventsCount}`;
+      }
+      case Type.PERIOD_VOTE: {
+        return `periodVote: slotId: ${tx.options.slotId},
+         root: ${bufferToHex(tx.inputs[0].prevout.hash)}`;
       }
       default:
         return undefined;

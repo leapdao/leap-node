@@ -70,6 +70,7 @@ const checkInsAndOuts = (tx, state, bridgeState, unspentFilter) => {
 };
 
 const checkOutpoints = (state, tx) => {
+  if (tx.type === Type.PERIOD_VOTE) return;
   tx.inputs.forEach(input => {
     const outpointId = input.prevout.hex();
     if (!state.unspent[outpointId]) {
@@ -79,6 +80,7 @@ const checkOutpoints = (state, tx) => {
 };
 
 const addOutputs = ({ balances, owners, unspent }, tx) => {
+  if (tx.type === Type.PERIOD_VOTE) return;
   tx.outputs.forEach((out, outPos) => {
     const outpoint = new Outpoint(tx.hash(), outPos);
     if (unspent[outpoint.hex()] !== undefined) {
@@ -108,6 +110,7 @@ const addOutputs = ({ balances, owners, unspent }, tx) => {
 };
 
 const removeInputs = ({ unspent, balances, owners }, tx) => {
+  if (tx.type === Type.PERIOD_VOTE) return;
   tx.inputs.forEach(input => {
     const outpointId = input.prevout.hex();
     const { address, value, color } = unspent[outpointId];

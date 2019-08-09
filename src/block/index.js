@@ -5,12 +5,12 @@ const updatePeriod = require('./updatePeriod');
 const updateValidators = require('./updateValidators');
 const updateEpoch = require('./updateEpoch');
 
-module.exports = (bridgeState, db, nodeConfig = {}) => async (
+module.exports = (bridgeState, db, nodeConfig = {}, sender) => async (
   state,
   chainInfo
 ) => {
   bridgeState.checkCallsCount = 0;
-  await updatePeriod(state, chainInfo, bridgeState, nodeConfig);
+  await updatePeriod(state, chainInfo, bridgeState, nodeConfig, sender);
   await addBlock(state, chainInfo, {
     bridgeState,
     db,

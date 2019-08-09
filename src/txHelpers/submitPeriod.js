@@ -18,8 +18,7 @@ const logError = height => err => {
   logPeriod('submitPeriod error: %s (height: %d)', err.message, height);
 };
 
-const mySlotToSubmitFor = (slots, height, bridgeState) => {
-  const mySlots = getSlotsByAddr(slots, bridgeState.account.address);
+const mySlotToSubmitFor = (slots, height, mySlots) => {
   const currentSlotId = getCurrentSlotId(slots, height);
   logPeriod('mySlots', currentSlotId, mySlots);
   return mySlots.find(slot => slot.id === currentSlotId);
@@ -41,13 +40,14 @@ module.exports = async (
   nodeConfig = {}
 ) => {
   const { lastBlocksRoot, lastPeriodRoot } = bridgeState;
-  let submittedPeriod = { timestamp: '0' };
+  const periodRoot = period.merkleRoot();
 
-  if (lastBlocksRoot === period.merkleRoot()) {
+  let submittedPeriod = { timestamp: '0' };
+  if (lastBlocksRoot === periodRoot) {
     submittedPeriod = await bridgeState.bridgeContract.methods
       .periods(lastPeriodRoot)
       .call();
-    logPeriod('submittedPeriod', period.merkleRoot(), submittedPeriod);
+    logPeriod('submittedPeriod', periodRoot, submittedPeriod);
     return submittedPeriod;
   }
 
@@ -56,7 +56,9 @@ module.exports = async (
     return submittedPeriod;
   }
 
-  const mySlotToSubmit = mySlotToSubmitFor(slots, height, bridgeState);
+  const mySlots = getSlotsByAddr(slots, bridgeState.account.address);
+  const mySlotToSubmit = mySlotToSubmitFor(slots, height, mySlots);
+
   if (mySlotToSubmit) {
     logPeriod('submitPeriod. Slot %d', mySlotToSubmit.id);
 
@@ -70,12 +72,13 @@ module.exports = async (
       );
       return submittedPeriod;
     }
+
     const tx = sendTransaction(
       bridgeState.web3,
       bridgeState.operatorContract.methods.submitPeriod(
         mySlotToSubmit.id,
         prevPeriodRoot,
-        period.merkleRoot()
+        periodRoot
       ),
       bridgeState.operatorContract.options.address,
       bridgeState.account
