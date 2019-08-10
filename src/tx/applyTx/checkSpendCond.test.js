@@ -109,6 +109,8 @@ async function expectToThrow(func, msg, args) {
   if (Array.isArray(msg)) {
     // eslint-disable-next-line no-param-reassign
     args = msg;
+    // eslint-disable-next-line no-param-reassign
+    msg = '';
   }
   try {
     await func(...args);
@@ -1284,7 +1286,11 @@ describe('checkSpendCond', () => {
     condition.inputs[0].setMsgData(msgData);
 
     bridgeState.blockHeight = 42000;
-    await expectToThrow(checkSpendCond, [state, condition, bridgeState]);
+    await expectToThrow(checkSpendCond, 'no permission', [
+      state,
+      condition,
+      bridgeState,
+    ]);
   });
 
   test('Earth Contract', async () => {
