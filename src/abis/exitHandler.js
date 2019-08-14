@@ -634,11 +634,14 @@ module.exports = [
         name: 'amount',
         type: 'uint256',
       },
+      {
+        indexed: false,
+        name: 'periodRoot',
+        type: 'bytes32',
+      },
     ],
     name: 'ExitStarted',
     type: 'event',
-    signature:
-      '0xaace06690e02011b548d8c5a74e1a678833d4136a56e657909fc6354bfb7c31f',
   },
   {
     anonymous: false,
