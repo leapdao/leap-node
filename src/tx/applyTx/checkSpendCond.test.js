@@ -109,6 +109,8 @@ async function expectToThrow(func, msg, args) {
   if (Array.isArray(msg)) {
     // eslint-disable-next-line no-param-reassign
     args = msg;
+    // eslint-disable-next-line no-param-reassign
+    msg = '';
   }
   try {
     await func(...args);
@@ -382,6 +384,95 @@ describe('checkSpendCond', () => {
       condition,
       bridgeState,
     ]);
+  });
+
+  test('Spending Condition: unused NFT', async () => {
+    const nftAddr = erc721Tokens[0];
+    const script = Buffer.from(
+      NFTCondition.replace(
+        '1111111111111111111111111111111111111111',
+        nftAddr.replace('0x', '')
+      ),
+      'hex'
+    );
+    const scriptHash = utils.ripemd160(script);
+    const NFTDeposit = Tx.deposit(
+      123, // depositId
+      456789, // id
+      `0x${scriptHash.toString('hex')}`, // owner (spending condition)
+      NFT_COLOR_BASE
+    );
+    const NFTDeposit2 = Tx.deposit(
+      124, // depositId
+      987654, // id
+      `0x${scriptHash.toString('hex')}`, // owner (spending condition)
+      NFT_COLOR_BASE
+    );
+    const leapDeposit = Tx.deposit(
+      1230, // depositId
+      5000000000,
+      `0x${scriptHash.toString('hex')}`, // owner (spending condition)
+      0
+    );
+    const state = {
+      unspent: {
+        [new Outpoint(
+          NFTDeposit.hash(),
+          3
+        ).hex()]: NFTDeposit.outputs[0].toJSON(),
+        [new Outpoint(
+          NFTDeposit2.hash(),
+          3
+        ).hex()]: NFTDeposit2.outputs[0].toJSON(),
+        [new Outpoint(
+          leapDeposit.hash(),
+          0
+        ).hex()]: leapDeposit.outputs[0].toJSON(),
+      },
+      gas: {
+        minPrice: 0,
+      },
+    };
+
+    // a spending condition transaction that spends the deposit is created
+    const receiver = Buffer.from(
+      '9999999999999999999999999999999999999999',
+      'hex'
+    );
+    const condition = Tx.spendCond(
+      [
+        new Input({
+          prevout: new Outpoint(leapDeposit.hash(), 0),
+          script,
+        }),
+        new Input({
+          prevout: new Outpoint(NFTDeposit.hash(), 3),
+        }),
+        new Input({
+          prevout: new Outpoint(NFTDeposit2.hash(), 3),
+        }),
+      ],
+      [
+        new Output(456789, `0x${receiver.toString('hex')}`, NFT_COLOR_BASE),
+        new Output(987654, `0x${receiver.toString('hex')}`, NFT_COLOR_BASE),
+        // gas change returned
+        new Output(
+          4993380102,
+          leapDeposit.outputs[0].address,
+          leapDeposit.outputs[0].color
+        ),
+      ]
+    );
+
+    const tokenId =
+      '000000000000000000000000000000000000000000000000000000000006F855';
+    const msgData =
+      '0xd01a81e1000000000000000000000000' + // function called
+      `${receiver.toString('hex') + tokenId}`;
+
+    condition.inputs[0].setMsgData(msgData);
+
+    await expectToThrow(checkSpendCond, [state, condition, bridgeState]);
   });
 
   test('Spending Condition: NFT no input for gas', async () => {
@@ -1182,7 +1273,7 @@ describe('checkSpendCond', () => {
         new Output(82384190, `0x${scriptHash.toString('hex')}`, 0), // gas change
       ]
     );
-    condition.sign([null, null, PRIV_1, PRIV_1]);
+    condition.sign([null, null, PRIV_1, null]);
 
     const msgData =
       '0x9abc2cc8' + // plantTree()
@@ -1195,7 +1286,11 @@ describe('checkSpendCond', () => {
     condition.inputs[0].setMsgData(msgData);
 
     bridgeState.blockHeight = 42000;
-    await checkSpendCond(state, condition, bridgeState);
+    await expectToThrow(checkSpendCond, 'no permission', [
+      state,
+      condition,
+      bridgeState,
+    ]);
   });
 
   test('Earth Contract', async () => {

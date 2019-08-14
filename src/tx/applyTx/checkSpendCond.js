@@ -82,6 +82,14 @@ const GAS_LIMIT_HEX = `0x${GAS_LIMIT.toString(16)}`;
 // fixed value until we get support for it in the transaction format
 const FIXED_GAS_PRICE = BigInt(142);
 
+const iterateBag = (tokenBag, cb) => {
+  Object.entries(tokenBag).forEach(([originAddr]) => {
+    Object.entries(tokenBag[originAddr]).forEach(([owner, value]) => {
+      cb(originAddr, owner, value);
+    });
+  });
+};
+
 function setAccount(account, address, stateManager) {
   return new Promise((resolve, reject) => {
     stateManager.putAccount(address, account, err => {
@@ -195,7 +203,10 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
       nftBag[contractAddrStr] = !nftBag[contractAddrStr]
         ? {}
         : nftBag[contractAddrStr];
-      nftBag[contractAddrStr][tokenId] = unspent.address;
+      nftBag[contractAddrStr][tokenId] = {
+        addr: unspent.address,
+        touched: false,
+      };
     } else if (i > 0) {
       tokenBag[contractAddrStr] = !tokenBag[contractAddrStr]
         ? {}
@@ -251,12 +262,14 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
     let allowance;
 
     if (!spendingIsOwner) {
-      if (input.signer && unspent.address !== input.signer) {
-        throw new Error(
-          `output owner ${unspent.address} unequal input signer: ${input.signer}`
-        );
+      if (input.signer) {
+        if (unspent.address !== input.signer) {
+          throw new Error(
+            `output owner ${unspent.address} unequal input signer: ${input.signer}`
+          );
+        }
+        allowance = {};
       }
-      allowance = {};
     } else {
       addrBuf = sigHashBuf;
     }
@@ -437,16 +450,22 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
       // const nstFromData = data.slice(0, 32);
       const nstToData = `0x${data.slice(32, 64).toString('hex')}`;
 
-      const tokenOwner = nftBag[originAddr][nstTokenId];
+      const tokenOwner = nftBag[originAddr][nstTokenId].addr;
       logOuts.push(
         new Output(BigInt(nstTokenId), tokenOwner, originColor, nstToData)
       );
+
+      nftBag[originAddr][nstTokenId].touched = true;
       return;
     }
 
     if (topics[0].equals(ERC20_ERC721_TRANSFER_EVENT)) {
       let fromAddr = topics[1].slice(12, 32);
       let toAddr = topics[2].slice(12, 32);
+      const tokenId =
+        isNFT(originColor) || isNST(originColor)
+          ? `0x${topics[3].toString('hex')}`
+          : null;
 
       // replace injected sigHash with plasma address
       if (toAddr.equals(sigHashBuf)) {
@@ -464,17 +483,21 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
       if (!isNFT(originColor) && data.length === 0) {
         // this hack assumes that an ERC1949 is minted
         // and that Transfer Event is emmited before UpdateData Event
-        // so in only puts the new owner into the nftBag
-        nftBag[originAddr][`0x${topics[3].toString('hex')}`] = toAddr;
+        // so it only puts the new owner into the nftBag
+        nftBag[originAddr][tokenId] = {
+          addr: toAddr,
+          touched: true,
+        };
         return;
       }
       // ? ERC721(tokenId) : ERC20(transferAmount)
       const transferAmount = isNFT(originColor)
-        ? BigInt(`0x${topics[3].toString('hex')}`)
+        ? BigInt(tokenId)
         : BigInt(`0x${data.toString('hex')}`, 16);
 
       if (isNFT(originColor) || isNST(originColor)) {
         logOuts.push(new Output(transferAmount, toAddr, originColor));
+        nftBag[originAddr][tokenId].touched = true;
       } else {
         tokenBag[originAddr][fromAddr] = subtract(
           tokenBag[originAddr][fromAddr],
@@ -490,23 +513,18 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
       }
     }
   });
-  for (const originAddr in tokenBag) {
-    if (Object.prototype.hasOwnProperty.call(tokenBag, originAddr)) {
-      for (const owner in tokenBag[originAddr]) {
-        if (Object.prototype.hasOwnProperty.call(tokenBag[originAddr], owner)) {
-          if (greaterThan(tokenBag[originAddr][owner], BigInt(0))) {
-            logOuts.push(
-              new Output(
-                tokenBag[originAddr][owner],
-                owner,
-                deployed[originAddr]
-              )
-            );
-          }
-        }
-      }
+  // itterate over tokenBag, add all leftovers to outputs
+  iterateBag(tokenBag, (originAddr, owner, amount) => {
+    if (greaterThan(amount, BigInt(0))) {
+      logOuts.push(new Output(amount, owner, deployed[originAddr]));
     }
-  }
+  });
+  iterateBag(nftBag, (originAddr, owner) => {
+    if (!nftBag[originAddr][owner].touched) {
+      // throw instead of return, because of the cb function
+      throw new Error(`not touched ${nftBag[originAddr][owner].addr}`);
+    }
+  });
 
   const gasUsed = BigInt(evmResult.gasUsed);
   // XXX: Fixed gasPrice for now. We include it again in the tx format as the next breaking change.
