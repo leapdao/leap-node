@@ -10,6 +10,10 @@ module.exports = (bridgeState, db, nodeConfig = {}, sender) => async (
   chainInfo
 ) => {
   bridgeState.checkCallsCount = 0;
+
+  // delete collected votes for submitted period
+  delete (state.periodVotes || {})[bridgeState.lastBlocksRoot];
+
   await updatePeriod(state, chainInfo, bridgeState, nodeConfig, sender);
   await addBlock(state, chainInfo, {
     bridgeState,
