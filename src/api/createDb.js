@@ -12,15 +12,17 @@ const createDb = levelDb => {
   const storeBlock = async (block, logsCache) => {
     const dbOpsBatch = levelDb.batch();
     block.txList.forEach((tx, txPos) => {
-      const txKey = `tx!${tx.hash()}`;
+      const txHash = tx.hash();
+      const txKey = `tx!${txHash}`;
       const value = {
         txData: tx.toJSON(),
         blockHash: block.hash(),
         height: block.height,
         txPos,
       };
-      if (logsCache && logsCache[tx.hash()]) {
-        value.logs = logsCache[tx.hash()];
+      if (logsCache && logsCache[txHash]) {
+        value.logs = [...logsCache[txHash]]; // copy array
+        delete logsCache[txHash];
       }
       dbOpsBatch.put(txKey, JSON.stringify(value));
 
