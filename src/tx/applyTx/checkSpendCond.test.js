@@ -30,6 +30,7 @@ const bridgeState = {
   networkId: 218508104,
   blockHeight: 123,
   minGasPrices: [100],
+  logsCache: {},
   web3: new Web3(),
 };
 

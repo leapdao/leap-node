@@ -17,7 +17,7 @@ module.exports = async (state, chainInfo, { bridgeState, db }) => {
 
   // store block data to db if we didn't see this block before
   if (chainInfo.height > bridgeState.lastBlockSynced) {
-    await db.storeBlock(b);
+    await db.storeBlock(b, bridgeState.logsCache);
     bridgeState.lastBlockSynced = chainInfo.height;
   }
 };

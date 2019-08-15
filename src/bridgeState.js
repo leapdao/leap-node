@@ -76,6 +76,7 @@ module.exports = class BridgeState {
     });
     this.bridgeDelay = config.bridgeDelay;
     this.relayBuffer = relayBuffer;
+    this.logsCache = {};
   }
 
   async init() {

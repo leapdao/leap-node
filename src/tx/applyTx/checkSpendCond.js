@@ -576,5 +576,6 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
     err.logOuts = logOuts;
     return Promise.reject(err);
   }
+  bridgeState.logsCache[tx.hash()] = evmResult.vm.logs;
   return Promise.resolve(logOuts);
 };
