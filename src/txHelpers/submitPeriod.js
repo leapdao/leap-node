@@ -10,8 +10,10 @@ const {
   sendTransaction,
   getCurrentSlotId,
   GENESIS,
+  buildCas,
 } = require('../utils');
 const { logPeriod } = require('../utils/debug');
+const checkEnoughVotes = require('../period/utils/checkEnoughVotes');
 
 /* istanbul ignore next */
 const logError = height => err => {
@@ -40,6 +42,7 @@ module.exports = async (
   nodeConfig = {}
 ) => {
   const { lastBlocksRoot, lastPeriodRoot } = bridgeState;
+  const periodVotes = bridgeState.currentState.periodVotes || {};
   const periodRoot = period.merkleRoot();
 
   let submittedPeriod = { timestamp: '0' };
@@ -73,19 +76,40 @@ module.exports = async (
       return submittedPeriod;
     }
 
+    const { result, votes, needed } = checkEnoughVotes(
+      periodRoot,
+      bridgeState.currentState
+    );
+
+    if (!result) {
+      logPeriod(
+        `submitPeriod. Not enough period votes collected: ${votes}/${needed}. Waiting..`
+      );
+      return submittedPeriod;
+    }
+
+    const cas = buildCas(periodVotes[periodRoot]);
+
+    bridgeState.periodsInFlight[periodRoot] = true;
+
     const tx = sendTransaction(
       bridgeState.web3,
-      bridgeState.operatorContract.methods.submitPeriod(
+      bridgeState.operatorContract.methods.submitPeriodWithCas(
         mySlotToSubmit.id,
         prevPeriodRoot,
-        periodRoot
+        periodRoot,
+        `0x${cas.toString(16)}`
       ),
       bridgeState.operatorContract.options.address,
       bridgeState.account
-    ).catch(logError(height));
+    ).catch(() => {
+      delete bridgeState.periodsInFlight[periodRoot];
+      logError(height);
+    });
 
     tx.then(receipt => {
       logPeriod('submitPeriod tx', receipt);
+      delete bridgeState.periodsInFlight[periodRoot];
     });
   }
 

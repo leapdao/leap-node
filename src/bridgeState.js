@@ -79,6 +79,7 @@ module.exports = class BridgeState {
     this.logsCache = {};
     this.submissions = [];
     this.periodHeights = {};
+    this.periodsInFlight = {};
 
     this.handleEvents = handleEvents({
       NewDeposit: ({ returnValues: event }) => {

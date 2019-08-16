@@ -11,6 +11,7 @@ const submitPeriod = require('../txHelpers/submitPeriod');
 const activateSlot = require('../txHelpers/activateSlot');
 const { getAuctionedByAddr } = require('../utils');
 const { logPeriod } = require('../utils/debug');
+const checkEnoughVotes = require('../period/utils/checkEnoughVotes');
 
 module.exports = async (
   state,
@@ -19,6 +20,25 @@ module.exports = async (
   nodeConfig = {},
   sender
 ) => {
+  if (bridgeState.previousPeriod) {
+    const previousPeriodRoot = bridgeState.previousPeriod.merkleRoot();
+    const { result } = checkEnoughVotes(previousPeriodRoot, state);
+    if (result && !bridgeState.periodsInFlight[previousPeriodRoot]) {
+      logPeriod(`Enough votes to submit period: ${previousPeriodRoot}`);
+      try {
+        await submitPeriod(
+          bridgeState.previousPeriod,
+          state.slots,
+          bridgeState.blockHeight,
+          bridgeState
+        );
+      } catch (err) {
+        /* istanbul ignore next */
+        logPeriod(`submit period: ${err}`);
+      }
+    }
+  }
+
   if (chainInfo.height % 32 === 0) {
     logPeriod('updatePeriod');
     try {
