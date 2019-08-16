@@ -17,7 +17,7 @@ jobs:
     - stage: tests
       name: "integration tests"
       script:
-        - git clone --single-branch -b master https://github.com/leapdao/integration-tests.git /tmp/tests
+        - git clone --single-branch -b epoch-length-issue https://github.com/leapdao/integration-tests.git /tmp/tests
         - |
           cat > /tmp/tests/configs/build << EOF
           contracts_repo=" --single-branch -b master https://github.com/leapdao/leap-contracts.git"
