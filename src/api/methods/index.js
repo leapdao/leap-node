@@ -49,6 +49,7 @@ module.exports = (bridgeState, db, app, tendermintPort) => {
     ),
     plasma_getPeriodByBlockHeight: require('./getPeriodByBlockHeight').bind(
       null,
+      bridgeState,
       db
     ),
     validator_getAddress: require('./getAddress').bind(null, bridgeState, app),

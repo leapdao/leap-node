@@ -17,11 +17,11 @@ const db = {
 
 describe('getPeriodByBlockHeight', () => {
   test('No period for block height', async () => {
-    expect(await getPeriodByBlockHeight(db, 64)).toBe(null);
+    expect(await getPeriodByBlockHeight({}, db, 64)).toBe(null);
   });
 
   test('existing data', async () => {
-    expect(await getPeriodByBlockHeight(db, 0)).toEqual([
+    expect(await getPeriodByBlockHeight({}, db, 10)).toEqual([
       {
         periodStart: 0,
         periodEnd: 31,
@@ -31,7 +31,17 @@ describe('getPeriodByBlockHeight', () => {
       },
     ]);
 
-    expect(await getPeriodByBlockHeight(db, 96)).toEqual([
+    expect(await getPeriodByBlockHeight({}, db, '0x10')).toEqual([
+      {
+        periodStart: 0,
+        periodEnd: 31,
+        casBitmap: '0x123',
+        slotId: 0,
+        validatorAddress: '0xabc',
+      },
+    ]);
+
+    expect(await getPeriodByBlockHeight({}, db, 100)).toEqual([
       {
         periodStart: 96,
         periodEnd: 127,
