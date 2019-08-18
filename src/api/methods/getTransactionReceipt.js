@@ -24,6 +24,7 @@ module.exports = async (db, hash) => {
     blockNumber: `0x${height.toString(16)}`,
     from: tx.from(prevTx),
     to: tx.to(),
+    raw: tx.hex(),
     cumulativeGasUsed: '0x0',
     gasUsed: '0x0',
     contractAddress: null,

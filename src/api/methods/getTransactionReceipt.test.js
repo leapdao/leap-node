@@ -64,6 +64,7 @@ describe('getTransactionReceipt', () => {
       blockNumber: '0x2',
       from: A1,
       to: A2,
+      raw: tx.hex(),
       cumulativeGasUsed: '0x0',
       gasUsed: '0x0',
       contractAddress: null,
