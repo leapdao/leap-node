@@ -35,6 +35,8 @@ module.exports = (bridgeState, db, nodeConfig = {}, sender) => async (
   bridgeState.currentState = state;
   bridgeState.blockHeight = chainInfo.height;
 
+  await bridgeState.saveSubmissions();
+
   if (chainInfo.height % 32 === 0) {
     // catch this, it is not fatal if it fails here
     logNode('Saving state');

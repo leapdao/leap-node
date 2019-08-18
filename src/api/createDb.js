@@ -107,6 +107,27 @@ const createDb = levelDb => {
     await levelDb.put('chainState', JSON.stringify(state));
   };
 
+  const storePeriods = async submissions => {
+    const dbOpsBatch = levelDb.batch();
+    await Promise.all(
+      submissions.map(submission => {
+        const key = `period!${submission.periodStart}`;
+        return getNullable(key).then(existingRecords => {
+          const records = existingRecords || [];
+          delete submission.periodStart;
+          records.push(submission);
+          dbOpsBatch.put(key, JSON.stringify(records));
+        });
+      })
+    );
+
+    return new Promise(resolve => {
+      dbOpsBatch.write(resolve);
+    });
+  };
+
+  const getPeriodData = periodStart => getNullable(`period!${periodStart}`);
+
   return {
     getLastBlockSynced,
     storeBlock,
@@ -115,6 +136,8 @@ const createDb = levelDb => {
     getTransactionByPrevOut,
     getChainState,
     storeChainState,
+    storePeriods,
+    getPeriodData,
   };
 };
 
