@@ -16,11 +16,11 @@ const db = {
 };
 
 describe('getPeriodByBlockHeight', () => {
-  test('No period for block height', async () => {
+  test('no period for block height', async () => {
     expect(await getPeriodByBlockHeight({}, db, 64)).toBe(null);
   });
 
-  test('existing data', async () => {
+  test('existing period for decimal height', async () => {
     expect(await getPeriodByBlockHeight({}, db, 10)).toEqual([
       {
         periodStart: 0,
@@ -30,7 +30,9 @@ describe('getPeriodByBlockHeight', () => {
         validatorAddress: '0xabc',
       },
     ]);
+  });
 
+  test('existing period for hex height', async () => {
     expect(await getPeriodByBlockHeight({}, db, '0x10')).toEqual([
       {
         periodStart: 0,
@@ -40,7 +42,23 @@ describe('getPeriodByBlockHeight', () => {
         validatorAddress: '0xabc',
       },
     ]);
+  });
 
+  test("existing period for 'latest' height", async () => {
+    expect(
+      await getPeriodByBlockHeight({ blockHeight: 20 }, db, 'latest')
+    ).toEqual([
+      {
+        periodStart: 0,
+        periodEnd: 31,
+        casBitmap: '0x123',
+        slotId: 0,
+        validatorAddress: '0xabc',
+      },
+    ]);
+  });
+
+  test('multiple submissions', async () => {
     expect(await getPeriodByBlockHeight({}, db, 100)).toEqual([
       {
         periodStart: 96,
