@@ -22,6 +22,10 @@ module.exports = async (
   if (chainInfo.height % 32 === 0) {
     logPeriod('updatePeriod');
     try {
+      bridgeState.periodHeights[bridgeState.currentPeriod.merkleRoot()] =
+        chainInfo.height - 1;
+      // will be executed by all the nodes, but the actual period vote tx will be
+      // submitted by validators only
       await submitPeriodVote(
         bridgeState.currentPeriod,
         state,

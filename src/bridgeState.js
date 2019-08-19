@@ -78,6 +78,7 @@ module.exports = class BridgeState {
     this.relayBuffer = relayBuffer;
     this.logsCache = {};
     this.submissions = [];
+    this.periodHeights = {};
 
     this.handleEvents = handleEvents({
       NewDeposit: ({ returnValues: event }) => {
@@ -138,7 +139,8 @@ module.exports = class BridgeState {
       Submission: ({ returnValues: event }) => {
         this.lastBlocksRoot = event.blocksRoot;
         this.lastPeriodRoot = event.periodRoot;
-        const [periodStart] = Period.periodBlockRange(this.blockHeight);
+        const blockHeight = this.periodHeights[this.lastBlocksRoot];
+        const [periodStart] = Period.periodBlockRange(blockHeight);
         this.submissions.push({
           periodStart,
           casBitmap: event.casRoot,
