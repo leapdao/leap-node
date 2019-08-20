@@ -1,10 +1,5 @@
 {
   "name": "lotion",
   "version": "0.2.0",
-  "main": "index.js",
-  "dependencies": {
-    "deterministic-json": "^1.0.5",
-    "js-abci": "^0.1.1",
-    "jsondiffpatch": "^0.3.11"
-  }
+  "main": "index.js"
 }
