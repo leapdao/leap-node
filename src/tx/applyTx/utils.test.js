@@ -12,6 +12,24 @@ const PRIV_1 =
   '0xad8e31c8862f5f86459e7cca97ac9302c5e1817077902540779eef66e21f394a';
 const ADDR_2 = '0xc5a72c0bf9f59ed5a1d2ac9f29bd80c55279d2d3';
 
+const periodVoteTx = Tx.periodVote(
+  0,
+  new Input(
+    new Outpoint(
+      '0x7777777777777777777777777777777777777777777777777777777777777777',
+      0
+    )
+  )
+);
+
+function getDefaultState() {
+  return {
+    balances: {},
+    owners: {},
+    unspent: {},
+  };
+}
+
 describe('applyTx utils', () => {
   describe('checkInsAndOuts', () => {
     test('ERC20', () => {
@@ -316,17 +334,19 @@ describe('applyTx utils', () => {
 
       checkOutpoints(state, transfer);
     });
+
+    test('always pass for periodVote', () => {
+      const state = getDefaultState();
+
+      checkOutpoints(state, periodVoteTx);
+    });
   });
 
   describe('addOuputs', () => {
     test('ERC20', () => {
       const deposit1 = Tx.deposit(12, '100000000000000000', ADDR_1, 0);
       const outpoint = new Outpoint(deposit1.hash(), 0);
-      const state = {
-        balances: {},
-        owners: {},
-        unspent: {},
-      };
+      const state = getDefaultState();
 
       addOutputs(state, deposit1);
       expect(state.unspent[outpoint.hex()]).toBeDefined();
@@ -354,11 +374,7 @@ describe('applyTx utils', () => {
       const outpoint1 = new Outpoint(deposit1.hash(), 0);
       const outpoint2 = new Outpoint(deposit2.hash(), 0);
       const outpoint3 = new Outpoint(deposit3.hash(), 0);
-      const state = {
-        balances: {},
-        owners: {},
-        unspent: {},
-      };
+      const state = getDefaultState();
 
       addOutputs(state, deposit1);
       expect(state.unspent[outpoint1.hex()]).toBeDefined();
@@ -376,16 +392,18 @@ describe('applyTx utils', () => {
 
     test('Existing outpoint', () => {
       const deposit = Tx.deposit(12, 500, ADDR_1, 0);
-      const state = {
-        balances: {},
-        owners: {},
-        unspent: {},
-      };
+      const state = getDefaultState();
 
       addOutputs(state, deposit);
       expect(() => addOutputs(state, deposit)).toThrow(
         'Attempt to create existing output'
       );
+    });
+
+    test('skip for periodVote', () => {
+      const state = getDefaultState();
+
+      addOutputs(state, periodVoteTx);
     });
   });
 
@@ -393,11 +411,7 @@ describe('applyTx utils', () => {
     test('ERC20', () => {
       const deposit = Tx.deposit(12, 500, ADDR_1, 0);
       const outpoint = new Outpoint(deposit.hash(), 0);
-      const state = {
-        balances: {},
-        owners: {},
-        unspent: {},
-      };
+      const state = getDefaultState();
 
       addOutputs(state, deposit);
       expect(state.unspent[outpoint.hex()]).toBeDefined();
@@ -427,11 +441,7 @@ describe('applyTx utils', () => {
       const outpoint1 = new Outpoint(deposit1.hash(), 0);
       const outpoint2 = new Outpoint(deposit2.hash(), 0);
       const outpoint3 = new Outpoint(deposit3.hash(), 0);
-      const state = {
-        balances: {},
-        owners: {},
-        unspent: {},
-      };
+      const state = getDefaultState();
 
       addOutputs(state, deposit1);
       expect(state.unspent[outpoint1.hex()]).toBeDefined();
@@ -472,6 +482,12 @@ describe('applyTx utils', () => {
       expect(state.unspent[outpoint3.hex()]).toBeUndefined();
       expect(state.balances[color][ADDR_2]).toEqual([]);
       expect(state.owners[color][value3]).toBeUndefined();
+    });
+
+    test('skip for periodVote', () => {
+      const state = getDefaultState();
+
+      removeInputs(state, periodVoteTx);
     });
   });
 });

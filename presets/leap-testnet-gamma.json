@@ -3,6 +3,7 @@
   "operatorAddr": "0xC74f4eD00F59bcb1B34C3461B23e58B6d6E2E199",
   "exitHandlerAddr": "0x54177deD16B8fe8F9017D6c44704f6998A914e54",
   "rootNetwork": "https://rinkeby.infura.io",
+  "rootNetworkId": 4,
   "network": "leap-testnet-gamma",
   "networkId": 1341,
   "genesis": {

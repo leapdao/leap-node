@@ -1,10 +1,7 @@
-/* eslint-disable no-await-in-loop */
+/* eslint-disable no-await-in-loop, import/no-extraneous-dependencies, guard-for-in */
 
-const createABCIServer = require('js-abci');
-const decodeTx = require('./tx-encoding.js').decode;
+const createABCIServer = require('../abci');
 const jsondiffpatch = require('jsondiffpatch');
-const getRoot = require('./get-root.js');
-const { stringify } = require('deterministic-json');
 
 const { getAddress } = require('../../src/utils');
 
@@ -63,6 +60,7 @@ async function runTx(
 
 function updateAndDiffValidators(validators, newValidators) {
   const diffs = [];
+  const pubKeys = {};
   const push = validator => {
     diffs.push({
       pubKey: {
@@ -74,17 +72,31 @@ function updateAndDiffValidators(validators, newValidators) {
   };
 
   for (const key in newValidators) {
-    if (validators[key] === undefined) {
-      validators[key] = newValidators[key];
-      push(validators[key]);
-    } else if (
-      typeof newValidators[key] === 'number' &&
-      validators[key].power !== newValidators[key]
+    const numberOrObj = newValidators[key];
+    let validator = validators[key];
+
+    if (
+      typeof numberOrObj === 'number' &&
+      validator &&
+      validator.power !== numberOrObj
     ) {
-      validators[key].power = newValidators[key];
-      push(validators[key]);
+      validator.power = numberOrObj;
+    } else {
+      validator = numberOrObj;
+      validators[key] = validator;
+    }
+
+    // can also be 0
+    if (validator) {
+      pubKeys[validator.pubKey.data] = validator;
     }
   }
+
+  // why do we have different validator addrs with the same pubKey?
+  for (const key in pubKeys) {
+    push(pubKeys[key]);
+  }
+
   return diffs;
 }
 
@@ -94,9 +106,9 @@ module.exports = function configureABCIServer({
   txMiddleware,
   blockMiddleware,
   store,
-  // initialAppHash,
   initChainMiddleware,
   periodMiddleware,
+  genesis,
 }) {
   const chainInfo = {
     height: 1,
@@ -107,11 +119,10 @@ module.exports = function configureABCIServer({
   abciApp.checkTx = async req => {
     const rawTx = req.tx;
     try {
-      const tx = decodeTx(rawTx);
       const [isValid, log] = await runTx(
         txMiddleware,
         store,
-        tx,
+        rawTx,
         chainInfo,
         false
       );
@@ -125,11 +136,10 @@ module.exports = function configureABCIServer({
   abciApp.deliverTx = async req => {
     const rawTx = req.tx;
     try {
-      const tx = decodeTx(rawTx);
       const [isValid, log] = await runTx(
         txMiddleware,
         store,
-        tx,
+        rawTx,
         chainInfo,
         true
       );
@@ -148,8 +158,8 @@ module.exports = function configureABCIServer({
     for (const blockHandler of blockMiddleware) {
       await blockHandler(store, chainInfo);
     }
-    const appHash = await getRoot(store);
-    return { data: appHash };
+
+    return {};
   };
 
   abciApp.initChain = async ({ validators }) => {
@@ -188,25 +198,20 @@ module.exports = function configureABCIServer({
     return { status: rsp.status };
   };
 
-  abciApp.query = () => {
-    try {
-      return {
-        value: Buffer.from(stringify(store)),
-        height: chainInfo.height - 1,
-        proof: '',
-        key: '',
-        index: 0,
-        code: 0,
-        log: '',
-      };
-    } catch (e) {
-      return { code: 2, log: `invalid query: ${e.message}` };
-    }
-  };
-
   abciApp.info = async () => {
-    const rootHash = await getRoot(store);
-    return { lastBlockAppHash: rootHash };
+    const rsp = {};
+
+    if (genesis && genesis.app_hash) {
+      rsp.lastBlockAppHash = Buffer.from(genesis.app_hash, 'hex');
+    }
+
+    if (store.blockHeight) {
+      chainInfo.height = store.blockHeight;
+      // we always save current bridgeState = commited block height + 1
+      rsp.lastBlockHeight = store.blockHeight - 1;
+    }
+
+    return rsp;
   };
 
   const abciServer = createABCIServer(abciApp);

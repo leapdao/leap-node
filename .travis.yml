@@ -1,9 +1,26 @@
 language: node_js
-cache: yarn
 node_js:
-  - '8.11'
-before_script: yarn global add codecov
-script:
-  - yarn lint
-  - yarn test
-  - codecov
+  - "8.11"
+cache: yarn
+jobs:
+  include:
+    - stage: tests
+      name: "yarn lint"
+      script: yarn lint
+
+    - stage: tests
+      name: "yarn test and codecov"
+      before_script: yarn global add codecov
+      script:
+        - yarn test
+        - codecov
+    - stage: tests
+      name: "integration tests"
+      script:
+        - git clone --single-branch -b master https://github.com/leapdao/integration-tests.git /tmp/tests
+        - |
+          cat > /tmp/tests/configs/build << EOF
+          contracts_repo=" --single-branch -b master https://github.com/leapdao/leap-contracts.git"
+          node_repo=" `pwd`"
+          EOF
+        - cd /tmp/tests && yarn && yarn build && yarn test

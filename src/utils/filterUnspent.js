@@ -6,13 +6,13 @@
  */
 
 const hasAddress = (utxo, address) => {
-  if (address === undefined) return true;
+  if (!address) return true;
   return utxo.address.toLowerCase() === address.toLowerCase();
 };
 
 const hasColor = (utxo, color) => {
   if (color === undefined) return true;
-  return utxo.color === color;
+  return Number(utxo.color) === Number(color);
 };
 
 module.exports = function filterUnspent(unspent, address, color) {

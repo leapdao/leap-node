@@ -6,6 +6,7 @@
  */
 
 /* eslint-disable no-console */
+/* global app, bridgeState, blockTicker, eventsRelay, db */
 
 const cliArgs = require('./src/utils/cliArgs');
 const cleanupLotion = require('./src/utils/cleanupLotion');
@@ -23,6 +24,7 @@ const BridgeState = require('./src/bridgeState');
 const BlockTicker = require('./src/utils/BlockTicker');
 const EventsRelay = require('./src/eventsRelay');
 const lotion = require('./lotion');
+const delayedSender = require('./src/txHelpers/delayedSender');
 
 const { logNode, logTendermint } = require('./src/utils/debug');
 
@@ -40,24 +42,6 @@ async function run() {
   })();
 
   global.app = lotion({
-    initialState: {
-      mempool: [],
-      balances: {}, // stores account balances like this { [colorIndex]: { address1: 0, ... } }
-      owners: {}, // index for NFT ownerOf call
-      unspent: {}, // stores unspent outputs (deposits, transfers)
-      processedDeposit: 0,
-      slots: [],
-      epoch: {
-        epoch: 0,
-        lastEpochHeight: 0,
-        epochLength: null,
-        epochLengthIndex: -1,
-      },
-      gas: {
-        minPrice: 0,
-        minPriceIndex: -1,
-      },
-    },
     networkId: `${config.network}-${config.networkId}`,
     genesis: config.genesis,
     devMode: cliArgs.devMode,
@@ -74,6 +58,7 @@ async function run() {
     },
     unsafeRpc: cliArgs.unsafeRpc,
     readonlyValidator: cliArgs.readonly,
+    dataPath: cliArgs.dataPath,
   });
 
   if (cliArgs.fresh) {
@@ -85,10 +70,9 @@ async function run() {
 
   const privKey = await readPrivKey(app, cliArgs);
 
-  global.eventsRelay = new EventsRelay(
-    config.eventsDelay,
-    cliArgs.tendermintPort
-  );
+  const sender = delayedSender(cliArgs.tendermintPort);
+
+  global.eventsRelay = new EventsRelay(config.eventsDelay, sender);
   global.bridgeState = new BridgeState(
     db,
     privKey,
@@ -107,10 +91,12 @@ async function run() {
   const nodeConfig = Object.assign({}, cliArgs, { network: config });
 
   app.useTx(txHandler(bridgeState, nodeConfig));
-  app.useBlock(blockHandler(bridgeState, db, nodeConfig));
-  app.usePeriod(periodHandler(bridgeState));
+  app.useBlock(blockHandler(bridgeState, db, nodeConfig, sender));
+  app.usePeriod(periodHandler(bridgeState, sender));
 
-  app.listen(cliArgs.port).then(async params => {
+  const lastGoodState = await bridgeState.loadState();
+
+  app.listen(lastGoodState).then(async params => {
     blockTicker.subscribe(eventsRelay.onNewBlock);
     await printStartupInfo(params, bridgeState);
 

@@ -9,13 +9,10 @@ const { Tx, Input, Outpoint } = require('leap-core');
 const { BigInt } = require('jsbi-utils');
 const TinyQueue = require('tinyqueue');
 
-const sendTx = require('./txHelpers/sendTx');
 const { handleEvents } = require('./utils');
 
-const minDelay = 2000;
-
 module.exports = class EventsRelay {
-  constructor(delay, tendermintPort) {
+  constructor(delay, { sendDelayed }) {
     this.relayBuffer = new TinyQueue([], (a, b) => {
       if (a.blockNumber === b.blockNumber) {
         return a.logIndex - b.logIndex;
@@ -23,15 +20,9 @@ module.exports = class EventsRelay {
       return a.blockNumber - b.blockNumber;
     });
     this.relayDelay = delay;
+    this.sendDelayed = sendDelayed;
 
-    this.tendermintPort = tendermintPort;
     this.onNewBlock = this.onNewBlock.bind(this);
-  }
-
-  sendDelayed(tx) {
-    setTimeout(() => {
-      sendTx(this.tendermintPort, tx.hex());
-    }, minDelay);
   }
 
   async onNewBlock(blockNumber) {
@@ -72,6 +63,18 @@ module.exports = class EventsRelay {
         const tx = Tx.deposit(event.depositId, value, event.depositor, color);
         this.sendDelayed(tx);
       },
+      NewDepositV2: async ({ returnValues: event }) => {
+        const color = Number(event.color);
+        const value = BigInt(event.amount);
+        const tx = Tx.deposit(
+          event.depositId,
+          value,
+          event.depositor,
+          color,
+          event.data
+        );
+        this.sendDelayed(tx);
+      },
       EpochLength: async event => {
         const { epochLength } = event.returnValues;
         const tx = Tx.epochLength(Number(epochLength));
@@ -83,6 +86,11 @@ module.exports = class EventsRelay {
         this.sendDelayed(tx);
       },
       ExitStarted: async event => {
+        const { txHash, outIndex } = event.returnValues;
+        const tx = Tx.exit(new Input(new Outpoint(txHash, Number(outIndex))));
+        this.sendDelayed(tx);
+      },
+      ExitStartedV2: async event => {
         const { txHash, outIndex } = event.returnValues;
         const tx = Tx.exit(new Input(new Outpoint(txHash, Number(outIndex))));
         this.sendDelayed(tx);

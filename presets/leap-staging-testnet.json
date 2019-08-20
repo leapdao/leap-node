@@ -1,0 +1,48 @@
+{
+  "bridgeAddr": "0x3c80369bBf392cC1DBA45B2F1d97F7A374f5BB40",
+  "operatorAddr": "0x18DF09E36c4f8Da8811411Cb3c1A0B2A9129B382",
+  "exitHandlerAddr": "0x690E1B4734697b30aE0f4ddEb40e97dC509513C8",
+  "rootNetwork": "https://rinkeby.infura.io/v3/f039330d8fb747e48a7ce98f51400d65",
+  "rootNetworkId": 4,
+  "network": "leap-staging-testnet",
+  "networkId": 334171723,
+  "eventsDelay": 2,
+  "bridgeDelay": 6,
+  "genesis": {
+    "genesis_time": "2019-04-22T18:28:01.352347206Z",
+    "app_hash": "",
+    "chain_id": "test-chain-FQ99Wy",
+    "consensus_params": {
+      "block": {
+        "max_bytes": "22020096",
+        "max_gas": "-1",
+        "time_iota_ms": "1000"
+      },
+      "evidence": {
+        "max_age": "100000"
+      },
+      "validator": {
+        "pub_key_types": [
+          "ed25519"
+        ]
+      }
+    },
+    "validators": [
+      {
+        "address": "AB4A0CF585798B42B4894DB7E88168CD9695075F",
+        "pub_key": {
+          "type": "tendermint/PubKeyEd25519",
+          "value": "9KzfKJUzi35YkyW7LfsmUOvYqUkpTYqbKzc205dgYfs="
+        },
+        "power": "10",
+        "name": ""
+      }
+    ]
+  },
+  "peers": [
+    "a2168aac2fd241a4780a38e104d1eb9d29275555@34.240.43.87:46691",
+    "073aeb2b93d034ba7881e081bf060d029f14a9b4@34.243.93.32:46691",
+    "91242eea2f5918732912061f53f7041e5b5ea186@52.209.190.103:46691",
+    "79f6a69bbf2fd212f4b3f73aac05763003526083@val2.staging.leapdao.org:46691"
+  ]
+}

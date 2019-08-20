@@ -1,20 +1,20 @@
 {
-  "exitHandlerAddr": "0x0036192587fD788B75829fbF79BE7F06E4F23B21",
-  "bridgeAddr": "0x314337900B28aFaa04765E59f37f348aa43a82cC",
-  "operatorAddr": "0x368211162758B29576D8551adDA6E8480AAdFe5a",
-  "rootNetwork": "https://mainnet.infura.io",
+  "exitHandlerAddr": "0x495AeB6FD65D39AA49482a938b85f7A70b075750",
+  "bridgeAddr": "0x3dC3f79596AF8666C2bc27e1A565Dee01dcb55c8",
+  "operatorAddr": "0xa47F5664e95830Bb952ef7Fb3d52996c3A8a2cA6",
+  "rootNetworkId": 1,
   "network": "leap-mainnet",
-  "networkId": 448747055,
+  "networkId": 448747062,
   "eventsDelay": 2,
   "bridgeDelay": 6,
-  "noSpendingConditions": true,
   "genesis": {
-    "app_hash": "68154a516d6821b07e6b25f76310faeae1d24d1c0a6cf3152ccba90f1fcb9db9",
-    "chain_id": "test-chain-egOhov",
+    "genesis_time": "2019-07-01T17:00:44.599891617Z",
+    "chain_id": "test-chain-UY6Lil",
     "consensus_params": {
-      "block_size": {
+      "block": {
         "max_bytes": "22020096",
-        "max_gas": "-1"
+        "max_gas": "-1",
+        "time_iota_ms": "1000"
       },
       "evidence": {
         "max_age": "100000"
@@ -25,23 +25,22 @@
         ]
       }
     },
-    "genesis_time": "2019-02-01T15:08:23.696358094Z",
     "validators": [
       {
-        "address": "2D5F1D9C778BC51B3432736C2E9B221EE74100C4",
-        "name": "",
-        "power": "10",
+        "address": "ED6A83843685A62325F35797A56C8C9490FB6938",
         "pub_key": {
           "type": "tendermint/PubKeyEd25519",
-          "value": "Cr3gsrjQ/GtTZllGK6Ht0zcm3v1ds6wBn3qjg0ZNtCo="
-        }
+          "value": "UkMNDJwtSUOAnIyMgh8cZrqYfn9ChIM/Ua4oELKO4ZY="
+        },
+        "power": "10",
+        "name": ""
       }
-    ]
+    ],
+    "app_hash": ""
   },
   "peers": [
-    "8e8789d1713de475cddc638a7854406ee2eb09a7@172.31.24.215:46691",
-    "105b9234cb40c70e1e896f053a8c061842891182@172.31.29.160:46691",
-    "5165813b4164e0bcfa2ad0fd7aea61af3b5907dc@sen1.mainnet.leapdao.org:46691",
-    "fe88ff67d3eb97dcc03a6cca227164eb98b8c59d@sen2.mainnet.leapdao.org:46691"
+    "67ba0283135d7a5e80c1b523c13268f714a02457@sen1.mainnet.leapdao.org:46691",
+    "b25cfb1b324a03337bd59d273efd50b708fb33b4@sen2.mainnet.leapdao.org:46691",
+    "4e0af20a7936b5eea96822c34328d811073d0cfb@val1.mainnet.leapdao.org:46691"
   ]
 }

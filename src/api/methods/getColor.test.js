@@ -1,36 +1,46 @@
 const getColor = require('./getColor');
-const { NFT_COLOR_BASE } = require('./constants');
+const { NFT_COLOR_BASE, NST_COLOR_BASE } = require('./constants');
 
 const {
   erc20Tokens,
   erc721Tokens,
-  exitHandlerContract,
+  erc1948Tokens,
 } = require('./getColors.test');
 
-const tokens = { erc20: [], erc721: [] };
+const tokens = {
+  erc20: erc20Tokens,
+  erc721: erc721Tokens,
+  erc1948: erc1948Tokens,
+};
 
 describe('getColor', () => {
   test('erc20 color', async () => {
-    expect(await getColor({ exitHandlerContract, tokens }, erc20Tokens[0])).toBe('0x0');
-    expect(await getColor({ exitHandlerContract, tokens }, erc20Tokens[1])).toBe('0x1');
+    expect(await getColor({ tokens }, erc20Tokens[0])).toBe('0x0');
+    expect(await getColor({ tokens }, erc20Tokens[1])).toBe('0x1');
   });
 
   test('erc721 color', async () => {
-    expect(await getColor({ exitHandlerContract, tokens }, erc721Tokens[0])).toBe(
+    expect(await getColor({ tokens }, erc721Tokens[0])).toBe(
       `0x${NFT_COLOR_BASE.toString(16)}`
     );
-    expect(await getColor({ exitHandlerContract, tokens }, erc721Tokens[1])).toBe(
+    expect(await getColor({ tokens }, erc721Tokens[1])).toBe(
       `0x${(NFT_COLOR_BASE + 1).toString(16)}`
+    );
+  });
+
+  test('erc1948 color', async () => {
+    expect(await getColor({ tokens }, erc1948Tokens[0])).toBe(
+      `0x${NST_COLOR_BASE.toString(16)}`
+    );
+    expect(await getColor({ tokens }, erc1948Tokens[1])).toBe(
+      `0x${(NST_COLOR_BASE + 1).toString(16)}`
     );
   });
 
   test('non-existent color', async () => {
     let error;
     try {
-      await getColor(
-        { exitHandlerContract, tokens },
-        '0x25e70D10AE0E481975aD8fA30f4e67653c441111'
-      );
+      await getColor({ tokens }, '0x25e70D10AE0E481975aD8fA30f4e67653c441111');
     } catch (err) {
       error = err.message;
     }

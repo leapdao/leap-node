@@ -34,7 +34,13 @@ describe('getBlockByHash', () => {
     expect(response).toEqual({
       number: '0x0',
       hash: block.hash(),
-      parentHash: undefined,
+      parentHash:
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
+      difficulty: 0,
+      extraData: 0,
+      gasLimit: 0,
+      gasUsed: 0,
+      miner: '0x0000000000000000000000000000000000000000',
       size: `0x${block.hex().length.toString(16)}`,
       timestamp: '0x0',
       transactions: [tx1.hash(), tx2.hash()],
@@ -49,7 +55,13 @@ describe('getBlockByHash', () => {
     expect(response).toEqual({
       number: '0x0',
       hash: block.hash(),
-      parentHash: undefined,
+      parentHash:
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
+      difficulty: 0,
+      extraData: 0,
+      gasLimit: 0,
+      gasUsed: 0,
+      miner: '0x0000000000000000000000000000000000000000',
       size: `0x${block.hex().length.toString(16)}`,
       timestamp: '0x0',
       transactions: [

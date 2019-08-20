@@ -5,6 +5,7 @@ const getConfig = require('./getConfig');
 
 const NODE_ID = '51dcb849fd7870881750c1ef5503b61341ea3a1c';
 const P2P_PORT = 41000;
+const version = `v${require('../../../package.json').version}`; //eslint-disable-line
 const appMock = {
   info: () => ({
     p2pPort: P2P_PORT,
@@ -24,6 +25,7 @@ describe('getConfig', () => {
       bridgeAddr: '0x186fab4587006032993a9abc62ab288cc259d7e7',
       operatorAddr: '0x186fab4587006032993a9abc62ab288cc259d7e7',
       rootNetwork: 'https://rinkeby.infura.io',
+      rootNetworkId: 4,
       network: 'testnet',
       networkId: '1341',
       eventsDelay: 6,
@@ -36,12 +38,14 @@ describe('getConfig', () => {
       operatorAddr: config.operatorAddr,
       genesis: {},
       rootNetwork: config.rootNetwork,
+      rootNetworkId: 4,
       network: config.network,
       networkId: config.networkId,
       p2pPort: P2P_PORT,
       nodeId: NODE_ID,
       eventsDelay: 6,
       bridgeDelay: 2,
+      version,
     });
   });
 
@@ -49,6 +53,7 @@ describe('getConfig', () => {
     const config = {
       exitHandlerAddr: '0x186fab4587006032993a9abc62ab288cc259d7e7',
       rootNetwork: 'https://rinkeby.infura.io',
+      rootNetworkId: 4,
       network: 'testnet',
       networkId: '1341',
       peers: ['peer1'],
@@ -60,6 +65,7 @@ describe('getConfig', () => {
     expect(result).toEqual({
       exitHandlerAddr: config.exitHandlerAddr,
       rootNetwork: config.rootNetwork,
+      rootNetworkId: 4,
       network: config.network,
       networkId: config.networkId,
       peers: config.peers,
@@ -68,6 +74,7 @@ describe('getConfig', () => {
       nodeId: NODE_ID,
       eventsDelay: 0,
       bridgeDelay: 0,
+      version,
     });
   });
 
@@ -75,6 +82,7 @@ describe('getConfig', () => {
     const config = {
       bridgeAddr: '0x186fab4587006032993a9abc62ab288cc259d7e7',
       rootNetwork: 'https://rinkeby.infura.io',
+      rootNetworkId: 4,
       network: 'testnet',
       networkId: '1341',
       peers: ['peer1'],
@@ -90,10 +98,12 @@ describe('getConfig', () => {
       'bridgeAddr',
       'operatorAddr',
       'rootNetwork',
+      'rootNetworkId',
       'network',
       'networkId',
       'eventsDelay',
       'bridgeDelay',
+      'version',
       'genesis',
       'peers',
       'p2pPort',

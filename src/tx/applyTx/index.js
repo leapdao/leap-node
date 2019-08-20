@@ -19,6 +19,7 @@ const checks = {
   [Type.VALIDATOR_JOIN]: require('./checkValidatorJoin'),
   [Type.VALIDATOR_LOGOUT]: require('./checkValidatorLogout'),
   [Type.SPEND_COND]: require('./checkSpendCond'),
+  [Type.PERIOD_VOTE]: require('./checkPeriodVote'),
 };
 
 module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {

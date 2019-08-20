@@ -2,17 +2,22 @@ const executeCall = require('./executeCall');
 const {
   erc20Tokens,
   erc721Tokens,
-  exitHandlerContract,
+  erc1948Tokens,
 } = require('./getColors.test');
 const { NFT_COLOR_BASE } = require('./constants');
 
+// TODO: support NSTs
 const A1 = '0xB8205608d54cb81f44F263bE086027D8610F3C94';
 const signatures = {
   tokenOfOwnerByIndex: '0x2f745c59000000000000000000000000',
   balanceOf: '0x70a08231000000000000000000000000',
   unsupported: '0x00000000000000000000000000000000', // represents any unsupported method
 };
-const tokens = { erc20: [], erc721: [] };
+const tokens = {
+  erc20: erc20Tokens,
+  erc721: erc721Tokens,
+  erc1948: erc1948Tokens,
+};
 
 describe('executeCall', () => {
   test('tag != latest', async () => {
@@ -37,7 +42,6 @@ describe('executeCall', () => {
 
     const response = await executeCall(
       {
-        exitHandlerContract,
         tokens,
         currentState: {
           balances: {
@@ -69,7 +73,6 @@ describe('executeCall', () => {
     try {
       await executeCall(
         {
-          exitHandlerContract,
           tokens,
           currentState: {
             balances: {},
@@ -94,7 +97,6 @@ describe('executeCall', () => {
     try {
       await executeCall(
         {
-          exitHandlerContract,
           tokens,
           currentState: {
             balances: {},
@@ -117,7 +119,6 @@ describe('executeCall', () => {
 
     const response = await executeCall(
       {
-        exitHandlerContract,
         tokens,
         currentState: {
           balances: {
@@ -143,7 +144,6 @@ describe('executeCall', () => {
 
     const response = await executeCall(
       {
-        exitHandlerContract,
         tokens,
         currentState: {
           balances: {},
@@ -165,7 +165,6 @@ describe('executeCall', () => {
 
     const response = await executeCall(
       {
-        exitHandlerContract,
         tokens,
         currentState: {
           balances: {
@@ -191,7 +190,6 @@ describe('executeCall', () => {
 
     const response = await executeCall(
       {
-        exitHandlerContract,
         tokens,
         currentState: {
           balances: {},

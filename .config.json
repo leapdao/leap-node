@@ -1,6 +1,7 @@
 {
   "bridgeAddr": "",
   "rootNetwork": "https://rinkeby.infura.io",
+  "rootNetworkId": 4,
   "genesis": null,
   "network": "",
   "networkId": 1341,

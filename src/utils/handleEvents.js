@@ -9,7 +9,7 @@ module.exports = handlers => {
     for (const event of events) {
       // istanbul ignore next
       if (event.event === undefined) {
-        console.warn('Unknown event. ABI can be outdated');
+        console.warn('Unknown event. ABI can be outdated'); // eslint-disable-line no-console
       }
 
       if (handlers[event.event]) {

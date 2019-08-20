@@ -13,7 +13,7 @@ axios.get.mockResolvedValue({
     block_time: 19.228571428571428,
     blockNum: 7269705,
     speed: 0.998286333650524,
-    safeLowWait: 22.6,
+    safeLowWait: 169.0,
     avgWait: 3.2,
     fastWait: 0.6,
     fastestWait: 0.6,
@@ -32,6 +32,11 @@ describe('getRootGasPrice', () => {
     test('reads specified gas price from gas station API', async () => {
       const result = await getRootGasPrice(web3, 'safeLow');
       expect(result).toBe(13400000000);
+    });
+
+    test('reads specified gas price from gas station API', async () => {
+      const result = await getRootGasPrice(web3, 'safeLowWait');
+      expect(result).toBe(16900000000);
     });
 
     test('caps gas price to 200 gwei', async () => {

@@ -14,15 +14,15 @@ services:
     volumes:
       - leap-node:/root
     ports:
-      # ATTENTION: if you are going to run this on an untrusted network, guard all ports except `p2p`.
-      # tx server
-      - "3000:3000"
+      # ATTENTION:
+      #   if you are going to run this on an untrusted network,
+      #   you may want to guard the rpc/ws ports.
       # rpc
       - "8645:8645"
       # ws
       - "8646:8646"
       # proxy_app
-      - "26659:26659"
+      - "127.0.0.1:26659:26659"
       # p2p
       - "46691:46691"
       # devtools-protocol

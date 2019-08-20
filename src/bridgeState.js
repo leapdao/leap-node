@@ -15,17 +15,17 @@ const { logNode } = require('./utils/debug');
 
 const bridgeABI = require('./abis/bridgeAbi');
 const exitABI = require('./abis/exitHandler');
-const operatorABI = require('./abis/operator');
+const singleOperatorABI = require('./abis/singleOperator');
+let operatorABI = require('./abis/operator');
 const proxyABI = require('./abis/proxy');
-const { NFT_COLOR_BASE } = require('./api/methods/constants');
+const { NFT_COLOR_BASE, NST_COLOR_BASE } = require('./api/methods/constants');
+const NETWORKS = require('./utils/networks');
 
 module.exports = class BridgeState {
   constructor(db, privKey, config, relayBuffer) {
     this.config = config;
-    this.web3 = new Web3();
-    this.web3.setProvider(
-      new this.web3.providers.HttpProvider(config.rootNetwork)
-    );
+    const networkConfig = NETWORKS[config.rootNetworkId] || { provider: {} };
+    this.web3 = new Web3(networkConfig.provider.http);
 
     this.exitHandlerContract = new this.web3.eth.Contract(
       exitABI.concat(proxyABI),
@@ -35,6 +35,13 @@ module.exports = class BridgeState {
       bridgeABI.concat(proxyABI),
       config.bridgeAddr
     );
+    // if theta mainnet or theta testnet, use old operator ABI
+    if (
+      networkConfig.networkId === 448747062 ||
+      networkConfig.networkId === 218508104
+    ) {
+      operatorABI = singleOperatorABI;
+    }
     this.operatorContract = new this.web3.eth.Contract(
       operatorABI.concat(proxyABI),
       config.operatorAddr
@@ -55,6 +62,7 @@ module.exports = class BridgeState {
     this.tokens = {
       erc20: [],
       erc721: [],
+      erc1948: [],
     };
     this.epochLengths = [];
     this.minGasPrices = [];
@@ -68,6 +76,7 @@ module.exports = class BridgeState {
     });
     this.bridgeDelay = config.bridgeDelay;
     this.relayBuffer = relayBuffer;
+    this.logsCache = {};
   }
 
   async init() {
@@ -85,12 +94,17 @@ module.exports = class BridgeState {
       this.web3,
       contracts,
       this.eventsBuffer,
-      genesisBlock
+      parseInt(genesisBlock, 10)
     );
     const blockNumber = await this.web3.eth.getBlockNumber();
     await this.eventsSubscription.init();
     await this.onNewBlock(blockNumber);
     await this.initBlocks();
+
+    if (this.lastBlocksRoot && this.lastPeriodRoot) {
+      this.currentPeriod = new Period(this.lastBlocksRoot);
+    }
+
     logNode('Synced');
   }
 
@@ -132,6 +146,14 @@ module.exports = class BridgeState {
           amount: event.amount,
         };
       },
+      NewDepositV2: ({ returnValues: event }) => {
+        this.deposits[event.depositId] = {
+          depositor: event.depositor,
+          color: event.color,
+          amount: event.amount,
+          data: event.data,
+        };
+      },
       ExitStarted: ({ returnValues: event }) => {
         const outpoint = new Outpoint(event.txHash, Number(event.outIndex));
         this.exits[outpoint.getUtxoId()] = {
@@ -142,11 +164,28 @@ module.exports = class BridgeState {
           amount: event.amount,
         };
       },
+      ExitStartedV2: ({ returnValues: event }) => {
+        const outpoint = new Outpoint(event.txHash, Number(event.outIndex));
+        this.exits[outpoint.getUtxoId()] = {
+          txHash: event.txHash,
+          outIndex: Number(event.outIndex),
+          exitor: event.exitor,
+          color: event.color,
+          amount: event.amount,
+          data: event.data,
+        };
+      },
       NewToken: ({ returnValues: event }) => {
-        if (event.color < NFT_COLOR_BASE) {
-          this.tokens.erc20.push(event.tokenAddr); // eslint-disable-line no-underscore-dangle
-        } else {
-          this.tokens.erc721.push(event.tokenAddr); // eslint-disable-line  no-underscore-dangle
+        let array = this.tokens.erc20;
+
+        if (event.color >= NST_COLOR_BASE) {
+          array = this.tokens.erc1948;
+        } else if (event.color >= NFT_COLOR_BASE) {
+          array = this.tokens.erc721;
+        }
+
+        if (array.indexOf(event.tokenAddr) === -1) {
+          array.push(event.tokenAddr);
         }
       },
       EpochLength: ({ returnValues: event }) => {
@@ -154,6 +193,10 @@ module.exports = class BridgeState {
       },
       MinGasPrice: ({ returnValues: event }) => {
         this.minGasPrices.push(Number(event.minGasPrice));
+      },
+      Submission: ({ returnValues: event }) => {
+        this.lastBlocksRoot = event.blocksRoot;
+        this.lastPeriodRoot = event.periodRoot;
       },
     });
 
@@ -163,5 +206,35 @@ module.exports = class BridgeState {
     for (const event of events) {
       this.relayBuffer.push(event);
     }
+  }
+
+  async saveState() {
+    this.currentState.blockHeight = this.blockHeight;
+    this.db.storeChainState(this.currentState);
+  }
+
+  async loadState() {
+    const res = await this.db.getChainState();
+    this.currentState = res || {
+      blockHeight: 0,
+      mempool: [],
+      balances: {}, // stores account balances like this { [colorIndex]: { address1: 0, ... } }
+      owners: {}, // index for NFT ownerOf call
+      unspent: {}, // stores unspent outputs (deposits, transfers)
+      processedDeposit: 0,
+      slots: [],
+      epoch: {
+        epoch: 0,
+        lastEpochHeight: 0,
+        epochLength: null,
+        epochLengthIndex: -1,
+      },
+      gas: {
+        minPrice: 0,
+        minPriceIndex: -1,
+      },
+    };
+
+    return this.currentState;
   }
 };

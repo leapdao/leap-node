@@ -23,13 +23,6 @@ const options = [
     help: 'Disabling validators set updates',
   },
   {
-    names: ['port'],
-    type: 'number',
-    env: 'TX_PORT',
-    default: 3000,
-    help: 'Tx endpoint port',
-  },
-  {
     names: ['rpcaddr'],
     type: 'string',
     env: 'RPC_ADDR',
@@ -127,6 +120,12 @@ const options = [
     default: false,
     env: 'UNSAFE_RPC',
     help: 'Run unsafe Tendermint RPC',
+  },
+  {
+    names: ['dataPath'],
+    type: 'string',
+    env: 'DATA_PATH',
+    help: 'Path to lotion folder',
   },
 ];
 

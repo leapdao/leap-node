@@ -1,19 +1,12 @@
-/* eslint-disable no-await-in-loop */
-
 const getPort = require('get-port');
 const fs = require('fs-extra');
-const level = require('level');
 const axios = require('axios');
 const { join } = require('path');
 const ABCIServer = require('./lib/abci-app.js');
-const TxServer = require('./lib/tx-server.js');
 const Tendermint = require('./lib/tendermint.js');
 const rimraf = require('rimraf');
 const generateNetworkId = require('./lib/network-id.js');
-const getNodeInfo = require('./lib/node-info.js');
-const getRoot = require('./lib/get-root.js');
 const os = require('os');
-const merk = require('merk');
 const { EventEmitter } = require('events');
 
 const LOTION_HOME = process.env.LOTION_HOME || join(os.homedir(), '.lotion');
@@ -33,7 +26,6 @@ function getGenesis(genesisPath) {
 }
 
 function Lotion(opts = {}) {
-  const initialState = opts.initialState || {};
   const peers = opts.peers || [];
   const logTendermint = opts.logTendermint || false;
   const createEmptyBlocks =
@@ -44,12 +36,10 @@ function Lotion(opts = {}) {
   const { unsafeRpc, readonlyValidator } = opts;
   const txMiddleware = [];
   const queryMiddleware = [];
-  const initializerMiddleware = [];
   const blockMiddleware = [];
   const periodMiddleware = [];
   const initChainMiddleware = [];
   const postListenMiddleware = [];
-  const txEndpoints = [];
   const keys =
     typeof opts.keys === 'string'
       ? JSON.parse(fs.readFileSync(opts.keys, { encoding: 'utf8' }))
@@ -59,12 +49,10 @@ function Lotion(opts = {}) {
       ? JSON.parse(getGenesis(opts.genesis))
       : opts.genesis;
 
-  const appState = Object.assign({}, initialState);
   const bus = new EventEmitter();
   let appInfo;
   let abciServer;
   let tendermint;
-  let txHTTPServer;
   let lotionPath;
 
   const networkId =
@@ -73,12 +61,10 @@ function Lotion(opts = {}) {
       txMiddleware,
       blockMiddleware,
       queryMiddleware,
-      initializerMiddleware,
-      initialState,
       devMode,
       genesis
     );
-  lotionPath = join(LOTION_HOME, 'networks', networkId);
+  lotionPath = opts.dataPath || join(LOTION_HOME, 'networks', networkId);
 
   if (devMode) {
     lotionPath += Math.floor(Math.random() * 1e9);
@@ -112,8 +98,6 @@ function Lotion(opts = {}) {
         appMethods.usePeriod(middleware.middleware);
       } else if (middleware.type === 'initChain') {
         appMethods.useInitChain(middleware.middleware);
-      } else if (middleware.type === 'initializer') {
-        appMethods.useInitializer(middleware.middleware);
       } else if (middleware.type === 'post-listen') {
         appMethods.usePostListen(middleware.middleware);
       }
@@ -134,16 +118,13 @@ function Lotion(opts = {}) {
     useQuery: queryHandler => {
       queryMiddleware.push(queryHandler);
     },
-    useInitializer: initializer => {
-      initializerMiddleware.push(initializer);
-    },
     usePostListen: postListener => {
       // TODO: rename "post listen", there's probably a more descriptive name.
       postListenMiddleware.push(postListener);
     },
-    listen: txServerPort => {
+    listen: store => {
       return new Promise(async resolve => {
-        // set up abci server, then tendermint node, then tx server
+        // set up abci server, then tendermint node
         const { tendermintPort, abciPort, p2pPort } = await getPorts(
           opts.p2pPort,
           opts.tendermintPort,
@@ -152,26 +133,14 @@ function Lotion(opts = {}) {
 
         const { tendermintAddr } = opts;
 
-        // initialize merk store
-        const merkDb = level(join(lotionPath, 'merk'));
-        const store = await merk(merkDb);
-
-        const tendermintRpcUrl = `http://localhost:${tendermintPort}`;
-
-        for (const initializer of initializerMiddleware) {
-          await initializer(appState);
-        }
-        Object.assign(store, appState);
-        const initialAppHash = (await getRoot(store)).toString('hex');
         abciServer = ABCIServer({
           txMiddleware,
           blockMiddleware,
           queryMiddleware,
-          initializerMiddleware,
           store,
-          initialAppHash,
           periodMiddleware,
           initChainMiddleware,
+          genesis,
         });
         abciServer.listen(abciPort, 'localhost');
 
@@ -188,7 +157,6 @@ function Lotion(opts = {}) {
             peers,
             genesis,
             keys,
-            initialAppHash,
             unsafeRpc,
             readonlyValidator,
           });
@@ -201,34 +169,21 @@ function Lotion(opts = {}) {
 
         await tendermint.synced;
 
-        const nodeInfo = await getNodeInfo(lotionPath);
-        const txServer = TxServer({
-          tendermintRpcUrl,
-          store,
-          nodeInfo,
-          txEndpoints,
-          port: txServerPort,
-        });
-        txHTTPServer = txServer.listen(txServerPort, 'localhost', () => {
-          // add some references to useful variables to app object.
-          appInfo = {
-            tendermintPort,
-            abciPort,
-            txServerPort,
-            p2pPort,
-            lotionPath,
-            genesisPath: join(lotionPath, 'config', 'genesis.json'),
-          };
+        appInfo = {
+          tendermintPort,
+          abciPort,
+          p2pPort,
+          lotionPath,
+          genesisPath: join(lotionPath, 'config', 'genesis.json'),
+        };
 
-          bus.emit('listen');
-          resolve(appInfo);
-        });
+        bus.emit('listen');
+        resolve(appInfo);
       });
     },
     close: () => {
       abciServer.close();
       tendermint.close();
-      txHTTPServer.close();
     },
     info: () => appInfo,
     lotionPath: () => lotionPath,

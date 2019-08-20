@@ -1,7 +1,21 @@
 const fs = require('fs');
-const { stringify } = require('deterministic-json');
 const { join } = require('path');
-const tendermint = require('tendermint-node');
+const tendermint = require('./tendermint-node');
+
+// default params (as of version 0.31), except `time_iota_ms`
+const CONSENSUS_PARAMS = {
+  block: {
+    max_bytes: '22020096',
+    max_gas: '-1',
+    time_iota_ms: '1000',
+  },
+  evidence: {
+    max_age: '100000',
+  },
+  validator: {
+    pub_key_types: ['ed25519'],
+  },
+};
 
 module.exports = async ({
   lotionPath,
@@ -14,7 +28,6 @@ module.exports = async ({
   peers,
   genesis,
   keys,
-  initialAppHash,
   createEmptyBlocks,
   unsafeRpc,
   readonlyValidator,
@@ -24,11 +37,15 @@ module.exports = async ({
   if (genesis) {
     fs.writeFileSync(
       join(lotionPath, 'config', 'genesis.json'),
-      stringify(genesis)
+      JSON.stringify(genesis)
     );
   }
   if (keys) {
-    const validatorJsonPath = join(lotionPath, 'config', 'priv_validator.json');
+    const validatorJsonPath = join(
+      lotionPath,
+      'config',
+      'priv_validator_key.json'
+    );
     const generatedValidatorJson = JSON.parse(
       fs.readFileSync(validatorJsonPath, { encoding: 'utf8' })
     );
@@ -41,32 +58,31 @@ module.exports = async ({
     {},
     JSON.parse(fs.readFileSync(join(lotionPath, 'config', 'genesis.json'))),
     {
-      app_hash: initialAppHash,
+      consensus_params: CONSENSUS_PARAMS,
     }
   );
   fs.writeFileSync(
     join(lotionPath, 'config', 'genesis.json'),
-    stringify(newGenesis)
+    JSON.stringify(newGenesis)
   );
 
   const opts = {
     rpc: { laddr: `tcp://${tendermintAddr}:${tendermintPort}` },
     p2p: { laddr: `tcp://0.0.0.0:${p2pPort}` },
-    proxyApp: `tcp://127.0.0.1:${abciPort}`,
+    proxy_app: `tcp://127.0.0.1:${abciPort}`,
   };
   if (peers.length) {
-    opts.p2p.persistentPeers = peers.join(',');
+    opts.p2p.persistent_peers = peers.join(',');
   }
   if (unsafeRpc) {
     opts.rpc.unsafe = true;
   }
   opts.consensus = {};
   if (createEmptyBlocks === false) {
-    opts.consensus.createEmptyBlocks = false;
+    opts.consensus.create_empty_blocks = false;
   }
-
   if (!logTendermint) {
-    opts.logLevel = 'error';
+    opts.log_level = 'error';
   }
   if (readonlyValidator) {
     opts.consensus.readonly = true;
