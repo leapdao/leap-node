@@ -29,7 +29,7 @@ module.exports = async (
         await submitPeriod(
           bridgeState.previousPeriod,
           state.slots,
-          bridgeState.blockHeight,
+          bridgeState.periodHeights[previousPeriodRoot],
           bridgeState
         );
       } catch (err) {

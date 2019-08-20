@@ -140,7 +140,7 @@ module.exports = class BridgeState {
       Submission: ({ returnValues: event }) => {
         this.lastBlocksRoot = event.blocksRoot;
         this.lastPeriodRoot = event.periodRoot;
-        const blockHeight = this.periodHeights[this.lastBlocksRoot];
+        const blockHeight = this.periodHeights[this.lastBlocksRoot] - 1;
         const [periodStart] = Period.periodBlockRange(blockHeight);
         this.submissions.push({
           periodStart,

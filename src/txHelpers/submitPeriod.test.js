@@ -28,6 +28,7 @@ const bridgeStateMock = attrs => ({
   currentState: {
     periodVotes: {},
   },
+  periodsInFlight: {},
   ...attrs,
 });
 
