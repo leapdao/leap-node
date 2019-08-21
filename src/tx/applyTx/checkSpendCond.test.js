@@ -1,5 +1,6 @@
 const { Tx, Input, Outpoint, Output } = require('leap-core');
 const utils = require('ethereumjs-util');
+const ethers = require('ethers'); // eslint-disable-line import/no-extraneous-dependencies
 const checkSpendCond = require('./checkSpendCond');
 const {
   NFT_COLOR_BASE,
@@ -1451,5 +1452,133 @@ describe('checkSpendCond', () => {
 
     bridgeState.blockHeight = 42000;
     await checkSpendCond(state, condition, bridgeState);
+  });
+
+  test('Earth Contract - consolidate', async () => {
+    let tmp = EarthContract;
+
+    // leap / goellars
+    tmp = replaceAll(
+      tmp,
+      '2341111111111111111111111111111111111234',
+      '1111111111111111111111111111111111111111'
+    );
+    // co2
+    tmp = replaceAll(
+      tmp,
+      '1231111111111111111111111111111111111123',
+      '2222222222222222222222222222222222222222'
+    );
+    // game master
+    tmp = replaceAll(
+      tmp,
+      '5671111111111111111111111111111111111567',
+      ADDR_1.replace('0x', '')
+    );
+
+    const script = Buffer.from(tmp, 'hex');
+    const scriptHash = utils.ripemd160(script);
+
+    const addr = `0x${scriptHash.toString('hex')}`;
+    // to pay for gas
+    const leapDeposit = Tx.deposit(
+      1, // depositId
+      100000000,
+      addr, // owner (spending condition)
+      0 // color
+    );
+    const co2Deposit = Tx.deposit(
+      3, // depositId
+      1000000000,
+      addr, // owner (spending condition)
+      1
+    );
+
+    const state = {
+      unspent: {
+        [new Outpoint(
+          leapDeposit.hash(),
+          0
+        ).hex()]: leapDeposit.outputs[0].toJSON(),
+        [new Outpoint(
+          co2Deposit.hash(),
+          0
+        ).hex()]: co2Deposit.outputs[0].toJSON(),
+      },
+      gas: {
+        minPrice: 0,
+      },
+    };
+
+    // a spending condition transaction that spends the deposit is created
+    const condition = Tx.spendCond(
+      [
+        new Input({
+          prevout: new Outpoint(leapDeposit.hash(), 0),
+          script,
+        }),
+        new Input({
+          prevout: new Outpoint(co2Deposit.hash(), 0),
+        }),
+      ],
+      []
+    );
+
+    const getMsgData = tx => {
+      const { v, r, s } = tx.getConditionSig(PRIV_1);
+      const abi = [
+        {
+          constant: false,
+          inputs: [
+            {
+              name: 'token',
+              type: 'address',
+            },
+            {
+              name: 'v',
+              type: 'uint8',
+            },
+            {
+              name: 'r',
+              type: 'bytes32',
+            },
+            {
+              name: 's',
+              type: 'bytes32',
+            },
+          ],
+          name: 'consolidate',
+          outputs: [],
+          payable: false,
+          stateMutability: 'nonpayable',
+          type: 'function',
+        },
+      ];
+      const methodSig = utils
+        .keccak256(
+          `${abi[0].name}(${abi[0].inputs.map(i => i.type).join(',')})`
+        )
+        .toString('hex')
+        .substr(0, 8);
+      const params = ethers.utils.defaultAbiCoder.encode(abi[0].inputs, [
+        '0x2222222222222222222222222222222222222222',
+        v,
+        r,
+        s,
+      ]);
+      return `0x${methodSig}${params.substring(2)}`;
+    };
+
+    condition.inputs[0].setMsgData(getMsgData(condition));
+
+    bridgeState.blockHeight = 42000;
+    try {
+      await checkSpendCond(state, condition, bridgeState);
+      throw new Error('should fail without outputs');
+    } catch (e) {
+      condition.outputs = e.logOuts;
+      condition.inputs[0].setMsgData(getMsgData(condition));
+      await checkSpendCond(state, condition, bridgeState);
+    }
   });
 });
