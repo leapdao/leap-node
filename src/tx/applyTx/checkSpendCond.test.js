@@ -32,6 +32,7 @@ const bridgeState = {
   blockHeight: 123,
   minGasPrices: [100],
   web3: new Web3(),
+  logsCache: {},
 };
 
 const NFTCondition =
