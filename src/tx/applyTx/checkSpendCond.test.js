@@ -223,9 +223,7 @@ describe('checkSpendCond', () => {
     apiResult = await checkSpendingCondition(bridgeState, condition.hex());
     expect(apiResult.outputs).toEqual(outs);
     expect(
-      apiResult.error.startsWith(
-        'Error: outputs do not match computation results'
-      )
+      apiResult.error.startsWith('outputs do not match computation results')
     ).toEqual(true);
   });
 
