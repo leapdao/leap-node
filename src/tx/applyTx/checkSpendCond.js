@@ -412,7 +412,7 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
 
   const logOuts = [];
   // iterate through all events
-  evmResult.vm.logs.forEach(log => {
+  (evmResult.vm.logs || []).forEach(log => {
     const originAddr = `0x${log[0].toString('hex')}`;
     const topics = log[1];
     const data = log[2];
