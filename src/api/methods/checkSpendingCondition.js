@@ -8,9 +8,13 @@ module.exports = async (bridgeState, rawTx) => {
   try {
     logOuts = await checkSpendCond(bridgeState.currentState, tx, bridgeState);
   } catch (err) {
-    // return err + the calculated logOuts <if any>
-    return { error: err.toString(), outputs: err.logOuts };
+    return {
+      error: err.message ? err.message : JSON.stringify(err),
+      outputs: err.logOuts,
+    };
   }
 
-  return { outputs: logOuts };
+  return {
+    outputs: logOuts,
+  };
 };
