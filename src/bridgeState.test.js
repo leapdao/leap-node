@@ -5,10 +5,10 @@ jest.mock('./utils/ContractsEventsSubscription');
 
 const ContractsEventsSubscription = require('./utils/ContractsEventsSubscription');
 
-/* eslint-disable */
-ContractsEventsSubscription.__setEventBatches([
+const EVENT_BATCHES = [
   [{ event: 'EpochLength', returnValues: { epochLength: '4' } }],
   [{ event: 'MinGasPrice', returnValues: { minGasPrice: '1000000' } }],
+  [{ event: 'EpochLength', returnValues: { epochLength: '3' } }],
   [
     {
       event: 'NewDeposit',
@@ -34,7 +34,7 @@ ContractsEventsSubscription.__setEventBatches([
     {
       event: 'NewDepositV2',
       returnValues: {
-        depositId: '0',
+        depositId: '1',
         depositor: '0xB8205608d54cb81f44F263bE086027D8610F3C94',
         color: '0',
         amount: '100',
@@ -44,7 +44,10 @@ ContractsEventsSubscription.__setEventBatches([
       },
     },
   ],
-]);
+];
+
+/* eslint-disable */
+ContractsEventsSubscription.__setEventBatches(EVENT_BATCHES);
 /* eslint-enable */
 
 const createInstance = (web3, bridgeContract, db, config) => {
@@ -159,5 +162,60 @@ describe('BridgeState', () => {
 
     expect(await bridgeState.loadState()).toEqual(newState);
     expect(methodCalled === 'getchainState').toBe(true);
+  });
+
+  test('Events handling', async () => {
+    const bridgeContract = {
+      methods: {
+        genesisBlockNumber: () => ({
+          call: async () => 5,
+        }),
+      },
+    };
+    const state = createInstance(
+      {
+        eth: {
+          getBlockNumber: async () => 5,
+        },
+      },
+      bridgeContract,
+      {
+        async getLastBlockSynced() {
+          return 0;
+        },
+        async storeBlock() {
+          return null;
+        },
+      },
+      {}
+    );
+    await state.init();
+    await Promise.all(EVENT_BATCHES.map(events => state.handleEvents(events)));
+    expect(state.epochLengths).toEqual([4, 3]);
+    expect(state.minGasPrices).toEqual([1000000]);
+    expect(state.deposits).toEqual({
+      '0': {
+        depositor: '0xB8205608d54cb81f44F263bE086027D8610F3C94',
+        color: '0',
+        amount: '100',
+      },
+      '1': {
+        depositor: '0xB8205608d54cb81f44F263bE086027D8610F3C94',
+        color: '0',
+        amount: '100',
+        data:
+          '0x0101010101010101010101010101010101010101010101010101010101010101',
+      },
+    });
+    expect(state.exits).toEqual({
+      '0x0000000000000000000000000000000000f484d8aeac943489841cc1cbb3bb0b': {
+        txHash:
+          '0x2bc83fb4a5ff059e8dfc6ac1a47903b133f484d8aeac943489841cc1cbb3bb0b',
+        outIndex: 0,
+        exitor: '0xB8205608d54cb81f44F263bE086027D8610F3C94',
+        color: '0',
+        amount: '100',
+      },
+    });
   });
 });

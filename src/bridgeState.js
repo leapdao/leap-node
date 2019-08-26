@@ -77,6 +77,68 @@ module.exports = class BridgeState {
     this.bridgeDelay = config.bridgeDelay;
     this.relayBuffer = relayBuffer;
     this.logsCache = {};
+
+    this.handleEvents = handleEvents({
+      NewDeposit: ({ returnValues: event }) => {
+        this.deposits[event.depositId] = {
+          depositor: event.depositor,
+          color: event.color,
+          amount: event.amount,
+        };
+      },
+      NewDepositV2: ({ returnValues: event }) => {
+        this.deposits[event.depositId] = {
+          depositor: event.depositor,
+          color: event.color,
+          amount: event.amount,
+          data: event.data,
+        };
+      },
+      ExitStarted: ({ returnValues: event }) => {
+        const outpoint = new Outpoint(event.txHash, Number(event.outIndex));
+        this.exits[outpoint.getUtxoId()] = {
+          txHash: event.txHash,
+          outIndex: Number(event.outIndex),
+          exitor: event.exitor,
+          color: event.color,
+          amount: event.amount,
+        };
+      },
+      ExitStartedV2: ({ returnValues: event }) => {
+        const outpoint = new Outpoint(event.txHash, Number(event.outIndex));
+        this.exits[outpoint.getUtxoId()] = {
+          txHash: event.txHash,
+          outIndex: Number(event.outIndex),
+          exitor: event.exitor,
+          color: event.color,
+          amount: event.amount,
+          data: event.data,
+        };
+      },
+      NewToken: ({ returnValues: event }) => {
+        let array = this.tokens.erc20;
+
+        if (event.color >= NST_COLOR_BASE) {
+          array = this.tokens.erc1948;
+        } else if (event.color >= NFT_COLOR_BASE) {
+          array = this.tokens.erc721;
+        }
+
+        if (array.indexOf(event.tokenAddr) === -1) {
+          array.push(event.tokenAddr);
+        }
+      },
+      EpochLength: ({ returnValues: event }) => {
+        this.epochLengths.push(Number(event.epochLength));
+      },
+      MinGasPrice: ({ returnValues: event }) => {
+        this.minGasPrices.push(Number(event.minGasPrice));
+      },
+      Submission: ({ returnValues: event }) => {
+        this.lastBlocksRoot = event.blocksRoot;
+        this.lastPeriodRoot = event.periodRoot;
+      },
+    });
   }
 
   async init() {
@@ -138,69 +200,7 @@ module.exports = class BridgeState {
       }
     }
 
-    const handler = handleEvents({
-      NewDeposit: ({ returnValues: event }) => {
-        this.deposits[event.depositId] = {
-          depositor: event.depositor,
-          color: event.color,
-          amount: event.amount,
-        };
-      },
-      NewDepositV2: ({ returnValues: event }) => {
-        this.deposits[event.depositId] = {
-          depositor: event.depositor,
-          color: event.color,
-          amount: event.amount,
-          data: event.data,
-        };
-      },
-      ExitStarted: ({ returnValues: event }) => {
-        const outpoint = new Outpoint(event.txHash, Number(event.outIndex));
-        this.exits[outpoint.getUtxoId()] = {
-          txHash: event.txHash,
-          outIndex: Number(event.outIndex),
-          exitor: event.exitor,
-          color: event.color,
-          amount: event.amount,
-        };
-      },
-      ExitStartedV2: ({ returnValues: event }) => {
-        const outpoint = new Outpoint(event.txHash, Number(event.outIndex));
-        this.exits[outpoint.getUtxoId()] = {
-          txHash: event.txHash,
-          outIndex: Number(event.outIndex),
-          exitor: event.exitor,
-          color: event.color,
-          amount: event.amount,
-          data: event.data,
-        };
-      },
-      NewToken: ({ returnValues: event }) => {
-        let array = this.tokens.erc20;
-
-        if (event.color >= NST_COLOR_BASE) {
-          array = this.tokens.erc1948;
-        } else if (event.color >= NFT_COLOR_BASE) {
-          array = this.tokens.erc721;
-        }
-
-        if (array.indexOf(event.tokenAddr) === -1) {
-          array.push(event.tokenAddr);
-        }
-      },
-      EpochLength: ({ returnValues: event }) => {
-        this.epochLengths.push(Number(event.epochLength));
-      },
-      MinGasPrice: ({ returnValues: event }) => {
-        this.minGasPrices.push(Number(event.minGasPrice));
-      },
-      Submission: ({ returnValues: event }) => {
-        this.lastBlocksRoot = event.blocksRoot;
-        this.lastPeriodRoot = event.periodRoot;
-      },
-    });
-
-    await handler(events);
+    await this.handleEvents(events);
 
     // now push to second buffer
     for (const event of events) {

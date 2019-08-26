@@ -13,13 +13,6 @@ module.exports = (state, tx, bridgeState) => {
   }
 
   if (
-    state.epoch.epochLengthIndex + 1 !==
-    bridgeState.epochLengths.length - 1
-  ) {
-    throw new Error('Unknown epochLength change');
-  }
-
-  if (
     bridgeState.epochLengths[state.epoch.epochLengthIndex + 1] !==
     tx.options.epochLength
   ) {

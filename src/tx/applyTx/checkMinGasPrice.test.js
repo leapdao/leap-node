@@ -26,17 +26,6 @@ describe('checkMinGasPrice', () => {
     expect(state.gas.minPrice).toBe('40000000000000');
   });
 
-  test('tx without corresponding event', () => {
-    const state = getInitialState();
-    const minGasTx = Tx.minGasPrice('40000000000000');
-
-    expect(() => {
-      checkMinGasPrice(state, minGasTx, {
-        minGasPrices: [],
-      });
-    }).toThrow('Unknown minGasPrice change');
-  });
-
   test('epoch length mismatch', () => {
     const state = getInitialState();
     const minGasTx = Tx.minGasPrice('40000000000000');

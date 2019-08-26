@@ -13,10 +13,6 @@ module.exports = (state, tx, bridgeState) => {
     throw new Error('minGasPrice tx expected');
   }
 
-  if (state.gas.minPriceIndex + 1 !== bridgeState.minGasPrices.length - 1) {
-    throw new Error('Unknown minGasPrice change');
-  }
-
   if (
     !equal(
       BigInt(bridgeState.minGasPrices[state.gas.minPriceIndex + 1]),
