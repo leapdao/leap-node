@@ -77,66 +77,6 @@ module.exports = class BridgeState {
     this.bridgeDelay = config.bridgeDelay;
     this.relayBuffer = relayBuffer;
     this.logsCache = {};
-  }
-
-  async init() {
-    logNode('Syncing events...');
-    this.lastBlockSynced = await this.db.getLastBlockSynced();
-    const genesisBlock = await this.bridgeContract.methods
-      .genesisBlockNumber()
-      .call();
-    const contracts = [
-      this.operatorContract,
-      this.bridgeContract,
-      this.exitHandlerContract,
-    ];
-    this.eventsSubscription = new ContractsEventsSubscription(
-      this.web3,
-      contracts,
-      this.eventsBuffer,
-      parseInt(genesisBlock, 10)
-    );
-    const blockNumber = await this.web3.eth.getBlockNumber();
-    await this.eventsSubscription.init();
-    await this.onNewBlock(blockNumber);
-    await this.initBlocks();
-
-    if (this.lastBlocksRoot && this.lastPeriodRoot) {
-      this.currentPeriod = new Period(this.lastBlocksRoot);
-    }
-
-    logNode('Synced');
-  }
-
-  async initBlocks() {
-    const blockOptions = {
-      timestamp: Math.round(Date.now() / 1000),
-    };
-    const blocks = [new Block(0, blockOptions), new Block(1, blockOptions)];
-
-    blocks.forEach(b => this.currentPeriod.addBlock(b));
-    await Promise.all(blocks.map(b => this.db.storeBlock(b)));
-  }
-
-  async onNewBlock(blockNumber) {
-    if (this.eventsBuffer.length === 0) {
-      return;
-    }
-
-    const events = [];
-
-    while (
-      this.eventsBuffer.peek().blockNumber <=
-      blockNumber - this.bridgeDelay
-    ) {
-      const event = this.eventsBuffer.pop();
-
-      events.push(event);
-
-      if (this.eventsBuffer.length === 0) {
-        break;
-      }
-    }
 
     this.handleEvents = handleEvents({
       NewDeposit: ({ returnValues: event }) => {
@@ -199,6 +139,73 @@ module.exports = class BridgeState {
         this.lastPeriodRoot = event.periodRoot;
       },
     });
+  }
+
+  async init() {
+    logNode('Syncing events...');
+    this.lastBlockSynced = await this.db.getLastBlockSynced();
+    const genesisBlock = await this.bridgeContract.methods
+      .genesisBlockNumber()
+      .call();
+    const contracts = [
+      this.operatorContract,
+      this.bridgeContract,
+      this.exitHandlerContract,
+    ];
+    this.eventsSubscription = new ContractsEventsSubscription(
+      this.web3,
+      contracts,
+      this.eventsBuffer,
+      parseInt(genesisBlock, 10)
+    );
+    const blockNumber = await this.web3.eth.getBlockNumber();
+    await this.eventsSubscription.init();
+    await this.onNewBlock(blockNumber);
+    await this.initBlocks();
+
+    if (this.lastBlocksRoot && this.lastPeriodRoot) {
+      this.currentPeriod = new Period(this.lastBlocksRoot);
+    }
+
+    logNode('Synced');
+  }
+
+  async initBlocks() {
+    const blockOptions = {
+      timestamp: Math.round(Date.now() / 1000),
+    };
+    const blocks = [new Block(0, blockOptions), new Block(1, blockOptions)];
+
+    blocks.forEach(b => this.currentPeriod.addBlock(b));
+    await Promise.all(blocks.map(b => this.db.storeBlock(b)));
+  }
+
+  async onNewBlock(blockNumber) {
+    if (this.eventsBuffer.length === 0) {
+      return;
+    }
+
+    const events = [];
+
+    while (
+      this.eventsBuffer.peek().blockNumber <=
+      blockNumber - this.bridgeDelay
+    ) {
+      const event = this.eventsBuffer.pop();
+
+      events.push(event);
+
+      if (this.eventsBuffer.length === 0) {
+        break;
+      }
+    }
+
+    await this.handleEvents(events);
+
+    // now push to second buffer
+    for (const event of events) {
+      this.relayBuffer.push(event);
+    }
   }
 
   async saveState() {
