@@ -43,17 +43,6 @@ describe('checkEpochLength', () => {
     expect(state.epoch.epochLength).toBe(3);
   });
 
-  test('tx without corresponding event', () => {
-    const state = getInitialState();
-    const epochLength = Tx.epochLength(4);
-
-    expect(() => {
-      checkEpochLength(state, epochLength, {
-        epochLengths: [],
-      });
-    }).toThrow('Unknown epochLength change');
-  });
-
   test('epoch length mismatch', () => {
     const state = getInitialState();
     const epochLength = Tx.epochLength(4);
