@@ -77,6 +77,8 @@ module.exports = class BridgeState {
     this.bridgeDelay = config.bridgeDelay;
     this.relayBuffer = relayBuffer;
     this.logsCache = {};
+    this.submissions = [];
+    this.periodHeights = {};
 
     this.handleEvents = handleEvents({
       NewDeposit: ({ returnValues: event }) => {
@@ -137,6 +139,14 @@ module.exports = class BridgeState {
       Submission: ({ returnValues: event }) => {
         this.lastBlocksRoot = event.blocksRoot;
         this.lastPeriodRoot = event.periodRoot;
+        const blockHeight = this.periodHeights[this.lastBlocksRoot];
+        const [periodStart] = Period.periodBlockRange(blockHeight);
+        this.submissions.push({
+          periodStart,
+          casBitmap: event.casRoot,
+          slotId: event.slotId,
+          validatorAddress: event.owner,
+        });
       },
     });
   }
@@ -206,6 +216,13 @@ module.exports = class BridgeState {
     for (const event of events) {
       this.relayBuffer.push(event);
     }
+  }
+
+  async saveSubmissions() {
+    if (!this.submissions.length) return;
+    this.db.storePeriods(this.submissions).then(() => {
+      this.submissions = [];
+    });
   }
 
   async saveState() {

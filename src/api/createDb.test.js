@@ -5,6 +5,19 @@ const ADDR_1 = '0xB8205608d54cb81f44F263bE086027D8610F3C94';
 const PRIV =
   '0x9b63fe8147edb8d251a6a66fd18c0ed73873da9fff3f08ea202e1c0a8ead7311';
 
+const levelBatch = {
+  put: jest.fn(() => Promise.resolve()),
+  write: resolve => setImmediate(resolve),
+};
+
+const levelMock = {
+  put: jest.fn(() => Promise.resolve()),
+  get: jest.fn(() => Promise.resolve()),
+  batch() {
+    return levelBatch;
+  },
+};
+
 describe('db', () => {
   test('getLastBlockSynced', async () => {
     let methodCalled = false;
@@ -242,5 +255,57 @@ describe('db', () => {
       txPos: 0,
     });
     expect(methodCalled).toBe(true);
+  });
+
+  describe('#storePeriods', () => {
+    const submission1 = {
+      periodStart: 32,
+      casBitmap: '0x123',
+      slotId: 1,
+      validatorAddress: ADDR_1,
+    };
+
+    const submission2 = {
+      periodStart: 64,
+      casBitmap: '0x456',
+      slotId: 2,
+      validatorAddress: ADDR_1,
+    };
+
+    test('single submission per period', async () => {
+      levelMock.get = jest.fn().mockRejectedValue({ type: 'NotFoundError' });
+      const db = createDb(levelMock);
+
+      await db.storePeriods([submission1, submission2]);
+
+      expect(levelMock.batch().put).toHaveBeenNthCalledWith(
+        1,
+        'period!32',
+        JSON.stringify([submission1])
+      );
+      expect(levelMock.batch().put).toHaveBeenNthCalledWith(
+        2,
+        'period!64',
+        JSON.stringify([submission2])
+      );
+    });
+
+    test('multiple submissions per period', async () => {
+      const samePeriodHeightSubmission = {
+        periodStart: 32,
+        casBitmap: '0x456',
+        slotId: 2,
+        validatorAddress: ADDR_1,
+      };
+      levelMock.get = jest.fn().mockResolvedValue([submission1]);
+      const db = createDb(levelMock);
+
+      await db.storePeriods([samePeriodHeightSubmission]);
+
+      expect(levelMock.batch().put).toHaveBeenCalledWith(
+        'period!32',
+        JSON.stringify([submission1, samePeriodHeightSubmission])
+      );
+    });
   });
 });
