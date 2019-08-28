@@ -4,7 +4,7 @@ module.exports = async (bridgeState, db, heightOrTag) => {
   let height = heightOrTag;
   if (heightOrTag === 'latest') {
     height = bridgeState.blockHeight;
-  } else if (typeof height === 'string' && height.indexOf('0x') === 0) {
+  } else if (typeof height === 'string' && height.startsWith('0x')) {
     height = parseInt(height, 16);
   }
   const [periodStart, periodEnd] = Period.periodBlockRange(height);
