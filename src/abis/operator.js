@@ -333,7 +333,7 @@ module.exports = [
       },
       {
         indexed: false,
-        name: 'casRoot',
+        name: 'casBitmap',
         type: 'bytes32',
       },
       {
@@ -437,7 +437,7 @@ module.exports = [
         type: 'bytes32',
       },
       {
-        name: '_cas',
+        name: '_casBitmap',
         type: 'bytes32',
       },
     ],
