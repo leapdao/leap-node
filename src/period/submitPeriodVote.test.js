@@ -26,7 +26,6 @@ const bridgeStateMock = () => ({
 });
 
 const stateMock = () => ({
-  periodVotes: {},
   slots: [
     {
       id: 0,

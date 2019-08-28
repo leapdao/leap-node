@@ -31,7 +31,6 @@ const stateMock = attrs => ({
       eventsCount: 1,
     },
   ],
-  periodVotes: {},
   ...attrs,
 });
 
