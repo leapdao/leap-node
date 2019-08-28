@@ -20,7 +20,7 @@ module.exports = async (db, hash) => {
 
   const blockNumber = `0x${height.toString(16)}`;
 
-  const txLogs = (logs || []).map(log => ({
+  const txLogs = (logs || []).map((log, i) => ({
     transactionLogIndex: 0,
     transactionIndex: txPos,
     blockNumber,
@@ -28,7 +28,7 @@ module.exports = async (db, hash) => {
     address: bufferToHex(Buffer.from(log[0])),
     topics: log[1].map(e => bufferToHex(Buffer.from(e))),
     data: bufferToHex(Buffer.from(log[2])),
-    logIndex: 0,
+    logIndex: i,
     blockHash,
   }));
 
