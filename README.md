@@ -81,7 +81,7 @@ Your local port `9999` forwards now to the remote host on address `127.0.0.1` an
 
 Dev config file: `leap-node --config=./presets/leap-testnet-gamma.json`
 
-Testnet config file: `leap-node --config=http://node1.testnet.leapdao.org:8645`
+Testnet config file: `leap-node --config=https://testnet-node.leapdao.org`
 
 Mainnet config file: N/A
 
