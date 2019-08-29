@@ -21,14 +21,14 @@ module.exports = async (db, hash) => {
   const blockNumber = `0x${height.toString(16)}`;
 
   const txLogs = (logs || []).map((log, i) => ({
-    transactionLogIndex: 0,
+    transactionLogIndex: i,
     transactionIndex: txPos,
     blockNumber,
     transactionHash: hash,
     address: bufferToHex(Buffer.from(log[0])),
     topics: log[1].map(e => bufferToHex(Buffer.from(e))),
     data: bufferToHex(Buffer.from(log[2])),
-    logIndex: i,
+    logIndex: 0,
     blockHash,
   }));
 
