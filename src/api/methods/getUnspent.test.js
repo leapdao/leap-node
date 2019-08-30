@@ -6,136 +6,118 @@ const PRIV1 =
 const A1 = '0xB8205608d54cb81f44F263bE086027D8610F3C94';
 const A2 = '0xD56F7dFCd2BaFfBC1d885F0266b21C7F2912020c';
 
+const TOKEN_ADDR = '0xb8205608d54cb81f44f263be086027d8610f3c94';
+
+const tx = Tx.transfer(
+  [
+    new Input(
+      new Outpoint(
+        '0x7777777777777777777777777777777777777777777777777777777777777777',
+        0
+      )
+    ),
+    new Input(
+      new Outpoint(
+        '0x7777777777777777777777777777777777777777777777777777777777777777',
+        1
+      )
+    ),
+  ],
+  [new Output(100, A2, 0), new Output(200, A1, 0), new Output(300, A2, 1)]
+).signAll(PRIV1);
+
+const unspent = {
+  [new Outpoint(tx.hash(), 0).hex()]: tx.outputs[0].toJSON(),
+  [new Outpoint(tx.hash(), 1).hex()]: tx.outputs[1].toJSON(),
+  [new Outpoint(tx.hash(), 2).hex()]: tx.outputs[2].toJSON(),
+};
+
 describe('getUnspent', () => {
-  test('unspent for exitstent addr', async () => {
-    const tx1 = Tx.transfer(
-      [
-        new Input(
-          new Outpoint(
-            '0x7777777777777777777777777777777777777777777777777777777777777777',
-            0
-          )
-        ),
-        new Input(
-          new Outpoint(
-            '0x7777777777777777777777777777777777777777777777777777777777777777',
-            1
-          )
-        ),
-      ],
-      [new Output(100, A2, 0), new Output(200, A1, 0), new Output(300, A2, 1)]
-    ).signAll(PRIV1);
+  test('unspent for existent addr', async () => {
     const state = {
-      unspent: {
-        [new Outpoint(tx1.hash(), 0).hex()]: tx1.outputs[0].toJSON(),
-        [new Outpoint(tx1.hash(), 1).hex()]: tx1.outputs[1].toJSON(),
-        [new Outpoint(tx1.hash(), 2).hex()]: tx1.outputs[2].toJSON(),
-      },
+      unspent,
     };
 
     const unspent1 = await getUnspent({ currentState: state }, A1);
     expect(unspent1).toEqual([
       {
-        outpoint: new Outpoint(tx1.hash(), 1).hex(),
-        output: tx1.outputs[1].toJSON(),
+        outpoint: new Outpoint(tx.hash(), 1).hex(),
+        output: tx.outputs[1].toJSON(),
       },
     ]);
 
     const unspent2 = await getUnspent({ currentState: state }, A2);
     expect(unspent2).toEqual([
       {
-        outpoint: new Outpoint(tx1.hash(), 0).hex(),
-        output: tx1.outputs[0].toJSON(),
+        outpoint: new Outpoint(tx.hash(), 0).hex(),
+        output: tx.outputs[0].toJSON(),
       },
       {
-        outpoint: new Outpoint(tx1.hash(), 2).hex(),
-        output: tx1.outputs[2].toJSON(),
+        outpoint: new Outpoint(tx.hash(), 2).hex(),
+        output: tx.outputs[2].toJSON(),
       },
     ]);
   });
 
   test('all unspent', async () => {
-    const tx1 = Tx.transfer(
-      [
-        new Input(
-          new Outpoint(
-            '0x7777777777777777777777777777777777777777777777777777777777777777',
-            0
-          )
-        ),
-        new Input(
-          new Outpoint(
-            '0x7777777777777777777777777777777777777777777777777777777777777777',
-            1
-          )
-        ),
-      ],
-      [new Output(100, A2, 0), new Output(200, A1, 0), new Output(300, A2, 1)]
-    ).signAll(PRIV1);
     const state = {
-      unspent: {
-        [new Outpoint(tx1.hash(), 0).hex()]: tx1.outputs[0].toJSON(),
-        [new Outpoint(tx1.hash(), 1).hex()]: tx1.outputs[1].toJSON(),
-        [new Outpoint(tx1.hash(), 2).hex()]: tx1.outputs[2].toJSON(),
-      },
+      unspent,
     };
 
-    const unspent = await getUnspent({ currentState: state });
-    expect(unspent).toEqual([
+    const unspents = await getUnspent({ currentState: state });
+    expect(unspents).toEqual([
       {
-        outpoint: new Outpoint(tx1.hash(), 0).hex(),
-        output: tx1.outputs[0].toJSON(),
+        outpoint: new Outpoint(tx.hash(), 0).hex(),
+        output: tx.outputs[0].toJSON(),
       },
       {
-        outpoint: new Outpoint(tx1.hash(), 1).hex(),
-        output: tx1.outputs[1].toJSON(),
+        outpoint: new Outpoint(tx.hash(), 1).hex(),
+        output: tx.outputs[1].toJSON(),
       },
       {
-        outpoint: new Outpoint(tx1.hash(), 2).hex(),
-        output: tx1.outputs[2].toJSON(),
+        outpoint: new Outpoint(tx.hash(), 2).hex(),
+        output: tx.outputs[2].toJSON(),
       },
     ]);
   });
 
-  test('unspent for exitstent addr for specific color', async () => {
-    const tx1 = Tx.transfer(
-      [
-        new Input(
-          new Outpoint(
-            '0x7777777777777777777777777777777777777777777777777777777777777777',
-            0
-          )
-        ),
-        new Input(
-          new Outpoint(
-            '0x7777777777777777777777777777777777777777777777777777777777777777',
-            1
-          )
-        ),
-      ],
-      [new Output(100, A2, 0), new Output(200, A1, 0), new Output(300, A2, 1)]
-    ).signAll(PRIV1);
+  test('unspent for existent addr for specific color', async () => {
     const state = {
-      unspent: {
-        [new Outpoint(tx1.hash(), 0).hex()]: tx1.outputs[0].toJSON(),
-        [new Outpoint(tx1.hash(), 1).hex()]: tx1.outputs[1].toJSON(),
-        [new Outpoint(tx1.hash(), 2).hex()]: tx1.outputs[2].toJSON(),
-      },
+      unspent,
     };
 
     const unspent1 = await getUnspent({ currentState: state }, A1, 0);
     expect(unspent1).toEqual([
       {
-        outpoint: new Outpoint(tx1.hash(), 1).hex(),
-        output: tx1.outputs[1].toJSON(),
+        outpoint: new Outpoint(tx.hash(), 1).hex(),
+        output: tx.outputs[1].toJSON(),
       },
     ]);
 
     const unspent2 = await getUnspent({ currentState: state }, A1, '0');
     expect(unspent2).toEqual([
       {
-        outpoint: new Outpoint(tx1.hash(), 1).hex(),
-        output: tx1.outputs[1].toJSON(),
+        outpoint: new Outpoint(tx.hash(), 1).hex(),
+        output: tx.outputs[1].toJSON(),
+      },
+    ]);
+  });
+
+  test('unspent for existent addr for specific token', async () => {
+    const bridgeState = {
+      currentState: {
+        unspent,
+      },
+      tokens: {
+        erc20: [TOKEN_ADDR],
+      },
+    };
+
+    const unspents = await getUnspent(bridgeState, A1, TOKEN_ADDR);
+    expect(unspents).toEqual([
+      {
+        outpoint: new Outpoint(tx.hash(), 1).hex(),
+        output: tx.outputs[1].toJSON(),
       },
     ]);
   });
@@ -144,7 +126,7 @@ describe('getUnspent', () => {
     const state = {
       unspent: {},
     };
-    const unspent = await getUnspent({ currentState: state }, '0x000');
-    expect(unspent).toEqual([]);
+    const unspents = await getUnspent({ currentState: state }, '0x000');
+    expect(unspents).toEqual([]);
   });
 });

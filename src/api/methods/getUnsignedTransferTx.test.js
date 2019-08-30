@@ -8,6 +8,8 @@ const PRIV1 =
 const A1 = '0xB8205608d54cb81f44F263bE086027D8610F3C94';
 const A2 = '0xD56F7dFCd2BaFfBC1d885F0266b21C7F2912020c';
 
+const TOKEN_ADDR = '0xB8205608d54cb81f44F263bE086027D8610F3C94';
+
 const tx1 = Tx.transfer(
   [
     new Input(
@@ -75,6 +77,9 @@ const state2 = {
 
 const fakedBridgeState = {
   currentState: state,
+  tokens: {
+    erc20: [TOKEN_ADDR],
+  },
 };
 const fakedBridgeState2 = {
   currentState: state2,
@@ -113,13 +118,18 @@ describe('getUnsignedTransferTx', () => {
       color: 0,
     };
 
-    const result = await getUnsignedTransferTx(
+    let result = await getUnsignedTransferTx(fakedBridgeState, A1, A2, 0, 200);
+
+    expect(result).toEqual(expected);
+
+    result = await getUnsignedTransferTx(
       fakedBridgeState,
       A1,
       A2,
-      0,
+      TOKEN_ADDR,
       200
     );
+
     expect(result).toEqual(expected);
   });
 
