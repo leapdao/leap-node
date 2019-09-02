@@ -79,6 +79,8 @@ const fakedBridgeState = {
   currentState: state,
   tokens: {
     erc20: [TOKEN_ADDR],
+    erc721: [],
+    erc1948: [],
   },
 };
 const fakedBridgeState2 = {
@@ -131,6 +133,17 @@ describe('getUnsignedTransferTx', () => {
     );
 
     expect(result).toEqual(expected);
+  });
+
+  test('Generate transfer transaction successfully', async () => {
+    let error;
+    try {
+      await getUnsignedTransferTx(fakedBridgeState, A1, A2, A2, 200);
+    } catch (err) {
+      error = err.message;
+    }
+
+    expect(error).toBe('Unknown token address');
   });
 
   test('Need two inputs and generate two outputs', async () => {
