@@ -671,6 +671,40 @@ module.exports = [
         name: 'amount',
         type: 'uint256',
       },
+    ],
+    name: 'ExitStarted',
+    type: 'event',
+    signature:
+      '0xaace06690e02011b548d8c5a74e1a678833d4136a56e657909fc6354bfb7c31f',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        name: 'txHash',
+        type: 'bytes32',
+      },
+      {
+        indexed: true,
+        name: 'outIndex',
+        type: 'uint8',
+      },
+      {
+        indexed: true,
+        name: 'color',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        name: 'exitor',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        name: 'amount',
+        type: 'uint256',
+      },
       {
         indexed: false,
         name: 'data',

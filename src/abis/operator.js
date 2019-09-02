@@ -346,6 +346,35 @@ module.exports = [
     type: 'event',
   },
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        name: 'blocksRoot',
+        type: 'bytes32',
+      },
+      {
+        indexed: true,
+        name: 'slotId',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        name: 'owner',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        name: 'periodRoot',
+        type: 'bytes32',
+      },
+    ],
+    name: 'Submission',
+    type: 'event',
+    signature:
+      '0x6690fe1f2634f1045e46d9adb5863d34ad6e548e6eb55fac8189444a403f8ee0',
+  },
+  {
     constant: false,
     inputs: [
       {
