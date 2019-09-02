@@ -122,6 +122,28 @@ describe('getUnspent', () => {
     ]);
   });
 
+  test('unspent for existent addr for non-existing token', async () => {
+    const bridgeState = {
+      currentState: {
+        unspent,
+      },
+      tokens: {
+        erc20: [],
+        erc721: [],
+        erc1948: [],
+      },
+    };
+
+    let error;
+    try {
+      await getUnspent(bridgeState, A1, TOKEN_ADDR);
+    } catch (err) {
+      error = err.message;
+    }
+
+    expect(error).toBe('Unknown token address');
+  });
+
   test('empty unspent list', async () => {
     const state = {
       unspent: {},
