@@ -1,6 +1,13 @@
+const { isValidAddress } = require('ethereumjs-util');
+const getColor = require('./getColor');
 const makeTransfer = require('../../txHelpers/makeTransfer');
 
-module.exports = async (bridgeState, from, to, color, value) => {
+module.exports = async (bridgeState, from, to, colorOrAddress, value) => {
+  let color = colorOrAddress;
+  if (isValidAddress(colorOrAddress)) {
+    color = await getColor(bridgeState, colorOrAddress);
+  }
+
   const tx = await makeTransfer(
     {
       balances: bridgeState.currentState.balances,
@@ -9,7 +16,7 @@ module.exports = async (bridgeState, from, to, color, value) => {
     from,
     to,
     value,
-    color
+    Number(color)
   );
   return tx.toJSON();
 };
