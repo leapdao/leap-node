@@ -144,7 +144,7 @@ module.exports = class BridgeState {
         const [periodStart] = Period.periodBlockRange(blockHeight);
         this.submissions.push({
           periodStart,
-          casBitmap: event.casRoot,
+          casBitmap: event.casBitmap,
           slotId: event.slotId,
           validatorAddress: event.owner,
         });
