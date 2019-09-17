@@ -2,7 +2,6 @@
   "groups": {
     "default": {
       "packages": [
-        "lotion/abci/package.json",
         "package.json"
       ]
     }
