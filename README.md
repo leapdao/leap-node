@@ -1,5 +1,5 @@
 [![codecov](https://codecov.io/gh/leapdao/leap-node/branch/master/graph/badge.svg)](https://codecov.io/gh/leapdao/leap-node)
-[![Docker Repository on Quay](https://quay.io/repository/leapdao/leap-node/status "Docker Repository on Quay")](https://quay.io/repository/leapdao/leap-node)
+[![Docker Repository on Quay](https://quay.io/repository/leapdao/leap-node/status "Docker Repository on Quay")](https://quay.io/repository/leapdao/leap-node) [![Greenkeeper badge](https://badges.greenkeeper.io/leapdao/leap-node.svg)](https://greenkeeper.io/)
 
 # Leap DAO validation node
 
