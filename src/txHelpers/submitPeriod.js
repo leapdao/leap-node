@@ -15,6 +15,8 @@ const {
 const { logPeriod } = require('../utils/debug');
 const checkEnoughVotes = require('../period/utils/checkEnoughVotes');
 
+const inFlight = {};
+
 /* istanbul ignore next */
 const logError = height => err => {
   logPeriod('submitPeriod error: %s (height: %d)', err.message, height);
@@ -46,6 +48,12 @@ module.exports = async (
   const periodRoot = period.merkleRoot();
 
   let submittedPeriod = { timestamp: '0' };
+
+  if (inFlight[periodRoot]) {
+    logPeriod('submittedPeriod in flight', periodRoot);
+    return submittedPeriod;
+  }
+
   if (lastBlocksRoot === periodRoot) {
     submittedPeriod = await bridgeState.bridgeContract.methods
       .periods(lastPeriodRoot)
@@ -90,7 +98,7 @@ module.exports = async (
 
     const cas = buildCas(periodVotes[periodRoot]);
 
-    bridgeState.periodsInFlight[periodRoot] = true;
+    inFlight[periodRoot] = true;
 
     const tx = sendTransaction(
       bridgeState.web3,
@@ -103,13 +111,16 @@ module.exports = async (
       bridgeState.operatorContract.options.address,
       bridgeState.account
     ).catch(() => {
-      delete bridgeState.periodsInFlight[periodRoot];
+      delete inFlight[periodRoot];
       logError(height);
     });
 
     tx.then(receipt => {
       logPeriod('submitPeriod tx', receipt);
-      delete bridgeState.periodsInFlight[periodRoot];
+      delete inFlight[periodRoot];
+      if (receipt && receipt.status === 1) {
+        bridgeState.submittedPeriod[periodRoot] = true;
+      }
     });
   }
 

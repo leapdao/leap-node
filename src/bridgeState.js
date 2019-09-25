@@ -79,7 +79,7 @@ module.exports = class BridgeState {
     this.logsCache = {};
     this.submissions = [];
     this.periodHeights = {};
-    this.periodsInFlight = {};
+    this.submittedPeriods = {};
 
     this.handleEvents = handleEvents({
       NewDeposit: ({ returnValues: event }) => {
@@ -140,6 +140,7 @@ module.exports = class BridgeState {
       Submission: ({ returnValues: event }) => {
         this.lastBlocksRoot = event.blocksRoot;
         this.lastPeriodRoot = event.periodRoot;
+        this.submittedPeriods[this.lastBlocksRoot] = true;
         const blockHeight = this.periodHeights[this.lastBlocksRoot] - 1;
         const [periodStart] = Period.periodBlockRange(blockHeight);
         this.submissions.push({

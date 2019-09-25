@@ -23,7 +23,7 @@ module.exports = async (
   if (bridgeState.previousPeriod) {
     const previousPeriodRoot = bridgeState.previousPeriod.merkleRoot();
     const { result } = checkEnoughVotes(previousPeriodRoot, state);
-    if (result && !bridgeState.periodsInFlight[previousPeriodRoot]) {
+    if (result && !bridgeState.submittedPeriods[previousPeriodRoot]) {
       logPeriod(`Enough votes to submit period: ${previousPeriodRoot}`);
       try {
         await submitPeriod(
@@ -32,6 +32,7 @@ module.exports = async (
           bridgeState.periodHeights[previousPeriodRoot],
           bridgeState
         );
+        bridgeState.submittedPeriods[previousPeriodRoot] = true;
       } catch (err) {
         /* istanbul ignore next */
         logPeriod(`submit period: ${err}`);
@@ -42,8 +43,8 @@ module.exports = async (
   if (chainInfo.height % 32 === 0) {
     logPeriod('updatePeriod');
     try {
-      bridgeState.periodHeights[bridgeState.currentPeriod.merkleRoot()] =
-        chainInfo.height - 1;
+      bridgeState.periodHeights[bridgeState.currentPeriod.merkleRoot()] = 
+        chainInfo.height;
       // will be executed by all the nodes, but the actual period vote tx will be
       // submitted by validators only
       await submitPeriodVote(
