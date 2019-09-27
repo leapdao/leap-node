@@ -53,14 +53,6 @@ module.exports = async (
         bridgeState,
         sender
       );
-
-      await submitPeriod(
-        bridgeState.currentPeriod,
-        state.slots,
-        chainInfo.height,
-        bridgeState,
-        nodeConfig
-      );
     } catch (err) {
       logPeriod(`period vote: ${err}`);
     }

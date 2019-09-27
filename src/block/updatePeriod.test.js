@@ -40,7 +40,7 @@ describe('updatePeriod', () => {
     );
     expect(bridgeState.previousPeriod).toBe(NON_EXISTENT_PERIOD);
     expect(bridgeState.periodHeights[NON_EXISTENT_PERIOD.merkleRoot()]).toBe(32);
-    expect(submitPeriod).toBeCalledWith(NON_EXISTENT_PERIOD, [], 32, bridgeState, {});
+    expect(submitPeriod).not.toBeCalled();
     expect(submitPeriodVote).toBeCalledWith(NON_EXISTENT_PERIOD, state, bridgeState, ADDR);
   });
 
