@@ -110,7 +110,8 @@ module.exports = async (
       ),
       bridgeState.operatorContract.options.address,
       bridgeState.account
-    ).catch(() => {
+    )
+    .catch(/* istanbul ignore next */ () => { 
       delete inFlight[periodRoot];
       logError(height);
     });

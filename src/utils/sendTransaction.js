@@ -7,7 +7,7 @@
 
 const getRootGasPrice = require('./getRootGasPrice');
 
-module.exports = async function sendTransaction(web3, method, to, account) {
+module.exports = async (web3, method, to, account) => {
   const gas = Math.round(
     (await method.estimateGas({ from: account.address })) * 1.21
   );

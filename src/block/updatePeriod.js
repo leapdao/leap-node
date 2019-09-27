@@ -54,6 +54,7 @@ module.exports = async (
         sender
       );
     } catch (err) {
+      /* istanbul ignore next */
       logPeriod(`period vote: ${err}`);
     }
     bridgeState.previousPeriod = bridgeState.currentPeriod;

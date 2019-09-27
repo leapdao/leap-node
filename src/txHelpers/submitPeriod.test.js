@@ -290,6 +290,13 @@ describe('submitPeriod', () => {
     });
 
     test('got enough votes: 3/4', async () => {
+      const slots = [
+        { signerAddr: ADDR, id: 0 },
+        { signerAddr: ADDR_1, id: 1 },
+        { signerAddr: ADDR_1, id: 2 },
+        { signerAddr: ADDR_1, id: 3 },
+      ];
+
       const bridgeState = bridgeStateMock({
         bridgeContract: bridgeContractMock({
           returnPeriod: { timestamp: '0' },
@@ -301,23 +308,13 @@ describe('submitPeriod', () => {
           periodVotes: {
             [period.merkleRoot()]: [0, 2, 3],
           },
-          slots: [
-            { signerAddr: ADDR, id: 0 },
-            { signerAddr: ADDR_1, id: 1 },
-            { signerAddr: ADDR_1, id: 2 },
-            { signerAddr: ADDR_1, id: 3 },
-          ],
+          slots,
         },
       });
 
       const submittedPeriod = await submitPeriod(
         period,
-        [
-          { signerAddr: ADDR, id: 0 },
-          { signerAddr: ADDR_1, id: 1 },
-          { signerAddr: ADDR_1, id: 2 },
-          { signerAddr: ADDR_1, id: 3 },
-        ],
+        slots,
         0,
         bridgeState,
         {}
