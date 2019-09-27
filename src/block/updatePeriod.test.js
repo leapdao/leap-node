@@ -107,13 +107,11 @@ describe('updatePeriod', () => {
       expect(submitPeriod).not.toBeCalled();
     });
 
-    test('do nothing period if no period pending', async () => {
+    test('do nothing if no period pending', async () => {
       const bridgeState = {
         previousPeriod: NON_EXISTENT_PERIOD,
         submittedPeriods: {},
-        periodHeights: {
-          [NON_EXISTENT_PERIOD.merkleRoot()]: 32
-        }
+        periodHeights: {}
       };
       await updatePeriod(
         {
