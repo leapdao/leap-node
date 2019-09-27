@@ -85,7 +85,7 @@ describe('updatePeriod', () => {
       expect(submitPeriod).toBeCalledWith(NON_EXISTENT_PERIOD, ['0x1'], 32, bridgeState);
     });
 
-    test('do nothing if not enough period votes and period pending', async () => {
+    test('do nothing if not enough period votes', async () => {
       const bridgeState = {
         previousPeriod: NON_EXISTENT_PERIOD,
         submittedPeriods: {},
@@ -97,26 +97,6 @@ describe('updatePeriod', () => {
         {
           periodVotes: { 
             [NON_EXISTENT_PERIOD.merkleRoot()]: [] // no votes
-          },
-          slots: ['0x1'], // one slot
-        },
-        { height: 34 },
-        bridgeState
-      );
-  
-      expect(submitPeriod).not.toBeCalled();
-    });
-
-    test('do nothing if no period pending', async () => {
-      const bridgeState = {
-        previousPeriod: NON_EXISTENT_PERIOD,
-        submittedPeriods: {},
-        periodHeights: {}
-      };
-      await updatePeriod(
-        {
-          periodVotes: { 
-            [NON_EXISTENT_PERIOD.merkleRoot()]: [0]
           },
           slots: ['0x1'], // one slot
         },
