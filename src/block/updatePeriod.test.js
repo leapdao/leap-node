@@ -85,7 +85,7 @@ describe('updatePeriod', () => {
       expect(submitPeriod).toBeCalledWith(NON_EXISTENT_PERIOD, ['0x1'], 32, bridgeState);
     });
 
-    test('do nothing period if not enough period votes and period pending', async () => {
+    test('do nothing if not enough period votes and period pending', async () => {
       const bridgeState = {
         previousPeriod: NON_EXISTENT_PERIOD,
         submittedPeriods: {},
