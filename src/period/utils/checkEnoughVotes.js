@@ -14,7 +14,8 @@
  * - `needed` is a minimum number of votes needed for consensus
  */
 module.exports = (periodRoot, state) => {
-  const { periodVotes, slots } = state;
+  const periodVotes = state.periodVotes || {};
+  const slots = state.slots || [];
 
   const votes = (periodVotes[periodRoot] || []).length;
   const needed = Math.floor((slots.length * 2) / 3) + 1;

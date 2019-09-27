@@ -10,8 +10,12 @@ const {
   sendTransaction,
   getCurrentSlotId,
   GENESIS,
+  buildCas,
 } = require('../utils');
 const { logPeriod } = require('../utils/debug');
+const checkEnoughVotes = require('../period/utils/checkEnoughVotes');
+
+const inFlight = {};
 
 /* istanbul ignore next */
 const logError = height => err => {
@@ -40,9 +44,16 @@ module.exports = async (
   nodeConfig = {}
 ) => {
   const { lastBlocksRoot, lastPeriodRoot } = bridgeState;
+  const periodVotes = bridgeState.currentState.periodVotes || {};
   const periodRoot = period.merkleRoot();
 
   let submittedPeriod = { timestamp: '0' };
+
+  if (inFlight[periodRoot]) {
+    logPeriod('submittedPeriod in flight', periodRoot);
+    return submittedPeriod;
+  }
+
   if (lastBlocksRoot === periodRoot) {
     submittedPeriod = await bridgeState.bridgeContract.methods
       .periods(lastPeriodRoot)
@@ -73,19 +84,44 @@ module.exports = async (
       return submittedPeriod;
     }
 
+    const { result, votes, needed } = checkEnoughVotes(
+      periodRoot,
+      bridgeState.currentState
+    );
+
+    if (!result) {
+      logPeriod(
+        `submitPeriod. Not enough period votes collected: ${votes}/${needed}. Waiting..`
+      );
+      return submittedPeriod;
+    }
+
+    const cas = buildCas(periodVotes[periodRoot]);
+
+    inFlight[periodRoot] = true;
+
     const tx = sendTransaction(
       bridgeState.web3,
-      bridgeState.operatorContract.methods.submitPeriod(
+      bridgeState.operatorContract.methods.submitPeriodWithCas(
         mySlotToSubmit.id,
         prevPeriodRoot,
-        periodRoot
+        periodRoot,
+        `0x${cas.toString(16)}`
       ),
       bridgeState.operatorContract.options.address,
       bridgeState.account
-    ).catch(logError(height));
+    )
+    .catch(/* istanbul ignore next */ () => { 
+      delete inFlight[periodRoot];
+      logError(height);
+    });
 
     tx.then(receipt => {
       logPeriod('submitPeriod tx', receipt);
+      delete inFlight[periodRoot];
+      if (receipt && receipt.status === 1) {
+        bridgeState.submittedPeriod[periodRoot] = true;
+      }
     });
   }
 

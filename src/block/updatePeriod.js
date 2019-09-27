@@ -11,6 +11,7 @@ const submitPeriod = require('../txHelpers/submitPeriod');
 const activateSlot = require('../txHelpers/activateSlot');
 const { getAuctionedByAddr } = require('../utils');
 const { logPeriod } = require('../utils/debug');
+const checkEnoughVotes = require('../period/utils/checkEnoughVotes');
 
 module.exports = async (
   state,
@@ -19,11 +20,31 @@ module.exports = async (
   nodeConfig = {},
   sender
 ) => {
+  if (bridgeState.previousPeriod) {
+    const previousPeriodRoot = bridgeState.previousPeriod.merkleRoot();
+    const { result } = checkEnoughVotes(previousPeriodRoot, state);
+    if (result && !bridgeState.submittedPeriods[previousPeriodRoot]) {
+      logPeriod(`Enough votes to submit period: ${previousPeriodRoot}`);
+      try {
+        await submitPeriod(
+          bridgeState.previousPeriod,
+          state.slots,
+          bridgeState.periodHeights[previousPeriodRoot],
+          bridgeState
+        );
+        bridgeState.submittedPeriods[previousPeriodRoot] = true;
+      } catch (err) {
+        /* istanbul ignore next */
+        logPeriod(`submit period: ${err}`);
+      }
+    }
+  }
+
   if (chainInfo.height % 32 === 0) {
     logPeriod('updatePeriod');
     try {
-      bridgeState.periodHeights[bridgeState.currentPeriod.merkleRoot()] =
-        chainInfo.height - 1;
+      bridgeState.periodHeights[bridgeState.currentPeriod.merkleRoot()] = 
+        chainInfo.height;
       // will be executed by all the nodes, but the actual period vote tx will be
       // submitted by validators only
       await submitPeriodVote(
@@ -32,15 +53,8 @@ module.exports = async (
         bridgeState,
         sender
       );
-
-      await submitPeriod(
-        bridgeState.currentPeriod,
-        state.slots,
-        chainInfo.height,
-        bridgeState,
-        nodeConfig
-      );
     } catch (err) {
+      /* istanbul ignore next */
       logPeriod(`period vote: ${err}`);
     }
     bridgeState.previousPeriod = bridgeState.currentPeriod;
