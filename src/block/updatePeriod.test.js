@@ -116,7 +116,7 @@ describe('updatePeriod', () => {
       await updatePeriod(
         {
           periodVotes: { 
-            [NON_EXISTENT_PERIOD.merkleRoot()]: [] // no votes
+            [NON_EXISTENT_PERIOD.merkleRoot()]: [0]
           },
           slots: ['0x1'], // one slot
         },
