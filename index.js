@@ -57,7 +57,6 @@ async function run() {
       );
     },
     unsafeRpc: cliArgs.unsafeRpc,
-    readonlyValidator: cliArgs.readonly,
     dataPath: cliArgs.dataPath,
   });
 

@@ -27,25 +27,25 @@ describe('updatePeriod', () => {
     const state = {
       slots: [],
     };
-    await updatePeriod(
-      state,
-      { height: 32 },
-      bridgeState,
-      {},
-      ADDR
-    );
+    await updatePeriod(state, { height: 32 }, bridgeState, ADDR);
 
     expect(bridgeState.currentPeriod.prevHash).toBe(
       NON_EXISTENT_PERIOD.merkleRoot()
     );
     expect(bridgeState.previousPeriod).toBe(NON_EXISTENT_PERIOD);
-    expect(bridgeState.periodHeights[NON_EXISTENT_PERIOD.merkleRoot()]).toBe(32);
+    expect(bridgeState.periodHeights[NON_EXISTENT_PERIOD.merkleRoot()]).toBe(
+      32
+    );
     expect(submitPeriod).not.toBeCalled();
-    expect(submitPeriodVote).toBeCalledWith(NON_EXISTENT_PERIOD, state, bridgeState, ADDR);
+    expect(submitPeriodVote).toBeCalledWith(
+      NON_EXISTENT_PERIOD,
+      state,
+      bridgeState,
+      ADDR
+    );
   });
 
   describe('at the height % 32 !== 0 and height % 32 !== 16', () => {
-
     test('do nothing if not enough period votes or no period yet', async () => {
       const bridgeState = {
         currentPeriod: NON_EXISTENT_PERIOD,
@@ -58,9 +58,9 @@ describe('updatePeriod', () => {
         { height: 15 },
         bridgeState
       );
-  
+
       expect(bridgeState.currentPeriod).toBe(NON_EXISTENT_PERIOD);
-      expect(bridgeState.previousPeriod).toBe(undefined);  
+      expect(bridgeState.previousPeriod).toBe(undefined);
     });
 
     test('submit period if enough period votes and period pending', async () => {
@@ -68,21 +68,26 @@ describe('updatePeriod', () => {
         previousPeriod: NON_EXISTENT_PERIOD,
         submittedPeriods: {},
         periodHeights: {
-          [NON_EXISTENT_PERIOD.merkleRoot()]: 32
-        }
+          [NON_EXISTENT_PERIOD.merkleRoot()]: 32,
+        },
       };
       await updatePeriod(
         {
-          periodVotes: { 
-            [NON_EXISTENT_PERIOD.merkleRoot()]: [0] // one vote
+          periodVotes: {
+            [NON_EXISTENT_PERIOD.merkleRoot()]: [0], // one vote
           },
           slots: ['0x1'], // one slot
         },
         { height: 34 },
         bridgeState
       );
-  
-      expect(submitPeriod).toBeCalledWith(NON_EXISTENT_PERIOD, ['0x1'], 32, bridgeState);
+
+      expect(submitPeriod).toBeCalledWith(
+        NON_EXISTENT_PERIOD,
+        ['0x1'],
+        32,
+        bridgeState
+      );
     });
 
     test('do nothing if not enough period votes', async () => {
@@ -90,20 +95,20 @@ describe('updatePeriod', () => {
         previousPeriod: NON_EXISTENT_PERIOD,
         submittedPeriods: {},
         periodHeights: {
-          [NON_EXISTENT_PERIOD.merkleRoot()]: 32
-        }
+          [NON_EXISTENT_PERIOD.merkleRoot()]: 32,
+        },
       };
       await updatePeriod(
         {
-          periodVotes: { 
-            [NON_EXISTENT_PERIOD.merkleRoot()]: [] // no votes
+          periodVotes: {
+            [NON_EXISTENT_PERIOD.merkleRoot()]: [], // no votes
           },
           slots: ['0x1'], // one slot
         },
         { height: 34 },
         bridgeState
       );
-  
+
       expect(submitPeriod).not.toBeCalled();
     });
 
@@ -111,23 +116,23 @@ describe('updatePeriod', () => {
       const bridgeState = {
         previousPeriod: NON_EXISTENT_PERIOD,
         submittedPeriods: {
-          [NON_EXISTENT_PERIOD.merkleRoot()]: true
+          [NON_EXISTENT_PERIOD.merkleRoot()]: true,
         },
         periodHeights: {
-          [NON_EXISTENT_PERIOD.merkleRoot()]: 32
-        }
+          [NON_EXISTENT_PERIOD.merkleRoot()]: 32,
+        },
       };
       await updatePeriod(
         {
-          periodVotes: { 
-            [NON_EXISTENT_PERIOD.merkleRoot()]: [] // no votes
+          periodVotes: {
+            [NON_EXISTENT_PERIOD.merkleRoot()]: [], // no votes
           },
           slots: ['0x1'], // one slot
         },
         { height: 34 },
         bridgeState
       );
-  
+
       expect(submitPeriod).not.toBeCalled();
     });
   });

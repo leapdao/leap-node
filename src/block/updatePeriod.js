@@ -13,13 +13,7 @@ const { getAuctionedByAddr } = require('../utils');
 const { logPeriod } = require('../utils/debug');
 const checkEnoughVotes = require('../period/utils/checkEnoughVotes');
 
-module.exports = async (
-  state,
-  chainInfo,
-  bridgeState,
-  nodeConfig = {},
-  sender
-) => {
+module.exports = async (state, chainInfo, bridgeState, sender) => {
   if (bridgeState.previousPeriod) {
     const previousPeriodRoot = bridgeState.previousPeriod.merkleRoot();
     const { result } = checkEnoughVotes(previousPeriodRoot, state);
@@ -43,7 +37,7 @@ module.exports = async (
   if (chainInfo.height % 32 === 0) {
     logPeriod('updatePeriod');
     try {
-      bridgeState.periodHeights[bridgeState.currentPeriod.merkleRoot()] = 
+      bridgeState.periodHeights[bridgeState.currentPeriod.merkleRoot()] =
         chainInfo.height;
       // will be executed by all the nodes, but the actual period vote tx will be
       // submitted by validators only
@@ -70,7 +64,7 @@ module.exports = async (
     )
       .filter(({ activationEpoch }) => activationEpoch - state.epoch.epoch >= 2)
       .map(({ id }) => id);
-    if (myAuctionedSlots.length > 0 && !nodeConfig.readonly) {
+    if (myAuctionedSlots.length > 0) {
       logPeriod('found some slots for activation', myAuctionedSlots);
       myAuctionedSlots.forEach(id => {
         const tx = activateSlot(id, bridgeState);

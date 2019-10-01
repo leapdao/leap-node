@@ -108,13 +108,6 @@ const options = [
     help: 'Start node with fresh state',
   },
   {
-    names: ['readonly'],
-    type: 'bool',
-    default: false,
-    env: 'READONLY',
-    help: 'Run validator without producing blocks, only observing',
-  },
-  {
     names: ['unsafeRpc'],
     type: 'bool',
     default: false,
@@ -163,11 +156,6 @@ if (!cliArgs.config) {
 
 if (cliArgs.privateKey && !fs.existsSync(cliArgs.privateKey)) {
   console.log(`${cliArgs.privateKey} does not exist`);
-  process.exit(0);
-}
-
-if (cliArgs.readonly && !cliArgs.unsafeRpc) {
-  console.log('--readonly flag requires --unsafeRpc');
   process.exit(0);
 }
 

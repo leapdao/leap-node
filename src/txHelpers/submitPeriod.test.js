@@ -67,7 +67,7 @@ describe('submitPeriod', () => {
 
     // submitted period has merkle root == lastBlocksRoot
     // lastBlocksRoot is being read from Submission event
-    const submittedPeriod = await submitPeriod(period, [], 0, bridgeState, {});
+    const submittedPeriod = await submitPeriod(period, [], 0, bridgeState);
 
     expect(submittedPeriod).toEqual({
       timestamp: '100',
@@ -82,7 +82,7 @@ describe('submitPeriod', () => {
       operatorContract: operatorContractMock(),
     });
 
-    const submittedPeriod = await submitPeriod(period, [], 0, bridgeState, {});
+    const submittedPeriod = await submitPeriod(period, [], 0, bridgeState);
 
     expect(submittedPeriod).toEqual({
       timestamp: '0',
@@ -110,8 +110,7 @@ describe('submitPeriod', () => {
       period,
       [{ signerAddr: ADDR, id: 0 }],
       1,
-      bridgeState,
-      {}
+      bridgeState
     );
 
     expect(submittedPeriod).toEqual({
@@ -143,8 +142,7 @@ describe('submitPeriod', () => {
       period,
       [{ signerAddr: ADDR, id: 0 }],
       0,
-      bridgeState,
-      {}
+      bridgeState
     );
 
     expect(submittedPeriod).toEqual({
@@ -178,44 +176,13 @@ describe('submitPeriod', () => {
       period,
       [{ signerAddr: ADDR, id: 0 }],
       0,
-      bridgeState,
-      {}
+      bridgeState
     );
 
     expect(submittedPeriod).toEqual({
       timestamp: '0',
     });
     expect(submitPeriodWithCas).toBeCalled();
-  });
-
-  test('not submitted, own slot, readonly validator', async () => {
-    const bridgeState = bridgeStateMock({
-      bridgeContract: bridgeContractMock({
-        returnPeriod: { timestamp: '0' },
-      }),
-      operatorContract: operatorContractMock(),
-      lastBlocksRoot: period.prevHash,
-      lastPeriodRoot: '0x1337',
-      currentState: {
-        periodVotes: {
-          [PERIOD_ROOT]: [0],
-        },
-        slots: [{ signerAddr: ADDR, id: 0 }],
-      },
-    });
-
-    const submittedPeriod = await submitPeriod(
-      period,
-      [{ signerAddr: ADDR, id: 0 }],
-      1,
-      bridgeState,
-      { readonly: true }
-    );
-
-    expect(submittedPeriod).toEqual({
-      timestamp: '0',
-    });
-    expect(submitPeriodWithCas).not.toBeCalled();
   });
 
   describe('period vote', () => {
@@ -239,8 +206,7 @@ describe('submitPeriod', () => {
         period,
         [{ signerAddr: ADDR, id: 0 }, { signerAddr: ADDR_1, id: 1 }],
         0,
-        bridgeState,
-        {}
+        bridgeState
       );
 
       expect(submittedPeriod).toEqual({
@@ -279,8 +245,7 @@ describe('submitPeriod', () => {
           { signerAddr: ADDR_1, id: 3 },
         ],
         0,
-        bridgeState,
-        {}
+        bridgeState
       );
 
       expect(submittedPeriod).toEqual({
@@ -312,13 +277,7 @@ describe('submitPeriod', () => {
         },
       });
 
-      const submittedPeriod = await submitPeriod(
-        period,
-        slots,
-        0,
-        bridgeState,
-        {}
-      );
+      const submittedPeriod = await submitPeriod(period, slots, 0, bridgeState);
 
       expect(submittedPeriod).toEqual({
         timestamp: '0',
