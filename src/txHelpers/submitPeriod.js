@@ -36,13 +36,7 @@ const getPrevPeriodRoot = (period, bridgeState) => {
   return null; // not found
 };
 
-module.exports = async (
-  period,
-  slots,
-  height,
-  bridgeState,
-  nodeConfig = {}
-) => {
+module.exports = async (period, slots, height, bridgeState) => {
   const { lastBlocksRoot, lastPeriodRoot } = bridgeState;
   const periodVotes = bridgeState.currentState.periodVotes || {};
   const periodRoot = period.merkleRoot();
@@ -59,11 +53,6 @@ module.exports = async (
       .periods(lastPeriodRoot)
       .call();
     logPeriod('submittedPeriod', periodRoot, submittedPeriod);
-    return submittedPeriod;
-  }
-
-  if (nodeConfig.readonly) {
-    logPeriod('Readonly node. Skipping the rest of submitPeriod');
     return submittedPeriod;
   }
 
@@ -110,11 +99,12 @@ module.exports = async (
       ),
       bridgeState.operatorContract.options.address,
       bridgeState.account
-    )
-    .catch(/* istanbul ignore next */ () => { 
-      delete inFlight[periodRoot];
-      logError(height);
-    });
+    ).catch(
+      /* istanbul ignore next */ () => {
+        delete inFlight[periodRoot];
+        logError(height);
+      }
+    );
 
     tx.then(receipt => {
       logPeriod('submitPeriod tx', receipt);

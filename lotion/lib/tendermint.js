@@ -30,7 +30,6 @@ module.exports = async ({
   keys,
   createEmptyBlocks,
   unsafeRpc,
-  readonlyValidator,
 }) => {
   await tendermint.init(lotionPath);
 
@@ -84,10 +83,6 @@ module.exports = async ({
   if (!logTendermint) {
     opts.log_level = 'error';
   }
-  if (readonlyValidator) {
-    opts.consensus.readonly = true;
-  }
-
   let shuttingDown = false;
   const tendermintProcess = tendermint.node(lotionPath, opts);
   if (logTendermint) {

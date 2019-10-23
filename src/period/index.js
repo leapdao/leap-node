@@ -9,7 +9,7 @@ const submitPeriod = require('../txHelpers/submitPeriod');
 const submitPeriodVote = require('./submitPeriodVote');
 const { logPeriod } = require('../utils/debug');
 
-module.exports = (bridgeState, sender, nodeConfig = {}) => async (
+module.exports = (bridgeState, sender) => async (
   rsp,
   chainInfo,
   chainHeight
@@ -32,8 +32,7 @@ module.exports = (bridgeState, sender, nodeConfig = {}) => async (
         bridgeState.previousPeriod,
         bridgeState.currentState.slots,
         height + bridgeState.checkCallsCount,
-        bridgeState,
-        nodeConfig
+        bridgeState
       );
 
       if (contractPeriod.timestamp === '0') {
