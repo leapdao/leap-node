@@ -71,3 +71,24 @@ test('init', async () => {
   const events = await sub.init();
   expect(events).toEqual(contractEvents);
 });
+
+test('specific event', async () => {
+  const contractEvents = [
+    { event: 'NewDeposit' },
+    { event: 'NewDeposit' },
+    { event: 'NewExit' },
+  ];
+  const sub = new ContractsEventsSubscription(
+    mockWeb3(10),
+    mockContracts((event) => {
+      expect(event).toBe('NewExit');
+      return contractEvents.slice(-1);
+    }),
+    [],
+    null,
+    'NewExit'
+  );
+
+  const events = await sub.init();
+  expect(events).toEqual([{ event: 'NewExit' }]);
+});
