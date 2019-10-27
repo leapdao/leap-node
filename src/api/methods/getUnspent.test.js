@@ -40,7 +40,8 @@ const unspent = {
 const bridgeState = extraState => merge({
   currentState: {
     unspent
-  }
+  },
+  exitingUtxos: {}
 }, extraState);
 
 describe('getUnspent', () => {
@@ -136,6 +137,28 @@ describe('getUnspent', () => {
     }
 
     expect(error).toBe('Unknown token address');
+  });
+
+  test('unspents with unprocessed exits', async () => {
+    const state = bridgeState({
+      exitingUtxos: {
+        [out1]: {}
+      },
+    });
+
+    const unspents = await getUnspent(state);
+
+    // unspents shouldn't include out1 which is exiting
+    expect(unspents).toEqual([
+      {
+        outpoint: out0,
+        output: tx.outputs[0].toJSON(),
+      },
+      {
+        outpoint: out2,
+        output: tx.outputs[2].toJSON(),
+      },
+    ]);
   });
 
   test('empty unspent list', async () => {
