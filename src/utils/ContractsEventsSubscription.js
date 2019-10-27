@@ -4,7 +4,7 @@
  * This source code is licensed under the Mozilla Public License Version 2.0
  * found in the LICENSE file in the root directory of this source tree.
  */
-
+const EventEmitter = require('events');
 const getBlockAverageTime = require('../utils/getBlockAverageTime');
 
 const BATCH_SIZE = 5000;
@@ -26,8 +26,9 @@ async function getPastEvents(contract, eventName, fromBlock, toBlock) {
   return events.reduce((result, ev) => result.concat(ev), []);
 }
 
-module.exports = class ContractsEventsSubscription {
+module.exports = class ContractsEventsSubscription extends EventEmitter {
   constructor(web3, contracts, eventsBuffer, fromBlock = null, eventName = 'allEvents') {
+    super();
     this.fromBlock = fromBlock;
     this.web3 = web3;
     this.contracts = contracts;
@@ -67,6 +68,7 @@ module.exports = class ContractsEventsSubscription {
 
     this.fromBlock = blockNumber;
 
+    this.emit('newEvents', events);
     return events;
   }
 };
