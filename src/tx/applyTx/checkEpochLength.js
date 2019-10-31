@@ -21,4 +21,5 @@ module.exports = (state, tx, bridgeState) => {
 
   state.epoch.epochLengthIndex += 1;
   state.epoch.epochLength = tx.options.epochLength;
+  bridgeState.epochLength = tx.options.epochLength;
 };

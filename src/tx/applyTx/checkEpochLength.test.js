@@ -36,11 +36,14 @@ describe('checkEpochLength', () => {
     });
 
     const epochLength2 = Tx.epochLength(3);
-    checkEpochLength(state, epochLength2, {
+    const bridgeState = {
+      epochLength: 4,
       epochLengths: [4, 3],
-    });
+    };
+    checkEpochLength(state, epochLength2, bridgeState);
 
     expect(state.epoch.epochLength).toBe(3);
+    expect(bridgeState.epochLength).toBe(3);
   });
 
   test('epoch length mismatch', () => {
