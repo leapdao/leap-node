@@ -57,6 +57,7 @@ module.exports = (bridgeState, db, app, tendermintPort) => {
       null,
       bridgeState
     ),
+    plasma_getState: async () => bridgeState,
   };
 
   const methodsWithCallback = Object.keys(nodeApi).reduce((set, key) => {
