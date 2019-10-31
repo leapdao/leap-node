@@ -20,11 +20,14 @@ describe('checkEpochLength', () => {
     const state = getInitialState();
     const epochLength = Tx.epochLength(4);
 
-    checkEpochLength(state, epochLength, {
+    const bridgeState = {
       epochLengths: [4],
-    });
+    };
+
+    checkEpochLength(state, epochLength, bridgeState);
 
     expect(state.epoch.epochLength).toBe(4);
+    expect(bridgeState.epochLength).toBe(4);
   });
 
   test('series of txs', () => {
