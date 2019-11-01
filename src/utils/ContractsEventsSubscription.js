@@ -64,7 +64,7 @@ module.exports = class ContractsEventsSubscription {
       this.eventsBuffer.push(event);
     }
 
-    this.fromBlock = blockNumber;
+    this.fromBlock = blockNumber + 1;
 
     return events;
   }
