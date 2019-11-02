@@ -21,7 +21,7 @@ describe('checkEpochLength', () => {
     const epochLength = Tx.epochLength(4, 2);
 
     checkEpochLength(state, epochLength, {
-      epochLengths: [4],
+      epochLengths: [[4, 2]],
     });
 
     expect(state.epoch.epochLength).toBe(4);
@@ -32,13 +32,13 @@ describe('checkEpochLength', () => {
 
     const epochLength1 = Tx.epochLength(4, 2);
     checkEpochLength(state, epochLength1, {
-      epochLengths: [4],
+      epochLengths: [[4, 2]],
     });
 
-    const epochLength2 = Tx.epochLength(3, 2);
+    const epochLength2 = Tx.epochLength(3, 5);
     const bridgeState = {
       epochLength: 4,
-      epochLengths: [4, 3],
+      epochLengths: [[4, 2], [3, 5]],
     };
     checkEpochLength(state, epochLength2, bridgeState);
 
@@ -52,7 +52,13 @@ describe('checkEpochLength', () => {
 
     expect(() => {
       checkEpochLength(state, epochLength, {
-        epochLengths: [5],
+        epochLengths: [[5, 2]],
+      });
+    }).toThrow('Wrong epoch length');
+
+    expect(() => {
+      checkEpochLength(state, epochLength, {
+        epochLengths: [[4, 1]],
       });
     }).toThrow('Wrong epoch length');
   });
