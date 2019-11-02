@@ -12,7 +12,8 @@ const { checkOutpoints, removeInputs, addOutputs } = require('./utils');
 
 const checks = {
   [Type.DEPOSIT]: require('./checkDeposit'),
-  [Type.EPOCH_LENGTH]: require('./checkEpochLength'),
+  [Type.EPOCH_LENGTH_V1]: require('./checkEpochLength'),
+  [Type.EPOCH_LENGTH_V2]: require('./checkEpochLength'),
   [Type.MIN_GAS_PRICE]: require('./checkMinGasPrice'),
   [Type.EXIT]: require('./checkExit'),
   [Type.TRANSFER]: require('./checkTransfer'),

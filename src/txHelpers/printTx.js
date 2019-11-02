@@ -11,7 +11,8 @@ module.exports = (state, tx) => {
       case Type.DEPOSIT: {
         return `deposit: ${printOutput(tx.outputs[0], '+')}`;
       }
-      case Type.EPOCH_LENGTH: {
+      case Type.EPOCH_LENGTH_V1:
+      case Type.EPOCH_LENGTH_V2: {
         return `epochLength: ${tx.options.epochLength}`;
       }
       case Type.MIN_GAS_PRICE: {
