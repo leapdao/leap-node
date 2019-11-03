@@ -519,12 +519,15 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
       logOuts.push(new Output(amount, owner, deployed[originAddr]));
     }
   });
-  iterateBag(nftBag, (originAddr, owner) => {
-    if (!nftBag[originAddr][owner].touched) {
-      // throw instead of return, because of the cb function
-      throw new Error(`not touched ${nftBag[originAddr][owner].addr}`);
-    }
-  });
+
+  if (bridgeState.flags.spend_cond_not_touched) {
+    iterateBag(nftBag, (originAddr, owner) => {
+      if (!nftBag[originAddr][owner].touched) {
+        // throw instead of return, because of the cb function
+        throw new Error(`not touched ${nftBag[originAddr][owner].addr}`);
+      }
+    });
+  }
 
   const gasUsed = BigInt(evmResult.gasUsed);
   // XXX: Fixed gasPrice for now. We include it again in the tx format as the next breaking change.
