@@ -131,8 +131,12 @@ module.exports = class BridgeState {
           array.push(event.tokenAddr);
         }
       },
-      EpochLength: ({ returnValues: event }) => {
-        this.epochLengths.push(Number(event.epochLength));
+      EpochLength: (event) => {
+        const { blockNumber, returnValues } = event;
+        this.epochLengths.push([
+          Number(returnValues.epochLength),
+          Number(blockNumber),
+        ]);
       },
       MinGasPrice: ({ returnValues: event }) => {
         this.minGasPrices.push(Number(event.minGasPrice));
