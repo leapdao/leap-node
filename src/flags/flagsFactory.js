@@ -1,11 +1,7 @@
 /* eslint-disable no-prototype-builtins */
 
 function flagValue(bridgeState, flagHeights, flag) {
-  if (!flagHeights.hasOwnProperty(flag)) {
-    return true;
-  }
-
-  const targetHeight = flagHeights[flag];
+  const targetHeight = flagHeights[flag] || 0;
   return bridgeState.blockHeight >= targetHeight;
 }
 
