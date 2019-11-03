@@ -49,6 +49,9 @@ module.exports = (state, tx) => {
         return `periodVote: slotId: ${tx.options.slotId},
          root: ${bufferToHex(tx.inputs[0].prevout.hash)}`;
       }
+      case Type.SPEND_COND: {
+        return 'SPEND_COND';
+      }
       default:
         return undefined;
     }
