@@ -6,9 +6,9 @@ jest.mock('./utils/ContractsEventsSubscription');
 const ContractsEventsSubscription = require('./utils/ContractsEventsSubscription');
 
 const EVENT_BATCHES = [
-  [{ event: 'EpochLength', returnValues: { epochLength: '4' } }],
+  [{ event: 'EpochLength', blockNumber: 1, returnValues: { epochLength: '4' } }],
   [{ event: 'MinGasPrice', returnValues: { minGasPrice: '1000000' } }],
-  [{ event: 'EpochLength', returnValues: { epochLength: '3' } }],
+  [{ event: 'EpochLength', blockNumber: 5, returnValues: { epochLength: '3' } }],
   [
     {
       event: 'NewDeposit',
@@ -191,7 +191,7 @@ describe('BridgeState', () => {
     );
     await state.init();
     await Promise.all(EVENT_BATCHES.map(events => state.handleEvents(events)));
-    expect(state.epochLengths).toEqual([4, 3]);
+    expect(state.epochLengths).toEqual([[4, 1], [3, 5]]);
     expect(state.minGasPrices).toEqual([1000000]);
     expect(state.deposits).toEqual({
       '0': {

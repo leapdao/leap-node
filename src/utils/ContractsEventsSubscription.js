@@ -66,7 +66,7 @@ module.exports = class ContractsEventsSubscription extends EventEmitter {
       this.eventsBuffer.push(event);
     }
 
-    this.fromBlock = blockNumber;
+    this.fromBlock = blockNumber + 1;
 
     this.emit('newEvents', events);
     return events;
