@@ -1,4 +1,5 @@
 const { Tx, Input, Outpoint, Output } = require('leap-core');
+const { merge } = require('lodash');
 const getUnspent = require('./getUnspent');
 
 const PRIV1 =
@@ -26,117 +27,111 @@ const tx = Tx.transfer(
   [new Output(100, A2, 0), new Output(200, A1, 0), new Output(300, A2, 1)]
 ).signAll(PRIV1);
 
+const out0 = new Outpoint(tx.hash(), 0).hex();
+const out1 = new Outpoint(tx.hash(), 1).hex();
+const out2 = new Outpoint(tx.hash(), 2).hex();
+
 const unspent = {
-  [new Outpoint(tx.hash(), 0).hex()]: tx.outputs[0].toJSON(),
-  [new Outpoint(tx.hash(), 1).hex()]: tx.outputs[1].toJSON(),
-  [new Outpoint(tx.hash(), 2).hex()]: tx.outputs[2].toJSON(),
+  [out0]: tx.outputs[0].toJSON(),
+  [out1]: tx.outputs[1].toJSON(),
+  [out2]: tx.outputs[2].toJSON(),
 };
+
+const bridgeState = extraState => merge({
+  currentState: {
+    unspent
+  },
+  exitingUtxos: {}
+}, extraState);
 
 describe('getUnspent', () => {
   test('unspent for existent addr', async () => {
-    const state = {
-      unspent,
-    };
 
-    const unspent1 = await getUnspent({ currentState: state }, A1);
+    const unspent1 = await getUnspent(bridgeState(), A1);
     expect(unspent1).toEqual([
       {
-        outpoint: new Outpoint(tx.hash(), 1).hex(),
+        outpoint: out1,
         output: tx.outputs[1].toJSON(),
       },
     ]);
 
-    const unspent2 = await getUnspent({ currentState: state }, A2);
+    const unspent2 = await getUnspent(bridgeState(), A2);
     expect(unspent2).toEqual([
       {
-        outpoint: new Outpoint(tx.hash(), 0).hex(),
+        outpoint: out0,
         output: tx.outputs[0].toJSON(),
       },
       {
-        outpoint: new Outpoint(tx.hash(), 2).hex(),
+        outpoint: out2,
         output: tx.outputs[2].toJSON(),
       },
     ]);
   });
 
   test('all unspent', async () => {
-    const state = {
-      unspent,
-    };
-
-    const unspents = await getUnspent({ currentState: state });
+    const unspents = await getUnspent(bridgeState());
     expect(unspents).toEqual([
       {
-        outpoint: new Outpoint(tx.hash(), 0).hex(),
+        outpoint: out0,
         output: tx.outputs[0].toJSON(),
       },
       {
-        outpoint: new Outpoint(tx.hash(), 1).hex(),
+        outpoint: out1,
         output: tx.outputs[1].toJSON(),
       },
       {
-        outpoint: new Outpoint(tx.hash(), 2).hex(),
+        outpoint: out2,
         output: tx.outputs[2].toJSON(),
       },
     ]);
   });
 
   test('unspent for existent addr for specific color', async () => {
-    const state = {
-      unspent,
-    };
-
-    const unspent1 = await getUnspent({ currentState: state }, A1, 0);
+    const unspent1 = await getUnspent(bridgeState(), A1, 0);
     expect(unspent1).toEqual([
       {
-        outpoint: new Outpoint(tx.hash(), 1).hex(),
+        outpoint: out1,
         output: tx.outputs[1].toJSON(),
       },
     ]);
 
-    const unspent2 = await getUnspent({ currentState: state }, A1, '0');
+    const unspent2 = await getUnspent(bridgeState(), A1, '0');
     expect(unspent2).toEqual([
       {
-        outpoint: new Outpoint(tx.hash(), 1).hex(),
+        outpoint: out1,
         output: tx.outputs[1].toJSON(),
       },
     ]);
   });
 
   test('unspent for existent addr for specific token', async () => {
-    const bridgeState = {
-      currentState: {
-        unspent,
-      },
+    const state = bridgeState({
       tokens: {
         erc20: [TOKEN_ADDR],
       },
-    };
+    });
 
-    const unspents = await getUnspent(bridgeState, A1, TOKEN_ADDR);
+    const unspents = await getUnspent(state, A1, TOKEN_ADDR);
     expect(unspents).toEqual([
       {
-        outpoint: new Outpoint(tx.hash(), 1).hex(),
+        outpoint: out1,
         output: tx.outputs[1].toJSON(),
       },
     ]);
   });
 
   test('unspent for existent addr for non-existing token', async () => {
-    const bridgeState = {
-      currentState: {
-        unspent,
-      },
+    const state = bridgeState({
       tokens: {
         erc20: [],
         erc721: [],
         erc1948: [],
       },
-    };
+    });
 
     let error;
     try {
-      await getUnspent(bridgeState, A1, TOKEN_ADDR);
+      await getUnspent(state, A1, TOKEN_ADDR);
     } catch (err) {
       error = err.message;
     }
@@ -144,11 +139,35 @@ describe('getUnspent', () => {
     expect(error).toBe('Unknown token address');
   });
 
+  test('unspents with unprocessed exits', async () => {
+    const state = bridgeState({
+      exitingUtxos: {
+        [out1]: {}
+      },
+    });
+
+    const unspents = await getUnspent(state);
+
+    // unspents shouldn't include out1 which is exiting
+    expect(unspents).toEqual([
+      {
+        outpoint: out0,
+        output: tx.outputs[0].toJSON(),
+      },
+      {
+        outpoint: out2,
+        output: tx.outputs[2].toJSON(),
+      },
+    ]);
+  });
+
   test('empty unspent list', async () => {
-    const state = {
-      unspent: {},
-    };
-    const unspents = await getUnspent({ currentState: state }, '0x000');
+    const state = bridgeState({
+      currentState: {
+        unspent: {},
+      }
+    });
+    const unspents = await getUnspent(state, '0x000');
     expect(unspents).toEqual([]);
   });
 });
