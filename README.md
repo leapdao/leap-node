@@ -59,6 +59,7 @@ Your local port `9999` forwards now to the remote host on address `127.0.0.1` an
 - `dataPath` — path to folder with network data (default: `~/.lotion/networks/<network>—<networkdId>`)
 
 ### Config file options
+```
   "bridgeAddr": "0x7b8342412883f4b34f335d4e1391ec190eb887ca",
   "operatorAddr": "0x9b83018de826c0343af6e682c24e7c91a421755c",
   "exitHandlerAddr": "0x0b32eb1aaa9b0804852f4fe1b2e6100edb4533d8",
@@ -66,12 +67,13 @@ Your local port `9999` forwards now to the remote host on address `127.0.0.1` an
   "rootNetworkId": 4,
   "network": "leap-testnet-gamma",
   "networkId": 1341,
+```
 
 - `bridgeAddr` — leap [Bridge](https://github.com/leapdao/leap-contracts) contract address
 - `operatorAddr` — leap [Operator](https://github.com/leapdao/leap-contracts) contract address
 - `exitHandlerAddr` — leap [ExitHandler](https://github.com/leapdao/leap-contracts) contract address
-- `rootNetwork` — *DEPRECATED. Use `rootNetworkId` instead.* Ethereum provider url (e.g. `https://rinkeby.infura.io`)
-- `rootNetworkId` — root network id (see [src/utils/networks.js](https://github.com/leapdao/leap-node/blob/master/src/utils/networks.js),
+- `rootNetwork` — Ethereum provider URL (e.g. `https://rinkeby.unfura.io`)
+- `rootNetworkId` — NetworkId (called also `chainId`) of the network.
 - `genesis` — genesis string
 - `network` — plasma network name
 - `networkId` - network ID. Possible values: `1340` - Leap mainnet, `1341` - Leap testnet.

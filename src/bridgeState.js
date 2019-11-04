@@ -19,13 +19,12 @@ const singleOperatorABI = require('./abis/singleOperator');
 let operatorABI = require('./abis/operator');
 const proxyABI = require('./abis/proxy');
 const { NFT_COLOR_BASE, NST_COLOR_BASE } = require('./api/methods/constants');
-const NETWORKS = require('./utils/networks');
 
 module.exports = class BridgeState {
   constructor(db, privKey, config, relayBuffer) {
     this.config = config;
-    const networkConfig = NETWORKS[config.rootNetworkId] || { provider: {} };
-    this.web3 = new Web3(networkConfig.provider.http);
+    logNode('Root network HTTP endpoint', config.rootNetwork);
+    this.web3 = new Web3(config.rootNetwork);
 
     this.exitHandlerContract = new this.web3.eth.Contract(
       exitABI.concat(proxyABI),
@@ -37,8 +36,8 @@ module.exports = class BridgeState {
     );
     // if theta mainnet or theta testnet, use old operator ABI
     if (
-      networkConfig.networkId === 448747062 ||
-      networkConfig.networkId === 218508104
+      config.rootNetworkId === 448747062 ||
+      config.rootNetworkId === 218508104
     ) {
       operatorABI = singleOperatorABI;
     }
@@ -131,7 +130,7 @@ module.exports = class BridgeState {
           array.push(event.tokenAddr);
         }
       },
-      EpochLength: (event) => {
+      EpochLength: event => {
         const { blockNumber, returnValues } = event;
         this.epochLengths.push([
           Number(returnValues.epochLength),
