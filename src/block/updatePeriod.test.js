@@ -11,6 +11,13 @@ const submitPeriod = jest.requireMock('../txHelpers/submitPeriod');
 const ADDR = '0x4436373705394267350db2c06613990d34621d69';
 const ADDR_2 = '0x4436373705394267350db2c06613990d34621d61';
 
+const SUBMITTED_PERIOD = {
+  prevHash: '0x000002',
+  merkleRoot() {
+    return '0x000022';
+  },
+};
+
 const NON_EXISTENT_PERIOD = {
   prevHash: '0x000001',
   merkleRoot() {
@@ -32,7 +39,8 @@ describe('updatePeriod', () => {
     expect(bridgeState.currentPeriod.prevHash).toBe(
       NON_EXISTENT_PERIOD.merkleRoot()
     );
-    expect(bridgeState.previousPeriod).toBe(NON_EXISTENT_PERIOD);
+    expect(bridgeState.pendingPeriod).toBe(NON_EXISTENT_PERIOD);
+    expect(bridgeState.previousPeriod).toBe(undefined);
     expect(bridgeState.periodHeights[NON_EXISTENT_PERIOD.merkleRoot()]).toBe(
       32
     );
@@ -60,12 +68,13 @@ describe('updatePeriod', () => {
       );
 
       expect(bridgeState.currentPeriod).toBe(NON_EXISTENT_PERIOD);
-      expect(bridgeState.previousPeriod).toBe(undefined);
+      expect(bridgeState.pendingPeriod).toBe(undefined);
     });
 
     test('submit period if enough period votes and period pending', async () => {
       const bridgeState = {
-        previousPeriod: NON_EXISTENT_PERIOD,
+        previousPeriod: SUBMITTED_PERIOD,
+        pendingPeriod: NON_EXISTENT_PERIOD,
         submittedPeriods: {},
         periodHeights: {
           [NON_EXISTENT_PERIOD.merkleRoot()]: 32,
@@ -88,6 +97,8 @@ describe('updatePeriod', () => {
         32,
         bridgeState
       );
+
+      expect(bridgeState.previousPeriod).toBe(NON_EXISTENT_PERIOD);
     });
 
     test('do nothing if not enough period votes', async () => {
