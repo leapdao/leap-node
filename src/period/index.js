@@ -11,10 +11,9 @@ const { logPeriod } = require('../utils/debug');
 
 module.exports = (bridgeState, sender) => async (
   rsp,
-  chainInfo,
-  chainHeight
+  chainInfo
 ) => {
-  const height = chainHeight - 32;
+  const height = chainInfo.height - 32;
 
   if (height <= 0 || !bridgeState.previousPeriod) {
     // genesis height doesn't need check
