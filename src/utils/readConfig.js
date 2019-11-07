@@ -40,16 +40,41 @@ const readConfigFile = async configPath => {
   return JSON.parse(await readFile(configPath));
 };
 
+const updateNetwork = async config => {
+  if (!config.rootNetwork) {
+    throw new Error(
+      'rootNetwork is not defined, please specify it in the config file.'
+    );
+  }
+
+  const web3 = new Web3(config.rootNetwork);
+
+  const rootNetworkId = await web3.eth.net.getId();
+
+  if (
+    config.rootNetworkId !== undefined &&
+    rootNetworkId !== config.rootNetworkId
+  ) {
+    throw new Error(
+      `Chain Id mismatch, expected ${config.rootNetworkId}, found ${rootNetworkId}.`
+    );
+  }
+
+  return { ...config, rootNetworkId };
+};
+
 const urlRegex = /^https{0,1}:\/\//;
 
 module.exports = async configPath => {
-  const config = urlRegex.test(configPath)
+  let config = urlRegex.test(configPath)
     ? await fetchNodeConfig(configPath)
     : await readConfigFile(configPath);
 
   if (!config.exitHandlerAddr) {
     throw new Error('exitHandlerAddr is required');
   }
+
+  config = await updateNetwork(config);
 
   return Object.assign({}, defaultConfig, config);
 };

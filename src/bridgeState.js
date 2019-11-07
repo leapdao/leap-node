@@ -23,7 +23,6 @@ const { NFT_COLOR_BASE, NST_COLOR_BASE } = require('./api/methods/constants');
 module.exports = class BridgeState {
   constructor(db, privKey, config, relayBuffer) {
     this.config = config;
-    logNode('Root network HTTP endpoint', config.rootNetwork);
     this.web3 = new Web3(config.rootNetwork);
 
     this.exitHandlerContract = new this.web3.eth.Contract(
