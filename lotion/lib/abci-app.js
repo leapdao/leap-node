@@ -189,7 +189,7 @@ module.exports = function configureABCIServer({
   abciApp.checkBridge = async ({ height }) => {
     const rsp = {};
     for (let i = 0; i < periodMiddleware.length; i += 1) {
-      await periodMiddleware[i](rsp, chainInfo, height);
+      await periodMiddleware[i](rsp, store, chainInfo, height);
     }
     return { status: rsp.status };
   };

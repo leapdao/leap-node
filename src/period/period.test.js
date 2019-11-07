@@ -7,6 +7,8 @@ const submitPeriodVote = require('../period/submitPeriodVote');
 
 const sender = () => {};
 
+const state = {};
+
 const EXISTENT_PERIOD = {
   prevHash: '0x000000',
   merkleRoot() {
@@ -24,7 +26,7 @@ const NON_EXISTENT_PERIOD = {
 describe('Period handler', () => {
   test('Do not check genesis period', async () => {
     const rsp = {};
-    await periodHandler({})(rsp, { height: 32 });
+    await periodHandler({})(rsp, state, { height: 32 });
     expect(rsp.status).toBe(1);
   });
 
@@ -37,9 +39,10 @@ describe('Period handler', () => {
       },
       checkCallsCount: 0,
     };
-    await periodHandler(bridgeState, sender)(rsp, { height: 64 });
+    await periodHandler(bridgeState, sender)(rsp, state, { height: 64 });
     expect(submitPeriodVote).toBeCalledWith(
       EXISTENT_PERIOD,
+      state,
       bridgeState,
       sender
     );
@@ -56,7 +59,7 @@ describe('Period handler', () => {
       },
       checkCallsCount: 0,
     };
-    await periodHandler(bridgeState)(rsp, { height: 64 });
+    await periodHandler(bridgeState)(rsp, state, { height: 64 });
     expect(rsp.status).toBe(1);
   });
 });
