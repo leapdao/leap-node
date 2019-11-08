@@ -40,7 +40,8 @@ const readConfigFile = async configPath => {
   return JSON.parse(await readFile(configPath));
 };
 
-const updateNetwork = async config => {
+const updateNetwork = async (config, cliRootNetwork) => {
+  config.rootNetwork = cliRootNetwork || config.rootNetwork;
   if (!config.rootNetwork) {
     throw new Error(
       'rootNetwork is not defined, please specify it in the config file.'
@@ -65,7 +66,7 @@ const updateNetwork = async config => {
 
 const urlRegex = /^https{0,1}:\/\//;
 
-module.exports = async configPath => {
+module.exports = async (configPath, cliRootNetwork) => {
   let config = urlRegex.test(configPath)
     ? await fetchNodeConfig(configPath)
     : await readConfigFile(configPath);
@@ -74,7 +75,7 @@ module.exports = async configPath => {
     throw new Error('exitHandlerAddr is required');
   }
 
-  config = await updateNetwork(config);
+  config = await updateNetwork(config, cliRootNetwork);
 
   return Object.assign({}, defaultConfig, config);
 };

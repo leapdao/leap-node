@@ -35,6 +35,20 @@ describe('readConfig', () => {
     });
   });
 
+  test('with rootNetwork from CLI', async () => {
+    Web3.__setMethodMock('eth.net.getId', () => 5777);
+
+    const result = await readConfig('./config.json', 'http://unfura.io/');
+    expect(result).toEqual({
+      exitHandlerAddr: '0x000',
+      network: 'testnet',
+      rootNetwork: 'http://unfura.io/',
+      rootNetworkId: 5777,
+      eventsDelay: 0,
+      bridgeDelay: 0,
+    });
+  });
+
   test('fetch node config', async () => {
     Web3.__setMethodMock('getConfig', () => ({
       exitHandlerAddr: '0x000',

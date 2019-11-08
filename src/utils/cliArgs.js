@@ -120,6 +120,12 @@ const options = [
     env: 'DATA_PATH',
     help: 'Path to lotion folder',
   },
+  {
+    names: ['rootNetwork'],
+    type: 'string',
+    env: 'ROOT_NETWORK',
+    help: 'Root chain provider URL. Overrides rootNetwork from config file',
+  },
 ];
 
 const parser = dashdash.createParser({ options });
