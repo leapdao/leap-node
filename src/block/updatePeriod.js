@@ -14,23 +14,24 @@ const { logPeriod } = require('../utils/debug');
 const checkEnoughVotes = require('../period/utils/checkEnoughVotes');
 
 module.exports = async (state, chainInfo, bridgeState, sender) => {
-  if (bridgeState.previousPeriod) {
-    const previousPeriodRoot = bridgeState.previousPeriod.merkleRoot();
-    const { result } = checkEnoughVotes(previousPeriodRoot, state);
-    if (result && !bridgeState.submittedPeriods[previousPeriodRoot]) {
-      logPeriod(`Enough votes to submit period: ${previousPeriodRoot}`);
+  if (bridgeState.pendingPeriod) {
+    const pendingPeriodRoot = bridgeState.pendingPeriod.merkleRoot();
+    const { result } = checkEnoughVotes(pendingPeriodRoot, state);
+    if (result && !bridgeState.submittedPeriods[pendingPeriodRoot]) {
+      logPeriod(`Enough votes to submit period: ${pendingPeriodRoot}`);
       try {
         await submitPeriod(
-          bridgeState.previousPeriod,
+          bridgeState.pendingPeriod,
           state.slots,
-          bridgeState.periodHeights[previousPeriodRoot],
+          bridgeState.periodHeights[pendingPeriodRoot],
           bridgeState
         );
-        bridgeState.submittedPeriods[previousPeriodRoot] = true;
+        bridgeState.submittedPeriods[pendingPeriodRoot] = true;
       } catch (err) {
         /* istanbul ignore next */
         logPeriod(`submit period: ${err}`);
       }
+      bridgeState.previousPeriod = bridgeState.pendingPeriod;
     }
   }
 
@@ -51,9 +52,9 @@ module.exports = async (state, chainInfo, bridgeState, sender) => {
       /* istanbul ignore next */
       logPeriod(`period vote: ${err}`);
     }
-    bridgeState.previousPeriod = bridgeState.currentPeriod;
+    bridgeState.pendingPeriod = bridgeState.currentPeriod;
     bridgeState.currentPeriod = new Period(
-      bridgeState.previousPeriod.merkleRoot()
+      bridgeState.pendingPeriod.merkleRoot()
     );
   }
   if (chainInfo.height % 32 === 16) {
