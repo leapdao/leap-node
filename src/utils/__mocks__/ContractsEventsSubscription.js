@@ -1,7 +1,10 @@
+const EventEmitter = require('events');
+
 let eventsBatches = [];
 
-class ContractsEventsSubscriptionMock {
+class ContractsEventsSubscriptionMock extends EventEmitter {
   constructor() {
+    super();
     this.fetchEvents = this.fetchEvents.bind(this);
     this.fetchCounts = 0;
     this.handlers = [];
@@ -21,7 +24,7 @@ class ContractsEventsSubscriptionMock {
     this.fetchCounts += 1;
 
     this.handlers.forEach(handler => handler(events));
-
+    this.emit('newEvents', events);
     return events;
   }
 }

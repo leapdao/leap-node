@@ -32,4 +32,6 @@ module.exports = (state, tx, bridgeState) => {
   ) {
     throw new Error('Trying to submit incorrect exit');
   }
+
+  delete bridgeState.exitingUtxos[prevout.hex()];
 };

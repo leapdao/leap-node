@@ -11,10 +11,12 @@ const { logPeriod } = require('../utils/debug');
 
 module.exports = (bridgeState, sender) => async (
   rsp,
-  chainInfo,
-  chainHeight
+  state,
+  chainInfo
 ) => {
-  const height = chainHeight - 32;
+  const height = chainInfo.height - 32;
+
+  logPeriod('checkBridge');
 
   if (height <= 0 || !bridgeState.previousPeriod) {
     // genesis height doesn't need check
@@ -22,11 +24,12 @@ module.exports = (bridgeState, sender) => async (
     return;
   }
 
-  logPeriod('checkBridge');
+  logPeriod('checkBridge. Period: ', bridgeState.previousPeriod.merkleRoot());
+
   // use a timeout to relax race conditions (if period submission is fast)
   await new Promise(resolve => {
     setTimeout(async () => {
-      await submitPeriodVote(bridgeState.previousPeriod, bridgeState, sender);
+      await submitPeriodVote(bridgeState.previousPeriod, state, bridgeState, sender);
 
       const contractPeriod = await submitPeriod(
         bridgeState.previousPeriod,

@@ -3,7 +3,11 @@ const checkExit = require('./checkExit');
 
 const ADDR_1 = '0x4436373705394267350db2c06613990d34621d69';
 
-const makeExitMock = (exitor, amount, color) => {
+const makeExitMock = (exitor, amount, color, outpoint) => {
+  const exitingUtxos = {};
+  if (outpoint) {
+    exitingUtxos[outpoint.hex()] = {};
+  }
   return {
     exits: new Proxy(
       {},
@@ -11,6 +15,7 @@ const makeExitMock = (exitor, amount, color) => {
         get: () => ({ exitor, amount, color }),
       }
     ),
+    exitingUtxos
   };
 };
 
@@ -29,8 +34,11 @@ describe('checkExit', () => {
       },
     };
 
+    const bridgeState = makeExitMock(ADDR_1, '500', 0, outpoint);
+
     const exit = Tx.exit(new Input(outpoint));
-    checkExit(state, exit, makeExitMock(ADDR_1, '500', 0));
+    checkExit(state, exit, bridgeState);
+    expect(bridgeState.exitingUtxos).toEqual({});
   });
 
   test('not 1 input', () => {

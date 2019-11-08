@@ -78,6 +78,7 @@ module.exports = class BridgeState {
     this.submissions = [];
     this.periodHeights = {};
     this.submittedPeriods = {};
+    this.exitingUtxos = {};
 
     this.handleEvents = handleEvents({
       NewDeposit: ({ returnValues: event }) => {
@@ -153,6 +154,19 @@ module.exports = class BridgeState {
         });
       },
     });
+
+    this.handleExitingUtxos = handleEvents({
+      ExitStarted: ({ returnValues: event }) => {
+        const outpoint = new Outpoint(event.txHash, Number(event.outIndex));
+        this.exitingUtxos[outpoint.hex()] = {
+          txHash: event.txHash,
+          outIndex: Number(event.outIndex),
+          exitor: event.exitor,
+          color: event.color,
+          amount: event.amount,
+        };
+      },
+    });
   }
 
   async init() {
@@ -181,6 +195,16 @@ module.exports = class BridgeState {
       this.currentPeriod = new Period(this.lastBlocksRoot);
     }
 
+    this.exitEventSubscription = new ContractsEventsSubscription(
+      this.web3,
+      [this.exitHandlerContract],
+      [],
+      blockNumber - this.bridgeDelay,
+      'ExitStarted'
+    );
+    this.exitEventSubscription.on('newEvents', this.handleExitingUtxos);
+    this.exitEventSubscription.init();
+    
     logNode('Synced');
   }
 
