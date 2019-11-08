@@ -57,6 +57,7 @@ Your local port `9999` forwards now to the remote host on address `127.0.0.1` an
 - `config` — path to config file or node's JSON RPC url (eg https://testnet-2.leapdao.org)
 - `version` — print version of the node
 - `dataPath` — path to folder with network data (default: `~/.lotion/networks/<network>—<networkdId>`)
+- `rootNetwork` — root chain provider url (e.g. `https://rinkeby.unfura.io`)
 
 ### Config file options
 ```
@@ -72,7 +73,7 @@ Your local port `9999` forwards now to the remote host on address `127.0.0.1` an
 - `bridgeAddr` — leap [Bridge](https://github.com/leapdao/leap-contracts) contract address
 - `operatorAddr` — leap [Operator](https://github.com/leapdao/leap-contracts) contract address
 - `exitHandlerAddr` — leap [ExitHandler](https://github.com/leapdao/leap-contracts) contract address
-- `rootNetwork` — Ethereum provider URL (e.g. `https://rinkeby.unfura.io`)
+- `rootNetwork` — root chain provider url (e.g. `https://rinkeby.unfura.io`)
 - `rootNetworkId` — NetworkId (called also `chainId`) of the network.
 - `genesis` — genesis string
 - `network` — plasma network name

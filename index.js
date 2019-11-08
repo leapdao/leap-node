@@ -32,7 +32,7 @@ async function run() {
   const config = await (async () => {
     let result;
     try {
-      result = readConfig(cliArgs.config);
+      result = readConfig(cliArgs.config, cliArgs.rootNetwork);
     } catch (err) {
       console.error(err.message);
       process.exit(0);
