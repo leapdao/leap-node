@@ -25,7 +25,7 @@ module.exports = (bridgeState, nodeConfig) => async (
     await applyTx(state, tx, bridgeState, nodeConfig);
     accumulateTx(state, tx);
   } catch (err) {
-    logError(err.message);
+    logError(err.message || err);
     throw err;
   }
 
