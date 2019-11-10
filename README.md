@@ -79,6 +79,38 @@ Your local port `9999` forwards now to the remote host on address `127.0.0.1` an
 - `network` — plasma network name
 - `networkId` - network ID. Possible values: `1340` - Leap mainnet, `1341` - Leap testnet.
 - `peers` — array of peers
+- `flagHeights` — `flag → height` mapping to enable feature flags only on certain heights (see [feature flags section](#feature-flags))
+
+### Feature flags
+
+If you want to introduce breaking changes (it can break existing networks) in tx checks you should wrap these changes into condition with feature flag to avoid [resync problems](https://github.com/leapdao/leap-node/issues/334).
+
+```es6
+if (bridgeState.flags.tx_should_fail_on_zero_input) {
+  if (valueOf(input) === 0) {
+    throw new Error('WTF');
+  }
+}
+```
+
+#### How to add a new flag
+
+1. Add it into `FLAGS` array [here](src/flags/index.js#L3)
+2. That’s all, you can use it. It will be `true` by default
+
+#### How to configure feature flags
+
+1. Add `flagHeights` section into the network config
+2. Add activation height:
+```
+{
+  ...,
+  "flagHeights": {
+    "tx_should_fail_on_zero_input": 5000,
+  }
+}
+```
+3. Until this height flag will be `false`, after (inclusively) — `true`
 
 ### Config presets
 
