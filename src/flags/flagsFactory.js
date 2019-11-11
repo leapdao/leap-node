@@ -17,7 +17,7 @@ module.exports = (flags = []) => (bridgeState, flagHeights = {}) => {
       }
 
       if (!flags.includes(key)) {
-        throw new Error(`Unknow feature flag ${key}`);
+        throw new Error(`Unknown feature flag ${key}`);
       }
 
       return flagValue(bridgeState, target, key);

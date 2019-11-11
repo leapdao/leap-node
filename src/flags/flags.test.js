@@ -44,7 +44,7 @@ describe('Feature flags', () => {
     const flags = makeFlags(bridgeState);
     expect(() => {
       const value = flags.unknown_flag; // eslint-disable-line no-unused-vars
-    }).toThrow('Unknow feature flag unknown_flag');
+    }).toThrow('Unknown feature flag unknown_flag');
   });
 
   it('should throw on attempt to set a flag value', () => {
