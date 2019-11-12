@@ -262,12 +262,20 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
     let allowance;
 
     if (!spendingIsOwner) {
-      if (input.signer) {
-        if (unspent.address !== input.signer) {
-          throw new Error(
-            `output owner ${unspent.address} unequal input signer: ${input.signer}`
-          );
+      if (input.signer && unspent.address !== input.signer) {
+        throw new Error(
+          `output owner ${unspent.address} unequal input signer: ${input.signer}`
+        );
+      }
+
+      // will throw if allowance is undefined
+      // stricter rule was introduced here
+      // https://github.com/leapdao/leap-node/blob/b534718807214318acaa6a9ff88b9cb8f1780ef1/src/tx/applyTx/checkSpendCond.js#L271
+      if (bridgeState.flags.spend_cond_stricter_rules) {
+        if (input.signer) {
+          allowance = {};
         }
+      } else {
         allowance = {};
       }
     } else {
@@ -281,10 +289,9 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
         tokenValueBuf,
         utils.toBuffer(unspent.data),
       ]);
-      bytecode =
-        bridgeState.networkId === 218508104 && bridgeState.blockHeight < 41000
-          ? ERC1948_BYTECODE_218508104
-          : ERC1948_BYTECODE;
+      bytecode = bridgeState.flags.spend_cond_new_bytecode
+        ? ERC1948_BYTECODE
+        : ERC1948_BYTECODE_218508104;
 
       if (allowance) {
         allowance = {
@@ -519,12 +526,15 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
       logOuts.push(new Output(amount, owner, deployed[originAddr]));
     }
   });
-  iterateBag(nftBag, (originAddr, owner) => {
-    if (!nftBag[originAddr][owner].touched) {
-      // throw instead of return, because of the cb function
-      throw new Error(`not touched ${nftBag[originAddr][owner].addr}`);
-    }
-  });
+
+  if (bridgeState.flags.spend_cond_stricter_rules) {
+    iterateBag(nftBag, (originAddr, owner) => {
+      if (!nftBag[originAddr][owner].touched) {
+        // throw instead of return, because of the cb function
+        throw new Error(`not touched ${nftBag[originAddr][owner].addr}`);
+      }
+    });
+  }
 
   const gasUsed = BigInt(evmResult.gasUsed);
   // XXX: Fixed gasPrice for now. We include it again in the tx format as the next breaking change.

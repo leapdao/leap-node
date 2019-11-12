@@ -19,6 +19,7 @@ const singleOperatorABI = require('./abis/singleOperator');
 let operatorABI = require('./abis/operator');
 const proxyABI = require('./abis/proxy');
 const { NFT_COLOR_BASE, NST_COLOR_BASE } = require('./api/methods/constants');
+const flags = require('./flags');
 
 module.exports = class BridgeState {
   constructor(db, privKey, config, relayBuffer) {
@@ -64,6 +65,8 @@ module.exports = class BridgeState {
     };
     this.epochLengths = [];
     this.minGasPrices = [];
+
+    this.flags = flags(this, config.flagHeights);
 
     this.onNewBlock = this.onNewBlock.bind(this);
     this.eventsBuffer = new TinyQueue([], (a, b) => {
@@ -204,7 +207,7 @@ module.exports = class BridgeState {
     );
     this.exitEventSubscription.on('newEvents', this.handleExitingUtxos);
     this.exitEventSubscription.init();
-    
+
     logNode('Synced');
   }
 

@@ -2,6 +2,7 @@ const { Tx, Input, Outpoint, Output } = require('leap-core');
 const utils = require('ethereumjs-util');
 const ethers = require('ethers'); // eslint-disable-line import/no-extraneous-dependencies
 const checkSpendCond = require('./checkSpendCond');
+const makeFlags = require('../../flags');
 const {
   NFT_COLOR_BASE,
   NST_COLOR_BASE,
@@ -34,6 +35,9 @@ const bridgeState = {
   logsCache: {},
   web3: new Web3(),
 };
+bridgeState.flags = makeFlags(bridgeState, {
+  spend_cond_new_bytecode: 1000,
+});
 
 const NFTCondition =
   '6080604052348015600f57600080fd5b5060043610602b5760e060020a6000350463d01a81e181146030575b600080fd5b605960048036036040811015604457600080fd5b50600160a060020a038135169060200135605b565b005b6040805160e060020a6323b872dd028152306004820152600160a060020a03841660248201526044810183905290517311111111111111111111111111111111111111119182916323b872dd9160648082019260009290919082900301818387803b15801560c857600080fd5b505af115801560db573d6000803e3d6000fd5b5050505050505056fea165627a7a723058206e658cc8b44fd3d32eef8c4222a0f8773e93bc6efa0fb08e4db77979dacc9e790029';
