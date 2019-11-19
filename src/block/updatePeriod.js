@@ -26,7 +26,6 @@ module.exports = async (state, chainInfo, bridgeState, sender) => {
           bridgeState.periodHeights[pendingPeriodRoot],
           bridgeState
         );
-        bridgeState.submittedPeriods[pendingPeriodRoot] = true;
       } catch (err) {
         /* istanbul ignore next */
         logPeriod(`submit period: ${err}`);
