@@ -99,18 +99,17 @@ module.exports = async (period, slots, height, bridgeState) => {
       ),
       bridgeState.operatorContract.options.address,
       bridgeState.account
-    ).catch(
-      /* istanbul ignore next */ () => {
-        delete inFlight[periodRoot];
-        logError(height);
-      }
-    );
+    ).catch((e) => {
+      logPeriod('submitPeriod error', e);
+      delete inFlight[periodRoot];
+      logError(height);
+    });
 
     tx.then(receipt => {
       logPeriod('submitPeriod tx', receipt);
       delete inFlight[periodRoot];
-      if (receipt && receipt.status === 1) {
-        bridgeState.submittedPeriod[periodRoot] = true;
+      if (receipt && receipt.status) {
+        bridgeState.submittedPeriods[periodRoot] = true;
       }
     });
   }
