@@ -43,6 +43,8 @@ Only bounties from the current sprint(if any) are payed out. Unless you are newb
 ## Gain for the project
 <!-- How the completion of this bounty helps the project to achieve it is purpose -->
 
+## Expert
+<!-- If the size of the bounty is larger than M, talk to a subject expert and put his name here -->
 
 ### Publicly visible delivery
 <!-- ideally, each bounty should has at least a part of delivery which is publicly visible. This could be a blog post, tweet, documentation or website update etc. LeapDAO Slack is not considered public. -->
