@@ -108,6 +108,12 @@ Config file: [presets/leap-mainnet.json](presets/leap-mainnet.json)
 <!-- TODO: better docs -->
 See [docs.leapdao.org](https://docs.leapdao.org/how-to-use/) for advanced configuration.
 
+## API
+
+`leap-node --version` — print current leap-node's version
+
+`leap-node --config=... --fresh` — delete local data for the network except validator keys. ⚠️Be careful, non-reversible
+
 ## Documentation
 
 See [docs.leapdao.org](https://docs.leapdao.org)
