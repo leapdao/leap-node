@@ -11,9 +11,27 @@
   * [Create/update AWS EC2 cluster](#createupdate-aws-ec2-cluster)
 * [Dive in development](#dive-in-development)
 
-## Prerequisites
+## Install
 
-* Python 2.X (required by node-gyp, only for building)
+You may need Python 2.X (required by node-gyp, only for building).
+
+```sh
+yarn
+```
+
+## Run
+
+To connect to the testnet
+
+```sh
+DEBUG=tendermint,leap-node* node index.js --config=https://testnet-node.leapdao.org
+```
+
+## Run local network
+
+Use [leap-sandox](leapdao/leap-sandbox). It is the easiest way to start local leap network at the moment.
+
+[Alternative guide](https://github.com/parsec-labs/parsec-contracts/wiki/Setting-up-local-development-environment) (may be outdated)
 
 ## Debug via Blink Developer Tools / node-inspector
 
@@ -112,7 +130,3 @@ Some useful commands once it is up and running:
 
 * check the logs: `ssh ubuntu@<ec2 host> journalctl -u leap-node`
 * start/stop/restart/status: `ssh ubuntu@<ec2 host> sudo service leap-node start/stop/restart/status`
-
-## Dive in development
-
-https://github.com/parsec-labs/parsec-contracts/wiki/Setting-up-local-development-environment
