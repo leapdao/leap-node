@@ -16,6 +16,8 @@
 You may need Python 2.X (required by node-gyp, only for building).
 
 ```sh
+git clone https://github.com/leapdao/leap-node.git
+cd leap-node
 yarn
 ```
 
@@ -31,7 +33,7 @@ DEBUG=tendermint,leap-node* node index.js --config=https://testnet-node.leapdao.
 
 Use [leap-sandox](https://github.com/leapdao/leap-sandbox). It is the easiest way to start local leap network at the moment.
 
-[Alternative guide](https://github.com/parsec-labs/parsec-contracts/wiki/Setting-up-local-development-environment) (may be outdated)
+[Alternative guide](https://github.com/parsec-labs/parsec-contracts/wiki/Setting-up-local-development-environment) how to manually set up a local environment (may be outdated)
 
 ## Debug via Blink Developer Tools / node-inspector
 
