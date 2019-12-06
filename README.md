@@ -75,7 +75,7 @@ npm install -g leap-node
 
 To run the node you execute a leap-node with commandline arguments.
 
-The bare minumum of arguments required are:
+The bare minimum of arguments required are:
 
 * `--config` to specify a path to local JSON file with network configuration or a JSON RPC url of another leap-node to get configuration from
 * `--rootNetwork` to specify a root chain provider url (e.g. your own ethereum node or infura)
@@ -87,7 +87,7 @@ DEBUG=tendermint,leap-node* leap-node [ARGS] --config=<path-to-config.json> --ro
 ```
 
 <!-- TODO: link better docs here -->
-Once started and synced with the network, the node exposes a Leap JSON RPC on a port 8645. You [use](https://docs.leapdao.org/) your node now or [apply to become a validator](https://docs.leapdao.org/connect/#becoming-a-validator).
+Once started and synced with the network, the node exposes a Leap JSON RPC on a port 8645. You can [use](https://docs.leapdao.org/) your node now or [apply to become a validator](https://docs.leapdao.org/connect/#becoming-a-validator).
 
 ## Available Networks
 
@@ -95,13 +95,13 @@ Once started and synced with the network, the node exposes a Leap JSON RPC on a 
 
 Config file: [presets/leap-testnet.json](presets/leap-testnet.json)
 
-Bridge UI: https://testnet.leapdao.org/
+[All the details](https://github.com/leapdao/leap-contracts/releases/tag/testnet)
 
 ### Mainnet
 
 Config file: [presets/leap-mainnet.json](presets/leap-mainnet.json)
 
-Bridge UI: Mainnet: https://mainnet.leapdao.org/
+[All the details](https://github.com/leapdao/leap-contracts/releases/tag/v1.1.0-mainnet-v2)
 
 ## Configuration
 
