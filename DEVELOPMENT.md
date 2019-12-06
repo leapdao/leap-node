@@ -29,7 +29,7 @@ DEBUG=tendermint,leap-node* node index.js --config=https://testnet-node.leapdao.
 
 ## Run local network
 
-Use [leap-sandox](leapdao/leap-sandbox). It is the easiest way to start local leap network at the moment.
+Use [leap-sandox](https://github.com/leapdao/leap-sandbox). It is the easiest way to start local leap network at the moment.
 
 [Alternative guide](https://github.com/parsec-labs/parsec-contracts/wiki/Setting-up-local-development-environment) (may be outdated)
 
@@ -60,9 +60,9 @@ Your local port `9999` forwards now to the remote host on address `127.0.0.1` an
   "networkId": 1341,
 ```
 
-* `bridgeAddr` — leap [Bridge](https://github.com/leapdao/leap-contracts) contract address
-* `operatorAddr` — leap [Operator](https://github.com/leapdao/leap-contracts) contract address
-* `exitHandlerAddr` — leap [ExitHandler](https://github.com/leapdao/leap-contracts) contract address
+* `bridgeAddr` — [Bridge](https://github.com/leapdao/leap-contracts/blob/master/contracts/Bridge.sol) proxy contract address
+* `operatorAddr` — [Operator](https://github.com/leapdao/leap-contracts/blob/master/contracts/PoaOperator.sol) proxy contract address
+* `exitHandlerAddr` — [ExitHandler](https://github.com/leapdao/leap-contracts/blob/master/contracts/FastExitHandler.sol) proxy contract address
 * `rootNetwork` — (optional, maybe specified via CLI args) root chain provider url (e.g. `https://rinkeby.unfura.io`)
 * `rootNetworkId` — NetworkId (called also `chainId`) of the network.
 * `network` — leap network name
