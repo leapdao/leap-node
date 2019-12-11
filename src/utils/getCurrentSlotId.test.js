@@ -15,23 +15,97 @@ test('no active slots', () => {
   expect(result).toBeUndefined();
 });
 
-test('1 active slots', () => {
-  const slots = [undefined, { id: 1, owner: ADDR_1 }];
-  expect(getCurrentSlotId(slots, 1)).toBe(1);
-  expect(getCurrentSlotId(slots, 2)).toBe(1);
-  expect(getCurrentSlotId(slots, 3)).toBe(1);
+const expectForSlots = (slots, fixtures) => {
+  fixtures.forEach(({ height, proposingSlot }) =>
+    test(`Period at height ${height} is proposed by slot ${proposingSlot}`, () =>
+      expect(getCurrentSlotId(slots, height)).toBe(proposingSlot)
+    )
+  );
+}
+
+describe('one slot', () => {
+  const slots = [
+    { id: 0, owner: ADDR_1 },
+  ];
+
+  expectForSlots(slots, [
+    { height: 30, proposingSlot: 0 },
+    { height: 31, proposingSlot: 0 },
+    { height: 32, proposingSlot: 0 },
+    { height: 33, proposingSlot: 0 },
+    { height: 63, proposingSlot: 0 },
+    { height: 64, proposingSlot: 0 }
+  ]);
 });
 
-test('several active slots', () => {
+describe('one slot with a gap', () => {
   const slots = [
     undefined,
+    { id: 0, owner: ADDR_1 },
+  ];
+
+  expectForSlots(slots, [
+    { height: 30, proposingSlot: 0 },
+    { height: 31, proposingSlot: 0 },
+    { height: 32, proposingSlot: 0 },
+    { height: 33, proposingSlot: 0 },
+    { height: 63, proposingSlot: 0 },
+    { height: 64, proposingSlot: 0 }
+  ]);
+});
+
+describe('two slots', () => {
+  const slots = [
+    { id: 0, owner: ADDR_1 },
+    { id: 1, owner: ADDR_1 },
+  ];
+
+  expectForSlots(slots, [
+    { height: 30, proposingSlot: 0 },
+    { height: 31, proposingSlot: 0 },
+    { height: 32, proposingSlot: 1 },
+    { height: 33, proposingSlot: 1 },
+    { height: 63, proposingSlot: 1 },
+    { height: 64, proposingSlot: 0 },
+  ]);
+});
+
+describe('three slots', () => {
+  const slots = [
+    { id: 0, owner: ADDR_1 },
     { id: 1, owner: ADDR_1 },
     { id: 2, owner: ADDR_1 },
-    undefined,
-    { id: 4, owner: ADDR_1 },
   ];
-  expect(getCurrentSlotId(slots, 1)).toBe(2);
-  expect(getCurrentSlotId(slots, 2)).toBe(4);
-  expect(getCurrentSlotId(slots, 3)).toBe(1);
-  expect(getCurrentSlotId(slots, 4)).toBe(2);
+
+  expectForSlots(slots, [
+    { height: 30, proposingSlot: 0 },
+    { height: 31, proposingSlot: 0 },
+    { height: 32, proposingSlot: 1 },
+    { height: 33, proposingSlot: 1 },
+    { height: 63, proposingSlot: 1 },
+    { height: 64, proposingSlot: 2 },
+    { height: 65, proposingSlot: 2 },
+    { height: 95, proposingSlot: 2 },
+    { height: 96, proposingSlot: 0 },
+  ]);
+});
+
+describe('two slots with a gap', () => {
+  const slots = [
+    { id: 0, owner: ADDR_1 },
+    undefined,
+    { id: 2, owner: ADDR_1 },
+  ];
+
+  expectForSlots(slots, [
+    { height: 30, proposingSlot: 0 },
+    { height: 31, proposingSlot: 0 },
+    { height: 32, proposingSlot: 2 },
+    { height: 33, proposingSlot: 2 },
+    { height: 63, proposingSlot: 2 },
+    { height: 64, proposingSlot: 0 },
+    { height: 65, proposingSlot: 0 },
+    { height: 95, proposingSlot: 0 },
+    { height: 96, proposingSlot: 2 },
+  ]);
 });
