@@ -77,7 +77,8 @@ async function run() {
     db,
     privKey,
     config,
-    eventsRelay.relayBuffer
+    eventsRelay.relayBuffer,
+    sender
   );
   global.blockTicker = new BlockTicker(bridgeState.web3, [
     bridgeState.onNewBlock,
@@ -91,8 +92,8 @@ async function run() {
   const nodeConfig = Object.assign({}, cliArgs, { network: config });
 
   app.useTx(txHandler(bridgeState, nodeConfig));
-  app.useBlock(blockHandler(bridgeState, db, nodeConfig, sender));
-  app.usePeriod(periodHandler(bridgeState, sender));
+  app.useBlock(blockHandler(bridgeState, db, nodeConfig));
+  app.usePeriod(periodHandler(bridgeState));
 
   const lastGoodState = await bridgeState.loadState();
 

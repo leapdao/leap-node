@@ -8,36 +8,31 @@ const PRIV_0 =
   '0x9b63fe8147edb8d251a6a66fd18c0ed73873da9fff3f08ea202e1c0a8ead7311';
 const PRIV_1 =
   '0xea3a59a673a9f7e74ad65e92ee04c2330fc5b905d0fa47bb2ae36c0b94af61cd';
-const TENDER_KEY_0 = '0x7640D69D9EDB21592CBDF4CC49956EA53E59656FC2D8BBD1AE3F427BF67D47FA'.toLowerCase();
-const TENDER_KEY_1 = '0x0000069D9EDB21592CBDF4CC49956EA53E59656FC2D8BBD1AE3F427BF67D47FA'.toLowerCase();
 const merkleRoot =
   '0x3342fc20b1a6b66a964d58e4f56ec38c3421964237b41853a603e1abd0b7885d';
-
-jest.mock('../../txHelpers/submitPeriod', () => jest.fn());
-const submitPeriodMock = jest.requireMock('../../txHelpers/submitPeriod');
 
 const stateMock = attrs => ({
   slots: [
     {
       id: 0,
-      tenderKey: TENDER_KEY_0,
       signerAddr: ADDR_0,
-      eventsCount: 1,
     },
     {
       id: 1,
-      tenderKey: TENDER_KEY_1,
       signerAddr: ADDR_1,
-      eventsCount: 1,
     },
   ],
   ...attrs,
 });
 
-const bridgeStateMock = attrs => ({
+const bridgeStateMock = (votes, extend) => ({
   blockHeight: 1,
   currentState: stateMock(),
-  ...attrs,
+  periodProposal: {
+    blocksRoot: merkleRoot,
+    votes: votes || [],
+  },
+  ...extend,
 });
 
 describe('checkPeriodVote', () => {
@@ -49,18 +44,11 @@ describe('checkPeriodVote', () => {
     ).signAll(PRIV_1);
 
     await checkPeriodVote(bridgeState.currentState, periodVoteTx, bridgeState);
-    expect(bridgeState.currentState.periodVotes[merkleRoot]).toEqual([1]);
-    expect(submitPeriodMock).not.toBeCalled();
+    expect(bridgeState.periodProposal.votes).toEqual([1]);
   });
 
   test('success: add vote, enough votes for submission', async () => {
-    const bridgeState = bridgeStateMock({
-      currentState: stateMock({
-        periodVotes: {
-          [merkleRoot]: [0],
-        },
-      }),
-    });
+    const bridgeState = bridgeStateMock([0]);
 
     const periodVoteTx = Tx.periodVote(
       1,
@@ -68,9 +56,19 @@ describe('checkPeriodVote', () => {
     ).signAll(PRIV_1);
 
     await checkPeriodVote(bridgeState.currentState, periodVoteTx, bridgeState);
+    expect(bridgeState.periodProposal.votes).toEqual([0, 1]);
+  });
 
-    expect(bridgeState.currentState.periodVotes[merkleRoot]).toEqual([0, 1]);
-    // expect(submitPeriodMock).toBeCalled();
+  test('success: already submitted vote', async () => {
+    const bridgeState = bridgeStateMock([1]);
+
+    const periodVoteTx = Tx.periodVote(
+      1,
+      new Input(new Outpoint(merkleRoot, 0))
+    ).signAll(PRIV_1);
+
+    await checkPeriodVote(bridgeState.currentState, periodVoteTx, bridgeState);
+    expect(bridgeState.periodProposal.votes).toEqual([1]);
   });
 
   test('reject: wrong type', async () => {
@@ -90,29 +88,6 @@ describe('checkPeriodVote', () => {
     expect(
       checkPeriodVote(bridgeState.currentState, periodVoteTx, bridgeState)
     ).rejects.toEqual(new Error('[period vote] Slot 2 is empty'));
-  });
-
-  test('reject: already submitted vote', async () => {
-    const bridgeState = bridgeStateMock({
-      currentState: stateMock({
-        periodVotes: {
-          [merkleRoot]: [1],
-        },
-      }),
-    });
-
-    const periodVoteTx = Tx.periodVote(
-      1,
-      new Input(new Outpoint(merkleRoot, 0))
-    ).signAll(PRIV_1);
-
-    expect(
-      checkPeriodVote(bridgeState.currentState, periodVoteTx, bridgeState)
-    ).rejects.toEqual(
-      new Error(
-        `[period vote] Already submitted. Slot: ${1}. Root: ${merkleRoot}`
-      )
-    );
   });
 
   test('reject: unsigned input', async () => {
@@ -155,6 +130,45 @@ describe('checkPeriodVote', () => {
       checkPeriodVote(bridgeState.currentState, periodVoteTx, bridgeState)
     ).rejects.toEqual(
       new Error(`[period vote] Input should have prevout index of 0. Got: 9`)
+    );
+  });
+
+  test('reject: no period proposal to vote on', async () => {
+    const bridgeState = bridgeStateMock([0], {
+      periodProposal: null,
+    });
+
+    const periodVoteTx = Tx.periodVote(
+      1,
+      new Input(new Outpoint(merkleRoot, 0))
+    ).signAll(PRIV_1);
+
+    expect(
+      checkPeriodVote(bridgeState.currentState, periodVoteTx, bridgeState)
+    ).rejects.toEqual(
+      new Error(`[period vote] Vote for different period. Proposed root: undefined.` +
+      ` Voted root: ${merkleRoot}`)
+    );
+  });
+
+  test('reject: proposed period is different', async () => {
+    const bridgeState = bridgeStateMock([0], {
+      periodProposal: {
+        blocksRoot: '0x123',
+        votes: [0],
+      }
+    });
+
+    const periodVoteTx = Tx.periodVote(
+      1,
+      new Input(new Outpoint(merkleRoot, 0))
+    ).signAll(PRIV_1);
+
+    expect(
+      checkPeriodVote(bridgeState.currentState, periodVoteTx, bridgeState)
+    ).rejects.toEqual(
+      new Error(`[period vote] Vote for different period. Proposed root: 0x123.` +
+      ` Voted root: ${merkleRoot}`)
     );
   });
 });

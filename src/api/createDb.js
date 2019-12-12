@@ -107,6 +107,14 @@ const createDb = levelDb => {
     await levelDb.put('chainState', JSON.stringify(state));
   };
 
+  const getNodeState = () => {
+    return getNullable('nodeState');
+  };
+
+  const storeNodeState = async state => {
+    await levelDb.put('nodeState', JSON.stringify(state));
+  };
+
   const storePeriods = async submissions => {
     const dbOpsBatch = levelDb.batch();
     await Promise.all(
@@ -135,8 +143,10 @@ const createDb = levelDb => {
     getTransaction,
     getTransactionByPrevOut,
     getChainState,
+    getNodeState,
     storeChainState,
     storePeriods,
+    storeNodeState,
     getPeriodData,
   };
 };

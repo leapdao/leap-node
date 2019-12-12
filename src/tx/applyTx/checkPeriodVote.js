@@ -7,8 +7,9 @@
 
 const { Type } = require('leap-core');
 const { bufferToHex } = require('ethereumjs-util');
+const { logNode } = require('../../utils/debug');
 
-module.exports = async (state, tx) => {
+module.exports = async (state, tx, bridgeState) => {
   if (tx.type !== Type.PERIOD_VOTE) {
     throw new Error('[period vote] periodVote tx expected');
   }
@@ -35,21 +36,18 @@ module.exports = async (state, tx) => {
     );
   }
 
-  const periodRoot = bufferToHex(tx.inputs[0].prevout.hash);
+  const blocksRoot = bufferToHex(tx.inputs[0].prevout.hash);
 
-  if (!state.periodVotes) {
-    state.periodVotes = {};
-  }
-
-  if (!state.periodVotes[periodRoot]) {
-    state.periodVotes[periodRoot] = [];
-  }
-
-  if (state.periodVotes[periodRoot].indexOf(slotId) >= 0) {
-    throw new Error(
-      `[period vote] Already submitted. Slot: ${slotId}. Root: ${periodRoot}`
+  if (!bridgeState.periodProposal || bridgeState.periodProposal.blocksRoot !== blocksRoot) {
+    logNode(
+      `[period vote] Vote for different period. Proposed root: ${(bridgeState.periodProposal || {}).blocksRoot}.` +
+      ` Voted root: ${blocksRoot}`
     );
+    return;
   }
 
-  state.periodVotes[periodRoot].push(slotId);
+  const votes = new Set(bridgeState.periodProposal.votes);
+
+  votes.add(slotId);
+  bridgeState.periodProposal.votes = [...votes];
 };

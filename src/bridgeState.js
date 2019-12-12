@@ -22,9 +22,10 @@ const { NFT_COLOR_BASE, NST_COLOR_BASE } = require('./api/methods/constants');
 const flags = require('./flags');
 
 module.exports = class BridgeState {
-  constructor(db, privKey, config, relayBuffer) {
+  constructor(db, privKey, config, relayBuffer, sender) {
     this.config = config;
     this.web3 = new Web3(config.rootNetwork);
+    this.sender = sender;
 
     this.exitHandlerContract = new this.web3.eth.Contract(
       exitABI.concat(proxyABI),
@@ -54,8 +55,6 @@ module.exports = class BridgeState {
     this.blockHeight = 0;
     this.currentState = null;
     this.networkId = config.networkId;
-    this.currentPeriod = new Period(GENESIS);
-    this.previousPeriod = null;
     this.deposits = {};
     this.exits = {};
     this.tokens = {
@@ -78,10 +77,13 @@ module.exports = class BridgeState {
     this.bridgeDelay = config.bridgeDelay;
     this.relayBuffer = relayBuffer;
     this.logsCache = {};
-    this.submissions = [];
-    this.periodHeights = {};
-    this.submittedPeriods = {};
     this.exitingUtxos = {};
+
+    this.currentPeriod = new Period(GENESIS);
+    this.periodProposal = null;
+    this.submissions = [];
+    this.lastBlocksRoot = null;
+    this.lastPeriodRoot = null;
 
     this.handleEvents = handleEvents({
       NewDeposit: ({ returnValues: event }) => {
@@ -155,8 +157,19 @@ module.exports = class BridgeState {
         );
         this.lastBlocksRoot = event.blocksRoot;
         this.lastPeriodRoot = event.periodRoot;
-        this.submittedPeriods[this.lastBlocksRoot] = true;
-        const blockHeight = this.periodHeights[this.lastBlocksRoot] - 1;
+
+        let proposal;
+        if (this.periodProposal && this.periodProposal.blocksRoot === event.blocksRoot) {
+          proposal = this.periodProposal;
+        }
+
+        if (this.stalePeriodProposal && this.stalePeriodProposal.blocksRoot === event.blocksRoot) {
+          proposal = this.stalePeriodProposal;
+          this.periodProposal.prevPeriodRoot = event.periodRoot;
+        }
+
+        if (this.isReplay()) return;
+        const blockHeight = proposal.height - 1;
         const [periodStart] = Period.periodBlockRange(blockHeight);
         this.submissions.push({
           periodStart,
@@ -192,6 +205,11 @@ module.exports = class BridgeState {
       this.bridgeContract,
       this.exitHandlerContract,
     ];
+
+    const nodeState = (await this.db.getNodeState()) || {};
+    this.periodProposal = nodeState.periodProposal || null;
+    this.stalePeriodProposal = nodeState.stalePeriodProposal || null;
+
     this.eventsSubscription = new ContractsEventsSubscription(
       this.web3,
       contracts,
@@ -258,16 +276,27 @@ module.exports = class BridgeState {
     }
   }
 
-  async saveSubmissions() {
+  isReplay() {
+    return !this.currentPeriod
+      || !this.currentPeriod.blockList.length
+      || this.currentPeriod.merkleRoot() === this.lastBlocksRoot;
+  }
+
+  async saveNodeState() {
+    await this.db.storeNodeState({
+      periodProposal: this.periodProposal,
+      stalePeriodProposal: this.stalePeriodProposal
+    });
+
     if (!this.submissions.length) return;
-    this.db.storePeriods(this.submissions).then(() => {
+    await this.db.storePeriods(this.submissions).then(() => {
       this.submissions = [];
     });
   }
 
   async saveState() {
     this.currentState.blockHeight = this.blockHeight;
-    this.db.storeChainState(this.currentState);
+    await this.db.storeChainState(this.currentState);
   }
 
   async loadState() {

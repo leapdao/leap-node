@@ -7,13 +7,14 @@
 
 const getRootGasPrice = require('./getRootGasPrice');
 
-module.exports = async (web3, method, to, account) => {
+module.exports = async (web3, method, to, account, opts = {}) => {
   const gas = Math.round(
     (await method.estimateGas({ from: account.address })) * 1.21
   );
   const gasPrice = await getRootGasPrice(web3).catch(() => null);
   const data = method.encodeABI();
   const tx = {
+    ...opts,
     to,
     data,
     gas,
@@ -24,5 +25,5 @@ module.exports = async (web3, method, to, account) => {
     account.privateKey
   );
   const txResult = web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-  return txResult;
+  return { receiptPromise: txResult };
 };
