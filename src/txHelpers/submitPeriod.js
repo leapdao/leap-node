@@ -38,7 +38,7 @@ const getPrevPeriodRoot = (period, bridgeState) => {
 
 module.exports = async (period, slots, height, bridgeState) => {
   const { lastBlocksRoot, lastPeriodRoot } = bridgeState;
-  const periodVotes = bridgeState.currentState.periodVotes || {};
+  const { periodVotes } = bridgeState;
   const periodRoot = period.merkleRoot();
 
   let submittedPeriod = { timestamp: '0' };
@@ -75,7 +75,8 @@ module.exports = async (period, slots, height, bridgeState) => {
 
     const { result, votes, needed } = checkEnoughVotes(
       periodRoot,
-      bridgeState.currentState
+      bridgeState.currentState,
+      bridgeState
     );
 
     if (!result) {

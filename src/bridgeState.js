@@ -85,6 +85,7 @@ module.exports = class BridgeState {
     this.submittedPeriods = {};
     this.lastBlocksRoot = null;
     this.lastPeriodRoot = null;
+    this.periodVotes = {};
 
     this.handleEvents = handleEvents({
       NewDeposit: ({ returnValues: event }) => {

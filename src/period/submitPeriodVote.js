@@ -14,10 +14,10 @@ const alreadyVoted = (periodRoot, slotId, periodVotes) =>
 
 module.exports = async (period, state, bridgeState, { send }) => {
   const { slots } = state;
-  const periodVotes = state.periodVotes || {};
+  const { account, periodVotes } = bridgeState;
   const periodRoot = period.merkleRoot();
 
-  const mySlots = getSlotsByAddr(slots, bridgeState.account.address);
+  const mySlots = getSlotsByAddr(slots, account.address);
 
   const isValidator = mySlots.length > 0;
 
@@ -34,7 +34,7 @@ module.exports = async (period, state, bridgeState, { send }) => {
 
   const input = new Input(new Outpoint(periodRoot, 0));
   const periodVoteTx = Tx.periodVote(mySlots[0].id, input).signAll(
-    bridgeState.account.privateKey
+    account.privateKey
   );
 
   await send(periodVoteTx);

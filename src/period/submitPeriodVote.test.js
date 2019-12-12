@@ -23,6 +23,7 @@ const bridgeStateMock = () => ({
     address: ADDR_0,
     privateKey: PRIV_0,
   },
+  periodVotes: {}
 });
 
 const stateMock = () => ({
@@ -80,12 +81,14 @@ describe('submit period vote', () => {
   });
 
   test('own slot, already submitted vote', async () => {
-    const bridgeState = bridgeStateMock();
-    const state = {
-      ...stateMock(),
+    const bridgeState = {
+      ...bridgeStateMock(),
       periodVotes: {
         [PERIOD_ROOT]: [0],
       },
+    };
+    const state = {
+      ...stateMock(),
     };
 
     await submitPeriodVote(period, state, bridgeState, sender);

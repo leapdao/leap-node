@@ -80,12 +80,12 @@ describe('updatePeriod', () => {
         periodHeights: {
           [NON_EXISTENT_PERIOD.merkleRoot()]: 32,
         },
+        periodVotes: {
+          [NON_EXISTENT_PERIOD.merkleRoot()]: [0], // one vote
+        }
       };
       await updatePeriod(
-        {
-          periodVotes: {
-            [NON_EXISTENT_PERIOD.merkleRoot()]: [0], // one vote
-          },
+        {         
           slots: ['0x1'], // one slot
         },
         { height: 34 },
@@ -109,12 +109,12 @@ describe('updatePeriod', () => {
         periodHeights: {
           [NON_EXISTENT_PERIOD.merkleRoot()]: 32,
         },
+        periodVotes: {
+          [NON_EXISTENT_PERIOD.merkleRoot()]: [], // no votes
+        },
       };
       await updatePeriod(
         {
-          periodVotes: {
-            [NON_EXISTENT_PERIOD.merkleRoot()]: [], // no votes
-          },
           slots: ['0x1'], // one slot
         },
         { height: 34 },
@@ -133,12 +133,12 @@ describe('updatePeriod', () => {
         periodHeights: {
           [NON_EXISTENT_PERIOD.merkleRoot()]: 32,
         },
+        periodVotes: {
+          [NON_EXISTENT_PERIOD.merkleRoot()]: [], // no votes
+        },
       };
       await updatePeriod(
         {
-          periodVotes: {
-            [NON_EXISTENT_PERIOD.merkleRoot()]: [], // no votes
-          },
           slots: ['0x1'], // one slot
         },
         { height: 34 },

@@ -8,7 +8,7 @@
 const { Type } = require('leap-core');
 const { bufferToHex } = require('ethereumjs-util');
 
-module.exports = async (state, tx) => {
+module.exports = async (state, tx, bridgeState) => {
   if (tx.type !== Type.PERIOD_VOTE) {
     throw new Error('[period vote] periodVote tx expected');
   }
@@ -37,19 +37,15 @@ module.exports = async (state, tx) => {
 
   const periodRoot = bufferToHex(tx.inputs[0].prevout.hash);
 
-  if (!state.periodVotes) {
-    state.periodVotes = {};
+  if (!bridgeState.periodVotes[periodRoot]) {
+    bridgeState.periodVotes[periodRoot] = [];
   }
 
-  if (!state.periodVotes[periodRoot]) {
-    state.periodVotes[periodRoot] = [];
-  }
-
-  if (state.periodVotes[periodRoot].indexOf(slotId) >= 0) {
+  if (bridgeState.periodVotes[periodRoot].indexOf(slotId) >= 0) {
     throw new Error(
       `[period vote] Already submitted. Slot: ${slotId}. Root: ${periodRoot}`
     );
   }
 
-  state.periodVotes[periodRoot].push(slotId);
+  bridgeState.periodVotes[periodRoot].push(slotId);
 };

@@ -3,7 +3,7 @@ const periodHandler = require('./index');
 jest.mock('../txHelpers/submitPeriod');
 jest.mock('../period/submitPeriodVote');
 
-const submitPeriodVote = require('../period/submitPeriodVote');
+const submitPeriodVote = require('./submitPeriodVote');
 
 const sender = () => {};
 

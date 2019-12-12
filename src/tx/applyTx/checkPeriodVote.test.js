@@ -37,6 +37,7 @@ const stateMock = attrs => ({
 const bridgeStateMock = attrs => ({
   blockHeight: 1,
   currentState: stateMock(),
+  periodVotes: {},
   ...attrs,
 });
 
@@ -49,17 +50,16 @@ describe('checkPeriodVote', () => {
     ).signAll(PRIV_1);
 
     await checkPeriodVote(bridgeState.currentState, periodVoteTx, bridgeState);
-    expect(bridgeState.currentState.periodVotes[merkleRoot]).toEqual([1]);
+    expect(bridgeState.periodVotes[merkleRoot]).toEqual([1]);
     expect(submitPeriodMock).not.toBeCalled();
   });
 
   test('success: add vote, enough votes for submission', async () => {
     const bridgeState = bridgeStateMock({
-      currentState: stateMock({
-        periodVotes: {
-          [merkleRoot]: [0],
-        },
-      }),
+      periodVotes: {
+        [merkleRoot]: [0],
+      },
+      currentState: stateMock({}),
     });
 
     const periodVoteTx = Tx.periodVote(
@@ -69,7 +69,7 @@ describe('checkPeriodVote', () => {
 
     await checkPeriodVote(bridgeState.currentState, periodVoteTx, bridgeState);
 
-    expect(bridgeState.currentState.periodVotes[merkleRoot]).toEqual([0, 1]);
+    expect(bridgeState.periodVotes[merkleRoot]).toEqual([0, 1]);
     // expect(submitPeriodMock).toBeCalled();
   });
 
@@ -94,11 +94,10 @@ describe('checkPeriodVote', () => {
 
   test('reject: already submitted vote', async () => {
     const bridgeState = bridgeStateMock({
-      currentState: stateMock({
-        periodVotes: {
-          [merkleRoot]: [1],
-        },
-      }),
+      periodVotes: {
+        [merkleRoot]: [1],
+      },
+      currentState: stateMock({}),
     });
 
     const periodVoteTx = Tx.periodVote(

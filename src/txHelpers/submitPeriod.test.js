@@ -25,9 +25,8 @@ const bridgeStateMock = attrs => ({
     address: ADDR,
     privateKey: PRIV,
   },
-  currentState: {
-    periodVotes: {},
-  },
+  periodVotes: {},
+  currentState: {},
   ...attrs,
 });
 
@@ -98,10 +97,10 @@ describe('submitPeriod', () => {
       operatorContract: operatorContractMock(),
       lastBlocksRoot: period.prevHash,
       lastPeriodRoot: '0x1337',
+      periodVotes: {
+        [PERIOD_ROOT]: [0],
+      },
       currentState: {
-        periodVotes: {
-          [PERIOD_ROOT]: [0],
-        },
         slots: [{ signerAddr: ADDR, id: 0 }],
       },
     });
@@ -130,10 +129,10 @@ describe('submitPeriod', () => {
         returnPeriod: { timestamp: '0' },
       }),
       operatorContract: operatorContractMock(),
+      periodVotes: {
+        [PERIOD_ROOT]: [0],
+      },
       currentState: {
-        periodVotes: {
-          [PERIOD_ROOT]: [0],
-        },
         slots: [{ signerAddr: ADDR, id: 0 }],
       },
     });
@@ -164,10 +163,10 @@ describe('submitPeriod', () => {
       operatorContract: operatorContractMock(),
       lastBlocksRoot: '0x9999', // doesn't match period.prevHash
       lastPeriodRoot: '0x1337',
+      periodVotes: {
+        [PERIOD_ROOT]: [0],
+      },
       currentState: {
-        periodVotes: {
-          [PERIOD_ROOT]: [0],
-        },
         slots: [{ signerAddr: ADDR, id: 0 }],
       },
     });
@@ -194,10 +193,10 @@ describe('submitPeriod', () => {
         operatorContract: operatorContractMock(),
         lastBlocksRoot: period.prevHash,
         lastPeriodRoot: '0x1337',
+        periodVotes: {
+          [period.merkleRoot()]: [1],
+        },
         currentState: {
-          periodVotes: {
-            [period.merkleRoot()]: [1],
-          },
           slots: [{ signerAddr: ADDR, id: 0 }, { signerAddr: ADDR_1, id: 1 }],
         },
       });
@@ -223,10 +222,10 @@ describe('submitPeriod', () => {
         operatorContract: operatorContractMock(),
         lastBlocksRoot: period.prevHash,
         lastPeriodRoot: '0x1337',
+        periodVotes: {
+          [period.merkleRoot()]: [1, 2],
+        },
         currentState: {
-          periodVotes: {
-            [period.merkleRoot()]: [1, 2],
-          },
           slots: [
             { signerAddr: ADDR, id: 0 },
             { signerAddr: ADDR_1, id: 1 },
@@ -269,10 +268,10 @@ describe('submitPeriod', () => {
         operatorContract: operatorContractMock(),
         lastBlocksRoot: period.prevHash,
         lastPeriodRoot: '0x1337',
+        periodVotes: {
+          [period.merkleRoot()]: [0, 2, 3],
+        },
         currentState: {
-          periodVotes: {
-            [period.merkleRoot()]: [0, 2, 3],
-          },
           slots,
         },
       });

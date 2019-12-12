@@ -17,7 +17,7 @@ const isReplay = require('../period/utils/isReplay');
 module.exports = async (state, chainInfo, bridgeState, sender) => {
   if (bridgeState.pendingPeriod) {
     const pendingPeriodRoot = bridgeState.pendingPeriod.merkleRoot();
-    const { result } = checkEnoughVotes(pendingPeriodRoot, state);
+    const { result } = checkEnoughVotes(pendingPeriodRoot, state, bridgeState);
     if (result && !bridgeState.submittedPeriods[pendingPeriodRoot]) {
       logPeriod(`Enough votes to submit period: ${pendingPeriodRoot}`);
       try {

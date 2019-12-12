@@ -23,7 +23,7 @@ module.exports = (bridgeState, db, nodeConfig = {}, sender) => async (
   }
 
   // delete collected votes for submitted period
-  delete (state.periodVotes || {})[bridgeState.lastBlocksRoot];
+  delete (bridgeState.periodVotes || {})[bridgeState.lastBlocksRoot];
 
   await updatePeriod(state, chainInfo, bridgeState, sender);
   await addBlock(state, chainInfo, {
