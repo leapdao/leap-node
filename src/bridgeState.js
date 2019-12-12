@@ -54,8 +54,6 @@ module.exports = class BridgeState {
     this.blockHeight = 0;
     this.currentState = null;
     this.networkId = config.networkId;
-    this.currentPeriod = new Period(GENESIS);
-    this.previousPeriod = null;
     this.deposits = {};
     this.exits = {};
     this.tokens = {
@@ -78,10 +76,15 @@ module.exports = class BridgeState {
     this.bridgeDelay = config.bridgeDelay;
     this.relayBuffer = relayBuffer;
     this.logsCache = {};
+    this.exitingUtxos = {};
+
+    this.currentPeriod = new Period(GENESIS);
+    this.previousPeriod = null;
     this.submissions = [];
     this.periodHeights = {};
     this.submittedPeriods = {};
-    this.exitingUtxos = {};
+    this.lastBlocksRoot = null;
+    this.lastPeriodRoot = null;
 
     this.handleEvents = handleEvents({
       NewDeposit: ({ returnValues: event }) => {
@@ -156,7 +159,11 @@ module.exports = class BridgeState {
         this.lastBlocksRoot = event.blocksRoot;
         this.lastPeriodRoot = event.periodRoot;
         this.submittedPeriods[this.lastBlocksRoot] = true;
+        
         const blockHeight = this.periodHeights[this.lastBlocksRoot] - 1;
+        if (!blockHeight) {
+          logNode('WARNING: missing period height. No period data will be stored');
+        }
         const [periodStart] = Period.periodBlockRange(blockHeight);
         this.submissions.push({
           periodStart,
