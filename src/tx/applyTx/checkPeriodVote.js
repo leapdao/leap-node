@@ -35,17 +35,17 @@ module.exports = async (state, tx, bridgeState) => {
     );
   }
 
-  const periodRoot = bufferToHex(tx.inputs[0].prevout.hash);
+  const blocksRoot = bufferToHex(tx.inputs[0].prevout.hash);
 
-  if (!bridgeState.periodVotes[periodRoot]) {
-    bridgeState.periodVotes[periodRoot] = [];
-  }
-
-  if (bridgeState.periodVotes[periodRoot].indexOf(slotId) >= 0) {
+  if (!bridgeState.periodProposal || bridgeState.periodProposal.blocksRoot !== blocksRoot) {
     throw new Error(
-      `[period vote] Already submitted. Slot: ${slotId}. Root: ${periodRoot}`
+      `[period vote] Vote for different period. Proposed root: ${(bridgeState.periodProposal || {}).blocksRoot}.` +
+      ` Voted root: ${blocksRoot}`
     );
   }
 
-  bridgeState.periodVotes[periodRoot].push(slotId);
+  const votes = new Set(bridgeState.periodProposal.votes);
+
+  votes.add(slotId);
+  bridgeState.periodProposal.votes = [...votes];
 };

@@ -1,18 +1,20 @@
 const { logNode } = require('../utils/debug');
 
 const addBlock = require('./addBlock');
-const updatePeriod = require('./updatePeriod');
 const updateValidators = require('./updateValidators');
 const updateEpoch = require('./updateEpoch');
-const isReplay = require('../period/utils/isReplay');
+const handleSlotActivation = require('../validator/handleSlotActivation');
+const handlePeriod = require('../validator/handlePeriod');
 
-module.exports = (bridgeState, db, nodeConfig = {}, sender) => async (
+module.exports = (bridgeState, db, nodeConfig = {}) => async (
   state,
   chainInfo
 ) => {
-  bridgeState.checkCallsCount = 0;
+  const { height } = chainInfo;
 
-  if (chainInfo.height % 32 === 0 && !isReplay(bridgeState)) {
+  bridgeState.checkCallsCount = 0;
+  
+  if (height % 32 === 0 && !bridgeState.isReplay()) {
     // catch this, it is not fatal if it fails here
     logNode('Saving state');
     try {
@@ -22,22 +24,24 @@ module.exports = (bridgeState, db, nodeConfig = {}, sender) => async (
     }
   }
 
-  // delete collected votes for submitted period
-  delete (bridgeState.periodVotes || {})[bridgeState.lastBlocksRoot];
+  await handlePeriod(height, bridgeState);
 
-  await updatePeriod(state, chainInfo, bridgeState, sender);
+  await handleSlotActivation(height, bridgeState);
+  
   await addBlock(state, chainInfo, {
     bridgeState,
     db,
   });
+
   if (!nodeConfig.no_validators_updates && state.slots.length > 0) {
     await updateValidators(state, chainInfo);
   }
 
   updateEpoch(state, chainInfo);
+
   logNode(
     'Height: %d, epoch: %d, epochLength: %d',
-    chainInfo.height,
+    height,
     state.epoch.epoch,
     state.epoch.epochLength
   );
@@ -46,5 +50,5 @@ module.exports = (bridgeState, db, nodeConfig = {}, sender) => async (
   bridgeState.currentState = state;
   bridgeState.blockHeight = chainInfo.height;
 
-  await bridgeState.saveSubmissions();
+  await bridgeState.saveNodeState();
 };

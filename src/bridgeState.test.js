@@ -81,6 +81,7 @@ describe('BridgeState', () => {
         async storeBlock() {
           return null;
         },
+        getNodeState: async () => {},
       },
       {}
     );
@@ -109,6 +110,7 @@ describe('BridgeState', () => {
         async storeBlock() {
           return null;
         },
+        getNodeState: async () => {},
       },
       {
         privKey:
@@ -186,6 +188,7 @@ describe('BridgeState', () => {
         async storeBlock() {
           return null;
         },
+        getNodeState: async () => {},
       },
       {}
     );
@@ -241,6 +244,7 @@ describe('BridgeState', () => {
         async storeBlock() {
           return null;
         },
+        getNodeState: async () => {},
       },
       {}
     );

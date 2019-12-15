@@ -13,11 +13,11 @@
  * - `votes` is a number of votes for a given period,
  * - `needed` is a minimum number of votes needed for consensus
  */
-module.exports = (periodRoot, state, bridgeState) => {
-  const { periodVotes } = bridgeState;
-  const slots = state.slots || [];
+module.exports = (blocksRoot, bridgeState) => {
+  const { periodProposal, currentState } = bridgeState;
+  const slots = currentState.slots || [];
 
-  const votes = (periodVotes[periodRoot] || []).length;
+  const votes = periodProposal && periodProposal.blocksRoot === blocksRoot ? periodProposal.votes.length : 0;
   const needed = Math.floor((slots.length * 2) / 3) + 1;
 
   return {
