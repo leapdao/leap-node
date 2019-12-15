@@ -4,4 +4,4 @@ exports.logPeriod = require('debug')('leap-node:period');
 exports.logTx = require('debug')('leap-node:tx');
 exports.logError = require('debug')('leap-node:error');
 exports.logValidators = require('debug')('leap-node:validators');
-exports.logBridge = require('debug')('bridge');
+exports.logBridge = require('debug')('leap-node:bridge');
