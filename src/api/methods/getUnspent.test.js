@@ -37,16 +37,20 @@ const unspent = {
   [out2]: tx.outputs[2].toJSON(),
 };
 
-const bridgeState = extraState => merge({
-  currentState: {
-    unspent
-  },
-  exitingUtxos: {}
-}, extraState);
+const bridgeState = extraState =>
+  merge(
+    {
+      currentState: {
+        unspent,
+      },
+      exitingUtxos: {},
+      config: {},
+    },
+    extraState
+  );
 
 describe('getUnspent', () => {
   test('unspent for existent addr', async () => {
-
     const unspent1 = await getUnspent(bridgeState(), A1);
     expect(unspent1).toEqual([
       {
@@ -142,7 +146,7 @@ describe('getUnspent', () => {
   test('unspents with unprocessed exits', async () => {
     const state = bridgeState({
       exitingUtxos: {
-        [out1]: {}
+        [out1]: {},
       },
     });
 
@@ -165,9 +169,31 @@ describe('getUnspent', () => {
     const state = bridgeState({
       currentState: {
         unspent: {},
-      }
+      },
     });
     const unspents = await getUnspent(state, '0x000');
     expect(unspents).toEqual([]);
+  });
+
+  test('omit unspent heartbeat NFTs from other addresses', async () => {
+    const state = bridgeState({
+      account: {
+        address: A1,
+      },
+      config: {
+        heartbeatColor: 0,
+      },
+    });
+
+    const unspentA1 = await getUnspent(state, A1, 0);
+    expect(unspentA1).toEqual([
+      {
+        outpoint: out1,
+        output: tx.outputs[1].toJSON(),
+      },
+    ]);
+
+    const unspentA2 = await getUnspent(state, A2, 0);
+    expect(unspentA2).toEqual([]);
   });
 });
