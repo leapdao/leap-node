@@ -151,7 +151,7 @@ module.exports = class BridgeState {
       Submission: ({ returnValues: event }) => {
         logBridge(
           'Submission. blocksRoot: ', event.blocksRoot, ' periodRoot: ', event.periodRoot,
-          ' slotId: ', event.slotId, ' validator: ', event.owner, ' casBitmap: ', event.castBitmap
+          ' slotId: ', event.slotId, ' validator: ', event.owner, ' casBitmap: ', event.casBitmap
         );
         this.lastBlocksRoot = event.blocksRoot;
         this.lastPeriodRoot = event.periodRoot;
