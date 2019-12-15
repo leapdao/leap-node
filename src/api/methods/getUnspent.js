@@ -4,17 +4,23 @@ const getColor = require('./getColor');
 const { filterUnspent } = require('../../utils');
 
 function othersHeartbeatUtxos(bridgeState) {
-  if (bridgeState.config.heartbeatColor !== undefined && bridgeState.account) {
+  if (
+    bridgeState.config.heartbeat &&
+    bridgeState.config.heartbeat.filter &&
+    bridgeState.account
+  ) {
     const {
       currentState: { unspent },
       account: { address },
-      config: { heartbeatColor },
+      config: {
+        heartbeat: { color },
+      },
     } = bridgeState;
     return Object.keys(unspent).filter(
       k =>
         unspent[k] &&
         unspent[k].address.toLowerCase() !== address.toLowerCase() &&
-        Number(unspent[k].color) === Number(heartbeatColor)
+        Number(unspent[k].color) === Number(color)
     );
   }
   return [];
