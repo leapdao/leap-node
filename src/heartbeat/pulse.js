@@ -1,3 +1,4 @@
+const { logNode } = require('../utils/debug');
 const { Tx, Input, Outpoint, Output } = require('leap-core');
 const getUnspent = require('../api/methods/getUnspent');
 
@@ -21,5 +22,7 @@ module.exports = async (bridgeState, { send }) => {
     );
     transfer.signAll(bridgeState.account.privateKey);
     await send(transfer);
+  } else {
+    logNode('Cannot find Heartbeat NFT in UTXO.');
   }
 };
