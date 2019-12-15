@@ -175,13 +175,16 @@ describe('getUnspent', () => {
     expect(unspents).toEqual([]);
   });
 
-  test('omit unspent heartbeat NFTs from other addresses', async () => {
+  test('omit unspent heartbeat NFTs from other addresses by default', async () => {
     const state = bridgeState({
       account: {
         address: A1,
       },
       config: {
-        heartbeatColor: 0,
+        heartbeat: {
+          filter: true,
+          color: 0,
+        },
       },
     });
 
@@ -195,5 +198,35 @@ describe('getUnspent', () => {
 
     const unspentA2 = await getUnspent(state, A2, 0);
     expect(unspentA2).toEqual([]);
+  });
+
+  test('include unspent heartbeat NFTs from other addresses if configured otherwise', async () => {
+    const state = bridgeState({
+      account: {
+        address: A1,
+      },
+      config: {
+        heartbeat: {
+          filter: false,
+          color: 0,
+        },
+      },
+    });
+
+    const unspentA1 = await getUnspent(state, A1, 0);
+    expect(unspentA1).toEqual([
+      {
+        outpoint: out1,
+        output: tx.outputs[1].toJSON(),
+      },
+    ]);
+
+    const unspentA2 = await getUnspent(state, A2, 0);
+    expect(unspentA2).toEqual([
+      {
+        outpoint: out0,
+        output: tx.outputs[0].toJSON(),
+      },
+    ]);
   });
 });
