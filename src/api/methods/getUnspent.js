@@ -6,6 +6,7 @@ const { filterUnspent } = require('../../utils');
 function othersHeartbeatUtxos(bridgeState) {
   if (
     bridgeState.config.heartbeat &&
+    bridgeState.config.heartbeat.color !== undefined &&
     bridgeState.config.heartbeat.filter &&
     bridgeState.account
   ) {
