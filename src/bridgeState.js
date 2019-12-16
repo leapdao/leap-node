@@ -124,7 +124,7 @@ module.exports = class BridgeState {
         };
       },
       NewToken: ({ returnValues: event }) => {
-        logBridge('NewToken. color: ', event.color, ' addr: ', event.tokenAddr);
+        logBridge(`NewToken. color: ${event.color} addr: ${event.tokenAddr}`);
         let array = this.tokens.erc20;
 
         if (event.color >= NST_COLOR_BASE) {
@@ -138,7 +138,7 @@ module.exports = class BridgeState {
         }
       },
       EpochLength: event => {
-        logBridge('EpochLength. epochLength: ', event.returnValues.epochLength);
+        logBridge(`EpochLength. epochLength: ${event.returnValues.epochLength}`);
         const { blockNumber, returnValues } = event;
         this.epochLengths.push([
           Number(returnValues.epochLength),
@@ -150,8 +150,8 @@ module.exports = class BridgeState {
       },
       Submission: ({ returnValues: event }) => {
         logBridge(
-          'Submission. blocksRoot: ', event.blocksRoot, ' periodRoot: ', event.periodRoot,
-          ' slotId: ', event.slotId, ' validator: ', event.owner, ' casBitmap: ', event.casBitmap
+          `Submission. blocksRoot: ${event.blocksRoot} periodRoot: ${event.periodRoot}` +
+          ` slotId: ${event.slotId} validator: ${event.owner} casBitmap: ${event.casBitmap}`
         );
         this.lastBlocksRoot = event.blocksRoot;
         this.lastPeriodRoot = event.periodRoot;
