@@ -1,20 +1,20 @@
 const { logNode } = require('../utils/debug');
-const pulse = require('./pulse');
 
-async function loop(bridgeState, sender) {
-  try {
-    await pulse(bridgeState, sender);
-    setTimeout(() => loop(bridgeState, sender), 60000);
-  } catch (e) {
-    logNode('Failed to send heartbeat', e.toString());
-    setTimeout(() => loop(bridgeState, sender), 5000);
-  }
+const loop = require('./loop');
+const defaults = require('./defaults');
+
+function updateConfig({ heartbeat = {} }) {
+  return { ...defaults, ...heartbeat };
 }
 
 module.exports = (bridgeState, sender) => {
-  if (!bridgeState.config.heartbeatColor) {
-    logNode('Cannot find Heartbeat color, liveliness service not started.');
+  bridgeState.config.heartbeat = updateConfig(bridgeState.config);
+  if (bridgeState.config.heartbeat.color) {
+    setTimeout(
+      () => loop(bridgeState, sender),
+      bridgeState.config.heartbeat.period
+    );
   } else {
-    setTimeout(() => loop(bridgeState, sender), 60000);
+    logNode('Cannot find Heartbeat color, liveliness service not started.');
   }
 };

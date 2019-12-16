@@ -44,11 +44,11 @@ const bridgeStateMock = {
     privateKey: PRIV,
   },
   config: {
-    heartbeatColor: HEARTBEAT_COLOR,
+    heartbeat: { color: HEARTBEAT_COLOR },
   },
 };
 
-describe('Heartbeat', () => {
+describe('Pulse', () => {
   test('If no Heartbeat NFT is found in UTXO, ignore and move along', async () => {
     getUnspent.mockImplementation(() => []);
     await pulse(bridgeStateMock, sender);
