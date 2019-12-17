@@ -4,12 +4,23 @@ const addBlock = require('./addBlock');
 const updatePeriod = require('./updatePeriod');
 const updateValidators = require('./updateValidators');
 const updateEpoch = require('./updateEpoch');
+const isReplay = require('../period/utils/isReplay');
 
 module.exports = (bridgeState, db, nodeConfig = {}, sender) => async (
   state,
   chainInfo
 ) => {
   bridgeState.checkCallsCount = 0;
+
+  if (chainInfo.height % 32 === 0 && !isReplay(bridgeState)) {
+    // catch this, it is not fatal if it fails here
+    logNode('Saving state');
+    try {
+      await bridgeState.saveState();
+    } catch (e) {
+      logNode(e);
+    }
+  }
 
   // delete collected votes for submitted period
   delete (state.periodVotes || {})[bridgeState.lastBlocksRoot];
@@ -36,14 +47,4 @@ module.exports = (bridgeState, db, nodeConfig = {}, sender) => async (
   bridgeState.blockHeight = chainInfo.height;
 
   await bridgeState.saveSubmissions();
-
-  if (chainInfo.height % 32 === 0) {
-    // catch this, it is not fatal if it fails here
-    logNode('Saving state');
-    try {
-      await bridgeState.saveState();
-    } catch (e) {
-      logNode(e);
-    }
-  }
 };
