@@ -12,6 +12,7 @@ const activateSlot = require('../txHelpers/activateSlot');
 const { getAuctionedByAddr } = require('../utils');
 const { logPeriod } = require('../utils/debug');
 const checkEnoughVotes = require('../period/utils/checkEnoughVotes');
+const isReplay = require('../period/utils/isReplay');
 
 module.exports = async (state, chainInfo, bridgeState, sender) => {
   if (bridgeState.pendingPeriod) {
@@ -34,7 +35,7 @@ module.exports = async (state, chainInfo, bridgeState, sender) => {
     }
   }
 
-  if (chainInfo.height % 32 === 0) {
+  if (chainInfo.height % 32 === 0 && !isReplay(bridgeState)) {
     logPeriod('updatePeriod');
     try {
       bridgeState.periodHeights[bridgeState.currentPeriod.merkleRoot()] =

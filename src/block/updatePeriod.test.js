@@ -20,6 +20,7 @@ const SUBMITTED_PERIOD = {
 
 const NON_EXISTENT_PERIOD = {
   prevHash: '0x000001',
+  blockList: ['0x'],
   merkleRoot() {
     return '0x000011';
   },
