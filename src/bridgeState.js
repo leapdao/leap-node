@@ -11,7 +11,7 @@ const { Period, Block, Outpoint } = require('leap-core');
 const ContractsEventsSubscription = require('./utils/ContractsEventsSubscription');
 const { handleEvents } = require('./utils');
 const { GENESIS } = require('./utils/constants');
-const { logNode } = require('./utils/debug');
+const { logBridge, logNode } = require('./utils/debug');
 
 const bridgeABI = require('./abis/bridgeAbi');
 const exitABI = require('./abis/exitHandler');
@@ -92,6 +92,7 @@ module.exports = class BridgeState {
         };
       },
       NewDepositV2: ({ returnValues: event }) => {
+        logBridge(`NewDepositV2. color: ${event.color} amount: ${event.amount} owner: ${event.depositor}`);
         this.deposits[event.depositId] = {
           depositor: event.depositor,
           color: event.color,
@@ -100,6 +101,7 @@ module.exports = class BridgeState {
         };
       },
       ExitStarted: ({ returnValues: event }) => {
+        logBridge(`ExitStarted. color: ${event.color} amount: ${event.amount} utxoId: ${event.txHash}:${event.outIndex}`);
         const outpoint = new Outpoint(event.txHash, Number(event.outIndex));
         this.exits[outpoint.getUtxoId()] = {
           txHash: event.txHash,
@@ -110,6 +112,7 @@ module.exports = class BridgeState {
         };
       },
       ExitStartedV2: ({ returnValues: event }) => {
+        logBridge(`ExitStartedV2. color: ${event.color} amount: ${event.amount} utxoId: ${event.txHash}:${event.outIndex}`);
         const outpoint = new Outpoint(event.txHash, Number(event.outIndex));
         this.exits[outpoint.getUtxoId()] = {
           txHash: event.txHash,
@@ -121,6 +124,7 @@ module.exports = class BridgeState {
         };
       },
       NewToken: ({ returnValues: event }) => {
+        logBridge(`NewToken. color: ${event.color} addr: ${event.tokenAddr}`);
         let array = this.tokens.erc20;
 
         if (event.color >= NST_COLOR_BASE) {
@@ -134,6 +138,7 @@ module.exports = class BridgeState {
         }
       },
       EpochLength: event => {
+        logBridge(`EpochLength. epochLength: ${event.returnValues.epochLength}`);
         const { blockNumber, returnValues } = event;
         this.epochLengths.push([
           Number(returnValues.epochLength),
@@ -144,6 +149,10 @@ module.exports = class BridgeState {
         this.minGasPrices.push(Number(event.minGasPrice));
       },
       Submission: ({ returnValues: event }) => {
+        logBridge(
+          `Submission. blocksRoot: ${event.blocksRoot} periodRoot: ${event.periodRoot}` +
+          ` slotId: ${event.slotId} validator: ${event.owner} casBitmap: ${event.casBitmap}`
+        );
         this.lastBlocksRoot = event.blocksRoot;
         this.lastPeriodRoot = event.periodRoot;
         this.submittedPeriods[this.lastBlocksRoot] = true;
