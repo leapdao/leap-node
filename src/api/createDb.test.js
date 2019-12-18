@@ -308,4 +308,26 @@ describe('db', () => {
       );
     });
   });
+
+  describe('nodeState', () => {
+    test('store', async () => {
+      const state = { someState: { state: 1 }};
+      const db = createDb(levelMock);
+
+      await db.storeNodeState(state);
+
+      expect(levelMock.put).toHaveBeenCalledWith(
+        'nodeState',
+        JSON.stringify(state)
+      );
+    });
+
+    test('read', async () => {
+      const db = createDb(levelMock);
+
+      await db.getNodeState();
+
+      expect(levelMock.get).toHaveBeenCalledWith('nodeState');
+    });
+  })
 });

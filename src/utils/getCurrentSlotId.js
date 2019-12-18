@@ -9,6 +9,6 @@ const { Period } = require('leap-core');
 module.exports = function getCurrentSlotId(slots, height) {
   const activeSlots = slots.filter(s => s);
   const [height32aligned] = Period.periodBlockRange(height);
-  const index = Math.floor(height32aligned / 32 % activeSlots.length);
+  const index = Math.floor((height32aligned / 32) % activeSlots.length);
   return activeSlots[index] && activeSlots[index].id;
 };
