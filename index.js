@@ -25,6 +25,7 @@ const BlockTicker = require('./src/utils/BlockTicker');
 const EventsRelay = require('./src/eventsRelay');
 const lotion = require('./lotion');
 const delayedSender = require('./src/txHelpers/delayedSender');
+const heartbeatService = require('./src/heartbeat');
 
 const { logNode, logTendermint } = require('./src/utils/debug');
 
@@ -94,6 +95,8 @@ async function run() {
   app.usePeriod(periodHandler(bridgeState, sender));
 
   const lastGoodState = await bridgeState.loadState();
+
+  heartbeatService(bridgeState, sender);
 
   app.listen(lastGoodState).then(async params => {
     blockTicker.subscribe(eventsRelay.onNewBlock);
