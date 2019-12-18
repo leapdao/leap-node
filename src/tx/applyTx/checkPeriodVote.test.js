@@ -143,12 +143,8 @@ describe('checkPeriodVote', () => {
       new Input(new Outpoint(merkleRoot, 0))
     ).signAll(PRIV_1);
 
-    expect(
-      checkPeriodVote(bridgeState.currentState, periodVoteTx, bridgeState)
-    ).rejects.toEqual(
-      new Error(`[period vote] Vote for different period. Proposed root: undefined.` +
-      ` Voted root: ${merkleRoot}`)
-    );
+    await checkPeriodVote(bridgeState.currentState, periodVoteTx, bridgeState);
+    expect(bridgeState.periodProposal).toEqual(null);
   });
 
   test('reject: proposed period is different', async () => {
@@ -164,11 +160,7 @@ describe('checkPeriodVote', () => {
       new Input(new Outpoint(merkleRoot, 0))
     ).signAll(PRIV_1);
 
-    expect(
-      checkPeriodVote(bridgeState.currentState, periodVoteTx, bridgeState)
-    ).rejects.toEqual(
-      new Error(`[period vote] Vote for different period. Proposed root: 0x123.` +
-      ` Voted root: ${merkleRoot}`)
-    );
+    await checkPeriodVote(bridgeState.currentState, periodVoteTx, bridgeState);
+    expect(bridgeState.periodProposal.votes).toEqual([0]);
   });
 });
