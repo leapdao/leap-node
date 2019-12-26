@@ -156,6 +156,7 @@ module.exports = class BridgeState {
         ]);
       },
       MinGasPrice: ({ returnValues: event }) => {
+        logBridge(`MinGasPrice. minGasPrice: ${event.minGasPrice}`);
         this.minGasPrices.push(Number(event.minGasPrice));
       },
       Submission: ({ returnValues: event }) => {

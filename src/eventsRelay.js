@@ -10,6 +10,7 @@ const { BigInt } = require('jsbi-utils');
 const TinyQueue = require('tinyqueue');
 
 const { handleEvents } = require('./utils');
+const { logBridge } = require('./utils/debug');
 
 module.exports = class EventsRelay {
   constructor(delay, { sendDelayed }) {
@@ -52,6 +53,7 @@ module.exports = class EventsRelay {
         eventCounter,
         signerAddr,
       } = event.returnValues;
+      logBridge(`${event.event}. slotId: ${slotId} signerAddr: ${signerAddr} tenderAddr: ${tenderAddr}`);
       const tx = Tx.validatorJoin(slotId, tenderAddr, eventCounter, signerAddr);
       this.sendDelayed(tx);
     };
@@ -101,12 +103,20 @@ module.exports = class EventsRelay {
       ValidatorJoin: handleJoin,
       ValidatorUpdate: handleJoin,
       ValidatorLogout: async event => {
+        const {
+          slotId,
+          tenderAddr,
+          eventCounter,
+          epoch,
+          newSigner
+        } = event.returnValues;
+        logBridge(`ValidatorLogout. slotId: ${slotId} epoch: ${epoch} newSigner: ${newSigner} tenderAddr: ${tenderAddr}`);
         const tx = Tx.validatorLogout(
-          event.returnValues.slotId,
-          event.returnValues.tenderAddr,
-          event.returnValues.eventCounter,
-          Number(event.returnValues.epoch) + 1,
-          event.returnValues.newSigner
+          slotId,
+          tenderAddr,
+          eventCounter,
+          Number(epoch) + 1,
+          newSigner
         );
         this.sendDelayed(tx);
       },
