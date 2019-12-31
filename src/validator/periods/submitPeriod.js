@@ -75,7 +75,8 @@ module.exports = async (
     return defaultResponse;
   }
 
-  const cas = buildCas(periodProposal.votes);
+  const quorumOfVotes = periodProposal.votes.slice(0, needed);
+  const cas = buildCas(quorumOfVotes);
   logPeriod('[submitPeriod] CAS:%s',`0x${cas.toString(16)}`);
 
   if (periodProposal.txHash) {
