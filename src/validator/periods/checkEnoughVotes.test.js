@@ -72,4 +72,14 @@ describe('checkEnoughVotes', () => {
       needed: 2,
     });
   });
+
+  test('2/2 is enough for slot list with gap', () => {
+    expect(
+      checkEnoughVotes('0x123', proposal(2), [{ id: 0 }, null, { id: 2 }])
+    ).toEqual({
+      result: true,
+      votes: 2,
+      needed: 2,
+    });
+  });
 });
