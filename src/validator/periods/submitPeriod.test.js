@@ -213,6 +213,31 @@ describe('submitPeriod', () => {
     expect(proposal.txHash).toEqual('0xdeadbeef');
   });
 
+  test('submit only minimum required CAS bitmap', async () => {
+    // 4 validator slots
+    const bridgeState = bridgeStateMock({
+      currentState: {
+        slots: [
+          { id: 0, signerAddr: ADDR },
+          { id: 1, signerAddr: ADDR_1 },
+          { id: 2, signerAddr: ADDR_1 },
+          { id: 3, signerAddr: ADDR_1 }
+        ]
+      },
+    });
+
+    // got 4 validator votes
+    checkEnoughVotes.mockReturnValue({ result: true, votes: 4, needed: 3 });
+    const proposal = periodProposal({
+      votes: [0, 1, 2, 3]
+    });
+
+    await submitPeriod(proposal, bridgeState);
+
+    // build CAS for 3 sigs only (quorum)
+    expect(utils.buildCas).toBeCalledWith([0, 1, 2]);
+  });
+
   test('pass through extra options to sendTransaction', async () => {
     const bridgeState = bridgeStateMock({});
 
