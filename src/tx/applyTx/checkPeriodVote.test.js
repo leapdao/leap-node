@@ -152,7 +152,7 @@ describe('checkPeriodVote', () => {
       periodProposal: {
         blocksRoot: '0x123',
         votes: [0],
-      }
+      },
     });
 
     const periodVoteTx = Tx.periodVote(

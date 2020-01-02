@@ -32,7 +32,7 @@ const stateMock = () => ({
   ],
 });
 
-const bridgeStateMock = (extend) => ({
+const bridgeStateMock = extend => ({
   isReplay: () => false,
   account: {
     address: ADDR_0,
@@ -42,7 +42,7 @@ const bridgeStateMock = (extend) => ({
   currentState: stateMock(),
   periodProposal: {
     blocksRoot: PERIOD_ROOT,
-    votes: []
+    votes: [],
   },
   ...extend,
 });
@@ -55,7 +55,11 @@ describe('submit period vote', () => {
       },
     });
 
-    await submitPeriodVote(PERIOD_ROOT, bridgeState.periodProposal, bridgeState);
+    await submitPeriodVote(
+      PERIOD_ROOT,
+      bridgeState.periodProposal,
+      bridgeState
+    );
 
     expect(sender.send).not.toBeCalled();
   });
@@ -63,7 +67,11 @@ describe('submit period vote', () => {
   test('own slot, submit period vote tx', async () => {
     const bridgeState = bridgeStateMock();
 
-    await submitPeriodVote(PERIOD_ROOT, bridgeState.periodProposal, bridgeState);
+    await submitPeriodVote(
+      PERIOD_ROOT,
+      bridgeState.periodProposal,
+      bridgeState
+    );
 
     expect(sender.send).toBeCalled();
     const tx = sender.send.mock.calls[0][0];
@@ -76,23 +84,30 @@ describe('submit period vote', () => {
     const bridgeState = bridgeStateMock({
       periodProposal: {
         blocksRoot: PERIOD_ROOT,
-        votes: [0]
+        votes: [0],
       },
     });
 
-    await submitPeriodVote(PERIOD_ROOT, bridgeState.periodProposal, bridgeState);
+    await submitPeriodVote(
+      PERIOD_ROOT,
+      bridgeState.periodProposal,
+      bridgeState
+    );
 
     expect(sender.send).not.toBeCalled();
   });
 
   test('tx replay', async () => {
     const bridgeState = bridgeStateMock({
-      isReplay: () => true
+      isReplay: () => true,
     });
 
-    await submitPeriodVote(PERIOD_ROOT, bridgeState.periodProposal, bridgeState);
+    await submitPeriodVote(
+      PERIOD_ROOT,
+      bridgeState.periodProposal,
+      bridgeState
+    );
 
     expect(sender.send).not.toBeCalled();
   });
-
 });

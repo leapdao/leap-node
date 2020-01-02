@@ -59,8 +59,6 @@ module.exports = async (params, bridgeState) => {
   }
 
   logNode(
-    `Network: ${bridgeState.config.network}, Network ID: ${
-      bridgeState.networkId
-    }`
+    `Network: ${bridgeState.config.network}, Network ID: ${bridgeState.networkId}`
   );
 };

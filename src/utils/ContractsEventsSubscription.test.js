@@ -80,7 +80,7 @@ test('specific event', async () => {
   ];
   const sub = new ContractsEventsSubscription(
     mockWeb3(10),
-    mockContracts((event) => {
+    mockContracts(event => {
       expect(event).toBe('NewExit');
       return contractEvents.slice(-1);
     }),
@@ -105,8 +105,8 @@ test('event emitter', async () => {
     []
   );
 
-  sub.addListener('newEvents', (events) => {
+  sub.addListener('newEvents', events => {
     expect(events).toEqual(contractEvents);
-  })
+  });
   await sub.init();
 });

@@ -10,10 +10,9 @@ const { logPeriod } = require('../../utils/debug');
 const { getSlotsByAddr } = require('../../utils');
 const isAlreadyVoted = require('./isAlreadyVoted');
 
-
 module.exports = async (periodBlocksRoot, periodProposal, bridgeState) => {
   if (bridgeState.isReplay()) return;
-  
+
   const { account, sender, currentState } = bridgeState;
   const mySlots = getSlotsByAddr(currentState.slots, account.address);
 
@@ -24,7 +23,6 @@ module.exports = async (periodBlocksRoot, periodProposal, bridgeState) => {
     return;
   }
 
-
   if (isAlreadyVoted(periodBlocksRoot, mySlots[0].id, periodProposal)) {
     logPeriod(
       `[period vote] Already voted. Slot: ${mySlots[0].id}. Root: ${periodBlocksRoot}`
@@ -32,11 +30,13 @@ module.exports = async (periodBlocksRoot, periodProposal, bridgeState) => {
     return;
   }
 
-  logPeriod(`[period vote] Submitting. Slot: ${mySlots[0].id}. Root: ${periodBlocksRoot}`);
+  logPeriod(
+    `[period vote] Submitting. Slot: ${mySlots[0].id}. Root: ${periodBlocksRoot}`
+  );
   const input = new Input(new Outpoint(periodBlocksRoot, 0));
   const periodVoteTx = Tx.periodVote(mySlots[0].id, input).signAll(
     account.privateKey
   );
 
-  await sender.send(periodVoteTx);  
+  await sender.send(periodVoteTx);
 };

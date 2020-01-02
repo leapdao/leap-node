@@ -13,11 +13,7 @@ const getNextSlotToProposeFrom = (periodProposal, bridgeState) => {
   return (periodProposal.proposerSlotId + 1) % activeSlots.length;
 };
 
-module.exports = (bridgeState) => async (
-  rsp,
-  state,
-  chainInfo
-) => {
+module.exports = bridgeState => async (rsp, state, chainInfo) => {
   const height = chainInfo.height - 32;
 
   if (height <= 0) {
@@ -46,7 +42,7 @@ module.exports = (bridgeState) => async (
     logPeriod('[checkBridge] Found successful submission tx');
     bridgeState.stalePeriodProposal = null;
     rsp.status = 1;
-    return
+    return;
   }
 
   if (bridgeState.checkCallsCount > 1 && bridgeState.checkCallsCount < 10) {
@@ -63,29 +59,41 @@ module.exports = (bridgeState) => async (
     logPeriod(
       '[checkBridge] No submission from proposer on time. Submitting from a next slot'
     );
-    periodProposal.proposerSlotId = getNextSlotToProposeFrom(periodProposal, bridgeState);
+    periodProposal.proposerSlotId = getNextSlotToProposeFrom(
+      periodProposal,
+      bridgeState
+    );
   } else {
-    // we have txHash in proposal, so submission is either failed or 
+    // we have txHash in proposal, so submission is either failed or
     // stuck in a mempool (underpriced?)
     const receipt = await bridgeState.web3.eth.getTransactionReceipt(txHash);
 
     if (!receipt) {
       // in a mempool
-      logPeriod('[checkBridge] No receipt yet, probably stuck in a mempool as underpriced. Resubmitting');
+      logPeriod(
+        '[checkBridge] No receipt yet, probably stuck in a mempool as underpriced. Resubmitting'
+      );
       const tx = await bridgeState.web3.eth.getTransaction(txHash);
       txOpts.nonce = tx.nonce;
     } else if (!receipt.status) {
       // status = 0, tx failed
-      logPeriod('[checkBridge] Found failed submission. Resubmitting from the next slot');
-      periodProposal.proposerSlotId = getNextSlotToProposeFrom(periodProposal, bridgeState);
+      logPeriod(
+        '[checkBridge] Found failed submission. Resubmitting from the next slot'
+      );
+      periodProposal.proposerSlotId = getNextSlotToProposeFrom(
+        periodProposal,
+        bridgeState
+      );
     } else {
       // status = 1, tx succeed
-      logPeriod('[checkBridge] Found successful submission tx. Waiting for Submission event to arrive..');
+      logPeriod(
+        '[checkBridge] Found successful submission tx. Waiting for Submission event to arrive..'
+      );
       rsp.status = 0;
       return;
     }
   }
-  
+
   // use a timeout to relax race conditions (if period submission is fast)
   await new Promise(resolve => {
     setTimeout(async () => {
@@ -95,7 +103,7 @@ module.exports = (bridgeState) => async (
         txOpts
       );
 
-      receiptPromise.then((receipt) => {
+      receiptPromise.then(receipt => {
         if (!receipt || !receipt.status) {
           rsp.status = 0;
         }
@@ -106,6 +114,5 @@ module.exports = (bridgeState) => async (
 
       resolve();
     }, 300);
-  });  
-  
+  });
 };

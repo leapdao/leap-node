@@ -10,7 +10,7 @@ const activateSlot = require('../txHelpers/activateSlot');
 
 const ADDR = '0xb8205608d54cb81f44f263be086027d8610f3c94';
 
-const state = (epoch) => ({
+const state = epoch => ({
   currentState: {
     epoch: {
       epoch,

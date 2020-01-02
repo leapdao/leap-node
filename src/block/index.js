@@ -13,7 +13,7 @@ module.exports = (bridgeState, db, nodeConfig = {}) => async (
   const { height } = chainInfo;
 
   bridgeState.checkCallsCount = 0;
-  
+
   if (height % 32 === 0 && !bridgeState.isReplay()) {
     // catch this, it is not fatal if it fails here
     logNode('Saving state');
@@ -27,7 +27,7 @@ module.exports = (bridgeState, db, nodeConfig = {}) => async (
   await handlePeriod(height, bridgeState);
 
   await handleSlotActivation(height, bridgeState);
-  
+
   await addBlock(state, chainInfo, {
     bridgeState,
     db,

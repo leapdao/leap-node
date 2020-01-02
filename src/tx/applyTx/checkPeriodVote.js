@@ -38,10 +38,14 @@ module.exports = async (state, tx, bridgeState) => {
 
   const blocksRoot = bufferToHex(tx.inputs[0].prevout.hash);
 
-  if (!bridgeState.periodProposal || bridgeState.periodProposal.blocksRoot !== blocksRoot) {
+  if (
+    !bridgeState.periodProposal ||
+    bridgeState.periodProposal.blocksRoot !== blocksRoot
+  ) {
     logNode(
-      `[period vote] Vote for different period. Proposed root: ${(bridgeState.periodProposal || {}).blocksRoot}.` +
-      ` Voted root: ${blocksRoot}`
+      `[period vote] Vote for different period. Proposed root: ${
+        (bridgeState.periodProposal || {}).blocksRoot
+      }. Voted root: ${blocksRoot}`
     );
     return;
   }

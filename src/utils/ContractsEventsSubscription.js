@@ -27,7 +27,13 @@ async function getPastEvents(contract, eventName, fromBlock, toBlock) {
 }
 
 module.exports = class ContractsEventsSubscription extends EventEmitter {
-  constructor(web3, contracts, eventsBuffer, fromBlock = null, eventName = 'allEvents') {
+  constructor(
+    web3,
+    contracts,
+    eventsBuffer,
+    fromBlock = null,
+    eventName = 'allEvents'
+  ) {
     super();
     this.fromBlock = fromBlock;
     this.web3 = web3;
@@ -57,7 +63,12 @@ module.exports = class ContractsEventsSubscription extends EventEmitter {
 
     const eventsList = await Promise.all(
       this.contracts.map(contract => {
-        return getPastEvents(contract, this.eventName, this.fromBlock || 0, blockNumber);
+        return getPastEvents(
+          contract,
+          this.eventName,
+          this.fromBlock || 0,
+          blockNumber
+        );
       })
     );
     const events = eventsList.reduce((acc, evnts) => acc.concat(evnts), []);

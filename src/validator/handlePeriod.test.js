@@ -6,14 +6,13 @@ const submitPeriod = jest.requireMock('./periods/submitPeriod');
 jest.mock('./periods/startNewPeriod', () => jest.fn());
 const startNewPeriod = jest.requireMock('./periods/startNewPeriod');
 
-const state = (extend) => ({
+const state = extend => ({
   isReplay: () => false,
   lastBlocksRoot: '0x456',
-  ...extend
+  ...extend,
 });
 
 describe('handlePeriod', () => {
-
   test('middle of the period with no period proposed', async () => {
     await handlePeriod(31, state());
     expect(submitPeriod).not.toBeCalled();
@@ -29,7 +28,7 @@ describe('handlePeriod', () => {
   test('middle of the period with a genesis period proposed', async () => {
     const bridgeState = state({
       periodProposal: {
-        blocksRoot: '0x123'
+        blocksRoot: '0x123',
       },
       lastBlocksRoot: null,
     });
@@ -42,7 +41,7 @@ describe('handlePeriod', () => {
   test('middle of the period with a period proposed', async () => {
     const bridgeState = state({
       periodProposal: {
-        blocksRoot: '0x123'
+        blocksRoot: '0x123',
       },
       lastBlocksRoot: '0x456',
     });
@@ -55,9 +54,9 @@ describe('handlePeriod', () => {
   test('middle of the period with a period proposed and found on chain', async () => {
     const bridgeState = state({
       periodProposal: {
-        blocksRoot: '0x123'
+        blocksRoot: '0x123',
       },
-      lastBlocksRoot: '0x123'
+      lastBlocksRoot: '0x123',
     });
     await handlePeriod(65, bridgeState);
     expect(bridgeState.periodProposal).toEqual(null);
@@ -67,12 +66,12 @@ describe('handlePeriod', () => {
   test('stale period finally found on chain', async () => {
     const bridgeState = state({
       stalePeriodProposal: {
-        blocksRoot: '0x123'
+        blocksRoot: '0x123',
       },
       periodProposal: {
-        blocksRoot: '0x456'
+        blocksRoot: '0x456',
       },
-      lastBlocksRoot: '0x123'
+      lastBlocksRoot: '0x123',
     });
     await handlePeriod(65, bridgeState);
     expect(bridgeState.stalePeriodProposal).toEqual(null);
@@ -84,5 +83,4 @@ describe('handlePeriod', () => {
     expect(submitPeriod).not.toBeCalled();
     expect(startNewPeriod).not.toBeCalled();
   });
-
 });

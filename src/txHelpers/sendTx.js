@@ -27,15 +27,13 @@ function drainBacklog() {
 module.exports = async (tendermintPort, rawTx) => {
   const tendermintRpcUrl = `http://localhost:${tendermintPort}/broadcast_tx_async`;
 
-  TX_BACKLOG.push(
-    () => {
-      axios.get(tendermintRpcUrl, {
-        params: {
-          tx: rawTx,
-        },
-      })
-    }
-  );
+  TX_BACKLOG.push(() => {
+    axios.get(tendermintRpcUrl, {
+      params: {
+        tx: rawTx,
+      },
+    });
+  });
 
   if (!AWAITS_DRAIN) {
     setTimeout(drainBacklog, 1000);

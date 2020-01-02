@@ -16,21 +16,20 @@ const getCurrentSlotId = require('../../utils/getCurrentSlotId');
 
 getCurrentSlotId.mockImplementation(() => 0);
 
-const state = (extend) => ({
+const state = extend => ({
   isReplay: () => false,
   currentPeriod: {
-    merkleRoot: () => '0x123'
+    merkleRoot: () => '0x123',
   },
   currentState: {
     slots: [{ id: 0 }, { id: 1 }],
   },
   lastPeriodRoot: '0x456',
-  ...extend
-})
+  ...extend,
+});
 
 describe('startNewPeriod', () => {
-
-  test('at the end of the period', async() => {
+  test('at the end of the period', async () => {
     const bridgeState = state();
     await startNewPeriod(64, bridgeState);
     expect(bridgeState.periodProposal).toEqual({
@@ -38,15 +37,17 @@ describe('startNewPeriod', () => {
       proposerSlotId: 0,
       votes: [],
       blocksRoot: '0x123',
-      prevPeriodRoot: '0x456'
+      prevPeriodRoot: '0x456',
     });
     expect(getCurrentSlotId).toBeCalledWith(bridgeState.currentState.slots, 64);
     expect(submitPeriodVote).toBeCalledWith(
-      '0x123', bridgeState.periodProposal, bridgeState
+      '0x123',
+      bridgeState.periodProposal,
+      bridgeState
     );
   });
 
-  test('at the end of the genesis period', async() => {
+  test('at the end of the genesis period', async () => {
     const bridgeState = state({ lastPeriodRoot: undefined });
     await startNewPeriod(32, bridgeState);
     expect(bridgeState.periodProposal).toEqual({
@@ -54,22 +55,24 @@ describe('startNewPeriod', () => {
       proposerSlotId: 0,
       votes: [],
       blocksRoot: '0x123',
-      prevPeriodRoot: GENESIS
+      prevPeriodRoot: GENESIS,
     });
     expect(getCurrentSlotId).toBeCalledWith(bridgeState.currentState.slots, 32);
     expect(submitPeriodVote).toBeCalledWith(
-      '0x123', bridgeState.periodProposal, bridgeState
+      '0x123',
+      bridgeState.periodProposal,
+      bridgeState
     );
   });
 
-  test('not the end of the period', async() => {
+  test('not the end of the period', async () => {
     const bridgeState = state();
     await startNewPeriod(31, bridgeState);
     expect(bridgeState.periodProposal).not.toBeDefined();
     expect(submitPeriodVote).not.toBeCalled();
   });
 
-  test('tx replay', async() => {
+  test('tx replay', async () => {
     const bridgeState = state({ isReplay: () => true });
     await startNewPeriod(32, bridgeState);
     expect(bridgeState.periodProposal).not.toBeDefined();

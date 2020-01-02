@@ -75,9 +75,12 @@ module.exports = class EventsRelay {
         );
         this.sendDelayed(tx);
       },
-      EpochLength: async (event) => {
+      EpochLength: async event => {
         const { epochLength } = event.returnValues;
-        const tx = Tx.epochLength(Number(epochLength), Number(event.blockNumber));
+        const tx = Tx.epochLength(
+          Number(epochLength),
+          Number(event.blockNumber)
+        );
         this.sendDelayed(tx);
       },
       MinGasPrice: async event => {

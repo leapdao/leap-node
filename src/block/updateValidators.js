@@ -15,9 +15,8 @@ const power = v => (typeof v === 'number' ? v : v.power);
 module.exports = async (state, chainInfo) => {
   const validatorPubKeys = state.slots
     .filter(s => s) // filter undefined slots
-    .filter(
-      s =>
-        s.activationEpoch ? s.activationEpoch - state.epoch.epoch > 2 : true
+    .filter(s =>
+      s.activationEpoch ? s.activationEpoch - state.epoch.epoch > 2 : true
     )
     .map(s => s.tenderKey.replace('0x', ''))
     .map(hexToBase64);

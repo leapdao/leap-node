@@ -20,18 +20,30 @@ const tokens = {
 
 describe('getCode', () => {
   test('ERC20', async () => {
-    expect(await getCode({ tokens }, erc20Tokens[0], 'latest')).toBe(CODE_ERC20);
-    expect(await getCode({ tokens }, erc20Tokens[1], 'latest')).toBe(CODE_ERC20);
+    expect(await getCode({ tokens }, erc20Tokens[0], 'latest')).toBe(
+      CODE_ERC20
+    );
+    expect(await getCode({ tokens }, erc20Tokens[1], 'latest')).toBe(
+      CODE_ERC20
+    );
   });
 
   test('ERC721', async () => {
-    expect(await getCode({ tokens }, erc721Tokens[0], 'latest')).toBe(CODE_ERC721);
-    expect(await getCode({ tokens }, erc721Tokens[1], 'latest')).toBe(CODE_ERC721);
+    expect(await getCode({ tokens }, erc721Tokens[0], 'latest')).toBe(
+      CODE_ERC721
+    );
+    expect(await getCode({ tokens }, erc721Tokens[1], 'latest')).toBe(
+      CODE_ERC721
+    );
   });
 
   test('ERC1948', async () => {
-    expect(await getCode({ tokens }, erc1948Tokens[0], 'latest')).toBe(CODE_ERC1948);
-    expect(await getCode({ tokens }, erc1948Tokens[1], 'latest')).toBe(CODE_ERC1948);
+    expect(await getCode({ tokens }, erc1948Tokens[0], 'latest')).toBe(
+      CODE_ERC1948
+    );
+    expect(await getCode({ tokens }, erc1948Tokens[1], 'latest')).toBe(
+      CODE_ERC1948
+    );
   });
 
   test('Invoking without block tag = latest', async () => {
@@ -52,7 +64,11 @@ describe('getCode', () => {
     let errCode;
     let errMsg;
     try {
-      await getCode({ tokens }, '0x25e70D10AE0E481975aD8fA30f4e67653c441111', 'latest');
+      await getCode(
+        { tokens },
+        '0x25e70D10AE0E481975aD8fA30f4e67653c441111',
+        'latest'
+      );
     } catch (err) {
       errCode = err.code;
       errMsg = err.message;

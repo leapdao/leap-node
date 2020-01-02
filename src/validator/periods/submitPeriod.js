@@ -5,21 +5,13 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-const {
-  getSlotsByAddr,
-  sendTransaction,
-  buildCas,
-} = require('../../utils');
+const { getSlotsByAddr, sendTransaction, buildCas } = require('../../utils');
 const { logPeriod } = require('../../utils/debug');
 const checkEnoughVotes = require('./checkEnoughVotes');
 const submitPeriodVote = require('./submitPeriodVote');
 const isAlreadyVoted = require('./isAlreadyVoted');
 
-module.exports = async (
-  periodProposal,
-  bridgeState,
-  opts = {}
-) => {
+module.exports = async (periodProposal, bridgeState, opts = {}) => {
   const defaultResponse = { receiptPromise: Promise.resolve() };
   const { proposerSlotId, blocksRoot, prevPeriodRoot } = periodProposal;
   const { currentState, lastBlocksRoot, lastPeriodRoot } = bridgeState;
@@ -27,20 +19,26 @@ module.exports = async (
 
   logPeriod(
     '[submitPeriod] proposerSlot:%d blocksRoot:%s prevPeriodRoot:%s',
-    proposerSlotId, blocksRoot, prevPeriodRoot
+    proposerSlotId,
+    blocksRoot,
+    prevPeriodRoot
   );
 
   if (lastBlocksRoot === blocksRoot) {
     // check if the period is already onchain
     const submittedPeriod = await bridgeState.bridgeContract.methods
-        .periods(lastPeriodRoot)
-        .call();
-    
+      .periods(lastPeriodRoot)
+      .call();
+
     if (submittedPeriod.timestamp === '0') {
       throw new Error('No period found onchain for bridgeState.lastBlocksRoot');
     }
 
-    logPeriod('[submitPeriod] already seen onchain', lastPeriodRoot, submittedPeriod);
+    logPeriod(
+      '[submitPeriod] already seen onchain',
+      lastPeriodRoot,
+      submittedPeriod
+    );
     return { receiptPromise: Promise.resolve({ status: true }) };
   }
 
@@ -56,7 +54,7 @@ module.exports = async (
   if (!isAlreadyVoted(blocksRoot, mySlots[0].id, periodProposal)) {
     await submitPeriodVote(blocksRoot, periodProposal, bridgeState);
   }
-  
+
   // check if it is our turn to submit period
   if (!mySlotToSubmit) {
     logPeriod('[submitPeriod] Not a proposer. Skipping');
@@ -65,9 +63,11 @@ module.exports = async (
 
   // check if we have enough period votes for submission
   const { result, votes, needed } = checkEnoughVotes(
-    blocksRoot, periodProposal, bridgeState.currentState.slots
+    blocksRoot,
+    periodProposal,
+    bridgeState.currentState.slots
   );
-  
+
   if (!result) {
     logPeriod(
       `[submitPeriod] Not enough period votes collected: ${votes}/${needed}. Waiting..`
@@ -77,10 +77,13 @@ module.exports = async (
 
   const quorumOfVotes = periodProposal.votes.slice(0, needed);
   const cas = buildCas(quorumOfVotes);
-  logPeriod('[submitPeriod] CAS:%s',`0x${cas.toString(16)}`);
+  logPeriod('[submitPeriod] CAS:%s', `0x${cas.toString(16)}`);
 
   if (periodProposal.txHash) {
-    logPeriod('[submitPeriod] Already submitted. txHash: %s', periodProposal.txHash);
+    logPeriod(
+      '[submitPeriod] Already submitted. txHash: %s',
+      periodProposal.txHash
+    );
     return defaultResponse;
   }
 
@@ -97,15 +100,18 @@ module.exports = async (
     opts
   );
 
-  receiptPromise.on('transactionHash', (hash) => {
-    logPeriod('[submitPeriod] txHash: ', hash);
-    periodProposal.txHash = hash;
-  }).then(receipt => {
-    logPeriod('[submitPeriod] Receipt', receipt);
-  }).catch((e) => {
-    // istanbul ignore next
-    logPeriod('[submitPeriod] Error', e);
-  });
+  receiptPromise
+    .on('transactionHash', hash => {
+      logPeriod('[submitPeriod] txHash: ', hash);
+      periodProposal.txHash = hash;
+    })
+    .then(receipt => {
+      logPeriod('[submitPeriod] Receipt', receipt);
+    })
+    .catch(e => {
+      // istanbul ignore next
+      logPeriod('[submitPeriod] Error', e);
+    });
 
   return { receiptPromise };
 };

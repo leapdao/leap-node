@@ -16,13 +16,12 @@ describe('api/methods', () => {
       networkId: 55881,
       epochLength: 5,
       something: {
-        nested: 'thing'
-      }
+        nested: 'thing',
+      },
     };
 
     const { nodeApi } = methods(bridgeState);
 
     expect(await nodeApi.plasma_getState()).toEqual(bridgeState);
   });
-
 });
