@@ -6,9 +6,21 @@ jest.mock('./utils/ContractsEventsSubscription');
 const ContractsEventsSubscription = require('./utils/ContractsEventsSubscription');
 
 const EVENT_BATCHES = [
-  [{ event: 'EpochLength', blockNumber: 1, returnValues: { epochLength: '4' } }],
+  [
+    {
+      event: 'EpochLength',
+      blockNumber: 1,
+      returnValues: { epochLength: '4' },
+    },
+  ],
   [{ event: 'MinGasPrice', returnValues: { minGasPrice: '1000000' } }],
-  [{ event: 'EpochLength', blockNumber: 5, returnValues: { epochLength: '3' } }],
+  [
+    {
+      event: 'EpochLength',
+      blockNumber: 5,
+      returnValues: { epochLength: '3' },
+    },
+  ],
   [
     {
       event: 'NewDeposit',
@@ -249,7 +261,9 @@ describe('BridgeState', () => {
       {}
     );
     await state.init();
-    await Promise.all(EVENT_BATCHES.map(events => state.handleExitingUtxos(events)));
+    await Promise.all(
+      EVENT_BATCHES.map(events => state.handleExitingUtxos(events))
+    );
     expect(state.exitingUtxos).toEqual({
       '0x2bc83fb4a5ff059e8dfc6ac1a47903b133f484d8aeac943489841cc1cbb3bb0b00': {
         txHash:

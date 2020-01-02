@@ -7,7 +7,8 @@
   "rules": {
     "no-param-reassign": ["error", { "props": false }],
     "no-restricted-syntax": 0,
-    "arrow-body-style": 0
+    "arrow-body-style": 0,
+    "prettier/prettier": "error"
   },
   "env": {
     "browser": true,
@@ -19,6 +20,7 @@
     "ecmaVersion": 6
   },
   "plugins": [
-    "jest"
+    "jest",
+    "prettier"
   ]
 }

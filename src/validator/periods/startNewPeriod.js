@@ -11,13 +11,21 @@ module.exports = async (height, bridgeState) => {
   // istanbul ignore next
   if (bridgeState.periodProposal) {
     bridgeState.stalePeriodProposal = bridgeState.periodProposal;
-    logPeriod('WARNING: period proposal already exists. Probably it wasn\'t submitted yet');
+    logPeriod(
+      "WARNING: period proposal already exists. Probably it wasn't submitted yet"
+    );
   }
 
   const currentPeriodBlocksRoot = bridgeState.currentPeriod.merkleRoot();
-  logPeriod('Creating new period. Previous period blocks root: ', currentPeriodBlocksRoot);
+  logPeriod(
+    'Creating new period. Previous period blocks root: ',
+    currentPeriodBlocksRoot
+  );
 
-  const proposerSlotId = getCurrentSlotId(bridgeState.currentState.slots, height);
+  const proposerSlotId = getCurrentSlotId(
+    bridgeState.currentState.slots,
+    height
+  );
 
   bridgeState.periodProposal = {
     height,
@@ -34,4 +42,4 @@ module.exports = async (height, bridgeState) => {
   );
 
   bridgeState.currentPeriod = new Period(currentPeriodBlocksRoot);
-}
+};

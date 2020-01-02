@@ -92,9 +92,14 @@ describe('readConfig', () => {
     } catch (err) {
       error = err.message;
     }
-    expect(error).toBe('rootNetwork is not defined, please specify it in the config file.');
+    expect(error).toBe(
+      'rootNetwork is not defined, please specify it in the config file.'
+    );
 
-    const result = await readConfig('https://tesnet.leapdao.org', 'http://localhost');
+    const result = await readConfig(
+      'https://tesnet.leapdao.org',
+      'http://localhost'
+    );
     expect(result).toEqual({
       exitHandlerAddr: '0x000',
       network: 'testnet',

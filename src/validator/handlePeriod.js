@@ -5,8 +5,10 @@ const submitPeriod = require('./periods/submitPeriod');
 module.exports = async (height, bridgeState) => {
   if (bridgeState.isReplay()) return;
 
-  if (bridgeState.stalePeriodProposal 
-    && bridgeState.lastBlocksRoot === bridgeState.stalePeriodProposal.blocksRoot) {
+  if (
+    bridgeState.stalePeriodProposal &&
+    bridgeState.lastBlocksRoot === bridgeState.stalePeriodProposal.blocksRoot
+  ) {
     logPeriod('Found successful submission tx for stale period proposal');
     bridgeState.stalePeriodProposal = null;
   }
@@ -18,7 +20,7 @@ module.exports = async (height, bridgeState) => {
     } else if (!bridgeState.periodProposal.txHash) {
       await submitPeriod(bridgeState.periodProposal, bridgeState);
     }
-  };
+  }
 
   if (height % 32 === 0) {
     await startNewPeriod(height, bridgeState);

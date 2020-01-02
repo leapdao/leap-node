@@ -15,10 +15,10 @@ const web3 = {
   eth: {
     getTransactionReceipt: () => null,
     getTransaction: () => ({ nonce: 3 }),
-  }
+  },
 };
 
-const proposal = (extra) => ({
+const proposal = extra => ({
   blocksRoot: '0x000010',
   proposerSlotId: 0,
   prevPeriodRoot: '0x5678',
@@ -29,10 +29,7 @@ const proposal = (extra) => ({
 const bridgeStateMock = periodProposal => ({
   web3,
   currentState: {
-    slots: [
-      { id: 0, signerAddr: ADDR },
-      { id: 1, signerAddr: ADDR_1 }
-    ]
+    slots: [{ id: 0, signerAddr: ADDR }, { id: 1, signerAddr: ADDR_1 }],
   },
   lastBlocksRoot: '0x123',
   checkCallsCount: 0,
@@ -46,7 +43,7 @@ describe('Period handler', () => {
     txPromise = new PromiEvent();
     submitPeriod.mockReturnValue(
       Promise.resolve({ receiptPromise: txPromise.eventEmitter })
-    );    
+    );
     web3.eth.getTransactionReceipt = () => ({ status: true });
   });
 
@@ -68,7 +65,7 @@ describe('Period handler', () => {
     const periodProposal = proposal();
     const bridgeState = {
       ...bridgeStateMock(periodProposal),
-      lastBlocksRoot: '0x000010'
+      lastBlocksRoot: '0x000010',
     };
 
     await periodHandler(bridgeState)(rsp, state, { height: 64 });
@@ -102,16 +99,12 @@ describe('Period handler', () => {
 
     test('submission success', async () => {
       txPromise.resolve({ status: true });
-  
+
       await periodHandler(bridgeState)(rsp, state, { height: 64 });
-  
+
       expect(periodProposal.proposerSlotId).toEqual(1);
-      expect(submitPeriod).toBeCalledWith(
-        periodProposal,
-        bridgeState,
-        {}
-      );
-      
+      expect(submitPeriod).toBeCalledWith(periodProposal, bridgeState, {});
+
       expect(rsp.status).toBe(1);
     });
 
@@ -121,49 +114,37 @@ describe('Period handler', () => {
         ...bridgeStateMock(periodProposal),
         checkCallsCount: 10,
       };
-  
+
       await periodHandler(bridgeState)(rsp, state, { height: 64 });
-  
+
       expect(periodProposal.proposerSlotId).toEqual(1);
-      expect(submitPeriod).toBeCalledWith(
-        periodProposal,
-        bridgeState,
-        {}
-      );
-      
+      expect(submitPeriod).toBeCalledWith(periodProposal, bridgeState, {});
+
       expect(rsp.status).toBe(1);
       expect(bridgeState.checkCallsCount).toEqual(1);
     });
 
     test('submission failure', async () => {
       txPromise.resolve({ status: false });
-  
+
       await periodHandler(bridgeState)(rsp, state, { height: 64 });
-        
+
       expect(periodProposal.proposerSlotId).toEqual(1);
-      expect(submitPeriod).toBeCalledWith(
-        periodProposal,
-        bridgeState,
-        {}
-      );
+      expect(submitPeriod).toBeCalledWith(periodProposal, bridgeState, {});
 
       expect(rsp.status).toBe(0);
     });
 
     test('submission stuck in a mempool', async () => {
       txPromise.resolve(null);
-  
+
       await periodHandler(bridgeState)(rsp, state, { height: 64 });
 
       expect(periodProposal.proposerSlotId).toEqual(1);
-      expect(submitPeriod).toBeCalledWith(
-        periodProposal,
-        bridgeState,
-        {}
-      );
+      expect(submitPeriod).toBeCalledWith(periodProposal, bridgeState, {});
 
       expect(rsp.status).toBe(0);
-    });  
+    });
   });
 
   describe('stuck in a mempool', () => {
@@ -177,12 +158,12 @@ describe('Period handler', () => {
       bridgeState = bridgeStateMock(periodProposal);
       web3.eth.getTransactionReceipt = () => Promise.resolve(null);
     });
-    
+
     test('resubmission success', async () => {
       txPromise.resolve({ status: true });
-      
+
       await periodHandler(bridgeState)(rsp, state, { height: 64 });
-  
+
       // same slot
       expect(periodProposal.proposerSlotId).toEqual(0);
 
@@ -191,15 +172,15 @@ describe('Period handler', () => {
         bridgeState,
         { nonce: 3 } // same nonce
       );
-      
+
       expect(rsp.status).toBe(1);
     });
 
     test('resubmission failure', async () => {
       txPromise.resolve({ status: false });
-  
+
       await periodHandler(bridgeState)(rsp, state, { height: 64 });
-      
+
       // same slot
       expect(periodProposal.proposerSlotId).toEqual(0);
 
@@ -214,7 +195,7 @@ describe('Period handler', () => {
 
     test('resubmission stuck in a mempool', async () => {
       txPromise.resolve(null);
-  
+
       await periodHandler(bridgeState)(rsp, state, { height: 64 });
 
       // same slot
@@ -225,7 +206,7 @@ describe('Period handler', () => {
         bridgeState,
         { nonce: 3 } // same nonce
       );
-      
+
       expect(rsp.status).toBe(0);
     });
   });
@@ -241,52 +222,40 @@ describe('Period handler', () => {
       bridgeState = bridgeStateMock(periodProposal);
       web3.eth.getTransactionReceipt = () => Promise.resolve({ status: false });
     });
-    
+
     test('resubmission success', async () => {
       txPromise.resolve({ status: true });
-      
+
       await periodHandler(bridgeState)(rsp, state, { height: 64 });
-  
+
       // next slot
       expect(periodProposal.proposerSlotId).toEqual(1);
 
-      expect(submitPeriod).toBeCalledWith(
-        periodProposal,
-        bridgeState,
-        {}
-      );
-      
+      expect(submitPeriod).toBeCalledWith(periodProposal, bridgeState, {});
+
       expect(rsp.status).toBe(1);
     });
 
     test('resubmission failure', async () => {
       txPromise.resolve({ status: false });
-  
+
       await periodHandler(bridgeState)(rsp, state, { height: 64 });
-      
+
       expect(periodProposal.proposerSlotId).toEqual(1);
 
-      expect(submitPeriod).toBeCalledWith(
-        periodProposal,
-        bridgeState,
-        {}
-      );
+      expect(submitPeriod).toBeCalledWith(periodProposal, bridgeState, {});
 
       expect(rsp.status).toBe(0);
     });
 
     test('resubmission stuck in a mempool', async () => {
       txPromise.resolve(null);
-  
+
       await periodHandler(bridgeState)(rsp, state, { height: 64 });
-  
+
       expect(periodProposal.proposerSlotId).toEqual(1);
 
-      expect(submitPeriod).toBeCalledWith(
-        periodProposal,
-        bridgeState,
-        {}
-      );
+      expect(submitPeriod).toBeCalledWith(periodProposal, bridgeState, {});
 
       expect(rsp.status).toBe(0);
     });

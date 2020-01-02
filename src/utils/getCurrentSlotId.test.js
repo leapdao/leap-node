@@ -18,15 +18,12 @@ test('no active slots', () => {
 const expectForSlots = (slots, fixtures) => {
   fixtures.forEach(({ height, proposingSlot }) =>
     test(`Period at height ${height} is proposed by slot ${proposingSlot}`, () =>
-      expect(getCurrentSlotId(slots, height)).toBe(proposingSlot)
-    )
+      expect(getCurrentSlotId(slots, height)).toBe(proposingSlot))
   );
-}
+};
 
 describe('one slot', () => {
-  const slots = [
-    { id: 0, owner: ADDR_1 },
-  ];
+  const slots = [{ id: 0, owner: ADDR_1 }];
 
   expectForSlots(slots, [
     { height: 30, proposingSlot: 0 },
@@ -34,15 +31,12 @@ describe('one slot', () => {
     { height: 32, proposingSlot: 0 },
     { height: 33, proposingSlot: 0 },
     { height: 63, proposingSlot: 0 },
-    { height: 64, proposingSlot: 0 }
+    { height: 64, proposingSlot: 0 },
   ]);
 });
 
 describe('one slot with a gap', () => {
-  const slots = [
-    undefined,
-    { id: 0, owner: ADDR_1 },
-  ];
+  const slots = [undefined, { id: 0, owner: ADDR_1 }];
 
   expectForSlots(slots, [
     { height: 30, proposingSlot: 0 },
@@ -50,15 +44,12 @@ describe('one slot with a gap', () => {
     { height: 32, proposingSlot: 0 },
     { height: 33, proposingSlot: 0 },
     { height: 63, proposingSlot: 0 },
-    { height: 64, proposingSlot: 0 }
+    { height: 64, proposingSlot: 0 },
   ]);
 });
 
 describe('two slots', () => {
-  const slots = [
-    { id: 0, owner: ADDR_1 },
-    { id: 1, owner: ADDR_1 },
-  ];
+  const slots = [{ id: 0, owner: ADDR_1 }, { id: 1, owner: ADDR_1 }];
 
   expectForSlots(slots, [
     { height: 30, proposingSlot: 0 },
@@ -91,11 +82,7 @@ describe('three slots', () => {
 });
 
 describe('two slots with a gap', () => {
-  const slots = [
-    { id: 0, owner: ADDR_1 },
-    undefined,
-    { id: 2, owner: ADDR_1 },
-  ];
+  const slots = [{ id: 0, owner: ADDR_1 }, undefined, { id: 2, owner: ADDR_1 }];
 
   expectForSlots(slots, [
     { height: 30, proposingSlot: 0 },

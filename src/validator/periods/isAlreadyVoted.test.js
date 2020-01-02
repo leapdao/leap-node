@@ -7,24 +7,22 @@
 
 const isAlreadyVoted = require('./isAlreadyVoted');
 
-const proposalWithVotes = (votes) => ({
+const proposalWithVotes = votes => ({
   blocksRoot: '0x123',
   votes,
 });
 
 describe('isAlreadyVoted', () => {
-
   test('vote is present', () => {
-    expect(isAlreadyVoted('0x123', 0, proposalWithVotes([0,1]))).toBe(true);
+    expect(isAlreadyVoted('0x123', 0, proposalWithVotes([0, 1]))).toBe(true);
   });
 
   test('no vote', () => {
     expect(isAlreadyVoted('0x123', 0, proposalWithVotes([]))).toBe(false);
-    expect(isAlreadyVoted('0x123', 2, proposalWithVotes([0,1]))).toBe(false);
+    expect(isAlreadyVoted('0x123', 2, proposalWithVotes([0, 1]))).toBe(false);
   });
 
   test('votes for different blocks root', () => {
-    expect(isAlreadyVoted('0x456', 0, proposalWithVotes([0,1]))).toBe(false);
+    expect(isAlreadyVoted('0x456', 0, proposalWithVotes([0, 1]))).toBe(false);
   });
-
 });

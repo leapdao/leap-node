@@ -94,7 +94,9 @@ module.exports = class BridgeState {
         };
       },
       NewDepositV2: ({ returnValues: event }) => {
-        logBridge(`NewDepositV2. color: ${event.color} amount: ${event.amount} owner: ${event.depositor}`);
+        logBridge(
+          `NewDepositV2. color: ${event.color} amount: ${event.amount} owner: ${event.depositor}`
+        );
         this.deposits[event.depositId] = {
           depositor: event.depositor,
           color: event.color,
@@ -103,7 +105,9 @@ module.exports = class BridgeState {
         };
       },
       ExitStarted: ({ returnValues: event }) => {
-        logBridge(`ExitStarted. color: ${event.color} amount: ${event.amount} utxoId: ${event.txHash}:${event.outIndex}`);
+        logBridge(
+          `ExitStarted. color: ${event.color} amount: ${event.amount} utxoId: ${event.txHash}:${event.outIndex}`
+        );
         const outpoint = new Outpoint(event.txHash, Number(event.outIndex));
         this.exits[outpoint.getUtxoId()] = {
           txHash: event.txHash,
@@ -114,7 +118,9 @@ module.exports = class BridgeState {
         };
       },
       ExitStartedV2: ({ returnValues: event }) => {
-        logBridge(`ExitStartedV2. color: ${event.color} amount: ${event.amount} utxoId: ${event.txHash}:${event.outIndex}`);
+        logBridge(
+          `ExitStartedV2. color: ${event.color} amount: ${event.amount} utxoId: ${event.txHash}:${event.outIndex}`
+        );
         const outpoint = new Outpoint(event.txHash, Number(event.outIndex));
         this.exits[outpoint.getUtxoId()] = {
           txHash: event.txHash,
@@ -140,7 +146,9 @@ module.exports = class BridgeState {
         }
       },
       EpochLength: event => {
-        logBridge(`EpochLength. epochLength: ${event.returnValues.epochLength}`);
+        logBridge(
+          `EpochLength. epochLength: ${event.returnValues.epochLength}`
+        );
         const { blockNumber, returnValues } = event;
         this.epochLengths.push([
           Number(returnValues.epochLength),
@@ -153,17 +161,23 @@ module.exports = class BridgeState {
       Submission: ({ returnValues: event }) => {
         logBridge(
           `Submission. blocksRoot: ${event.blocksRoot} periodRoot: ${event.periodRoot}` +
-          ` slotId: ${event.slotId} validator: ${event.owner} casBitmap: ${event.casBitmap}`
+            ` slotId: ${event.slotId} validator: ${event.owner} casBitmap: ${event.casBitmap}`
         );
         this.lastBlocksRoot = event.blocksRoot;
         this.lastPeriodRoot = event.periodRoot;
 
         let proposal;
-        if (this.periodProposal && this.periodProposal.blocksRoot === event.blocksRoot) {
+        if (
+          this.periodProposal &&
+          this.periodProposal.blocksRoot === event.blocksRoot
+        ) {
           proposal = this.periodProposal;
         }
 
-        if (this.stalePeriodProposal && this.stalePeriodProposal.blocksRoot === event.blocksRoot) {
+        if (
+          this.stalePeriodProposal &&
+          this.stalePeriodProposal.blocksRoot === event.blocksRoot
+        ) {
           proposal = this.stalePeriodProposal;
           this.periodProposal.prevPeriodRoot = event.periodRoot;
         }
@@ -277,15 +291,17 @@ module.exports = class BridgeState {
   }
 
   isReplay() {
-    return !this.currentPeriod
-      || !this.currentPeriod.blockList.length
-      || this.currentPeriod.merkleRoot() === this.lastBlocksRoot;
+    return (
+      !this.currentPeriod ||
+      !this.currentPeriod.blockList.length ||
+      this.currentPeriod.merkleRoot() === this.lastBlocksRoot
+    );
   }
 
   async saveNodeState() {
     await this.db.storeNodeState({
       periodProposal: this.periodProposal,
-      stalePeriodProposal: this.stalePeriodProposal
+      stalePeriodProposal: this.stalePeriodProposal,
     });
 
     if (!this.submissions.length) return;

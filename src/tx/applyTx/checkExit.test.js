@@ -15,7 +15,7 @@ const makeExitMock = (exitor, amount, color, outpoint) => {
         get: () => ({ exitor, amount, color }),
       }
     ),
-    exitingUtxos
+    exitingUtxos,
   };
 };
 

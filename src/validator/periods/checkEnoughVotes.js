@@ -14,7 +14,10 @@
  * - `needed` is a minimum number of votes needed for consensus
  */
 module.exports = (blocksRoot, periodProposal, slots = []) => {
-  const votes = periodProposal && periodProposal.blocksRoot === blocksRoot ? periodProposal.votes.length : 0;
+  const votes =
+    periodProposal && periodProposal.blocksRoot === blocksRoot
+      ? periodProposal.votes.length
+      : 0;
   const needed = Math.floor((slots.length * 2) / 3) + 1;
 
   return {

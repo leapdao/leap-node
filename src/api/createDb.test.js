@@ -311,7 +311,7 @@ describe('db', () => {
 
   describe('nodeState', () => {
     test('store', async () => {
-      const state = { someState: { state: 1 }};
+      const state = { someState: { state: 1 } };
       const db = createDb(levelMock);
 
       await db.storeNodeState(state);
@@ -329,5 +329,5 @@ describe('db', () => {
 
       expect(levelMock.get).toHaveBeenCalledWith('nodeState');
     });
-  })
+  });
 });

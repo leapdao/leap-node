@@ -19,7 +19,7 @@ const slots = num =>
     eventsCount: 1,
   }));
 
-const proposal = (votesNumber) => ({
+const proposal = votesNumber => ({
   blocksRoot: '0x123',
   votes: votesNumber > 0 ? range(0, votesNumber - 1) : [],
 });

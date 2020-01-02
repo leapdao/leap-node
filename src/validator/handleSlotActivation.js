@@ -4,7 +4,7 @@ const { getAuctionedByAddr } = require('../utils');
 
 module.exports = (height, bridgeState) => {
   if (height % 32 !== 16) return;
-  
+
   const { currentState } = bridgeState;
 
   // check if there is a validator slot that is "waiting for me"
@@ -12,9 +12,11 @@ module.exports = (height, bridgeState) => {
     currentState.slots,
     bridgeState.account.address
   )
-    .filter(({ activationEpoch }) => currentState.epoch.epoch - activationEpoch >= 2)
+    .filter(
+      ({ activationEpoch }) => currentState.epoch.epoch - activationEpoch >= 2
+    )
     .map(({ id }) => id);
-    
+
   if (myAuctionedSlots.length > 0) {
     logValidators('found some slots for activation', myAuctionedSlots);
     myAuctionedSlots.forEach(id => {
