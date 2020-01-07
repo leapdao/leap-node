@@ -25,6 +25,7 @@ const state = extend => ({
     slots: [{ id: 0 }, { id: 1 }],
   },
   lastPeriodRoot: '0x456',
+  savePeriodProposals: jest.fn(),
   ...extend,
 });
 
@@ -58,6 +59,7 @@ describe('startNewPeriod', () => {
       prevPeriodRoot: GENESIS,
     });
     expect(getCurrentSlotId).toBeCalledWith(bridgeState.currentState.slots, 32);
+    expect(bridgeState.savePeriodProposals).toBeCalled();
     expect(submitPeriodVote).toBeCalledWith(
       '0x123',
       bridgeState.periodProposal,
@@ -69,6 +71,7 @@ describe('startNewPeriod', () => {
     const bridgeState = state();
     await startNewPeriod(31, bridgeState);
     expect(bridgeState.periodProposal).not.toBeDefined();
+    expect(bridgeState.savePeriodProposals).not.toBeCalled();
     expect(submitPeriodVote).not.toBeCalled();
   });
 
@@ -76,6 +79,7 @@ describe('startNewPeriod', () => {
     const bridgeState = state({ isReplay: () => true });
     await startNewPeriod(32, bridgeState);
     expect(bridgeState.periodProposal).not.toBeDefined();
+    expect(bridgeState.savePeriodProposals).not.toBeCalled();
     expect(submitPeriodVote).not.toBeCalled();
   });
 });
