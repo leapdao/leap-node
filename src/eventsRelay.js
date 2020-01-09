@@ -53,7 +53,9 @@ module.exports = class EventsRelay {
         eventCounter,
         signerAddr,
       } = event.returnValues;
-      logBridge(`${event.event}. slotId: ${slotId} signerAddr: ${signerAddr} tenderAddr: ${tenderAddr}`);
+      logBridge(
+        `${event.event}. slotId: ${slotId} signerAddr: ${signerAddr} tenderAddr: ${tenderAddr}`
+      );
       const tx = Tx.validatorJoin(slotId, tenderAddr, eventCounter, signerAddr);
       this.sendDelayed(tx);
     };
@@ -108,9 +110,11 @@ module.exports = class EventsRelay {
           tenderAddr,
           eventCounter,
           epoch,
-          newSigner
+          newSigner,
         } = event.returnValues;
-        logBridge(`ValidatorLogout. slotId: ${slotId} epoch: ${epoch} newSigner: ${newSigner} tenderAddr: ${tenderAddr}`);
+        logBridge(
+          `ValidatorLogout. slotId: ${slotId} epoch: ${epoch} newSigner: ${newSigner} tenderAddr: ${tenderAddr}`
+        );
         const tx = Tx.validatorLogout(
           slotId,
           tenderAddr,
