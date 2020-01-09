@@ -16,7 +16,10 @@ module.exports = async (web3, method, to, account, opts = {}) => {
     );
   } catch (e) {
     const methodSig = `${method._method.name}(${method.arguments.join(', ')})`; // eslint-disable-line no-underscore-dangle
-    logNode('[sendTransaction] estimateGas fails, probably failing transaction: ', methodSig);
+    logNode(
+      '[sendTransaction] estimateGas fails, probably failing transaction: ',
+      methodSig
+    );
     const result = new PromiEvent();
     result.reject(e);
     return { receiptPromise: result.eventEmitter };
