@@ -209,7 +209,6 @@ module.exports = class BridgeState {
   }
 
   async init() {
-    logNode('Syncing events...');
     this.lastBlockSynced = await this.db.getLastBlockSynced();
     const genesisBlock = await this.bridgeContract.methods
       .genesisBlockNumber()
@@ -223,17 +222,22 @@ module.exports = class BridgeState {
     const nodeState = (await this.db.getNodeState()) || {};
     this.periodProposal = nodeState.periodProposal || null;
     this.stalePeriodProposal = nodeState.stalePeriodProposal || null;
+    this.lastSeenRootChainBlock =
+      nodeState.lastSeenRootChainBlock || parseInt(genesisBlock, 10);
 
+    logNode(`Syncing events from height ${this.lastSeenRootChainBlock}...`);
     this.eventsSubscription = new ContractsEventsSubscription(
       this.web3,
       contracts,
       this.eventsBuffer,
-      parseInt(genesisBlock, 10)
+      this.lastSeenRootChainBlock
     );
     const blockNumber = await this.web3.eth.getBlockNumber();
     await this.eventsSubscription.init();
     await this.onNewBlock(blockNumber);
-    await this.initBlocks();
+    if (this.lastBlockSynced === 0) {
+      await this.initBlocks();
+    }
 
     if (this.lastBlocksRoot && this.lastPeriodRoot) {
       this.currentPeriod = new Period(this.lastBlocksRoot);
@@ -263,6 +267,7 @@ module.exports = class BridgeState {
   }
 
   async onNewBlock(blockNumber) {
+    this.lastSeenRootChainBlock = blockNumber;
     if (this.eventsBuffer.length === 0) {
       return;
     }
@@ -299,14 +304,16 @@ module.exports = class BridgeState {
   }
 
   async saveNodeState() {
-    await this.db.storeNodeState({
+    if (!this.submissions.length) return;
+    await this.db.storePeriods(this.submissions);
+    this.submissions = [];
+  }
+
+  async savePeriodProposals() {
+    return this.db.storeNodeState({
       periodProposal: this.periodProposal,
       stalePeriodProposal: this.stalePeriodProposal,
-    });
-
-    if (!this.submissions.length) return;
-    await this.db.storePeriods(this.submissions).then(() => {
-      this.submissions = [];
+      lastSeenRootChainBlock: this.lastSeenRootChainBlock,
     });
   }
 
