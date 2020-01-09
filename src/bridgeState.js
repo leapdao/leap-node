@@ -305,13 +305,12 @@ module.exports = class BridgeState {
 
   async saveNodeState() {
     if (!this.submissions.length) return;
-    await this.db.storePeriods(this.submissions).then(() => {
-      this.submissions = [];
-    });
+    await this.db.storePeriods(this.submissions);
+    this.submissions = [];
   }
 
   async savePeriodProposals() {
-    await this.db.storeNodeState({
+    return this.db.storeNodeState({
       periodProposal: this.periodProposal,
       stalePeriodProposal: this.stalePeriodProposal,
       lastSeenRootChainBlock: this.lastSeenRootChainBlock,

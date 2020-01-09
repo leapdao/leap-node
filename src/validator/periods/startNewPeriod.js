@@ -35,7 +35,7 @@ module.exports = async (height, bridgeState) => {
     prevPeriodRoot: bridgeState.lastPeriodRoot || GENESIS,
   };
 
-  bridgeState.savePeriodProposals();
+  await bridgeState.savePeriodProposals();
 
   await submitPeriodVote(
     currentPeriodBlocksRoot,
