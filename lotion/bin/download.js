@@ -10,7 +10,7 @@ const {
 } = require('fs');
 const { join, dirname } = require('path');
 const { get } = require('axios');
-const unzip = require('unzip').Parse;
+const unzip = require('unzipper').Parse;
 const mkdirp = require('mkdirp').sync;
 
 const versionPath = join(__dirname, 'version');
