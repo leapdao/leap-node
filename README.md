@@ -48,6 +48,8 @@ You will definitely need to run a leap-node instance, if you want to become a va
 
 ## Getting Started
 
+Please find all necessary instructions to set up your own node and on how to become a validator in our [LeapDAO docs](https://docs.leapdao.org/connect).  
+
 ### Quick start
 
 ```sh
@@ -58,9 +60,13 @@ npm install -g leap-node
 DEBUG=tendermint,leap-node* leap-node --config=https://testnet-node.leapdao.org
 ```
 
+### Hardware Requirements
+
+* 64 bit CPU
+
 ### Prerequisites
 
-* Node.js 8+ (Node.js 12 is not supported [yet](https://github.com/leapdao/leap-node/issues/346))
+* Node.js 8+ (10/12 compatible)
 * build-essential
 
 ### Install
