@@ -48,10 +48,52 @@ You will definitely need to run a leap-node instance, if you want to become a va
 
 ## Getting Started
 
+Please find all necessary instructions to set up your own node and on how to become a validator in our [LeapDAO docs](https://docs.leapdao.org/connect).  
+
 ### Quick start
 
-Please find all necessary instructions to set up your own node and on how to become a validator in our [LeapDAO docs]((https://docs.leapdao.org/connect).  
+```sh
+# Install latest leap-node from NPM. You may need different version depending on the network you connect to.
+npm install -g leap-node
 
+# Start the node connecting to testnet. It will take a few hours to sync with the tip of the network.
+DEBUG=tendermint,leap-node* leap-node --config=https://testnet-node.leapdao.org
+```
+
+### Hardware Requirements
+
+* 64 bit CPU
+
+### Prerequisites
+
+* Node.js 8+ (10/12 compatible)
+* build-essential
+
+### Install
+
+Install latest leap-node from NPM. You may need different version depending on the network you connect to:
+
+```sh
+npm install -g leap-node
+```
+
+### Run
+
+To run the node you execute a leap-node with commandline arguments.
+
+The bare minimum of arguments required are:
+
+* `--config` to specify a path to local JSON file with network configuration or a JSON RPC url of another leap-node to get configuration from
+* `--rootNetwork` to specify a root chain provider url (e.g. your own ethereum node or infura)
+
+Chain ID of the root chain provider should match the rootNetworkId in the network configuration file (e.g. 4 for Rinkeby).
+
+```sh
+DEBUG=tendermint,leap-node* leap-node [ARGS] --config=<path-to-config.json> --rootNetwork=<root-network-provider-url>
+```
+
+<!-- TODO: link better docs here -->
+Once started and synced with the network, the node exposes a Leap JSON RPC on a port 8645. You can [use](https://docs.leapdao.org/) your node now or [apply to become a validator](https://docs.leapdao.org/connect/#becoming-a-validator).
 
 ## Available Networks
 
