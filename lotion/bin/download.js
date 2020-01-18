@@ -71,6 +71,7 @@ function getBinaryDownloadURL(version) {
   };
   const arches = {
     x32: '386',
+    ia32: '386',
     x64: 'amd64',
     arm: 'arm',
     arm64: 'arm',
