@@ -87,6 +87,9 @@ module.exports = class BridgeState {
 
     this.handleEvents = handleEvents({
       NewDeposit: ({ returnValues: event }) => {
+        logBridge(
+          `NewDeposit. id: ${event.depositId} color: ${event.color} amount: ${event.amount} owner: ${event.depositor}`
+        );
         this.deposits[event.depositId] = {
           depositor: event.depositor,
           color: event.color,
@@ -95,7 +98,7 @@ module.exports = class BridgeState {
       },
       NewDepositV2: ({ returnValues: event }) => {
         logBridge(
-          `NewDepositV2. color: ${event.color} amount: ${event.amount} owner: ${event.depositor}`
+          `NewDepositV2. id: ${event.depositId} color: ${event.color} amount: ${event.amount} owner: ${event.depositor}`
         );
         this.deposits[event.depositId] = {
           depositor: event.depositor,
