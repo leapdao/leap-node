@@ -170,31 +170,18 @@ module.exports = class BridgeState {
         this.lastBlocksRoot = event.blocksRoot;
         this.lastPeriodRoot = event.periodRoot;
 
-        let proposal;
-        if (
-          this.periodProposal &&
-          this.periodProposal.blocksRoot === event.blocksRoot
-        ) {
-          proposal = this.periodProposal;
-        }
-
         if (
           this.stalePeriodProposal &&
           this.stalePeriodProposal.blocksRoot === event.blocksRoot
         ) {
-          proposal = this.stalePeriodProposal;
-          this.periodProposal.prevPeriodRoot = event.periodRoot;
+          (this.periodProposal || {}).prevPeriodRoot = event.periodRoot;
         }
 
-        if (this.isReplay()) return;
-        const blockHeight = proposal.height - 1;
-        const [periodStart] = Period.periodBlockRange(blockHeight);
-        this.submissions.push({
-          periodStart,
+        this.submissions[event.blocksRoot] = {
           casBitmap: event.casBitmap,
           slotId: event.slotId,
           validatorAddress: event.owner,
-        });
+        };
       },
     });
 

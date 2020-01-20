@@ -56,7 +56,8 @@ const createDb = levelDb => {
       .get(key)
       .then(jsonStr => {
         // hash, not object
-        if (jsonStr.indexOf('0x') === 0) return jsonStr;
+        if (jsonStr === null || jsonStr === undefined) return null;
+        if (jsonStr.indexOf && jsonStr.indexOf('0x') === 0) return jsonStr;
         try {
           return JSON.parse(jsonStr);
         } catch (e) {
@@ -115,26 +116,33 @@ const createDb = levelDb => {
     await levelDb.put('nodeState', JSON.stringify(state));
   };
 
-  const storePeriods = async submissions => {
-    const dbOpsBatch = levelDb.batch();
-    await Promise.all(
-      submissions.map(submission => {
-        const key = `period!${submission.periodStart}`;
-        return getNullable(key).then(existingRecords => {
-          const records = existingRecords || [];
-          delete submission.periodStart;
-          records.push(submission);
-          dbOpsBatch.put(key, JSON.stringify(records));
-        });
-      })
+  const getPeriodData = periodStart => getNullable(`period!${periodStart}`);
+
+  const getPeriodDataByBlocksRoot = blocksRoot => {
+    return getNullable(`period!${blocksRoot}`).then(periodDataKey => {
+      if (!periodDataKey) return null;
+      return getNullable(periodDataKey);
+    });
+  };
+
+  const storeSubmission = async (periodStartHeight, submission) => {
+    const existingRecord = await getPeriodDataByBlocksRoot(
+      submission.blocksRoot
     );
+    // skip saving if record with the same root exists, otherwise overwrite
+    if (existingRecord && existingRecord.blocksRoot === submission.blocksRoot) {
+      return Promise.resolve();
+    }
+
+    const dbOpsBatch = levelDb.batch();
+    const key = `period!${periodStartHeight}`;
+    dbOpsBatch.put(`period!${submission.blocksRoot}`, key);
+    dbOpsBatch.put(key, JSON.stringify(submission));
 
     return new Promise(resolve => {
       dbOpsBatch.write(resolve);
     });
   };
-
-  const getPeriodData = periodStart => getNullable(`period!${periodStart}`);
 
   /*
    * Returns the last seen root chain block height. If there is no such a number, returns 0.
@@ -157,11 +165,12 @@ const createDb = levelDb => {
     getChainState,
     getNodeState,
     storeChainState,
-    storePeriods,
+    storeSubmission,
     storeNodeState,
     getPeriodData,
     getLastSeenRootChainBlock,
     setLastSeenRootChainBlock,
+    getPeriodDataByBlocksRoot,
   };
 };
 

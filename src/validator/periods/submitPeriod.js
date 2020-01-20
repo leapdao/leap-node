@@ -5,6 +5,7 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
+const { Period } = require('leap-core');
 const { getSlotsByAddr, sendTransaction, buildCas } = require('../../utils');
 const { logPeriod } = require('../../utils/debug');
 const checkEnoughVotes = require('./checkEnoughVotes');
@@ -39,6 +40,16 @@ module.exports = async (periodProposal, bridgeState, opts = {}) => {
       lastPeriodRoot,
       submittedPeriod
     );
+
+    if (bridgeState.submissions[blocksRoot]) {
+      logPeriod('[submitPeriod] Saving period data into db:', blocksRoot);
+      const blockHeight = periodProposal.height - 1;
+      const [periodStartHeight] = Period.periodBlockRange(blockHeight);
+      await bridgeState.db.storeSubmission(
+        periodStartHeight,
+        bridgeState.submissions[blocksRoot]
+      );
+    }
     return { receiptPromise: Promise.resolve({ status: true }) };
   }
 

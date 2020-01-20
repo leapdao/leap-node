@@ -23,6 +23,7 @@ const BLOCKS_ROOT =
 const periodProposal = extend => ({
   blocksRoot: BLOCKS_ROOT,
   proposerSlotId: 0,
+  height: 64,
   prevPeriodRoot: '0x5678',
   votes: [0, 1],
   ...extend,
@@ -51,6 +52,10 @@ const bridgeStateMock = attrs => ({
     slots: [{ id: 0, signerAddr: ADDR }, { id: 1, signerAddr: ADDR_1 }],
   },
   operatorContract: operatorContractMock(),
+  submissions: [],
+  db: {
+    storeSubmission: jest.fn(),
+  },
   ...attrs,
 });
 
@@ -100,6 +105,38 @@ describe('submitPeriod', () => {
     expect(receiptPromise).resolves.toEqual({ status: true });
     expect(submitPeriodVote).not.toBeCalled();
     expect(utils.sendTransaction).not.toBeCalled();
+  });
+
+  test('period is onchain — should store period submission if any exists', async () => {
+    const submissionEvent = {
+      casBitmap: '0x8899',
+      slotId: 1,
+      validatorAddress: ADDR,
+    };
+    const bridgeState = bridgeStateMock({
+      bridgeContract: bridgeContractMock({
+        returnPeriod: { timestamp: '100' }, // period found in the bridge contract
+      }),
+      lastBlocksRoot: BLOCKS_ROOT,
+      submissions: {
+        [BLOCKS_ROOT]: submissionEvent,
+      },
+    });
+
+    // submitted period has merkle root == lastBlocksRoot
+    // lastBlocksRoot is being read from Submission event
+    const { receiptPromise } = await submitPeriod(
+      periodProposal(),
+      bridgeState
+    );
+
+    expect(receiptPromise).resolves.toEqual({ status: true });
+    expect(submitPeriodVote).not.toBeCalled();
+    expect(utils.sendTransaction).not.toBeCalled();
+    expect(bridgeState.db.storeSubmission).toHaveBeenCalledWith(
+      32,
+      submissionEvent
+    );
   });
 
   test('period is expected to be onchain, but it is not', async () => {

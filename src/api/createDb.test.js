@@ -257,17 +257,17 @@ describe('db', () => {
     expect(methodCalled).toBe(true);
   });
 
-  describe('#storePeriods', () => {
+  describe('#storeSubmission', () => {
     const submission1 = {
-      periodStart: 32,
-      casBitmap: '0x123',
+      blocksRoot: '0x123',
+      casBitmap: '0x200',
       slotId: 1,
       validatorAddress: ADDR_1,
     };
 
     const submission2 = {
-      periodStart: 64,
-      casBitmap: '0x456',
+      blocksRoot: '0x456',
+      casBitmap: '0x100',
       slotId: 2,
       validatorAddress: ADDR_1,
     };
@@ -276,35 +276,59 @@ describe('db', () => {
       levelMock.get = jest.fn().mockRejectedValue({ type: 'NotFoundError' });
       const db = createDb(levelMock);
 
-      await db.storePeriods([submission1, submission2]);
+      await db.storeSubmission(32, submission1);
+      await db.storeSubmission(64, submission2);
 
       expect(levelMock.batch().put).toHaveBeenNthCalledWith(
         1,
-        'period!32',
-        JSON.stringify([submission1])
+        'period!0x123',
+        'period!32'
       );
       expect(levelMock.batch().put).toHaveBeenNthCalledWith(
         2,
+        'period!32',
+        JSON.stringify(submission1)
+      );
+      expect(levelMock.batch().put).toHaveBeenNthCalledWith(
+        3,
+        'period!0x456',
+        'period!64'
+      );
+      expect(levelMock.batch().put).toHaveBeenNthCalledWith(
+        4,
         'period!64',
-        JSON.stringify([submission2])
+        JSON.stringify(submission2)
       );
     });
 
-    test('multiple submissions per period', async () => {
-      const samePeriodHeightSubmission = {
-        periodStart: 32,
-        casBitmap: '0x456',
+    test('skip saving if submission already exists', async () => {
+      const sameRootSubmission = {
+        blocksRoot: '0x123',
+        casBitmap: '0x300',
         slotId: 2,
         validatorAddress: ADDR_1,
       };
-      levelMock.get = jest.fn().mockResolvedValue([submission1]);
+      levelMock.get
+        .mockResolvedValue('period!32')
+        .mockResolvedValue(submission1);
       const db = createDb(levelMock);
 
-      await db.storePeriods([samePeriodHeightSubmission]);
+      await db.storeSubmission(32, sameRootSubmission);
 
-      expect(levelMock.batch().put).toHaveBeenCalledWith(
+      expect(levelMock.batch().put).not.toHaveBeenCalled();
+
+      await db.storeSubmission(32, submission2);
+
+      expect(levelMock.batch().put).toHaveBeenNthCalledWith(
+        1,
+        'period!0x456',
+        'period!32'
+      );
+
+      expect(levelMock.batch().put).toHaveBeenNthCalledWith(
+        2,
         'period!32',
-        JSON.stringify([submission1, samePeriodHeightSubmission])
+        JSON.stringify(submission2)
       );
     });
   });
