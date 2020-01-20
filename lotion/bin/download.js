@@ -20,46 +20,44 @@ const binaryDownloadUrl = getBinaryDownloadURL(tendermintVersion);
 
 console.log(`downloading ${binaryDownloadUrl}`);
 
-get(binaryDownloadUrl, { responseType: 'stream' }).then(
-  res => {
-    if (res.status !== 200) {
-      throw Error(`Request failed, status: ${res.status}`);
+get(binaryDownloadUrl, { responseType: 'stream' }).then(res => {
+  if (res.status !== 200) {
+    throw Error(`Request failed, status: ${res.status}`);
+  }
+
+  const hasher = createHash('sha256');
+  const length = parseInt(res.headers['content-length']);
+  const tempBinPath = join(__dirname, '_tendermint');
+  // unzip, write to file, and check hash
+  const file = createWriteStream(tempBinPath, { mode: 0o755 });
+
+  res.data.pipe(unzip()).once('entry', entry => {
+    // write to a temporary file which we rename if the hash check passes
+    entry.pipe(file);
+  });
+
+  // verify hash of file
+  res.data.on('data', chunk => hasher.update(chunk));
+  file.on('finish', () => {
+    const actualHash = hasher.digest().toString('hex');
+    const expectedHash = getExpectedHash(binaryDownloadUrl);
+
+    if (actualHash !== expectedHash) {
+      console.error(
+        'ERROR: hash of downloaded tendermint binary did not match. Got %s, expected %s',
+        actualHash,
+        expectedHash
+      );
+      process.exit(1);
     }
 
-    const hasher = createHash('sha256');
-    const length = parseInt(res.headers['content-length']);
-    const tempBinPath = join(__dirname, '_tendermint');
-    // unzip, write to file, and check hash
-    const file = createWriteStream(tempBinPath, { mode: 0o755 });
+    console.log('✅ verified hash of tendermint binary\n');
+    renameSync(tempBinPath, binPath);
+  });
 
-    res.data.pipe(unzip()).once('entry', entry => {
-      // write to a temporary file which we rename if the hash check passes
-      entry.pipe(file);
-    });
-
-    // verify hash of file
-    res.data.on('data', chunk => hasher.update(chunk));
-    file.on('finish', () => {
-      const actualHash = hasher.digest().toString('hex');
-      const expectedHash = getExpectedHash(binaryDownloadUrl);
-
-      if (actualHash !== expectedHash) {
-        console.error(
-          'ERROR: hash of downloaded tendermint binary did not match. Got %s, expected %s',
-          actualHash,
-          expectedHash
-        );
-        process.exit(1);
-      }
-
-      console.log('✅ verified hash of tendermint binary\n');
-      renameSync(tempBinPath, binPath);
-    });
-
-    res.data.on('data', () => process.stdout.write('.'));
-    res.data.on('end', () => console.log());
-  }
-);
+  res.data.on('data', () => process.stdout.write('.'));
+  res.data.on('end', () => console.log());
+});
 
 // gets a URL to the binary zip, hosted on GitHub
 function getBinaryDownloadURL(version) {
@@ -87,8 +85,8 @@ function getExpectedHash(binaryDownloadUrl) {
   const shasumPath = join(__dirname, 'SHA256SUMS');
   const shasums = readFileSync(shasumPath).toString();
 
-  for (let line of shasums.split('\n')) {
-    let [shasum, filename] = line.split(/\s+/);
+  for (const line of shasums.split('\n')) {
+    const [shasum, filename] = line.split(/\s+/);
     if (binaryDownloadUrl.includes(filename)) {
       return shasum;
     }

@@ -10,7 +10,7 @@ const binPath = process.env.TM_BINARY || require.resolve('../bin/tendermint');
 function flags(opts = {}, prefix = '') {
   const args = [];
 
-  for (let [key, value] of Object.entries(opts)) {
+  for (const [key, value] of Object.entries(opts)) {
     if (value && typeof value === 'object') {
       // recurse for objects
       args.push(...flags(value, `${prefix}${key}.`));
@@ -24,7 +24,7 @@ function flags(opts = {}, prefix = '') {
 
 async function exec(command, opts) {
   const args = [command, ...flags(opts)];
-  debug('executing: tendermint ' + args.join(' '));
+  debug(`executing: tendermint ${args.join(' ')}`);
   const res = _spawnSync(binPath, args);
 
   if (res.status !== 0) {
@@ -36,7 +36,7 @@ async function exec(command, opts) {
 
 function spawn(command, opts) {
   const args = [command, ...flags(opts)];
-  debug('spawning: tendermint ' + args.join(' '));
+  debug(`spawning: tendermint ${args.join(' ')}`);
   const child = _spawn(binPath, args);
 
   setTimeout(() => {
@@ -123,7 +123,7 @@ let waitForSync = wait(async tendermintRpcUrl => {
 
 function wait(condition) {
   return async function(client, child, timeout = 30 * 1000) {
-    let start = Date.now();
+    const start = Date.now();
     while (true) {
       if (timeout) {
         const elapsed = Date.now() - start;
