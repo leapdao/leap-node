@@ -33,7 +33,6 @@ const stateMock = () => ({
 });
 
 const bridgeStateMock = extend => ({
-  isReplay: () => false,
   account: {
     address: ADDR_0,
     privateKey: PRIV_0,
@@ -86,20 +85,6 @@ describe('submit period vote', () => {
         blocksRoot: PERIOD_ROOT,
         votes: [0],
       },
-    });
-
-    await submitPeriodVote(
-      PERIOD_ROOT,
-      bridgeState.periodProposal,
-      bridgeState
-    );
-
-    expect(sender.send).not.toBeCalled();
-  });
-
-  test('tx replay', async () => {
-    const bridgeState = bridgeStateMock({
-      isReplay: () => true,
     });
 
     await submitPeriodVote(

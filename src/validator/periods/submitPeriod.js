@@ -5,7 +5,6 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-const { Period } = require('leap-core');
 const { getSlotsByAddr, sendTransaction, buildCas } = require('../../utils');
 const { logPeriod } = require('../../utils/debug');
 const checkEnoughVotes = require('./checkEnoughVotes');
@@ -15,7 +14,7 @@ const isAlreadyVoted = require('./isAlreadyVoted');
 module.exports = async (periodProposal, bridgeState, opts = {}) => {
   const defaultResponse = { receiptPromise: Promise.resolve() };
   const { proposerSlotId, blocksRoot, prevPeriodRoot } = periodProposal;
-  const { currentState, lastBlocksRoot, lastPeriodRoot } = bridgeState;
+  const { currentState } = bridgeState;
   const { slots } = currentState;
 
   logPeriod(
@@ -25,31 +24,9 @@ module.exports = async (periodProposal, bridgeState, opts = {}) => {
     prevPeriodRoot
   );
 
-  if (lastBlocksRoot === blocksRoot) {
-    // check if the period is already onchain
-    const submittedPeriod = await bridgeState.bridgeContract.methods
-      .periods(lastPeriodRoot)
-      .call();
+  if (await bridgeState.getPeriodSubmissionFromDb(blocksRoot)) {
+    logPeriod('[submitPeriod] already seen onchain', blocksRoot);
 
-    if (submittedPeriod.timestamp === '0') {
-      throw new Error('No period found onchain for bridgeState.lastBlocksRoot');
-    }
-
-    logPeriod(
-      '[submitPeriod] already seen onchain',
-      lastPeriodRoot,
-      submittedPeriod
-    );
-
-    if (bridgeState.submissions[blocksRoot]) {
-      logPeriod('[submitPeriod] Saving period data into db:', blocksRoot);
-      const blockHeight = periodProposal.height - 1;
-      const [periodStartHeight] = Period.periodBlockRange(blockHeight);
-      await bridgeState.db.storeSubmission(
-        periodStartHeight,
-        bridgeState.submissions[blocksRoot]
-      );
-    }
     return { receiptPromise: Promise.resolve({ status: true }) };
   }
 

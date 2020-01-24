@@ -9,6 +9,6 @@ module.exports = async (bridgeState, db, heightOrTag) => {
   }
   const [periodStart, periodEnd] = Period.periodBlockRange(height);
   const periodData = await db.getPeriodData(periodStart);
-  if (!periodData) return null; // return null as Infura does
-  return periodData.map(d => ({ periodStart, periodEnd, ...d }));
+  if (!periodData) return null;
+  return { periodStart, periodEnd, ...periodData };
 };

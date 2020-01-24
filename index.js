@@ -27,7 +27,7 @@ const lotion = require('./lotion');
 const delayedSender = require('./src/txHelpers/delayedSender');
 const heartbeatService = require('./src/heartbeat');
 
-const { logNode, logTendermint } = require('./src/utils/debug');
+const { logNode, logTendermint, logVerbose } = require('./src/utils/debug');
 
 async function run() {
   const config = await (async () => {
@@ -101,7 +101,12 @@ async function run() {
   app.useBlock(blockHandler(bridgeState, db, nodeConfig));
   app.usePeriod(periodHandler(bridgeState));
 
-  const lastGoodState = await bridgeState.loadState();
+  const lastGoodState = await bridgeState.loadConsensusState();
+
+  logVerbose('Restored app state', {
+    ...lastGoodState,
+    unspent: 'redacted for shortness',
+  });
 
   heartbeatService(bridgeState, sender);
 

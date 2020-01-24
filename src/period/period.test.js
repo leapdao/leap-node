@@ -34,6 +34,7 @@ const bridgeStateMock = periodProposal => ({
   lastBlocksRoot: '0x123',
   checkCallsCount: 0,
   stalePeriodProposal: periodProposal,
+  hasSeenPeriod: () => false,
 });
 
 describe('Period handler', () => {
@@ -66,6 +67,7 @@ describe('Period handler', () => {
     const bridgeState = {
       ...bridgeStateMock(periodProposal),
       lastBlocksRoot: '0x000010',
+      hasSeenPeriod: blocksRoot => blocksRoot === '0x000010',
     };
 
     await periodHandler(bridgeState)(rsp, state, { height: 64 });

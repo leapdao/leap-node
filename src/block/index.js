@@ -1,4 +1,4 @@
-const { logNode } = require('../utils/debug');
+const { logNode, logVerbose } = require('../utils/debug');
 
 const addBlock = require('./addBlock');
 const updateValidators = require('./updateValidators');
@@ -14,11 +14,13 @@ module.exports = (bridgeState, db, nodeConfig = {}) => async (
 
   bridgeState.checkCallsCount = 0;
 
-  if (height % 32 === 0 && !bridgeState.isReplay()) {
+  const alreadySavedStateAtThisHeight =
+    height === bridgeState.currentState.blockHeight + 1;
+  if (height % 32 === 0 && !alreadySavedStateAtThisHeight) {
     // catch this, it is not fatal if it fails here
     logNode('Saving state');
     try {
-      await bridgeState.saveState();
+      await bridgeState.saveConsensusState();
     } catch (e) {
       logNode(e);
     }
@@ -52,4 +54,10 @@ module.exports = (bridgeState, db, nodeConfig = {}) => async (
 
   await bridgeState.saveNodeState();
   await bridgeState.saveLastSeenRootChainBlock();
+
+  logVerbose(
+    'Period blocks:',
+    String(bridgeState.currentPeriod.blockList.map(b => b.height))
+  );
+  logVerbose('Period prevHash:', bridgeState.currentPeriod.prevHash);
 };

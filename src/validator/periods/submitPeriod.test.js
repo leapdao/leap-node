@@ -56,6 +56,7 @@ const bridgeStateMock = attrs => ({
   db: {
     storeSubmission: jest.fn(),
   },
+  hasSeenPeriod: () => false,
   ...attrs,
 });
 
@@ -92,7 +93,7 @@ describe('submitPeriod', () => {
       bridgeContract: bridgeContractMock({
         returnPeriod: { timestamp: '100' }, // period found in the bridge contract
       }),
-      lastBlocksRoot: BLOCKS_ROOT,
+      hasSeenPeriod: blocksRoot => blocksRoot === BLOCKS_ROOT,
     });
 
     // submitted period has merkle root == lastBlocksRoot
@@ -121,6 +122,7 @@ describe('submitPeriod', () => {
       submissions: {
         [BLOCKS_ROOT]: submissionEvent,
       },
+      hasSeenPeriod: blocksRoot => blocksRoot === BLOCKS_ROOT,
     });
 
     // submitted period has merkle root == lastBlocksRoot
@@ -144,13 +146,13 @@ describe('submitPeriod', () => {
       bridgeContract: bridgeContractMock({
         returnPeriod: { timestamp: '0' }, // period found in the bridge contract
       }),
-      lastBlocksRoot: BLOCKS_ROOT,
+      hasSeenPeriod: blocksRoot => blocksRoot === BLOCKS_ROOT,
     });
 
     // lastBlocksRoot is the same as in submitted period,
     // but for some reason there is no such period on chain (internal error in leap-node?)
     expect(submitPeriod(periodProposal(), bridgeState)).rejects.toEqual(
-      new Error('No period found onchain for bridgeState.lastBlocksRoot')
+      new Error(`No period found onchain for blocks root ${BLOCKS_ROOT}`)
     );
     expect(utils.sendTransaction).not.toBeCalled();
   });

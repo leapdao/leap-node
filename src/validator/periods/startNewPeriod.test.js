@@ -17,9 +17,9 @@ const getCurrentSlotId = require('../../utils/getCurrentSlotId');
 getCurrentSlotId.mockImplementation(() => 0);
 
 const state = extend => ({
-  isReplay: () => false,
   currentPeriod: {
     merkleRoot: () => '0x123',
+    blockList: [],
   },
   currentState: {
     slots: [{ id: 0 }, { id: 1 }],
@@ -70,14 +70,6 @@ describe('startNewPeriod', () => {
   test('not the end of the period', async () => {
     const bridgeState = state();
     await startNewPeriod(31, bridgeState);
-    expect(bridgeState.periodProposal).not.toBeDefined();
-    expect(bridgeState.savePeriodProposals).not.toBeCalled();
-    expect(submitPeriodVote).not.toBeCalled();
-  });
-
-  test('tx replay', async () => {
-    const bridgeState = state({ isReplay: () => true });
-    await startNewPeriod(32, bridgeState);
     expect(bridgeState.periodProposal).not.toBeDefined();
     expect(bridgeState.savePeriodProposals).not.toBeCalled();
     expect(submitPeriodVote).not.toBeCalled();
