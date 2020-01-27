@@ -228,7 +228,7 @@ module.exports = class BridgeState {
     this.periodProposal = nodeState.periodProposal || null;
     this.stalePeriodProposal = nodeState.stalePeriodProposal || null;
     this.lastSeenRootChainBlock =
-      nodeState.lastSeenRootChainBlock || this.genesisBlockHeight;
+      nodeState.rootChainBlockAtProposal || this.genesisBlockHeight;
 
     logNode(`Syncing events from height ${this.lastSeenRootChainBlock}...`);
     this.eventsSubscription = new ContractsEventsSubscription(
@@ -318,7 +318,7 @@ module.exports = class BridgeState {
     return this.db.storeNodeState({
       periodProposal: this.periodProposal,
       stalePeriodProposal: this.stalePeriodProposal,
-      lastSeenRootChainBlock: this.lastSeenRootChainBlock,
+      rootChainBlockAtProposal: this.lastSeenRootChainBlock,
     });
   }
 
