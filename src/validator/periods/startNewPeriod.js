@@ -45,7 +45,8 @@ module.exports = async (height, bridgeState) => {
     };
 
     logPeriod(
-      `[startNewPeriod] New period proposal ${bridgeState.periodProposal}`
+      '[startNewPeriod] New period proposal',
+      bridgeState.periodProposal
     );
 
     await bridgeState.saveNodeState();
@@ -58,7 +59,7 @@ module.exports = async (height, bridgeState) => {
   }
 
   logPeriod(
-    '[startNewPeriod] Creating new period. Previous period blocks root: ',
+    '[startNewPeriod] Creating new period. Previous period blocks root:',
     currentPeriodBlocksRoot
   );
   bridgeState.currentPeriod = new Period(currentPeriodBlocksRoot);
