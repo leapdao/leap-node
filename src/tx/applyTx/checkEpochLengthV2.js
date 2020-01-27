@@ -15,9 +15,7 @@ module.exports = (state, tx, bridgeState) => {
   const { blockHeight, epochLength } = tx.options;
   const event = bridgeState.epochLengths.find(
     ([expectedEpochLength, expectedBlockHeight]) =>
-      blockHeight &&
-      expectedBlockHeight === blockHeight &&
-      expectedEpochLength === epochLength
+      expectedBlockHeight === blockHeight && expectedEpochLength === epochLength
   );
 
   if (!event) {
