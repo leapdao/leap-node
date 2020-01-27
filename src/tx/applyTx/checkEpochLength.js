@@ -12,14 +12,11 @@ module.exports = (state, tx, bridgeState) => {
     throw new Error('epochLength tx V1 expected');
   }
 
-  const [expectedEpochLength, expectedBlockHeight] = bridgeState.epochLengths[
+  const [expectedEpochLength] = bridgeState.epochLengths[
     state.epoch.epochLengthIndex + 1
   ];
-  const { blockHeight, epochLength } = tx.options;
-  if (
-    expectedEpochLength !== epochLength ||
-    (blockHeight && blockHeight !== expectedBlockHeight)
-  ) {
+  const { epochLength } = tx.options;
+  if (expectedEpochLength !== epochLength) {
     throw new Error('Wrong epoch length');
   }
 
