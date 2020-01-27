@@ -8,21 +8,21 @@
 const { Type } = require('leap-core');
 
 module.exports = (state, tx, bridgeState) => {
-  if (tx.type !== Type.EPOCH_LENGTH_V1) {
-    throw new Error('epochLength tx V1 expected');
+  if (tx.type !== Type.EPOCH_LENGTH_V2) {
+    throw new Error('epochLength tx V2 expected');
   }
 
-  const [expectedEpochLength, expectedBlockHeight] = bridgeState.epochLengths[
-    state.epoch.epochLengthIndex + 1
-  ];
   const { blockHeight, epochLength } = tx.options;
-  if (
-    expectedEpochLength !== epochLength ||
-    (blockHeight && blockHeight !== expectedBlockHeight)
-  ) {
+  const event = bridgeState.epochLengths.find(
+    ([expectedEpochLength, expectedBlockHeight]) =>
+      blockHeight &&
+      expectedBlockHeight === blockHeight &&
+      expectedEpochLength === epochLength
+  );
+
+  if (!event) {
     throw new Error('Wrong epoch length');
   }
 
-  state.epoch.epochLengthIndex += 1;
   state.epoch.epochLength = tx.options.epochLength;
 };

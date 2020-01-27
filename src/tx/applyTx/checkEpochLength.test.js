@@ -43,7 +43,6 @@ describe('checkEpochLength', () => {
     checkEpochLength(state, epochLength2, bridgeState);
 
     expect(state.epoch.epochLength).toBe(3);
-    expect(bridgeState.epochLength).toBe(3);
   });
 
   test('epoch length mismatch', () => {
