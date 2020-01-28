@@ -27,7 +27,7 @@ module.exports = async (height, bridgeState) => {
       .call();
 
     if (submittedPeriod.timestamp === '0') {
-      throw new Error(`No period found onchain for blocks root ${periodRoot}`);
+      throw new Error(`No period found onchain for root ${periodRoot}`);
     }
     logPeriod('[submitPeriod] period found onchain', periodRoot);
 
@@ -47,9 +47,7 @@ module.exports = async (height, bridgeState) => {
     );
     bridgeState.lastProcessedPeriodRoot = submissionInDatabase.periodRoot;
     bridgeState.periodProposal = null;
-  }
-
-  if (!periodProposal.txHash) {
+  } else if (!periodProposal.txHash) {
     await submitPeriod(periodProposal, bridgeState);
   }
 };

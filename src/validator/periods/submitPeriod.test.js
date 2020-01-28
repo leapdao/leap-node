@@ -56,21 +56,8 @@ const bridgeStateMock = attrs => ({
   db: {
     storeSubmission: jest.fn(),
   },
-  hasSeenPeriod: () => false,
+  getPeriodSubmissionFromDb: () => null,
   ...attrs,
-});
-
-const bridgeContractMock = ({ returnPeriod }) => ({
-  options: {
-    address: ADDR,
-  },
-  methods: {
-    periods: () => ({
-      async call() {
-        return returnPeriod;
-      },
-    }),
-  },
 });
 
 describe('submitPeriod', () => {
@@ -90,14 +77,10 @@ describe('submitPeriod', () => {
 
   test('period is onchain', async () => {
     const bridgeState = bridgeStateMock({
-      bridgeContract: bridgeContractMock({
-        returnPeriod: { timestamp: '100' }, // period found in the bridge contract
-      }),
-      hasSeenPeriod: blocksRoot => blocksRoot === BLOCKS_ROOT,
+      getPeriodSubmissionFromDb: blocksRoot =>
+        blocksRoot === BLOCKS_ROOT ? { blocksRoot } : null,
     });
 
-    // submitted period has merkle root == lastBlocksRoot
-    // lastBlocksRoot is being read from Submission event
     const { receiptPromise } = await submitPeriod(
       periodProposal(),
       bridgeState
@@ -105,55 +88,6 @@ describe('submitPeriod', () => {
 
     expect(receiptPromise).resolves.toEqual({ status: true });
     expect(submitPeriodVote).not.toBeCalled();
-    expect(utils.sendTransaction).not.toBeCalled();
-  });
-
-  test('period is onchain — should store period submission if any exists', async () => {
-    const submissionEvent = {
-      casBitmap: '0x8899',
-      slotId: 1,
-      validatorAddress: ADDR,
-    };
-    const bridgeState = bridgeStateMock({
-      bridgeContract: bridgeContractMock({
-        returnPeriod: { timestamp: '100' }, // period found in the bridge contract
-      }),
-      lastBlocksRoot: BLOCKS_ROOT,
-      submissions: {
-        [BLOCKS_ROOT]: submissionEvent,
-      },
-      hasSeenPeriod: blocksRoot => blocksRoot === BLOCKS_ROOT,
-    });
-
-    // submitted period has merkle root == lastBlocksRoot
-    // lastBlocksRoot is being read from Submission event
-    const { receiptPromise } = await submitPeriod(
-      periodProposal(),
-      bridgeState
-    );
-
-    expect(receiptPromise).resolves.toEqual({ status: true });
-    expect(submitPeriodVote).not.toBeCalled();
-    expect(utils.sendTransaction).not.toBeCalled();
-    expect(bridgeState.db.storeSubmission).toHaveBeenCalledWith(
-      32,
-      submissionEvent
-    );
-  });
-
-  test('period is expected to be onchain, but it is not', async () => {
-    const bridgeState = bridgeStateMock({
-      bridgeContract: bridgeContractMock({
-        returnPeriod: { timestamp: '0' }, // period found in the bridge contract
-      }),
-      hasSeenPeriod: blocksRoot => blocksRoot === BLOCKS_ROOT,
-    });
-
-    // lastBlocksRoot is the same as in submitted period,
-    // but for some reason there is no such period on chain (internal error in leap-node?)
-    expect(submitPeriod(periodProposal(), bridgeState)).rejects.toEqual(
-      new Error(`No period found onchain for blocks root ${BLOCKS_ROOT}`)
-    );
     expect(utils.sendTransaction).not.toBeCalled();
   });
 

@@ -3,6 +3,44 @@ const { logPeriod } = require('../../utils/debug');
 const { getCurrentSlotId } = require('../../utils');
 const submitPeriodVote = require('./submitPeriodVote');
 
+const createNewProposal = async (height, bridgeState) => {
+  if (bridgeState.periodProposal) {
+    // by setting stalePeriodProposal here we are enabling checkBridge to
+    // stop consensus until stale period proposal is processed
+    bridgeState.stalePeriodProposal = bridgeState.periodProposal;
+    logPeriod(
+      "WARNING: period proposal already exists. Probably it wasn't submitted yet"
+    );
+  }
+
+  const currentPeriodBlocksRoot = bridgeState.currentPeriod.merkleRoot();
+
+  const proposerSlotId = getCurrentSlotId(
+    bridgeState.currentState.slots,
+    height
+  );
+
+  bridgeState.periodProposal = {
+    height,
+    proposerSlotId,
+    votes: [],
+    blocksRoot: currentPeriodBlocksRoot,
+    prevPeriodRoot: bridgeState.lastProcessedPeriodRoot,
+  };
+
+  logPeriod('[startNewPeriod] New period proposal', bridgeState.periodProposal);
+
+  await bridgeState.saveNodeState();
+
+  await submitPeriodVote(
+    currentPeriodBlocksRoot,
+    bridgeState.periodProposal,
+    bridgeState
+  );
+
+  return currentPeriodBlocksRoot;
+};
+
 module.exports = async (height, bridgeState) => {
   logPeriod(`[startNewPeriod] height: ${height}`);
   if (height % 32 !== 0) {
@@ -20,42 +58,7 @@ module.exports = async (height, bridgeState) => {
       `[startNewPeriod] Reusing saved period proposal: ${currentPeriodBlocksRoot}`
     );
   } else {
-    currentPeriodBlocksRoot = bridgeState.currentPeriod.merkleRoot();
-
-    if (periodProposal) {
-      // by setting stalePeriodProposal here we are enabling checkBridge to
-      // stop consensus until stale period proposal is processed
-      bridgeState.stalePeriodProposal = bridgeState.periodProposal;
-      logPeriod(
-        "WARNING: period proposal already exists. Probably it wasn't submitted yet"
-      );
-    }
-
-    const proposerSlotId = getCurrentSlotId(
-      bridgeState.currentState.slots,
-      height
-    );
-
-    bridgeState.periodProposal = {
-      height,
-      proposerSlotId,
-      votes: [],
-      blocksRoot: currentPeriodBlocksRoot,
-      prevPeriodRoot: bridgeState.lastProcessedPeriodRoot,
-    };
-
-    logPeriod(
-      '[startNewPeriod] New period proposal',
-      bridgeState.periodProposal
-    );
-
-    await bridgeState.saveNodeState();
-
-    await submitPeriodVote(
-      currentPeriodBlocksRoot,
-      bridgeState.periodProposal,
-      bridgeState
-    );
+    currentPeriodBlocksRoot = await createNewProposal(height, bridgeState);
   }
 
   logPeriod(

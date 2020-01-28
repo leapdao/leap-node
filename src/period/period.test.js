@@ -31,10 +31,9 @@ const bridgeStateMock = periodProposal => ({
   currentState: {
     slots: [{ id: 0, signerAddr: ADDR }, { id: 1, signerAddr: ADDR_1 }],
   },
-  lastBlocksRoot: '0x123',
   checkCallsCount: 0,
   stalePeriodProposal: periodProposal,
-  hasSeenPeriod: () => false,
+  getPeriodSubmissionFromDb: () => null,
 });
 
 describe('Period handler', () => {
@@ -66,8 +65,8 @@ describe('Period handler', () => {
     const periodProposal = proposal();
     const bridgeState = {
       ...bridgeStateMock(periodProposal),
-      lastBlocksRoot: '0x000010',
-      hasSeenPeriod: blocksRoot => blocksRoot === '0x000010',
+      getPeriodSubmissionFromDb: blocksRoot =>
+        blocksRoot === '0x000010' ? { blocksRoot } : null,
     };
 
     await periodHandler(bridgeState)(rsp, state, { height: 64 });
