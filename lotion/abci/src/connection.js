@@ -71,10 +71,10 @@ class Connection extends EventEmitter {
   }
 
   write(message) {
-    this._write(message).catch(err => this.emit('error', err));
+    this.writeAsync(message).catch(err => this.emit('error', err));
   }
 
-  async _write(message) {
+  async writeAsync(message) {
     Response.verify(message);
     // log outgoing messages, except for 'flush'
     if (debug.enabled && !message.flush) {

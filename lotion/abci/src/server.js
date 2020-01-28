@@ -21,8 +21,7 @@ function createServer(app) {
 
       const succeed = response => {
         // respond to client
-        const message = { [type]: response };
-        conn.write(message);
+        conn.write({ [type]: response });
         cb();
       };
 
@@ -49,9 +48,9 @@ function createServer(app) {
           res = await res;
         }
 
-        succeed(res);
+        return succeed(res);
       } catch (err) {
-        fail(err);
+        return fail(err);
       }
     });
   });

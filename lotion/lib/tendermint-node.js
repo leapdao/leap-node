@@ -1,11 +1,41 @@
 const axios = require('axios');
 const url = require('url');
 const debug = require('debug')('tendermint');
-const _spawnSync = require('child_process').spawnSync;
-const _spawn = require('child_process').spawn;
+const { spawnSync, spawn } = require('child_process');
 
 const logging = process.env.TM_LOG;
 const binPath = process.env.TM_BINARY || require.resolve('../bin/tendermint');
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function wait(condition) {
+  return async (client, child, timeout = 30 * 1000) => {
+    const start = Date.now();
+    /* eslint-disable no-constant-condition, no-await-in-loop */
+    while (true) {
+      if (timeout) {
+        const elapsed = Date.now() - start;
+
+        if (elapsed > timeout) {
+          throw Error('Timed out while waiting');
+        }
+      }
+
+      try {
+        if (await condition(client)) {
+          break;
+        }
+      } catch (err) {
+        // eslint-ignore no-empty
+      }
+
+      await sleep(1000);
+    }
+    /* eslint-enable no-constant-condition, no-await-in-loop */
+  };
+}
 
 function flags(opts = {}, prefix = '') {
   const args = [];
@@ -25,7 +55,7 @@ function flags(opts = {}, prefix = '') {
 async function exec(command, opts) {
   const args = [command, ...flags(opts)];
   debug(`executing: tendermint ${args.join(' ')}`);
-  const res = _spawnSync(binPath, args);
+  const res = spawnSync(binPath, args);
 
   if (res.status !== 0) {
     throw Error(`tendermint exited with code ${res.status}`);
@@ -34,16 +64,18 @@ async function exec(command, opts) {
   return res;
 }
 
-function spawn(command, opts) {
+function spawnTendermint(command, opts) {
   const args = [command, ...flags(opts)];
   debug(`spawning: tendermint ${args.join(' ')}`);
-  const child = _spawn(binPath, args);
+  const child = spawn(binPath, args);
 
   setTimeout(() => {
     try {
       child.stdout.resume();
       child.stderr.resume();
-    } catch (err) {}
+    } catch (err) {
+      // eslint-ignore-line no-empty
+    }
   }, 4000);
 
   if (logging) {
@@ -62,21 +94,35 @@ function spawn(command, opts) {
   return child;
 }
 
-function node(path, opts = {}) {
-  if (typeof path !== 'string') {
-    throw Error('"path" argument is required');
+function getRpcPort(opts, defaultPort = 26657) {
+  if (!opts || ((!opts.rpc || !opts.rpc.laddr) && !opts.laddr)) {
+    return defaultPort;
   }
-  opts.home = path;
 
-  const child = spawn('node', opts);
-  const rpcPort = getRpcPort(opts);
+  const parsed = url.parse(opts.laddr || opts.rpc.laddr);
 
-  return setupChildProcess(child, rpcPort);
+  return parsed.port;
 }
+
+const waitForRpc = wait(async tendermintRpcUrl => {
+  await axios.get(`${tendermintRpcUrl}/status`);
+
+  return true;
+});
+
+const waitForSync = wait(async tendermintRpcUrl => {
+  const status = (await axios.get(`${tendermintRpcUrl}/status`)).data.result;
+
+  return (
+    status.sync_info.catching_up === false &&
+    Number(status.sync_info.latest_block_height) > 0
+  );
+});
 
 function setupChildProcess(child, rpcPort) {
   const tendermintRpcUrl = `http://localhost:${rpcPort}`;
-  let started, synced;
+  let started;
+  let synced;
 
   return Object.assign(child, {
     started: () => {
@@ -96,56 +142,16 @@ function setupChildProcess(child, rpcPort) {
   });
 }
 
-function getRpcPort(opts, defaultPort = 26657) {
-  if (!opts || ((!opts.rpc || !opts.rpc.laddr) && !opts.laddr)) {
-    return defaultPort;
+function node(path, opts = {}) {
+  if (typeof path !== 'string') {
+    throw Error('"path" argument is required');
   }
+  opts.home = path;
 
-  const parsed = url.parse(opts.laddr || opts.rpc.laddr);
+  const child = spawnTendermint('node', opts);
+  const rpcPort = getRpcPort(opts);
 
-  return parsed.port;
-}
-
-let waitForRpc = wait(async tendermintRpcUrl => {
-  await axios.get(`${tendermintRpcUrl}/status`);
-
-  return true;
-});
-
-let waitForSync = wait(async tendermintRpcUrl => {
-  const status = (await axios.get(`${tendermintRpcUrl}/status`)).data.result;
-
-  return (
-    status.sync_info.catching_up === false &&
-    Number(status.sync_info.latest_block_height) > 0
-  );
-});
-
-function wait(condition) {
-  return async function(client, child, timeout = 30 * 1000) {
-    const start = Date.now();
-    while (true) {
-      if (timeout) {
-        const elapsed = Date.now() - start;
-
-        if (elapsed > timeout) {
-          throw Error('Timed out while waiting');
-        }
-      }
-
-      try {
-        if (await condition(client)) {
-          break;
-        }
-      } catch (err) {}
-
-      await sleep(1000);
-    }
-  };
-}
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return setupChildProcess(child, rpcPort);
 }
 
 module.exports = {
