@@ -1,64 +1,61 @@
-'use strict'
+const net = require('net');
+const debug = require('debug')('abci');
+const Connection = require('./connection.js');
 
-const net = require('net')
-const debug = require('debug')('abci')
-const Connection = require('./connection.js')
+function createServer(app) {
+  const server = net.createServer(client => {
+    client.name = `${client.remoteAddress}:${client.remotePort}`;
 
-function createServer (app) {
-  let server = net.createServer((client) => {
-    client.name = `${client.remoteAddress}:${client.remotePort}`
-
-    let conn = new Connection(client, async (req, cb) => {
-      let [ type ] = Object.keys(req)
-      let message = req[type]
+    const conn = new Connection(client, async (req, cb) => {
+      const [type] = Object.keys(req);
+      let message = req[type];
 
       // special messages
       if (type === 'flush') {
-        conn.write({ flush: {} })
-        return cb()
+        conn.write({ flush: {} });
+        return cb();
       } else if (type === 'echo') {
-        conn.write({ echo: { message: message.message } })
-        return cb()
+        conn.write({ echo: { message: message.message } });
+        return cb();
       }
 
-      let succeed = (response) => {
+      const succeed = response => {
         // respond to client
-        let message = { [type]: response }
-        conn.write(message)
-        cb()
-      }
+        conn.write({ [type]: response });
+        cb();
+      };
 
-      let fail = (err) => {
+      const fail = err => {
         // if app throws an error, send an 'exception' response
         // and close the connection
-        debug(`ABCI error on "${type}":`, err)
-        message = { exception: { error: err.toString() } }
-        conn.write(message)
-        conn.close()
-      }
+        debug(`ABCI error on "${type}":`, err);
+        message = { exception: { error: err.toString() } };
+        conn.write(message);
+        conn.close();
+      };
 
       // message handler not implemented in app, send emtpy response
       if (app[type] == null) {
-        return succeed({})
+        return succeed({});
       }
 
       // call method
       try {
-        let res = app[type](message)
+        let res = app[type](message);
 
         // method can optionally be async
         if (res instanceof Promise) {
-          res = await res
+          res = await res;
         }
 
-        succeed(res)
+        return succeed(res);
       } catch (err) {
-        fail(err)
+        return fail(err);
       }
-    })
-  })
+    });
+  });
 
-  return server
+  return server;
 }
 
-module.exports = createServer
+module.exports = createServer;
