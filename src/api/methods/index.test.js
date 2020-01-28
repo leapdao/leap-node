@@ -14,7 +14,11 @@ describe('api/methods', () => {
   test('#plasma_getState', async () => {
     const bridgeState = {
       networkId: 55881,
-      epochLength: 5,
+      currentState: {
+        epoch: {
+          epochLength: 5,
+        },
+      },
       something: {
         nested: 'thing',
       },
@@ -22,6 +26,9 @@ describe('api/methods', () => {
 
     const { nodeApi } = methods(bridgeState);
 
-    expect(await nodeApi.plasma_getState()).toEqual(bridgeState);
+    const state = await nodeApi.plasma_getState();
+    expect(state.networkId).toEqual(55881);
+    expect(state.currentState.epoch.epochLength).toEqual(5);
+    expect(state.something).toEqual(undefined);
   });
 });
