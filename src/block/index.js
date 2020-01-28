@@ -51,4 +51,5 @@ module.exports = (bridgeState, db, nodeConfig = {}) => async (
   bridgeState.blockHeight = chainInfo.height;
 
   await bridgeState.saveNodeState();
+  await bridgeState.saveLastSeenRootChainBlock();
 };

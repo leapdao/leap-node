@@ -13,7 +13,7 @@ const { handleEvents } = require('./utils');
 const { logBridge } = require('./utils/debug');
 
 module.exports = class EventsRelay {
-  constructor(delay, { sendDelayed }) {
+  constructor(delay, fromBlock, { sendDelayed }) {
     this.relayBuffer = new TinyQueue([], (a, b) => {
       if (a.blockNumber === b.blockNumber) {
         return a.logIndex - b.logIndex;
@@ -22,6 +22,8 @@ module.exports = class EventsRelay {
     });
     this.relayDelay = delay;
     this.sendDelayed = sendDelayed;
+    this.fromBlock = fromBlock;
+    this.blockHeight = fromBlock;
 
     this.onNewBlock = this.onNewBlock.bind(this);
   }
@@ -39,7 +41,10 @@ module.exports = class EventsRelay {
     ) {
       const event = this.relayBuffer.pop();
 
-      events.push(event);
+      // skip if we relayed already
+      if (event.blockNumber >= this.fromBlock) {
+        events.push(event);
+      }
 
       if (this.relayBuffer.length === 0) {
         break;
@@ -127,5 +132,6 @@ module.exports = class EventsRelay {
     });
 
     await handler(events);
+    this.blockHeight = blockNumber;
   }
 };

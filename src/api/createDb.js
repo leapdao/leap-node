@@ -136,6 +136,18 @@ const createDb = levelDb => {
 
   const getPeriodData = periodStart => getNullable(`period!${periodStart}`);
 
+  /*
+   * Returns the last seen root chain block height. If there is no such a number, returns 0.
+   */
+  const getLastSeenRootChainBlock = () =>
+    levelDb.get('lastSeenRootChainBlock').catch(() => 0);
+
+  /*
+   * Saves last seen root chain block height
+   */
+  const setLastSeenRootChainBlock = (blockHeight = 0) =>
+    levelDb.put('lastSeenRootChainBlock', blockHeight);
+
   return {
     getLastBlockSynced,
     storeBlock,
@@ -148,6 +160,8 @@ const createDb = levelDb => {
     storePeriods,
     storeNodeState,
     getPeriodData,
+    getLastSeenRootChainBlock,
+    setLastSeenRootChainBlock,
   };
 };
 

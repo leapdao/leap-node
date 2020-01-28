@@ -72,12 +72,18 @@ async function run() {
 
   const sender = delayedSender(cliArgs.tendermintPort);
 
-  global.eventsRelay = new EventsRelay(config.eventsDelay, sender);
+  const lastRelayedRootChainBlock = await db.getLastSeenRootChainBlock();
+  global.eventsRelay = new EventsRelay(
+    config.eventsDelay,
+    lastRelayedRootChainBlock,
+    sender
+  );
+
   global.bridgeState = new BridgeState(
     db,
     privKey,
     config,
-    eventsRelay.relayBuffer,
+    eventsRelay,
     sender
   );
   global.blockTicker = new BlockTicker(bridgeState.web3, [

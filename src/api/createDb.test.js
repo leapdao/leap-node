@@ -330,4 +330,24 @@ describe('db', () => {
       expect(levelMock.get).toHaveBeenCalledWith('nodeState');
     });
   });
+
+  describe('lastSeenRootChainBlock', () => {
+    test('#setLastSeenRootChainBlock', async () => {
+      const db = createDb(levelMock);
+
+      await db.setLastSeenRootChainBlock(4);
+
+      expect(levelMock.put).toHaveBeenCalledWith('lastSeenRootChainBlock', 4);
+    });
+
+    test('#getLastSeenRootChainBlock', async () => {
+      levelMock.get = jest.fn().mockResolvedValue(4);
+      const db = createDb(levelMock);
+
+      const value = await db.getLastSeenRootChainBlock();
+
+      expect(levelMock.get).toHaveBeenCalledWith('lastSeenRootChainBlock');
+      expect(value).toEqual(4);
+    });
+  });
 });

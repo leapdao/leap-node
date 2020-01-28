@@ -22,7 +22,7 @@ const { NFT_COLOR_BASE, NST_COLOR_BASE } = require('./api/methods/constants');
 const flags = require('./flags');
 
 module.exports = class BridgeState {
-  constructor(db, privKey, config, relayBuffer, sender) {
+  constructor(db, privKey, config, eventsRelay, sender) {
     this.config = config;
     this.web3 = new Web3(config.rootNetwork);
     this.sender = sender;
@@ -75,7 +75,7 @@ module.exports = class BridgeState {
       return a.blockNumber - b.blockNumber;
     });
     this.bridgeDelay = config.bridgeDelay;
-    this.relayBuffer = relayBuffer;
+    this.eventsRelay = eventsRelay;
     this.logsCache = {};
     this.exitingUtxos = {};
 
@@ -217,6 +217,7 @@ module.exports = class BridgeState {
     const genesisBlock = await this.bridgeContract.methods
       .genesisBlockNumber()
       .call();
+    this.genesisBlockHeight = parseInt(genesisBlock, 10);
     const contracts = [
       this.operatorContract,
       this.bridgeContract,
@@ -227,7 +228,7 @@ module.exports = class BridgeState {
     this.periodProposal = nodeState.periodProposal || null;
     this.stalePeriodProposal = nodeState.stalePeriodProposal || null;
     this.lastSeenRootChainBlock =
-      nodeState.lastSeenRootChainBlock || parseInt(genesisBlock, 10);
+      nodeState.rootChainBlockAtProposal || this.genesisBlockHeight;
 
     logNode(`Syncing events from height ${this.lastSeenRootChainBlock}...`);
     this.eventsSubscription = new ContractsEventsSubscription(
@@ -295,7 +296,7 @@ module.exports = class BridgeState {
 
     // now push to second buffer
     for (const event of events) {
-      this.relayBuffer.push(event);
+      this.eventsRelay.relayBuffer.push(event);
     }
   }
 
@@ -317,8 +318,17 @@ module.exports = class BridgeState {
     return this.db.storeNodeState({
       periodProposal: this.periodProposal,
       stalePeriodProposal: this.stalePeriodProposal,
-      lastSeenRootChainBlock: this.lastSeenRootChainBlock,
+      rootChainBlockAtProposal: this.lastSeenRootChainBlock,
     });
+  }
+
+  async saveLastSeenRootChainBlock() {
+    const lastRelayedBlock = this.eventsRelay.blockHeight;
+    return this.db.setLastSeenRootChainBlock(lastRelayedBlock);
+  }
+
+  async getLastSeenRootChainBlock() {
+    return this.db.getLastSeenRootChainBlock() || this.genesisBlockHeight;
   }
 
   async saveState() {
