@@ -12,8 +12,6 @@ module.exports = (state, tx) => {
     throw new Error('validatorJoin tx expected');
   }
 
-  console.log(tx.options.eventsCount);
-  console.log(state.slots[tx.options.slotId]);
   if (
     state.slots[tx.options.slotId] &&
     tx.options.eventsCount !== state.slots[tx.options.slotId].eventsCount + 1
