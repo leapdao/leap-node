@@ -13,7 +13,7 @@ const { checkOutpoints, removeInputs, addOutputs } = require('./utils');
 const checks = {
   [Type.DEPOSIT]: require('./checkDeposit'),
   [Type.EPOCH_LENGTH_V1]: require('./checkEpochLength'),
-  [Type.EPOCH_LENGTH_V2]: require('./checkEpochLength'),
+  [Type.EPOCH_LENGTH_V2]: require('./checkEpochLengthV2'),
   [Type.MIN_GAS_PRICE]: require('./checkMinGasPrice'),
   [Type.EXIT]: require('./checkExit'),
   [Type.TRANSFER]: require('./checkTransfer'),
@@ -23,13 +23,12 @@ const checks = {
   [Type.PERIOD_VOTE]: require('./checkPeriodVote'),
 };
 
-module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
+module.exports = async (state, tx, bridgeState, nodeConfig) => {
   if (!checks[tx.type]) {
     throw new Error('Unsupported tx type');
   }
 
   checkOutpoints(state, tx);
-
   await checks[tx.type](state, tx, bridgeState, nodeConfig);
 
   removeInputs(state, tx);

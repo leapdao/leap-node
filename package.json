@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node index.js",
     "test": "./node_modules/.bin/jest --maxWorkers=4 --detectOpenHandles --forceExit",
-    "lint": "./node_modules/.bin/eslint src",
+    "lint": "./node_modules/.bin/eslint src lotion",
     "test:watch": "./node_modules/.bin/jest --watch --coverage=false",
     "precommit": "./node_modules/.bin/lint-staged",
     "install": "node ./lotion/bin/download.js",

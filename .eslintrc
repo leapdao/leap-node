@@ -8,7 +8,9 @@
     "no-param-reassign": ["error", { "props": false }],
     "no-restricted-syntax": 0,
     "arrow-body-style": 0,
-    "prettier/prettier": "error"
+    "prettier/prettier": "error",
+    "no-console": 0,
+    "no-bitwise": 0
   },
   "env": {
     "browser": true,
