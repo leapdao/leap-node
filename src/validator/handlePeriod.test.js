@@ -7,6 +7,9 @@ const submitPeriod = jest.requireMock('./periods/submitPeriod');
 jest.mock('./periods/startNewPeriod', () => jest.fn());
 const startNewPeriod = jest.requireMock('./periods/startNewPeriod');
 
+jest.mock('../utils/saveSubmission', () => jest.fn());
+const saveSubmission = jest.requireMock('../utils/saveSubmission');
+
 const ADDR = '0xb8205608d54cb81f44f263be086027d8610f3c94';
 
 const BLOCKS_ROOT = '0x123';
@@ -14,25 +17,11 @@ const PERIOD_ROOT = '0x512';
 
 const state = extend => ({
   lastProcessedPeriodRoot: '0x765',
-  getPeriodSubmissionFromDb: () => null,
   submissions: [],
   db: {
-    storeSubmission: jest.fn(),
+    getPeriodSubmissionFromDb: () => null,
   },
   ...extend,
-});
-
-const bridgeContractMock = ({ returnPeriod }) => ({
-  options: {
-    address: ADDR,
-  },
-  methods: {
-    periods: () => ({
-      async call() {
-        return returnPeriod;
-      },
-    }),
-  },
 });
 
 describe('handlePeriod', () => {
@@ -41,7 +30,7 @@ describe('handlePeriod', () => {
     await handlePeriod(31, bridgeState);
     expect(submitPeriod).not.toBeCalled();
     expect(startNewPeriod).not.toBeCalled();
-    expect(bridgeState.db.storeSubmission).not.toBeCalled();
+    expect(saveSubmission).not.toBeCalled();
   });
 
   test('end of the period with no period proposed', async () => {
@@ -49,7 +38,7 @@ describe('handlePeriod', () => {
     await handlePeriod(32, bridgeState);
     expect(submitPeriod).not.toBeCalled();
     expect(startNewPeriod).toBeCalled();
-    expect(bridgeState.db.storeSubmission).not.toBeCalled();
+    expect(saveSubmission).not.toBeCalled();
   });
 
   test('middle of the period with a genesis period proposed', async () => {
@@ -65,7 +54,7 @@ describe('handlePeriod', () => {
     await handlePeriod(33, bridgeState);
     expect(submitPeriod).toBeCalled();
     expect(startNewPeriod).not.toBeCalled();
-    expect(bridgeState.db.storeSubmission).not.toBeCalled();
+    expect(saveSubmission).not.toBeCalled();
   });
 
   test('middle of the period with a period proposed', async () => {
@@ -80,7 +69,7 @@ describe('handlePeriod', () => {
     await handlePeriod(65, bridgeState);
     expect(submitPeriod).toBeCalled();
     expect(startNewPeriod).not.toBeCalled();
-    expect(bridgeState.db.storeSubmission).not.toBeCalled();
+    expect(saveSubmission).not.toBeCalled();
   });
 
   test('middle of the period with a period proposed, tx for proposal in flight', async () => {
@@ -96,7 +85,7 @@ describe('handlePeriod', () => {
     await handlePeriod(65, bridgeState);
     expect(submitPeriod).not.toBeCalled();
     expect(startNewPeriod).not.toBeCalled();
-    expect(bridgeState.db.storeSubmission).not.toBeCalled();
+    expect(saveSubmission).not.toBeCalled();
   });
 
   test('submission event received, not in db yet, period is onchain', async () => {
@@ -107,15 +96,14 @@ describe('handlePeriod', () => {
       blocksRoot: BLOCKS_ROOT,
       periodRoot: PERIOD_ROOT,
     };
+    const periodProposal = {
+      height: 64,
+      blocksRoot: BLOCKS_ROOT,
+      prevPeriodRoot: '0x882233',
+    };
+
     const bridgeState = state({
-      bridgeContract: bridgeContractMock({
-        returnPeriod: { timestamp: '100' }, // period found in the bridge contract
-      }),
-      periodProposal: {
-        height: 64,
-        blocksRoot: BLOCKS_ROOT,
-        prevPeriodRoot: '0x882233',
-      },
+      periodProposal,
       submissions: {
         [BLOCKS_ROOT]: submissionEvent,
       },
@@ -123,10 +111,11 @@ describe('handlePeriod', () => {
 
     await handlePeriod(67, bridgeState);
 
-    expect(bridgeState.db.storeSubmission).toHaveBeenCalledWith(32, {
-      ...submissionEvent,
-      prevPeriodRoot: '0x882233',
-    });
+    expect(saveSubmission).toHaveBeenCalledWith(
+      periodProposal,
+      submissionEvent,
+      bridgeState.db
+    );
     expect(bridgeState.lastProcessedPeriodRoot).toEqual(PERIOD_ROOT);
     expect(bridgeState.periodProposal).toEqual(null);
   });
@@ -138,42 +127,20 @@ describe('handlePeriod', () => {
         blocksRoot: BLOCKS_ROOT,
         prevPeriodRoot: '0x882233',
       },
-      getPeriodSubmissionFromDb: blocksRoot =>
-        blocksRoot === BLOCKS_ROOT
-          ? { blocksRoot, periodRoot: PERIOD_ROOT }
-          : null,
+      db: {
+        getPeriodSubmissionFromDb: blocksRoot =>
+          blocksRoot === BLOCKS_ROOT
+            ? { blocksRoot, periodRoot: PERIOD_ROOT }
+            : null,
+      },
     });
 
     await handlePeriod(67, bridgeState);
 
     expect(submitPeriod).not.toBeCalled();
     expect(startNewPeriod).not.toBeCalled();
-    expect(bridgeState.db.storeSubmission).not.toBeCalled();
+    expect(saveSubmission).not.toBeCalled();
     expect(bridgeState.lastProcessedPeriodRoot).toEqual(PERIOD_ROOT);
     expect(bridgeState.periodProposal).toEqual(null);
-  });
-
-  test('period is expected to be onchain, but it is not', () => {
-    const bridgeState = state({
-      bridgeContract: bridgeContractMock({
-        returnPeriod: { timestamp: '0' }, // period found in the bridge contract
-      }),
-      periodProposal: {
-        height: 64,
-        blocksRoot: BLOCKS_ROOT,
-        prevPeriodRoot: '0x882233',
-      },
-      submissions: {
-        [BLOCKS_ROOT]: { periodRoot: PERIOD_ROOT },
-      },
-    });
-
-    expect(submitPeriod).not.toBeCalled();
-    expect(startNewPeriod).not.toBeCalled();
-    expect(bridgeState.db.storeSubmission).not.toBeCalled();
-
-    return expect(handlePeriod(67, bridgeState)).rejects.toEqual(
-      new Error(`No period found onchain for root ${PERIOD_ROOT}`)
-    );
   });
 });

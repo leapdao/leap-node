@@ -11,7 +11,8 @@ const { Period, Block, Outpoint } = require('leap-core');
 const ContractsEventsSubscription = require('./utils/ContractsEventsSubscription');
 const { handleEvents } = require('./utils');
 const { GENESIS } = require('./utils/constants');
-const { logBridge, logNode, logVerbose, logPeriod } = require('./utils/debug');
+const { logBridge, logNode, logVerbose } = require('./utils/debug');
+const saveSubmission = require('./utils/saveSubmission');
 
 const bridgeABI = require('./abis/bridgeAbi');
 const exitABI = require('./abis/exitHandler');
@@ -185,12 +186,12 @@ module.exports = class BridgeState {
           this.stalePeriodProposal.blocksRoot === event.blocksRoot
         ) {
           this.periodProposal.prevPeriodRoot = event.periodRoot;
-          await this.saveSubmission(this.stalePeriodProposal, submission);
+          await saveSubmission(this.stalePeriodProposal, submission, this.db);
         } else if (
           this.periodProposal &&
           this.periodProposal.blocksRoot === event.blocksRoot
         ) {
-          await this.saveSubmission(this.periodProposal, submission);
+          await saveSubmission(this.periodProposal, submission, this.db);
         } else {
           this.submissions[event.blocksRoot] = submission;
         }
@@ -302,18 +303,6 @@ module.exports = class BridgeState {
     for (const event of events) {
       this.eventsRelay.relayBuffer.push(event);
     }
-  }
-
-  async getPeriodSubmissionFromDb(blocksRoot) {
-    return this.db.getPeriodDataByBlocksRoot(blocksRoot);
-  }
-
-  async saveSubmission(periodProposal, submission) {
-    submission.prevPeriodRoot = periodProposal.prevPeriodRoot;
-    logPeriod('[submitPeriod] Saving period data into db:', submission);
-    const blockHeight = periodProposal.height - 1;
-    const [periodStartHeight] = Period.periodBlockRange(blockHeight);
-    await this.db.storeSubmission(periodStartHeight, submission);
   }
 
   async saveNodeState() {

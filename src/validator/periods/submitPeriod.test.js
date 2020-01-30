@@ -55,8 +55,8 @@ const bridgeStateMock = attrs => ({
   submissions: [],
   db: {
     storeSubmission: jest.fn(),
+    getPeriodSubmissionFromDb: () => null,
   },
-  getPeriodSubmissionFromDb: () => null,
   ...attrs,
 });
 
@@ -77,8 +77,11 @@ describe('submitPeriod', () => {
 
   test('period is onchain', async () => {
     const bridgeState = bridgeStateMock({
-      getPeriodSubmissionFromDb: blocksRoot =>
-        blocksRoot === BLOCKS_ROOT ? { blocksRoot } : null,
+      db: {
+        storeSubmission: jest.fn(),
+        getPeriodSubmissionFromDb: blocksRoot =>
+          blocksRoot === BLOCKS_ROOT ? { blocksRoot } : null,
+      },
     });
 
     const { receiptPromise } = await submitPeriod(

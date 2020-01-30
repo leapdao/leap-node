@@ -27,6 +27,9 @@ const state = extend => ({
   },
   lastProcessedPeriodRoot: '0x456',
   saveNodeState: jest.fn(),
+  db: {
+    setStalePeriodProposal: jest.fn(),
+  },
   ...extend,
 });
 
@@ -73,6 +76,7 @@ describe('startNewPeriod', () => {
     });
     expect(getCurrentSlotId).toBeCalledWith(bridgeState.currentState.slots, 64);
     expect(bridgeState.saveNodeState).toBeCalled();
+    expect(bridgeState.db.setStalePeriodProposal).toBeCalled();
     expect(bridgeState.stalePeriodProposal).toEqual(previousProposal);
     expect(submitPeriodVote).toBeCalledWith(
       '0x123',

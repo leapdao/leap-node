@@ -382,17 +382,17 @@ describe('db', () => {
 
     expect(levelMock.put).toHaveBeenCalledWith(
       'stalePeriodProposal',
-      '{ prop: 1}'
+      JSON.stringify({ prop: 1 })
     );
   });
 
   test('#getStalePeriodProposal', async () => {
-    levelMock.get = jest.fn().mockResolvedValue('{ prop: 1}');
+    levelMock.get = jest.fn().mockResolvedValue(JSON.stringify({ prop: 1 }));
     const db = createDb(levelMock);
 
     const value = await db.getStalePeriodProposal();
 
-    expect(levelMock.get).toHaveBeenCalledWith('getStalePeriodProposal');
+    expect(levelMock.get).toHaveBeenCalledWith('stalePeriodProposal');
     expect(value).toEqual({ prop: 1 });
   });
 });

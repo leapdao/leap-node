@@ -24,7 +24,7 @@ module.exports = async (periodProposal, bridgeState, opts = {}) => {
     prevPeriodRoot
   );
 
-  if (await bridgeState.getPeriodSubmissionFromDb(blocksRoot)) {
+  if (await bridgeState.db.getPeriodSubmissionFromDb(blocksRoot)) {
     logPeriod('[submitPeriod] already seen onchain', blocksRoot);
 
     return { receiptPromise: Promise.resolve({ status: true }) };

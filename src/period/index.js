@@ -38,15 +38,15 @@ module.exports = bridgeState => async (rsp, state, chainInfo) => {
 
   const { txHash } = periodProposal;
 
-  if (await bridgeState.getPeriodSubmissionFromDb(periodProposal.blocksRoot)) {
+  if (
+    await bridgeState.db.getPeriodSubmissionFromDb(periodProposal.blocksRoot)
+  ) {
     logPeriod('[checkBridge] Found successful submission tx');
     bridgeState.stalePeriodProposal = null;
     bridgeState.db.setStalePeriodProposal(null);
     rsp.status = 1;
     return;
   }
-
-  console.log('YO', bridgeState.checkCallsCount);
 
   if (bridgeState.checkCallsCount > 1 && bridgeState.checkCallsCount < 10) {
     logPeriod(

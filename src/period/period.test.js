@@ -33,7 +33,10 @@ const bridgeStateMock = periodProposal => ({
   },
   checkCallsCount: 0,
   stalePeriodProposal: periodProposal,
-  getPeriodSubmissionFromDb: () => null,
+  db: {
+    setStalePeriodProposal: jest.fn(),
+    getPeriodSubmissionFromDb: () => null,
+  },
 });
 
 describe('Period handler', () => {
@@ -65,12 +68,16 @@ describe('Period handler', () => {
     const periodProposal = proposal();
     const bridgeState = {
       ...bridgeStateMock(periodProposal),
-      getPeriodSubmissionFromDb: blocksRoot =>
-        blocksRoot === '0x000010' ? { blocksRoot } : null,
+      db: {
+        setStalePeriodProposal: jest.fn(),
+        getPeriodSubmissionFromDb: blocksRoot =>
+          blocksRoot === '0x000010' ? { blocksRoot } : null,
+      },
     };
 
     await periodHandler(bridgeState)(rsp, state, { height: 64 });
     expect(rsp.status).toBe(1);
+    expect(bridgeState.db.setStalePeriodProposal).toBeCalledWith(null);
     expect(bridgeState.stalePeriodProposal).toEqual(null);
   });
 
@@ -104,9 +111,12 @@ describe('Period handler', () => {
       await periodHandler(bridgeState)(rsp, state, { height: 64 });
 
       expect(periodProposal.proposerSlotId).toEqual(1);
+      expect(bridgeState.db.setStalePeriodProposal).toBeCalledWith(
+        periodProposal
+      );
       expect(submitPeriod).toBeCalledWith(periodProposal, bridgeState, {});
 
-      expect(rsp.status).toBe(1);
+      expect(rsp.status).toBe(0);
     });
 
     test('submission success after switching over the slot', async () => {
@@ -119,9 +129,12 @@ describe('Period handler', () => {
       await periodHandler(bridgeState)(rsp, state, { height: 64 });
 
       expect(periodProposal.proposerSlotId).toEqual(1);
+      expect(bridgeState.db.setStalePeriodProposal).toBeCalledWith(
+        periodProposal
+      );
       expect(submitPeriod).toBeCalledWith(periodProposal, bridgeState, {});
 
-      expect(rsp.status).toBe(1);
+      expect(rsp.status).toBe(0);
       expect(bridgeState.checkCallsCount).toEqual(1);
     });
 
@@ -131,6 +144,9 @@ describe('Period handler', () => {
       await periodHandler(bridgeState)(rsp, state, { height: 64 });
 
       expect(periodProposal.proposerSlotId).toEqual(1);
+      expect(bridgeState.db.setStalePeriodProposal).toBeCalledWith(
+        periodProposal
+      );
       expect(submitPeriod).toBeCalledWith(periodProposal, bridgeState, {});
 
       expect(rsp.status).toBe(0);
@@ -142,6 +158,9 @@ describe('Period handler', () => {
       await periodHandler(bridgeState)(rsp, state, { height: 64 });
 
       expect(periodProposal.proposerSlotId).toEqual(1);
+      expect(bridgeState.db.setStalePeriodProposal).toBeCalledWith(
+        periodProposal
+      );
       expect(submitPeriod).toBeCalledWith(periodProposal, bridgeState, {});
 
       expect(rsp.status).toBe(0);
@@ -174,7 +193,7 @@ describe('Period handler', () => {
         { nonce: 3 } // same nonce
       );
 
-      expect(rsp.status).toBe(1);
+      expect(rsp.status).toBe(0);
     });
 
     test('resubmission failure', async () => {
@@ -234,7 +253,7 @@ describe('Period handler', () => {
 
       expect(submitPeriod).toBeCalledWith(periodProposal, bridgeState, {});
 
-      expect(rsp.status).toBe(1);
+      expect(rsp.status).toBe(0);
     });
 
     test('resubmission failure', async () => {

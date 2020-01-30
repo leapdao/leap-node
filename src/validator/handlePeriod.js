@@ -1,5 +1,6 @@
 const startNewPeriod = require('./periods/startNewPeriod');
 const submitPeriod = require('./periods/submitPeriod');
+const saveSubmission = require('../utils/saveSubmission');
 
 module.exports = async (height, bridgeState) => {
   if (height % 32 === 0) {
@@ -11,13 +12,13 @@ module.exports = async (height, bridgeState) => {
   if (!periodProposal) return;
 
   const submission = bridgeState.submissions[periodProposal.blocksRoot];
-  const submissionInDatabase = await bridgeState.getPeriodSubmissionFromDb(
+  const submissionInDatabase = await bridgeState.db.getPeriodSubmissionFromDb(
     periodProposal.blocksRoot
   );
 
   if (submission || submissionInDatabase) {
     if (!submissionInDatabase) {
-      await bridgeState.saveSubmission(periodProposal, submission);
+      await saveSubmission(periodProposal, submission, bridgeState.db);
     }
     const { blocksRoot, periodRoot } = submission || submissionInDatabase;
     delete bridgeState.submissions[blocksRoot];

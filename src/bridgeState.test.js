@@ -94,6 +94,7 @@ describe('BridgeState', () => {
           return null;
         },
         getNodeState: async () => {},
+        getStalePeriodProposal: async () => {},
       },
       {}
     );
@@ -123,6 +124,7 @@ describe('BridgeState', () => {
           return null;
         },
         getNodeState: async () => {},
+        getStalePeriodProposal: async () => {},
       },
       {
         privKey:
@@ -201,6 +203,7 @@ describe('BridgeState', () => {
           return null;
         },
         getNodeState: async () => {},
+        getStalePeriodProposal: async () => {},
       },
       {}
     );
@@ -257,6 +260,7 @@ describe('BridgeState', () => {
           return null;
         },
         getNodeState: async () => {},
+        getStalePeriodProposal: async () => {},
       },
       {}
     );
