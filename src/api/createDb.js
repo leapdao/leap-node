@@ -156,6 +156,11 @@ const createDb = levelDb => {
   const setLastSeenRootChainBlock = (blockHeight = 0) =>
     levelDb.put('lastSeenRootChainBlock', blockHeight);
 
+  const setStalePeriodProposal = periodProposal =>
+    levelDb.put('stalePeriodProposal', JSON.stringify(periodProposal));
+
+  const getStalePeriodProposal = () => getNullable('stalePeriodProposal');
+
   return {
     getLastBlockSynced,
     storeBlock,
@@ -171,6 +176,8 @@ const createDb = levelDb => {
     getLastSeenRootChainBlock,
     setLastSeenRootChainBlock,
     getPeriodDataByBlocksRoot,
+    setStalePeriodProposal,
+    getStalePeriodProposal,
   };
 };
 

@@ -8,6 +8,7 @@ const createNewProposal = async (height, bridgeState) => {
     // by setting stalePeriodProposal here we are enabling checkBridge to
     // stop consensus until stale period proposal is processed
     bridgeState.stalePeriodProposal = bridgeState.periodProposal;
+    bridgeState.db.setStalePeriodProposal(bridgeState.stalePeriodProposal);
     logPeriod(
       "WARNING: period proposal already exists. Probably it wasn't submitted yet"
     );

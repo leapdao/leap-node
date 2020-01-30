@@ -374,4 +374,25 @@ describe('db', () => {
       expect(value).toEqual(4);
     });
   });
+
+  test('#setStalePeriodProposal', async () => {
+    const db = createDb(levelMock);
+
+    await db.setStalePeriodProposal({ prop: 1 });
+
+    expect(levelMock.put).toHaveBeenCalledWith(
+      'stalePeriodProposal',
+      '{ prop: 1}'
+    );
+  });
+
+  test('#getStalePeriodProposal', async () => {
+    levelMock.get = jest.fn().mockResolvedValue('{ prop: 1}');
+    const db = createDb(levelMock);
+
+    const value = await db.getStalePeriodProposal();
+
+    expect(levelMock.get).toHaveBeenCalledWith('getStalePeriodProposal');
+    expect(value).toEqual({ prop: 1 });
+  });
 });

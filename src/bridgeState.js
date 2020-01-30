@@ -11,7 +11,7 @@ const { Period, Block, Outpoint } = require('leap-core');
 const ContractsEventsSubscription = require('./utils/ContractsEventsSubscription');
 const { handleEvents } = require('./utils');
 const { GENESIS } = require('./utils/constants');
-const { logBridge, logNode, logVerbose } = require('./utils/debug');
+const { logBridge, logNode, logVerbose, logPeriod } = require('./utils/debug');
 
 const bridgeABI = require('./abis/bridgeAbi');
 const exitABI = require('./abis/exitHandler');
@@ -163,7 +163,7 @@ module.exports = class BridgeState {
         logBridge(`MinGasPrice. minGasPrice: ${event.minGasPrice}`);
         this.minGasPrices.push(Number(event.minGasPrice));
       },
-      Submission: ({ returnValues: event }) => {
+      Submission: async ({ returnValues: event }) => {
         logBridge(
           `Submission. blocksRoot: ${event.blocksRoot} periodRoot: ${event.periodRoot}` +
             ` slotId: ${event.slotId} validator: ${event.owner} casBitmap: ${event.casBitmap}`
@@ -171,20 +171,29 @@ module.exports = class BridgeState {
         this.lastBlocksRoot = event.blocksRoot;
         this.lastPeriodRoot = event.periodRoot;
 
-        if (
-          this.stalePeriodProposal &&
-          this.stalePeriodProposal.blocksRoot === event.blocksRoot
-        ) {
-          (this.periodProposal || {}).prevPeriodRoot = event.periodRoot;
-        }
-
-        this.submissions[event.blocksRoot] = {
+        const submission = {
           casBitmap: event.casBitmap,
           slotId: event.slotId,
           validatorAddress: event.owner,
           blocksRoot: event.blocksRoot,
           periodRoot: event.periodRoot,
         };
+
+        if (
+          this.periodProposal &&
+          this.stalePeriodProposal &&
+          this.stalePeriodProposal.blocksRoot === event.blocksRoot
+        ) {
+          this.periodProposal.prevPeriodRoot = event.periodRoot;
+          await this.saveSubmission(this.stalePeriodProposal, submission);
+        } else if (
+          this.periodProposal &&
+          this.periodProposal.blocksRoot === event.blocksRoot
+        ) {
+          await this.saveSubmission(this.periodProposal, submission);
+        } else {
+          this.submissions[event.blocksRoot] = submission;
+        }
       },
     });
 
@@ -217,7 +226,7 @@ module.exports = class BridgeState {
     const nodeState = (await this.db.getNodeState()) || {};
     logVerbose(`Restored node state`, nodeState);
     this.periodProposal = nodeState.periodProposal || null;
-    this.stalePeriodProposal = nodeState.stalePeriodProposal || null;
+    this.stalePeriodProposal = await this.db.getStalePeriodProposal();
     this.lastSeenRootChainBlock =
       nodeState.rootChainBlockAtProposal || this.genesisBlockHeight;
     this.blockHeight = nodeState.blockHeight;
@@ -299,10 +308,17 @@ module.exports = class BridgeState {
     return this.db.getPeriodDataByBlocksRoot(blocksRoot);
   }
 
+  async saveSubmission(periodProposal, submission) {
+    submission.prevPeriodRoot = periodProposal.prevPeriodRoot;
+    logPeriod('[submitPeriod] Saving period data into db:', submission);
+    const blockHeight = periodProposal.height - 1;
+    const [periodStartHeight] = Period.periodBlockRange(blockHeight);
+    await this.db.storeSubmission(periodStartHeight, submission);
+  }
+
   async saveNodeState() {
     return this.db.storeNodeState({
       periodProposal: this.periodProposal,
-      stalePeriodProposal: this.stalePeriodProposal,
       rootChainBlockAtProposal: this.lastSeenRootChainBlock,
       lastSeenBlocksRoot: this.lastBlocksRoot,
       blockHeight: this.currentState.blockHeight,

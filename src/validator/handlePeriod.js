@@ -1,5 +1,3 @@
-const { Period } = require('leap-core');
-const { logPeriod, logVerbose } = require('../utils/debug');
 const startNewPeriod = require('./periods/startNewPeriod');
 const submitPeriod = require('./periods/submitPeriod');
 
@@ -17,35 +15,13 @@ module.exports = async (height, bridgeState) => {
     periodProposal.blocksRoot
   );
 
-  if (submission && !submissionInDatabase) {
-    submission.prevPeriodRoot = periodProposal.prevPeriodRoot;
-    const { blocksRoot, periodRoot } = submission;
-
-    // check if the period is already onchain
-    const submittedPeriod = await bridgeState.bridgeContract.methods
-      .periods(periodRoot)
-      .call();
-
-    if (submittedPeriod.timestamp === '0') {
-      throw new Error(`No period found onchain for root ${periodRoot}`);
+  if (submission || submissionInDatabase) {
+    if (!submissionInDatabase) {
+      await bridgeState.saveSubmission(periodProposal, submission);
     }
-    logPeriod('[submitPeriod] period found onchain', periodRoot);
-
-    logPeriod('[submitPeriod] Saving period data into db:', submission);
-    const blockHeight = periodProposal.height - 1;
-    const [periodStartHeight] = Period.periodBlockRange(blockHeight);
-    await bridgeState.db.storeSubmission(periodStartHeight, submission);
-
+    const { blocksRoot, periodRoot } = submission || submissionInDatabase;
     delete bridgeState.submissions[blocksRoot];
     bridgeState.lastProcessedPeriodRoot = periodRoot;
-    bridgeState.periodProposal = null;
-  }
-
-  if (submissionInDatabase) {
-    logVerbose(
-      `Proposed period was seen onchain already: ${periodProposal.blocksRoot}`
-    );
-    bridgeState.lastProcessedPeriodRoot = submissionInDatabase.periodRoot;
     bridgeState.periodProposal = null;
   } else if (!periodProposal.txHash) {
     await submitPeriod(periodProposal, bridgeState);
