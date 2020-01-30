@@ -19,7 +19,7 @@ const state = extend => ({
   lastProcessedPeriodRoot: '0x765',
   submissions: [],
   db: {
-    getPeriodSubmissionFromDb: () => null,
+    getPeriodDataByBlocksRoot: () => null,
   },
   ...extend,
 });
@@ -128,7 +128,7 @@ describe('handlePeriod', () => {
         prevPeriodRoot: '0x882233',
       },
       db: {
-        getPeriodSubmissionFromDb: blocksRoot =>
+        getPeriodDataByBlocksRoot: blocksRoot =>
           blocksRoot === BLOCKS_ROOT
             ? { blocksRoot, periodRoot: PERIOD_ROOT }
             : null,

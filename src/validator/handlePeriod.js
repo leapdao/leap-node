@@ -12,7 +12,7 @@ module.exports = async (height, bridgeState) => {
   if (!periodProposal) return;
 
   const submission = bridgeState.submissions[periodProposal.blocksRoot];
-  const submissionInDatabase = await bridgeState.db.getPeriodSubmissionFromDb(
+  const submissionInDatabase = await bridgeState.db.getPeriodDataByBlocksRoot(
     periodProposal.blocksRoot
   );
 

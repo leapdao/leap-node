@@ -55,7 +55,7 @@ const bridgeStateMock = attrs => ({
   submissions: [],
   db: {
     storeSubmission: jest.fn(),
-    getPeriodSubmissionFromDb: () => null,
+    getPeriodDataByBlocksRoot: () => null,
   },
   ...attrs,
 });
@@ -79,7 +79,7 @@ describe('submitPeriod', () => {
     const bridgeState = bridgeStateMock({
       db: {
         storeSubmission: jest.fn(),
-        getPeriodSubmissionFromDb: blocksRoot =>
+        getPeriodDataByBlocksRoot: blocksRoot =>
           blocksRoot === BLOCKS_ROOT ? { blocksRoot } : null,
       },
     });

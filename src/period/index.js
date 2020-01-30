@@ -39,7 +39,7 @@ module.exports = bridgeState => async (rsp, state, chainInfo) => {
   const { txHash } = periodProposal;
 
   if (
-    await bridgeState.db.getPeriodSubmissionFromDb(periodProposal.blocksRoot)
+    await bridgeState.db.getPeriodDataByBlocksRoot(periodProposal.blocksRoot)
   ) {
     logPeriod('[checkBridge] Found successful submission tx');
     bridgeState.stalePeriodProposal = null;

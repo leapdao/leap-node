@@ -35,7 +35,7 @@ const bridgeStateMock = periodProposal => ({
   stalePeriodProposal: periodProposal,
   db: {
     setStalePeriodProposal: jest.fn(),
-    getPeriodSubmissionFromDb: () => null,
+    getPeriodDataByBlocksRoot: () => null,
   },
 });
 
@@ -70,7 +70,7 @@ describe('Period handler', () => {
       ...bridgeStateMock(periodProposal),
       db: {
         setStalePeriodProposal: jest.fn(),
-        getPeriodSubmissionFromDb: blocksRoot =>
+        getPeriodDataByBlocksRoot: blocksRoot =>
           blocksRoot === '0x000010' ? { blocksRoot } : null,
       },
     };
