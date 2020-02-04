@@ -4,25 +4,19 @@ const checkDeposit = require('./checkDeposit');
 const ADDR_1 = '0x4436373705394267350db2c06613990d34621d69';
 const ADDR_2 = '0x8ab21c65041778dfc7ec7995f9cdef3d5221a5ad';
 
-const makeDepositMock = (depositor, amount, color) => {
+const makeDepositMock = (depositor = ADDR_1, amount = '500', color = 0) => {
   return {
-    deposits: new Proxy(
-      {},
-      {
-        get: () => ({ depositor, amount, color }),
-      }
-    ),
+    deposits: {
+      1: { depositor, amount, color },
+    },
   };
 };
 
 const getInitialState = () => ({
-  processedDeposit: 0,
   gas: {
     minPrice: 0,
   },
 });
-
-const defaultDepositMock = makeDepositMock(ADDR_1, '500', 0);
 
 describe('checkDeposit', () => {
   test('wrong type', () => {
@@ -33,15 +27,13 @@ describe('checkDeposit', () => {
   test('valid tx', () => {
     const state = getInitialState();
     const tx = Tx.deposit(1, 500, ADDR_1, 0);
-    checkDeposit(state, tx, defaultDepositMock);
-    expect(state.processedDeposit).toBe(1);
+    checkDeposit(state, tx, makeDepositMock());
   });
 
   test('valid tx (non-default color)', () => {
     const state = getInitialState();
     const tx = Tx.deposit(1, 500, ADDR_1, 1);
-    checkDeposit(state, tx, makeDepositMock(ADDR_1, '500', '1'));
-    expect(state.processedDeposit).toBe(1);
+    checkDeposit(state, tx, makeDepositMock(ADDR_1, '500', 1));
   });
 
   test('valid tx (nft)', () => {
@@ -50,24 +42,23 @@ describe('checkDeposit', () => {
     const value = '293875120984651807345';
     const tx = Tx.deposit(1, value, ADDR_1, color);
     checkDeposit(state, tx, makeDepositMock(ADDR_1, value, String(color)));
-    expect(state.processedDeposit).toBe(1);
   });
 
-  test('non-existent', () => {
+  test('no deposits', () => {
     const state = getInitialState();
     const tx = Tx.deposit(1, 500, ADDR_1, 0);
 
     expect(() => {
       checkDeposit(state, tx, { deposits: {} });
-    }).toThrow('Trying to submit incorrect deposit');
+    }).toThrow('Unexpected deposit: no Deposit event on the root chain');
   });
 
-  test('skipping depositId', () => {
+  test('not on root chain', () => {
     const state = getInitialState();
     const tx = Tx.deposit(2, 500, ADDR_1, 0);
     expect(() => {
-      checkDeposit(state, tx, defaultDepositMock);
-    }).toThrow('Deposit ID skipping ahead. want 1, found 2');
+      checkDeposit(state, tx, makeDepositMock());
+    }).toThrow('Unexpected deposit: no Deposit event on the root chain');
   });
 
   test('wrong owner', () => {
@@ -75,7 +66,11 @@ describe('checkDeposit', () => {
     const tx = Tx.deposit(1, 500, ADDR_1, 0);
     expect(() => {
       checkDeposit(state, tx, makeDepositMock(ADDR_2, '500', 0));
-    }).toThrow('Trying to submit incorrect deposit');
+    }).toThrow(
+      'Incorrect deposit tx. DepositId: 1 ' +
+        'Expected: 0:500:0x8ab21c65041778dfc7ec7995f9cdef3d5221a5ad:undefined ' +
+        'Actual: 0:500:0x4436373705394267350db2c06613990d34621d69:undefined'
+    );
   });
 
   test('wrong value', () => {
@@ -83,42 +78,61 @@ describe('checkDeposit', () => {
     const tx = Tx.deposit(1, 500, ADDR_1, 0);
     expect(() => {
       checkDeposit(state, tx, makeDepositMock(ADDR_1, '600', 0));
-    }).toThrow('Trying to submit incorrect deposit');
+    }).toThrow(
+      'Incorrect deposit tx. DepositId: 1 ' +
+        'Expected: 0:600:0x4436373705394267350db2c06613990d34621d69:undefined ' +
+        'Actual: 0:500:0x4436373705394267350db2c06613990d34621d69:undefined'
+    );
+  });
+
+  test('ERC20 deposit < 1', () => {
+    const state = getInitialState();
+    const tx = Tx.deposit(1, 2, ADDR_1, 0);
+    tx.outputs[0].value = '0';
+    expect(() => {
+      checkDeposit(state, tx, makeDepositMock(ADDR_1, '0', 0));
+    }).toThrow('Deposit out has value < 1');
+  });
+
+  test('ERC721 deposit < 1', () => {
+    const state = getInitialState();
+    const tx = Tx.deposit(1, 0, ADDR_1, 35000);
+    checkDeposit(state, tx, makeDepositMock(ADDR_1, '0', 35000));
   });
 
   test('wrong color', () => {
     const state = getInitialState();
     const tx = Tx.deposit(1, 500, ADDR_1, 0);
     expect(() => {
-      checkDeposit(state, tx, makeDepositMock(ADDR_1, '600', 1));
-    }).toThrow('Trying to submit incorrect deposit');
+      checkDeposit(state, tx, makeDepositMock(ADDR_1, '500', 1));
+    }).toThrow(
+      'Incorrect deposit tx. DepositId: 1 ' +
+        'Expected: 1:500:0x4436373705394267350db2c06613990d34621d69:undefined ' +
+        'Actual: 0:500:0x4436373705394267350db2c06613990d34621d69:undefined'
+    );
   });
 
   test('prevent double deposit', () => {
     const state = getInitialState();
     const tx = Tx.deposit(1, 500, ADDR_1, 0);
-    checkDeposit(state, tx, defaultDepositMock);
+    const bridgeState = makeDepositMock();
+    checkDeposit(state, tx, bridgeState, null, false);
     expect(() => {
-      checkDeposit(state, tx, defaultDepositMock);
+      checkDeposit(state, tx, bridgeState, null, false);
     }).toThrow('Deposit ID already used.');
   });
 
-  test('prevent double deposit (spent)', () => {
-    const state = getInitialState();
-    const deposit = Tx.deposit(1, 500, ADDR_1, 0);
-    checkDeposit(state, deposit, defaultDepositMock);
-
-    expect(() => {
-      checkDeposit(state, deposit, defaultDepositMock);
-    }).toThrow('Deposit ID already used.');
-  });
-
-  test('duplicate tx', () => {
+  test('CheckTx can be called multiple times', () => {
     const state = getInitialState();
     const tx = Tx.deposit(1, 500, ADDR_1, 0);
-    checkDeposit(state, tx, defaultDepositMock);
+    const bridgeState = makeDepositMock();
+    checkDeposit(state, tx, bridgeState, null, true);
+    expect(bridgeState.deposits[1].included).toEqual(undefined);
+    checkDeposit(state, tx, bridgeState, null, true);
+    checkDeposit(state, tx, bridgeState, null, false);
+    expect(bridgeState.deposits[1].included).toEqual(true);
     expect(() => {
-      checkDeposit(state, tx, defaultDepositMock);
+      checkDeposit(state, tx, bridgeState, null, false);
     }).toThrow('Deposit ID already used.');
   });
 });
