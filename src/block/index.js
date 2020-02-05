@@ -6,7 +6,7 @@ const updateEpoch = require('./updateEpoch');
 const handleSlotActivation = require('../validator/handleSlotActivation');
 const handlePeriod = require('../validator/handlePeriod');
 
-module.exports = (bridgeState, db, nodeConfig = {}, isCheck) => async (
+module.exports = (bridgeState, db, nodeConfig = {}) => async (
   state,
   chainInfo
 ) => {
