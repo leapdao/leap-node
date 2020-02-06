@@ -23,6 +23,7 @@ const BLOCKS_ROOT =
 const periodProposal = extend => ({
   blocksRoot: BLOCKS_ROOT,
   proposerSlotId: 0,
+  height: 64,
   prevPeriodRoot: '0x5678',
   votes: [0, 1],
   ...extend,
@@ -51,20 +52,12 @@ const bridgeStateMock = attrs => ({
     slots: [{ id: 0, signerAddr: ADDR }, { id: 1, signerAddr: ADDR_1 }],
   },
   operatorContract: operatorContractMock(),
+  submissions: [],
+  db: {
+    storeSubmission: jest.fn(),
+    getPeriodDataByBlocksRoot: () => null,
+  },
   ...attrs,
-});
-
-const bridgeContractMock = ({ returnPeriod }) => ({
-  options: {
-    address: ADDR,
-  },
-  methods: {
-    periods: () => ({
-      async call() {
-        return returnPeriod;
-      },
-    }),
-  },
 });
 
 describe('submitPeriod', () => {
@@ -84,14 +77,13 @@ describe('submitPeriod', () => {
 
   test('period is onchain', async () => {
     const bridgeState = bridgeStateMock({
-      bridgeContract: bridgeContractMock({
-        returnPeriod: { timestamp: '100' }, // period found in the bridge contract
-      }),
-      lastBlocksRoot: BLOCKS_ROOT,
+      db: {
+        storeSubmission: jest.fn(),
+        getPeriodDataByBlocksRoot: blocksRoot =>
+          blocksRoot === BLOCKS_ROOT ? { blocksRoot } : null,
+      },
     });
 
-    // submitted period has merkle root == lastBlocksRoot
-    // lastBlocksRoot is being read from Submission event
     const { receiptPromise } = await submitPeriod(
       periodProposal(),
       bridgeState
@@ -99,22 +91,6 @@ describe('submitPeriod', () => {
 
     expect(receiptPromise).resolves.toEqual({ status: true });
     expect(submitPeriodVote).not.toBeCalled();
-    expect(utils.sendTransaction).not.toBeCalled();
-  });
-
-  test('period is expected to be onchain, but it is not', async () => {
-    const bridgeState = bridgeStateMock({
-      bridgeContract: bridgeContractMock({
-        returnPeriod: { timestamp: '0' }, // period found in the bridge contract
-      }),
-      lastBlocksRoot: BLOCKS_ROOT,
-    });
-
-    // lastBlocksRoot is the same as in submitted period,
-    // but for some reason there is no such period on chain (internal error in leap-node?)
-    expect(submitPeriod(periodProposal(), bridgeState)).rejects.toEqual(
-      new Error('No period found onchain for bridgeState.lastBlocksRoot')
-    );
     expect(utils.sendTransaction).not.toBeCalled();
   });
 

@@ -4306,10 +4306,10 @@ lcid@^2.0.0:
   dependencies:
     invert-kv "^2.0.0"
 
-leap-core@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/leap-core/-/leap-core-1.0.0.tgz#105fe20c3ec2c23c9ba1dbd7c4b0d205a7fc095e"
-  integrity sha512-edkyGVlBUfpvd3OHLUEGbCJQeWLGR2EAZNsQfXiCzTz2M8wwrk10aqCb3fBNhVTawH3idqlqewJyng5rY1dmYg==
+leap-core@^2.0.0-preview.1:
+  version "2.0.0-preview.1"
+  resolved "https://registry.yarnpkg.com/leap-core/-/leap-core-2.0.0-preview.1.tgz#e1ff86aef7513915ab47cdd0fe9b9bd4b9b8ed80"
+  integrity sha512-Lzq6/Xff5eoHps1MqyRhxMdDIcCj3VLOYqEo0t3eMzequZ45sl4f55gOiHcdrO9AwPJiZKJqUUVPcRIXAHOAcw==
   dependencies:
     "@types/web3" "^1.0.18"
     ethereumjs-util "6.0.0"

@@ -13,7 +13,7 @@
  * - `votes` is a number of votes for a given period,
  * - `needed` is a minimum number of votes needed for consensus
  */
-module.exports = (blocksRoot, periodProposal, slots = []) => {
+module.exports = (blocksRoot, periodProposal, slots) => {
   const activeSlots = slots.filter(s => s);
   const votes =
     periodProposal && periodProposal.blocksRoot === blocksRoot
