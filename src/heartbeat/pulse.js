@@ -6,7 +6,7 @@ module.exports = async (bridgeState, { send }) => {
   const [nft] = await getUnspent(
     bridgeState,
     bridgeState.account.address,
-    bridgeState.config.heartbeatColor
+    bridgeState.config.heartbeat.color
   );
 
   if (nft) {
@@ -16,7 +16,7 @@ module.exports = async (bridgeState, { send }) => {
         new Output(
           nft.output.value,
           bridgeState.account.address,
-          bridgeState.config.heartbeatColor
+          bridgeState.config.heartbeat.color
         ),
       ]
     );
