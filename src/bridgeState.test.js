@@ -94,6 +94,7 @@ describe('BridgeState', () => {
           return null;
         },
         getNodeState: async () => {},
+        getStalePeriodProposal: async () => {},
       },
       {}
     );
@@ -123,6 +124,7 @@ describe('BridgeState', () => {
           return null;
         },
         getNodeState: async () => {},
+        getStalePeriodProposal: async () => {},
       },
       {
         privKey:
@@ -135,7 +137,7 @@ describe('BridgeState', () => {
     );
   });
 
-  test('BridgeState.{loadState, saveState}', async () => {
+  test('BridgeState.{loadConsensusState, saveConsensusState}', async () => {
     let methodCalled = '';
     let storedObj = null;
 
@@ -163,18 +165,18 @@ describe('BridgeState', () => {
 
     const db = createDb(level);
     const bridgeState = new BridgeState(db, null, {});
-    const initialState = await bridgeState.loadState();
+    const initialState = await bridgeState.loadConsensusState();
     expect(methodCalled === 'getchainState').toBe(true);
 
-    expect(await bridgeState.loadState()).toEqual(initialState);
+    expect(await bridgeState.loadConsensusState()).toEqual(initialState);
     expect(methodCalled === 'getchainState').toBe(true);
 
     const newState = bridgeState.currentState;
     newState.blockHeight = 1;
-    bridgeState.saveState(newState);
+    bridgeState.saveConsensusState(newState);
     expect(methodCalled === 'setchainState').toBe(true);
 
-    expect(await bridgeState.loadState()).toEqual(newState);
+    expect(await bridgeState.loadConsensusState()).toEqual(newState);
     expect(methodCalled === 'getchainState').toBe(true);
   });
 
@@ -201,6 +203,7 @@ describe('BridgeState', () => {
           return null;
         },
         getNodeState: async () => {},
+        getStalePeriodProposal: async () => {},
       },
       {}
     );
@@ -257,6 +260,7 @@ describe('BridgeState', () => {
           return null;
         },
         getNodeState: async () => {},
+        getStalePeriodProposal: async () => {},
       },
       {}
     );

@@ -11,7 +11,8 @@ const { Period, Block, Outpoint } = require('leap-core');
 const ContractsEventsSubscription = require('./utils/ContractsEventsSubscription');
 const { handleEvents } = require('./utils');
 const { GENESIS } = require('./utils/constants');
-const { logBridge, logNode } = require('./utils/debug');
+const { logBridge, logNode, logVerbose } = require('./utils/debug');
+const saveSubmission = require('./utils/saveSubmission');
 
 const bridgeABI = require('./abis/bridgeAbi');
 const exitABI = require('./abis/exitHandler');
@@ -79,11 +80,12 @@ module.exports = class BridgeState {
     this.logsCache = {};
     this.exitingUtxos = {};
 
-    this.currentPeriod = new Period(GENESIS);
+    this.currentPeriod = null;
     this.periodProposal = null;
     this.submissions = [];
     this.lastBlocksRoot = null;
     this.lastPeriodRoot = null;
+    this.lastProcessedPeriodRoot = GENESIS;
 
     this.handleEvents = handleEvents({
       NewDeposit: ({ returnValues: event }) => {
@@ -162,7 +164,7 @@ module.exports = class BridgeState {
         logBridge(`MinGasPrice. minGasPrice: ${event.minGasPrice}`);
         this.minGasPrices.push(Number(event.minGasPrice));
       },
-      Submission: ({ returnValues: event }) => {
+      Submission: async ({ returnValues: event }) => {
         logBridge(
           `Submission. blocksRoot: ${event.blocksRoot} periodRoot: ${event.periodRoot}` +
             ` slotId: ${event.slotId} validator: ${event.owner} casBitmap: ${event.casBitmap}`
@@ -170,31 +172,29 @@ module.exports = class BridgeState {
         this.lastBlocksRoot = event.blocksRoot;
         this.lastPeriodRoot = event.periodRoot;
 
-        let proposal;
-        if (
-          this.periodProposal &&
-          this.periodProposal.blocksRoot === event.blocksRoot
-        ) {
-          proposal = this.periodProposal;
-        }
-
-        if (
-          this.stalePeriodProposal &&
-          this.stalePeriodProposal.blocksRoot === event.blocksRoot
-        ) {
-          proposal = this.stalePeriodProposal;
-          this.periodProposal.prevPeriodRoot = event.periodRoot;
-        }
-
-        if (this.isReplay()) return;
-        const blockHeight = proposal.height - 1;
-        const [periodStart] = Period.periodBlockRange(blockHeight);
-        this.submissions.push({
-          periodStart,
+        const submission = {
           casBitmap: event.casBitmap,
           slotId: event.slotId,
           validatorAddress: event.owner,
-        });
+          blocksRoot: event.blocksRoot,
+          periodRoot: event.periodRoot,
+        };
+
+        if (
+          this.periodProposal &&
+          this.stalePeriodProposal &&
+          this.stalePeriodProposal.blocksRoot === event.blocksRoot
+        ) {
+          this.periodProposal.prevPeriodRoot = event.periodRoot;
+          await saveSubmission(this.stalePeriodProposal, submission, this.db);
+        } else if (
+          this.periodProposal &&
+          this.periodProposal.blocksRoot === event.blocksRoot
+        ) {
+          await saveSubmission(this.periodProposal, submission, this.db);
+        } else {
+          this.submissions[event.blocksRoot] = submission;
+        }
       },
     });
 
@@ -225,10 +225,12 @@ module.exports = class BridgeState {
     ];
 
     const nodeState = (await this.db.getNodeState()) || {};
+    logVerbose(`Restored node state`, nodeState);
     this.periodProposal = nodeState.periodProposal || null;
-    this.stalePeriodProposal = nodeState.stalePeriodProposal || null;
+    this.stalePeriodProposal = await this.db.getStalePeriodProposal();
     this.lastSeenRootChainBlock =
       nodeState.rootChainBlockAtProposal || this.genesisBlockHeight;
+    this.blockHeight = nodeState.blockHeight;
 
     logNode(`Syncing events from height ${this.lastSeenRootChainBlock}...`);
     this.eventsSubscription = new ContractsEventsSubscription(
@@ -237,15 +239,18 @@ module.exports = class BridgeState {
       this.eventsBuffer,
       this.lastSeenRootChainBlock
     );
+
     const blockNumber = await this.web3.eth.getBlockNumber();
+
+    const periodPrevHash =
+      nodeState.lastSeenBlocksRoot || this.lastBlocksRoot || GENESIS;
+    logNode('Current period prev root:', periodPrevHash);
+    this.currentPeriod = new Period(periodPrevHash);
+
     await this.eventsSubscription.init();
     await this.onNewBlock(blockNumber);
-    if (this.lastBlockSynced === 0) {
+    if (periodPrevHash === GENESIS) {
       await this.initBlocks();
-    }
-
-    if (this.lastBlocksRoot && this.lastPeriodRoot) {
-      this.currentPeriod = new Period(this.lastBlocksRoot);
     }
 
     this.exitEventSubscription = new ContractsEventsSubscription(
@@ -300,25 +305,12 @@ module.exports = class BridgeState {
     }
   }
 
-  isReplay() {
-    return (
-      !this.currentPeriod ||
-      !this.currentPeriod.blockList.length ||
-      this.currentPeriod.merkleRoot() === this.lastBlocksRoot
-    );
-  }
-
   async saveNodeState() {
-    if (!this.submissions.length) return;
-    await this.db.storePeriods(this.submissions);
-    this.submissions = [];
-  }
-
-  async savePeriodProposals() {
     return this.db.storeNodeState({
       periodProposal: this.periodProposal,
-      stalePeriodProposal: this.stalePeriodProposal,
       rootChainBlockAtProposal: this.lastSeenRootChainBlock,
+      lastSeenBlocksRoot: this.lastBlocksRoot,
+      blockHeight: this.currentState.blockHeight,
     });
   }
 
@@ -331,12 +323,12 @@ module.exports = class BridgeState {
     return this.db.getLastSeenRootChainBlock() || this.genesisBlockHeight;
   }
 
-  async saveState() {
+  async saveConsensusState() {
     this.currentState.blockHeight = this.blockHeight;
     await this.db.storeChainState(this.currentState);
   }
 
-  async loadState() {
+  async loadConsensusState() {
     const res = await this.db.getChainState();
     this.currentState = res || {
       blockHeight: 0,

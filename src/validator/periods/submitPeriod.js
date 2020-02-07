@@ -14,7 +14,7 @@ const isAlreadyVoted = require('./isAlreadyVoted');
 module.exports = async (periodProposal, bridgeState, opts = {}) => {
   const defaultResponse = { receiptPromise: Promise.resolve() };
   const { proposerSlotId, blocksRoot, prevPeriodRoot } = periodProposal;
-  const { currentState, lastBlocksRoot, lastPeriodRoot } = bridgeState;
+  const { currentState } = bridgeState;
   const { slots } = currentState;
 
   logPeriod(
@@ -24,21 +24,9 @@ module.exports = async (periodProposal, bridgeState, opts = {}) => {
     prevPeriodRoot
   );
 
-  if (lastBlocksRoot === blocksRoot) {
-    // check if the period is already onchain
-    const submittedPeriod = await bridgeState.bridgeContract.methods
-      .periods(lastPeriodRoot)
-      .call();
+  if (await bridgeState.db.getPeriodDataByBlocksRoot(blocksRoot)) {
+    logPeriod('[submitPeriod] already seen onchain', blocksRoot);
 
-    if (submittedPeriod.timestamp === '0') {
-      throw new Error('No period found onchain for bridgeState.lastBlocksRoot');
-    }
-
-    logPeriod(
-      '[submitPeriod] already seen onchain',
-      lastPeriodRoot,
-      submittedPeriod
-    );
     return { receiptPromise: Promise.resolve({ status: true }) };
   }
 

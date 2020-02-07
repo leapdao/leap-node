@@ -1,28 +1,30 @@
-const { logPeriod } = require('../utils/debug');
 const startNewPeriod = require('./periods/startNewPeriod');
 const submitPeriod = require('./periods/submitPeriod');
+const saveSubmission = require('../utils/saveSubmission');
 
 module.exports = async (height, bridgeState) => {
-  if (bridgeState.isReplay()) return;
-
-  if (
-    bridgeState.stalePeriodProposal &&
-    bridgeState.lastBlocksRoot === bridgeState.stalePeriodProposal.blocksRoot
-  ) {
-    logPeriod('Found successful submission tx for stale period proposal');
-    bridgeState.stalePeriodProposal = null;
-  }
-
-  if (bridgeState.periodProposal) {
-    if (bridgeState.lastBlocksRoot === bridgeState.periodProposal.blocksRoot) {
-      logPeriod('Period is found onchain', bridgeState.lastPeriodRoot);
-      bridgeState.periodProposal = null;
-    } else if (!bridgeState.periodProposal.txHash) {
-      await submitPeriod(bridgeState.periodProposal, bridgeState);
-    }
-  }
-
   if (height % 32 === 0) {
     await startNewPeriod(height, bridgeState);
+  }
+
+  const { periodProposal } = bridgeState;
+
+  if (!periodProposal) return;
+
+  const submission = bridgeState.submissions[periodProposal.blocksRoot];
+  const submissionInDatabase = await bridgeState.db.getPeriodDataByBlocksRoot(
+    periodProposal.blocksRoot
+  );
+
+  if (submission || submissionInDatabase) {
+    if (!submissionInDatabase) {
+      await saveSubmission(periodProposal, submission, bridgeState.db);
+    }
+    const { blocksRoot, periodRoot } = submission || submissionInDatabase;
+    delete bridgeState.submissions[blocksRoot];
+    bridgeState.lastProcessedPeriodRoot = periodRoot;
+    bridgeState.periodProposal = null;
+  } else if (!periodProposal.txHash) {
+    await submitPeriod(periodProposal, bridgeState);
   }
 };
