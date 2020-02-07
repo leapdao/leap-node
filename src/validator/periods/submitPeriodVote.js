@@ -11,8 +11,6 @@ const { getSlotsByAddr } = require('../../utils');
 const isAlreadyVoted = require('./isAlreadyVoted');
 
 module.exports = async (periodBlocksRoot, periodProposal, bridgeState) => {
-  if (bridgeState.isReplay()) return;
-
   const { account, sender, currentState } = bridgeState;
   const mySlots = getSlotsByAddr(currentState.slots, account.address);
 

@@ -38,9 +38,12 @@ module.exports = bridgeState => async (rsp, state, chainInfo) => {
 
   const { txHash } = periodProposal;
 
-  if (bridgeState.lastBlocksRoot === periodProposal.blocksRoot) {
+  if (
+    await bridgeState.db.getPeriodDataByBlocksRoot(periodProposal.blocksRoot)
+  ) {
     logPeriod('[checkBridge] Found successful submission tx');
     bridgeState.stalePeriodProposal = null;
+    bridgeState.db.setStalePeriodProposal(null);
     rsp.status = 1;
     return;
   }
@@ -94,25 +97,7 @@ module.exports = bridgeState => async (rsp, state, chainInfo) => {
     }
   }
 
-  // use a timeout to relax race conditions (if period submission is fast)
-  await new Promise(resolve => {
-    setTimeout(async () => {
-      const { receiptPromise } = await submitPeriod(
-        periodProposal,
-        bridgeState,
-        txOpts
-      );
+  bridgeState.db.setStalePeriodProposal(periodProposal);
 
-      receiptPromise.then(receipt => {
-        if (!receipt || !receipt.status) {
-          rsp.status = 0;
-        }
-        if (receipt && receipt.status) {
-          rsp.status = 1;
-        }
-      });
-
-      resolve();
-    }, 300);
-  });
+  await submitPeriod(periodProposal, bridgeState, txOpts);
 };
