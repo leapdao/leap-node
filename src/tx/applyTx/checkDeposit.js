@@ -9,40 +9,41 @@ const { Type } = require('leap-core');
 const { BigInt, equal, lessThan } = require('jsbi-utils');
 const { isNFT, isNST, addrCmp } = require('../../utils');
 
-module.exports = (state, tx, bridgeState) => {
+module.exports = (state, tx, bridgeState, nodeConfig, isCheck) => {
   if (tx.type !== Type.DEPOSIT) {
     throw new Error('Deposit tx expected');
   }
 
-  if (tx.options.depositId <= state.processedDeposit) {
-    throw new Error('Deposit ID already used.');
-  }
-  if (tx.options.depositId > state.processedDeposit + 1) {
-    throw new Error(
-      `Deposit ID skipping ahead. want ${state.processedDeposit + 1}, found ${
-        tx.options.depositId
-      }`
-    );
+  const deposit = bridgeState.deposits[tx.options.depositId];
+
+  if (!deposit) {
+    throw new Error('Unexpected deposit: no Deposit event on the root chain');
   }
 
-  const txColor = tx.outputs[0].color;
-  if (
-    !isNFT(txColor) &&
-    !isNST(txColor) &&
-    lessThan(BigInt(tx.outputs[0].value), BigInt(1))
-  ) {
+  if (deposit.included) {
+    throw new Error('Deposit ID already used.');
+  }
+
+  const { color, value, address, data } = tx.outputs[0];
+
+  if (!isNFT(color) && !isNST(color) && lessThan(BigInt(value), BigInt(1))) {
     throw new Error('Deposit out has value < 1');
   }
-  const deposit = bridgeState.deposits[tx.options.depositId];
+
   if (
-    !deposit ||
-    !equal(BigInt(deposit.amount), BigInt(tx.outputs[0].value)) ||
-    Number(deposit.color) !== txColor ||
-    !addrCmp(deposit.depositor, tx.outputs[0].address) ||
+    !equal(BigInt(deposit.amount), BigInt(value)) ||
+    Number(deposit.color) !== color ||
+    !addrCmp(deposit.depositor, address) ||
     // NFTs do not have data :)
-    (isNST(txColor) && deposit.data !== tx.outputs[0].data)
+    (isNST(color) && deposit.data !== data)
   ) {
-    throw new Error('Trying to submit incorrect deposit');
+    throw new Error(
+      `Incorrect deposit tx. DepositId: ${tx.options.depositId} ` +
+        `Expected: ${deposit.color}:${deposit.amount}:${deposit.depositor}:${deposit.data} ` +
+        `Actual: ${color}:${value}:${address}:${data}`
+    );
   }
-  state.processedDeposit += 1;
+  if (!isCheck) {
+    deposit.included = true;
+  }
 };

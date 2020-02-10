@@ -23,13 +23,13 @@ const checks = {
   [Type.PERIOD_VOTE]: require('./checkPeriodVote'),
 };
 
-module.exports = async (state, tx, bridgeState, nodeConfig) => {
+module.exports = async (state, tx, bridgeState, nodeConfig, isCheck) => {
   if (!checks[tx.type]) {
     throw new Error('Unsupported tx type');
   }
 
   checkOutpoints(state, tx);
-  await checks[tx.type](state, tx, bridgeState, nodeConfig);
+  await checks[tx.type](state, tx, bridgeState, nodeConfig, isCheck);
 
   removeInputs(state, tx);
   addOutputs(state, tx);

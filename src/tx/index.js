@@ -22,7 +22,7 @@ module.exports = (bridgeState, nodeConfig) => async (
   const printedTx = printTx(state, tx);
 
   try {
-    await applyTx(state, tx, bridgeState, nodeConfig);
+    await applyTx(state, tx, bridgeState, nodeConfig, isCheck);
     accumulateTx(state, tx);
   } catch (err) {
     logError(err.message || err);
