@@ -6,7 +6,6 @@
  */
 
 const { Type } = require('leap-core');
-const { BigInt, equal } = require('jsbi-utils');
 
 module.exports = (state, tx, bridgeState) => {
   if (tx.type !== Type.MIN_GAS_PRICE) {
@@ -14,10 +13,8 @@ module.exports = (state, tx, bridgeState) => {
   }
 
   if (
-    !equal(
-      BigInt(bridgeState.minGasPrices[state.gas.minPriceIndex + 1]),
-      BigInt(tx.options.minGasPrice)
-    )
+    BigInt(bridgeState.minGasPrices[state.gas.minPriceIndex + 1]) !==
+    BigInt(tx.options.minGasPrice)
   ) {
     throw new Error('Wrong minGasPrice');
   }

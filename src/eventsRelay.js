@@ -6,7 +6,6 @@
  */
 
 const { Tx, Input, Outpoint } = require('leap-core');
-const { BigInt } = require('jsbi-utils');
 const TinyQueue = require('tinyqueue');
 
 const { handleEvents } = require('./utils');
