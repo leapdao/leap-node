@@ -1,4 +1,3 @@
-const Web3 = require('web3');
 const axios = require('axios');
 const getRootGasPrice = require('./getRootGasPrice');
 
