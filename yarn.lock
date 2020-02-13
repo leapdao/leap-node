@@ -4515,10 +4515,10 @@ kleur@^3.0.2:
   resolved "https://registry.yarnpkg.com/kleur/-/kleur-3.0.3.tgz#a79c9ecc86ee1ce3fa6206d1216c501f147fc07e"
   integrity sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==
 
-leap-core@^3.0.0-beta.0:
-  version "3.0.0-beta.0"
-  resolved "https://registry.yarnpkg.com/leap-core/-/leap-core-3.0.0-beta.0.tgz#34d02068010563d622861ddf66e7abd64567aac7"
-  integrity sha512-wLL1eBaXQ+ID0kOYnFsCeldXU4aRL6I8o5bK7JLQgX1yUTNuMlMBGMb6snFQ3VWYOtktsCpgPOfm0l3AnWXy+g==
+leap-core@^3.0.0-beta.1:
+  version "3.0.0-beta.1"
+  resolved "https://registry.yarnpkg.com/leap-core/-/leap-core-3.0.0-beta.1.tgz#d3e3531a3fd086176e65836e117901601a77ad82"
+  integrity sha512-nd6og467eeyw15/IbX54pXN5JGVVL4xaPIKKrax4I5wlzLDV9smshefPSmq7yW6zvM5cuIUzlDK2vPynKjBdYA==
   dependencies:
     "@types/web3" "^1.0.18"
     ethereumjs-util "6.0.0"
