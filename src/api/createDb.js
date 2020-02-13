@@ -1,3 +1,7 @@
+const { Util } = require('leap-core');
+
+const { fromJSON, toJSON } = Util;
+
 const createDb = levelDb => {
   /*
    * Returns last synced block number from the db. If there is no such a number, returns 0
@@ -24,7 +28,7 @@ const createDb = levelDb => {
         value.logs = [...logsCache[txHash]]; // copy array
         delete logsCache[txHash];
       }
-      dbOpsBatch.put(txKey, JSON.stringify(value));
+      dbOpsBatch.put(txKey, toJSON(value));
 
       // create 'utxoId → tx' index
       tx.inputs
@@ -35,7 +39,7 @@ const createDb = levelDb => {
 
     dbOpsBatch.put(
       `block!${block.hash()}`,
-      JSON.stringify({
+      toJSON({
         blockData: block.toJSON(),
         height: block.height,
       })
@@ -59,7 +63,7 @@ const createDb = levelDb => {
         if (jsonStr === null || jsonStr === undefined) return null;
         if (jsonStr.indexOf && jsonStr.indexOf('0x') === 0) return jsonStr;
         try {
-          return JSON.parse(jsonStr);
+          return fromJSON(jsonStr);
         } catch (e) {
           return jsonStr;
         }
@@ -105,7 +109,7 @@ const createDb = levelDb => {
    * Saves the `BridgeState.currentState`
    */
   const storeChainState = async state => {
-    await levelDb.put('chainState', JSON.stringify(state));
+    await levelDb.put('chainState', toJSON(state));
   };
 
   const getNodeState = () => {
@@ -113,7 +117,7 @@ const createDb = levelDb => {
   };
 
   const storeNodeState = async state => {
-    await levelDb.put('nodeState', JSON.stringify(state));
+    await levelDb.put('nodeState', toJSON(state));
   };
 
   const getPeriodData = periodStart => getNullable(`period!${periodStart}`);
@@ -137,7 +141,7 @@ const createDb = levelDb => {
     const dbOpsBatch = levelDb.batch();
     const key = `period!${periodStartHeight}`;
     dbOpsBatch.put(`period!${submission.blocksRoot}`, key);
-    dbOpsBatch.put(key, JSON.stringify(submission));
+    dbOpsBatch.put(key, toJSON(submission));
 
     return new Promise(resolve => {
       dbOpsBatch.write(resolve);
@@ -157,7 +161,7 @@ const createDb = levelDb => {
     levelDb.put('lastSeenRootChainBlock', blockHeight);
 
   const setStalePeriodProposal = periodProposal =>
-    levelDb.put('stalePeriodProposal', JSON.stringify(periodProposal));
+    levelDb.put('stalePeriodProposal', toJSON(periodProposal));
 
   const getStalePeriodProposal = () => getNullable('stalePeriodProposal');
 
