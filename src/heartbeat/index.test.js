@@ -34,10 +34,17 @@ describe('Heartbeat', () => {
   test('Start the service if config is correct', async () => {
     const bridgeStateMock = {
       config: {
-        heartbeat: { color: HEARTBEAT_COLOR },
+        heartbeat: {},
+      },
+      operatorContract: {
+        methods: {
+          heartbeatColor: () => ({
+            call: async () => HEARTBEAT_COLOR,
+          }),
+        },
       },
     };
-    heartbeat(bridgeStateMock);
+    await heartbeat(bridgeStateMock);
     expect(setTimeout).toHaveBeenCalledTimes(1);
     expect(setTimeout).toHaveBeenLastCalledWith(
       expect.any(Function),

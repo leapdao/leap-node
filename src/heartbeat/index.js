@@ -25,9 +25,12 @@ function updateConfig({ heartbeat = {} }) {
   return { ...defaults, ...heartbeat };
 }
 
-module.exports = (bridgeState, sender) => {
+module.exports = async (bridgeState, sender) => {
   bridgeState.config.heartbeat = updateConfig(bridgeState.config);
-  if (bridgeState.config.heartbeat.color) {
+  const color = await bridgeState.operatorContract.methods
+    .heartbeatColor()
+    .call();
+  if (color) {
     setTimeout(
       () => loop(bridgeState, sender),
       bridgeState.config.heartbeat.period
