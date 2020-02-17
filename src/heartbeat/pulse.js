@@ -3,10 +3,13 @@ const { Tx, Input, Outpoint, Output } = require('leap-core');
 const getUnspent = require('../api/methods/getUnspent');
 
 module.exports = async (bridgeState, { send }) => {
+  const heartbeatColor = await bridgeState.operatorContract.methods
+    .heartbeatColor()
+    .call();
   const [nft] = await getUnspent(
     bridgeState,
     bridgeState.account.address,
-    bridgeState.config.heartbeat.color
+    heartbeatColor
   );
 
   if (nft) {
@@ -16,7 +19,7 @@ module.exports = async (bridgeState, { send }) => {
         new Output(
           nft.output.value,
           bridgeState.account.address,
-          bridgeState.config.heartbeat.color
+          heartbeatColor
         ),
       ]
     );
