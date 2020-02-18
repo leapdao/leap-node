@@ -10,13 +10,6 @@ const bridgeStateMock = {
   config: {
     heartbeat: { ...defaults, color: HEARTBEAT_COLOR },
   },
-  operatorContract: {
-    methods: {
-      heartbeatColor: () => ({
-        call: async () => HEARTBEAT_COLOR,
-      }),
-    },
-  },
 };
 
 jest.useFakeTimers();
