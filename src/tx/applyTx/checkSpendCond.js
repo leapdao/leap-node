@@ -489,7 +489,7 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
       // ? ERC721(tokenId) : ERC20(transferAmount)
       const transferAmount = isNFT(originColor)
         ? BigInt(tokenId)
-        : BigInt(`0x${data.toString('hex')}`, 16);
+        : BigInt(`0x${data.toString('hex')}`);
 
       if (isNFT(originColor) || isNST(originColor)) {
         logOuts.push(new Output(transferAmount, toAddr, originColor));
