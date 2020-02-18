@@ -4,6 +4,8 @@ const jayson = require('jayson');
 const jsonParser = require('body-parser').json;
 const WsJsonRpcServer = require('rpc-websockets').Server;
 
+const { Util } = require('leap-core');
+
 const getMethods = require('./methods');
 
 const api = express();
@@ -31,7 +33,14 @@ module.exports = async (bridgeState, tendermintPort, db, app) => {
     tendermintPort
   );
 
-  api.use(jayson.server(methodsWithCallback).middleware());
+  api.use(
+    jayson
+      .server(methodsWithCallback, {
+        reviver: (_, value) => Util.fromJSON(JSON.stringify(value)),
+        replacer: (_, value) => JSON.parse(Util.toJSON(value)),
+      })
+      .middleware()
+  );
 
   return {
     listenHttp: async ({ host, port }) => {
