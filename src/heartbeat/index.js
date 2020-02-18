@@ -31,6 +31,7 @@ module.exports = async (bridgeState, sender) => {
     .heartbeatColor()
     .call();
   if (heartbeatColor) {
+    bridgeState.config.heartbeat.color = heartbeatColor;
     setTimeout(
       () => loop(bridgeState, sender),
       bridgeState.config.heartbeat.period

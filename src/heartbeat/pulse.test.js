@@ -43,15 +43,8 @@ const bridgeStateMock = {
     address: ADDR,
     privateKey: PRIV,
   },
-  operatorContract: {
-    methods: {
-      heartbeatColor: () => ({
-        call: async () => HEARTBEAT_COLOR,
-      }),
-    },
-  },
   config: {
-    heartbeat: {},
+    heartbeat: { color: HEARTBEAT_COLOR },
   },
 };
 
