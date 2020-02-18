@@ -1,4 +1,3 @@
-const Web3 = require('web3');
 const axios = require('axios');
 const getRootGasPrice = require('./getRootGasPrice');
 
@@ -20,9 +19,17 @@ axios.get.mockResolvedValue({
   },
 });
 
+const mockWeb3 = (networkId = 1) => ({
+  eth: {
+    net: {
+      getId: () => networkId,
+    },
+  },
+});
+
 describe('getRootGasPrice', () => {
   describe('mainnet', () => {
-    const web3 = new Web3('https://mainnet.infura.io');
+    const web3 = mockWeb3();
 
     test('reads "fast" gas price by default from gas station API', async () => {
       const result = await getRootGasPrice(web3);
@@ -55,7 +62,14 @@ describe('getRootGasPrice', () => {
   });
 
   test('returns null for non-mainnet networks', async () => {
-    const result = await getRootGasPrice(new Web3('https://rinkeby.infura.io'));
+    const rinkebyWeb3 = {
+      eth: {
+        net: {
+          getId: () => 4,
+        },
+      },
+    };
+    const result = await getRootGasPrice(rinkebyWeb3);
     expect(result).toBeNull();
   });
 });
