@@ -108,7 +108,7 @@ async function run() {
     unspent: 'redacted for shortness',
   });
 
-  heartbeatService(bridgeState, sender);
+  await heartbeatService(bridgeState, sender);
 
   app.listen(lastGoodState).then(async params => {
     blockTicker.subscribe(eventsRelay.onNewBlock);

@@ -2,6 +2,20 @@ module.exports = [
   {
     constant: true,
     inputs: [],
+    name: 'heartbeatColor',
+    outputs: [
+      {
+        name: '',
+        type: 'uint16',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
     name: 'casChallengeDuration',
     outputs: [
       {
