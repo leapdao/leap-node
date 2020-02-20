@@ -1,5 +1,4 @@
 const { INVALID_PARAMS } = require('./constants');
-const { BigInt } = require('jsbi-utils');
 
 module.exports = async (bridgeState, address, tag = 'latest') => {
   if (tag !== 'latest') {

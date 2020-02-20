@@ -1,7 +1,6 @@
 const getColor = require('./getColor');
 const { INVALID_PARAMS } = require('./constants');
 const { isNFT, isNST } = require('../../utils');
-const { BigInt } = require('jsbi-utils');
 
 const formatUint256 = n => `0x${n.toString(16).padStart(64, '0')}`;
 

@@ -6,26 +6,18 @@
  */
 
 const { Outpoint, Type } = require('leap-core');
-const {
-  BigInt,
-  add,
-  subtract,
-  divide,
-  lessThan,
-  greaterThan,
-} = require('jsbi-utils');
 const { isNFT, isNST } = require('../../utils');
 const { uniq, isEqual } = require('lodash');
 
 const groupValuesByColor = (values, { color, value }) => {
-  if (!isNFT(color) && !isNST(color) && lessThan(BigInt(value), BigInt(1))) {
+  if (!isNFT(color) && !isNST(color) && BigInt(value) < 1n) {
     throw new Error('One of the outs has value < 1');
   }
   return Object.assign({}, values, {
     [color]:
       isNFT(color) || isNST(color)
         ? (values[color] || new Set()).add(BigInt(value))
-        : add(values[color] || BigInt(0), BigInt(value)),
+        : (values[color] || 0n) + BigInt(value),
   });
 };
 
@@ -46,23 +38,23 @@ const checkInsAndOuts = (tx, state, bridgeState, unspentFilter) => {
   const minGasPrice = BigInt(state.gas.minPrice);
   const gas = Math.max(0, tx.outputs.length * 20000 - tx.inputs.length * 10000);
   for (const color of colors) {
-    const inputValue = insValues[color] || BigInt(0);
-    const outputValue = outsValues[color] || BigInt(0);
+    const inputValue = insValues[color] || 0n;
+    const outputValue = outsValues[color] || 0n;
     if (
       color === 0 &&
       gas > 0 &&
-      greaterThan(minGasPrice, 0) &&
+      minGasPrice > 0n &&
       tx.type === Type.TRANSFER
     ) {
-      const txGasPrice = divide(subtract(inputValue, outputValue), BigInt(gas));
-      if (lessThan(txGasPrice, minGasPrice)) {
+      const txGasPrice = (inputValue - outputValue) / BigInt(gas);
+      if (txGasPrice < minGasPrice) {
         throw new Error(`Tx underpriced`);
       }
     }
     const isNFTByColor = isNFT(color) || isNST(color);
     if (
       (isNFTByColor && !isEqual(inputValue, outputValue)) ||
-      (!isNFTByColor && greaterThan(outputValue, inputValue))
+      (!isNFTByColor && outputValue > inputValue)
     ) {
       throw new Error(`Ins and outs values are mismatch for color ${color}`);
     }
@@ -100,10 +92,7 @@ const addOutputs = ({ balances, owners, unspent }, tx) => {
       cOwners[out.value] = out.address;
     } else {
       cBalances[out.address] = BigInt(cBalances[out.address] || 0);
-      cBalances[out.address] = add(
-        cBalances[out.address],
-        out.value
-      ).toString();
+      cBalances[out.address] = (cBalances[out.address] + out.value).toString();
     }
     unspent[outpoint.hex()] = out.toJSON();
   });
@@ -120,9 +109,8 @@ const removeInputs = ({ unspent, balances, owners }, tx) => {
       balances[color][address].splice(index, 1);
       delete owners[color][BigInt(value).toString()];
     } else {
-      balances[color][address] = subtract(
-        BigInt(balances[color][address]),
-        BigInt(value)
+      balances[color][address] = (
+        BigInt(balances[color][address]) - BigInt(value)
       ).toString();
     }
     delete unspent[outpointId];

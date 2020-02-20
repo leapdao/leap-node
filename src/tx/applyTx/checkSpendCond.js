@@ -9,14 +9,6 @@ const { Type, Output } = require('leap-core');
 const Transaction = require('ethereumjs-tx');
 const VM = require('ethereumjs-vm');
 const utils = require('ethereumjs-util');
-const {
-  BigInt,
-  multiply,
-  add,
-  subtract,
-  lessThan,
-  greaterThan,
-} = require('jsbi-utils');
 const isEqual = require('lodash/isEqual');
 const getColors = require('../../api/methods/getColors');
 const {
@@ -76,11 +68,11 @@ const ERC1948_DATA_UPDATED_EVENT = Buffer.from(
 );
 
 // 6 mil as gas limit
-const GAS_LIMIT = BigInt(6000000);
+const GAS_LIMIT = 6000000n;
 const GAS_LIMIT_HEX = `0x${GAS_LIMIT.toString(16)}`;
 
 // fixed value until we get support for it in the transaction format
-const FIXED_GAS_PRICE = BigInt(142);
+const FIXED_GAS_PRICE = 142n;
 
 const iterateBag = (tokenBag, cb) => {
   Object.entries(tokenBag).forEach(([originAddr]) => {
@@ -214,10 +206,7 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
       if (!tokenBag[contractAddrStr][unspent.address]) {
         tokenBag[contractAddrStr][unspent.address] = BigInt(unspent.value);
       } else {
-        tokenBag[contractAddrStr][unspent.address] = add(
-          tokenBag[contractAddrStr][unspent.address],
-          BigInt(unspent.value)
-        );
+        tokenBag[contractAddrStr][unspent.address] += BigInt(unspent.value);
       }
     }
 
@@ -500,29 +489,23 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
       // ? ERC721(tokenId) : ERC20(transferAmount)
       const transferAmount = isNFT(originColor)
         ? BigInt(tokenId)
-        : BigInt(`0x${data.toString('hex')}`, 16);
+        : BigInt(`0x${data.toString('hex')}`);
 
       if (isNFT(originColor) || isNST(originColor)) {
         logOuts.push(new Output(transferAmount, toAddr, originColor));
         nftBag[originAddr][tokenId].touched = true;
       } else {
-        tokenBag[originAddr][fromAddr] = subtract(
-          tokenBag[originAddr][fromAddr],
-          transferAmount
-        );
+        tokenBag[originAddr][fromAddr] -= transferAmount;
         if (!tokenBag[originAddr][toAddr]) {
-          tokenBag[originAddr][toAddr] = BigInt(0);
+          tokenBag[originAddr][toAddr] = 0n;
         }
-        tokenBag[originAddr][toAddr] = add(
-          tokenBag[originAddr][toAddr],
-          transferAmount
-        );
+        tokenBag[originAddr][toAddr] += transferAmount;
       }
     }
   });
   // itterate over tokenBag, add all leftovers to outputs
   iterateBag(tokenBag, (originAddr, owner, amount) => {
-    if (greaterThan(amount, BigInt(0))) {
+    if (amount > 0n) {
       logOuts.push(new Output(amount, owner, deployed[originAddr]));
     }
   });
@@ -544,7 +527,7 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
     bridgeState.minGasPrices[bridgeState.minGasPrices.length - 1]
   );
 
-  if (lessThan(gasPrice, minGasPrice)) {
+  if (gasPrice < minGasPrice) {
     return Promise.reject(
       new Error(
         `tx gasPrice ${gasPrice.toString()} less than minGasPrice: ${minGasPrice.toString()}`
@@ -552,12 +535,8 @@ module.exports = async (state, tx, bridgeState, nodeConfig = {}) => {
     );
   }
 
-  const gasChange = subtract(
-    BigInt(spendingInputUnspent.value),
-    multiply(gasPrice, gasUsed)
-  );
-
-  if (lessThan(gasChange, BigInt(0))) {
+  const gasChange = BigInt(spendingInputUnspent.value) - gasPrice * gasUsed;
+  if (gasChange < 0n) {
     throw new Error(
       'Not enough input for spending condition to cover gas costs'
     );

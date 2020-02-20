@@ -57,10 +57,8 @@
     "get-port": "^3.1.0",
     "graceful-fs": "^4.2.3",
     "jayson": "^2.0.6",
-    "jsbi": "^3.0.0",
-    "jsbi-utils": "^1.0.0",
     "jsondiffpatch": "^0.2.5",
-    "leap-core": "^2.0.0-preview.1",
+    "leap-core": "^3.0.0",
     "level": "^6.0.0",
     "lodash": "^4.17.13",
     "lodash.get": "^4.4.2",
@@ -76,7 +74,7 @@
     "web3-core-promievent": "^1.2.4"
   },
   "devDependencies": {
-    "babel-eslint": "^10.0.1",
+    "babel-eslint": "^10.0.3",
     "eslint": "^4.19.1",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-config-airbnb-base": "^12.1.0",
@@ -85,7 +83,7 @@
     "eslint-plugin-jest": "^21.17.0",
     "eslint-plugin-prettier": "^3.1.2",
     "husky": "^0.14.3",
-    "jest": "^24.8.0",
+    "jest": "^25.1.0",
     "lint-staged": "^7.0.5",
     "prettier": "^1.12.1"
   },
@@ -112,6 +110,7 @@
       "src/txHelpers/printTx.js",
       "src/txHelpers/sendTx.js",
       "src/txHelpers/delayedSender.js",
+      "src/txHelpers/activateSlot.js",
       "src/api/jsonrpc.js",
       "src/api/db.js",
       "src/api/methods/getAddress.js",

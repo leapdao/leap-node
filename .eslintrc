@@ -24,5 +24,8 @@
   "plugins": [
     "jest",
     "prettier"
-  ]
+  ],
+  "globals": {
+    "BigInt": true
+  }
 }

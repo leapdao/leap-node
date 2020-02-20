@@ -6,7 +6,6 @@
  */
 
 const { Type } = require('leap-core');
-const { BigInt, equal, lessThan } = require('jsbi-utils');
 const { isNFT, isNST, addrCmp } = require('../../utils');
 
 module.exports = (state, tx, bridgeState, nodeConfig, isCheck) => {
@@ -26,12 +25,12 @@ module.exports = (state, tx, bridgeState, nodeConfig, isCheck) => {
 
   const { color, value, address, data } = tx.outputs[0];
 
-  if (!isNFT(color) && !isNST(color) && lessThan(BigInt(value), BigInt(1))) {
+  if (!isNFT(color) && !isNST(color) && BigInt(value) < 1n) {
     throw new Error('Deposit out has value < 1');
   }
 
   if (
-    !equal(BigInt(deposit.amount), BigInt(value)) ||
+    BigInt(deposit.amount) !== BigInt(value) ||
     Number(deposit.color) !== color ||
     !addrCmp(deposit.depositor, address) ||
     // NFTs do not have data :)

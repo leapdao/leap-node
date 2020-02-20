@@ -6,7 +6,6 @@
  */
 
 const { Type } = require('leap-core');
-const { BigInt, equal } = require('jsbi-utils');
 const { addrCmp, isNST } = require('../../utils');
 
 module.exports = (state, tx, bridgeState) => {
@@ -25,7 +24,7 @@ module.exports = (state, tx, bridgeState) => {
     !unspent ||
     !exit ||
     !addrCmp(exit.exitor, unspent.address) ||
-    !equal(BigInt(exit.amount), BigInt(unspent.value)) ||
+    BigInt(exit.amount) !== BigInt(unspent.value) ||
     Number(exit.color) !== unspent.color ||
     // only NSTs can have data
     (isNST(exit.color) && exit.data !== unspent.data)

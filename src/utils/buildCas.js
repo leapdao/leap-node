@@ -5,13 +5,7 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
-const { BigInt, leftShift, bitwiseOr } = require('jsbi');
-
 module.exports = slotIds =>
   slotIds
     .filter(k => k < 256)
-    .reduce(
-      (cas, slotId) =>
-        bitwiseOr(cas, leftShift(BigInt(1), BigInt(255 - slotId))),
-      BigInt(0)
-    );
+    .reduce((cas, slotId) => cas | (1n << BigInt(255 - slotId)), 0n);
