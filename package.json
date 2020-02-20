@@ -110,6 +110,7 @@
       "src/txHelpers/printTx.js",
       "src/txHelpers/sendTx.js",
       "src/txHelpers/delayedSender.js",
+      "src/txHelpers/activateSlot.js",
       "src/api/jsonrpc.js",
       "src/api/db.js",
       "src/api/methods/getAddress.js",
