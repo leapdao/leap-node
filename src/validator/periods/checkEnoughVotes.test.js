@@ -82,4 +82,15 @@ describe('checkEnoughVotes', () => {
       needed: 2,
     });
   });
+
+  test('should not account for logged out slots', () => {
+    // we have 5 slots (CAS quorum 4), but slot 2 is logged out, so the CAS quorum is 3
+    const slotsArray = slots(5);
+    slotsArray[1].activationEpoch = 6;
+    expect(checkEnoughVotes('0x123', proposal(5), slotsArray)).toEqual({
+      result: true,
+      votes: 5,
+      needed: 3,
+    });
+  });
 });

@@ -5,6 +5,8 @@
  * found in the LICENSE file in the root directory of this source tree.
  */
 
+const getActiveSlots = require('../../utils/getActiveSlots');
+
 /**
  * Checks if a given period root voted for by at least 2/3 of validator set
  * @returns {Object} Object with results like
@@ -14,7 +16,7 @@
  * - `needed` is a minimum number of votes needed for consensus
  */
 module.exports = (blocksRoot, periodProposal, slots) => {
-  const activeSlots = slots.filter(s => s);
+  const activeSlots = getActiveSlots(slots);
   const votes =
     periodProposal && periodProposal.blocksRoot === blocksRoot
       ? periodProposal.votes.length

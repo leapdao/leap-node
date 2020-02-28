@@ -7,9 +7,10 @@
 
 const submitPeriod = require('../validator/periods/submitPeriod');
 const { logPeriod } = require('../utils/debug');
+const getActiveSlots = require('../utils/getActiveSlots');
 
 const getNextSlotToProposeFrom = (periodProposal, bridgeState) => {
-  const activeSlots = bridgeState.currentState.slots.filter(s => s);
+  const activeSlots = getActiveSlots(bridgeState.currentState.slots);
   return (periodProposal.proposerSlotId + 1) % activeSlots.length;
 };
 
